@@ -1,16 +1,8 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
-```
-
-Sauvegarde avec **Ctrl+S** puis :
-```
-git add .
-```
-```
-git commit -m "fix vercel.json"
-```
-```
-git push
