@@ -11,26 +11,23 @@ function Generate() {
   const [cvFile, setCvFile] = useState(null)
   const [cvTexte, setCvTexte] = useState('')
   const [loading, setLoading] = useState(false)
-  const [cvGenere, setCvGenere] = useState('')
+  const [cvData, setCvData] = useState(null)
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0]
     if (!file) return
     setCvFile(file)
-
     const reader = new FileReader()
     reader.onload = async (event) => {
       const typedArray = new Uint8Array(event.target.result)
       const pdf = await pdfjsLib.getDocument(typedArray).promise
       let texteComplet = ''
-
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i)
         const content = await page.getTextContent()
         const texte = content.items.map(item => item.str).join(' ')
         texteComplet += texte + '\n'
       }
-
       setCvTexte(texteComplet)
     }
     reader.readAsArrayBuffer(file)
@@ -42,20 +39,17 @@ function Generate() {
       return
     }
     setLoading(true)
-    setCvGenere('')
+    setCvData(null)
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('/api/generate', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': import.meta.env.VITE_ANTHROPIC_API_KEY,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
-          max_tokens: 2000,
+          max_tokens: 3000,
           messages: [
             {
               role: 'user',
@@ -67,21 +61,52 @@ ${cvTexte}
 Voici l'offre d'emploi ciblée :
 ${offreEmploi}
 
-Génère un CV optimisé en français qui :
-1. Intègre naturellement les mots-clés importants de l'offre
-2. Restructure les expériences pour correspondre au poste
-3. Met en avant les compétences pertinentes
-4. Est optimisé pour passer les filtres ATS
-5. Reste authentique et professionnel
+Génère un CV optimisé et retourne UNIQUEMENT un objet JSON valide avec cette structure exacte, sans aucun commentaire ni texte avant ou après :
 
-Retourne uniquement le CV optimisé, sans commentaires.`
+{
+  "prenom": "...",
+  "nom": "...",
+  "titre": "...",
+  "email": "...",
+  "telephone": "...",
+  "ville": "...",
+  "linkedin": "...",
+  "accroche": "...",
+  "experiences": [
+    {
+      "poste": "...",
+      "entreprise": "...",
+      "periode": "...",
+      "lieu": "...",
+      "missions": ["...", "...", "..."]
+    }
+  ],
+  "formations": [
+    {
+      "diplome": "...",
+      "etablissement": "...",
+      "periode": "...",
+      "mention": "..."
+    }
+  ],
+  "competences": ["...", "...", "..."],
+  "langues": [
+    {
+      "langue": "...",
+      "niveau": "..."
+    }
+  ],
+  "atouts": ["...", "...", "..."]
+}`
             }
           ]
         })
       })
 
       const data = await response.json()
-      setCvGenere(data.content[0].text)
+      const texte = data.content[0].text
+      const json = JSON.parse(texte)
+      setCvData(json)
     } catch (error) {
       alert('Une erreur est survenue. Vérifie ta clé API.')
       console.error(error)
@@ -151,25 +176,83 @@ Retourne uniquement le CV optimisé, sans commentaires.`
           <div className="result-box">
             <div className="result-header">
               <span>Ton CV optimisé</span>
-              {cvGenere && (
-                <button
-                  className="btn-download"
-                  onClick={() => {
-                    const blob = new Blob([cvGenere], { type: 'text/plain' })
-                    const url = URL.createObjectURL(blob)
-                    const a = document.createElement('a')
-                    a.href = url
-                    a.download = 'mon-cv-optimise.txt'
-                    a.click()
-                  }}
-                >
-                  📥 Télécharger
-                </button>
-              )}
+              {cvData && <button className="btn-download">📥 Télécharger</button>}
             </div>
             <div className="result-content">
-              {cvGenere ? (
-                <div className="result-text">{cvGenere}</div>
+              {cvData ? (
+                <div className="cv-finance">
+                  <div className="cv-header-finance">
+                    <h1>{cvData.prenom} {cvData.nom}</h1>
+                    <h2>{cvData.titre}</h2>
+                    <div className="cv-contact">
+                      <span>📧 {cvData.email}</span>
+                      <span>📞 {cvData.telephone}</span>
+                      <span>📍 {cvData.ville}</span>
+                      {cvData.linkedin && <span>🔗 {cvData.linkedin}</span>}
+                    </div>
+                  </div>
+
+                  {cvData.accroche && (
+                    <div className="cv-section">
+                      <h3 className="cv-section-title">Profil</h3>
+                      <p className="cv-accroche">{cvData.accroche}</p>
+                    </div>
+                  )}
+
+                  <div className="cv-section">
+                    <h3 className="cv-section-title">Expériences professionnelles</h3>
+                    {cvData.experiences.map((exp, i) => (
+                      <div key={i} className="cv-exp">
+                        <div className="cv-exp-header">
+                          <div>
+                            <div className="cv-exp-poste">{exp.poste}</div>
+                            <div className="cv-exp-entreprise">{exp.entreprise} — {exp.lieu}</div>
+                          </div>
+                          <div className="cv-exp-periode">{exp.periode}</div>
+                        </div>
+                        <ul className="cv-missions">
+                          {exp.missions.map((m, j) => <li key={j}>{m}</li>)}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="cv-section">
+                    <h3 className="cv-section-title">Formation</h3>
+                    {cvData.formations.map((f, i) => (
+                      <div key={i} className="cv-exp">
+                        <div className="cv-exp-header">
+                          <div>
+                            <div className="cv-exp-poste">{f.diplome}</div>
+                            <div className="cv-exp-entreprise">{f.etablissement}</div>
+                          </div>
+                          <div className="cv-exp-periode">{f.periode}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="cv-bottom">
+                    <div className="cv-section">
+                      <h3 className="cv-section-title">Compétences</h3>
+                      <div className="cv-competences">
+                        {cvData.competences.map((c, i) => (
+                          <span key={i} className="cv-tag">{c}</span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="cv-section">
+                      <h3 className="cv-section-title">Langues</h3>
+                      {cvData.langues.map((l, i) => (
+                        <div key={i} className="cv-langue">
+                          <span>{l.langue}</span>
+                          <span className="cv-niveau">{l.niveau}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               ) : (
                 <div className="result-empty">
                   <div className="empty-icon">✨</div>
