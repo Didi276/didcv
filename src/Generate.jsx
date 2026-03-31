@@ -61,7 +61,14 @@ ${cvTexte}
 Voici l'offre d'emploi ciblée :
 ${offreEmploi}
 
-Génère un CV optimisé et retourne UNIQUEMENT un objet JSON valide avec cette structure exacte, sans aucun commentaire ni texte avant ou après :
+Génère un CV optimisé UNE PAGE MAXIMUM et retourne UNIQUEMENT un objet JSON valide avec cette structure exacte, sans aucun commentaire ni texte avant ou après.
+
+Règles strictes :
+- Maximum 3 expériences avec 3 missions chacune
+- Maximum 2 formations
+- Maximum 8 compétences
+- Accroche de 2 lignes maximum
+- Le tout doit tenir sur UNE SEULE PAGE A4
 
 {
   "prenom": "...",
