@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import jsPDF from 'jspdf'
+import html2canvas from 'html2canvas'
 import * as pdfjsLib from 'pdfjs-dist'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
@@ -121,7 +123,16 @@ const data = await response.json()
 
     setLoading(false)
   }
-
+const handleDownload = async () => {
+    const element = document.getElementById('cv-to-print')
+    const canvas = await html2canvas(element, { scale: 2 })
+    const imgData = canvas.toDataURL('image/png')
+    const pdf = new jsPDF('p', 'mm', 'a4')
+    const pdfWidth = pdf.internal.pageSize.getWidth()
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
+    pdf.save('mon-cv-didcv.pdf')
+  }
   return (
     <div className="generate-page">
       <nav>
@@ -183,11 +194,11 @@ const data = await response.json()
           <div className="result-box">
             <div className="result-header">
               <span>Ton CV optimisé</span>
-              {cvData && <button className="btn-download">📥 Télécharger</button>}
+              {cvData && <button className="btn-download" onClick={handleDownload}>📥 Télécharger PDF</button>}
             </div>
             <div className="result-content">
               {cvData ? (
-                <div className="cv-finance">
+                <<div className="cv-finance" id="cv-to-print">
                   <div className="cv-header-finance">
                     <h1>{cvData.prenom} {cvData.nom}</h1>
                     <h2>{cvData.titre}</h2>
