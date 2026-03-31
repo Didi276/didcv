@@ -102,10 +102,10 @@ Génère un CV optimisé et retourne UNIQUEMENT un objet JSON valide avec cette 
           ]
         })
       })
-
-      const data = await response.json()
+const data = await response.json()
       const texte = data.content[0].text
-      const json = JSON.parse(texte)
+      const jsonPropre = texte.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+      const json = JSON.parse(jsonPropre)
       setCvData(json)
     } catch (error) {
       alert('Une erreur est survenue. Vérifie ta clé API.')
