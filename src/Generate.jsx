@@ -198,7 +198,7 @@ const handleDownload = async () => {
             </div>
             <div className="result-content">
               {cvData ? (
-                <<div className="cv-finance" id="cv-to-print">
+                <div className="cv-finance" id="cv-to-print">
                   <div className="cv-header-finance">
                     <h1>{cvData.prenom} {cvData.nom}</h1>
                     <h2>{cvData.titre}</h2>
