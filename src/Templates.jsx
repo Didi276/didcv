@@ -11,12 +11,36 @@ const templates = [
     badge: 'Populaire'
   },
   {
-    id: 'classique',
-    nom: 'Classique',
-    description: 'Universel et ATS friendly, convient à tous les secteurs',
-    couleur: '#1a56db',
-    accent: '#1a56db',
-    badge: 'ATS optimal'
+    id: 'linkedin',
+    nom: 'LinkedIn',
+    description: 'Propre et moderne, le style reconnu par tous les recruteurs',
+    couleur: '#0a66c2',
+    accent: '#0a66c2',
+    badge: 'Tendance'
+  },
+  {
+    id: 'canva',
+    nom: 'Canva Pro',
+    description: 'Coloré et design, pour se démarquer visuellement',
+    couleur: '#f093fb',
+    accent: '#f5576c',
+    badge: 'Original'
+  },
+  {
+    id: 'harvard',
+    nom: 'Harvard',
+    description: 'Style classique américain, sobre et élégant',
+    couleur: '#A51C30',
+    accent: '#A51C30',
+    badge: 'Prestige'
+  },
+  {
+    id: 'siliconvalley',
+    nom: 'Silicon Valley',
+    description: 'Minimaliste et tech, style Apple/Google',
+    couleur: '#1d1d1f',
+    accent: '#1d1d1f',
+    badge: 'Tech'
   },
   {
     id: 'moderne',
@@ -24,31 +48,7 @@ const templates = [
     description: 'Colonne latérale colorée, moderne et professionnel',
     couleur: '#0f6e56',
     accent: '#0f6e56',
-    badge: 'Tendance'
-  },
-  {
-    id: 'creatif',
-    nom: 'Créatif',
-    description: 'Design audacieux pour les métiers créatifs',
-    couleur: '#993556',
-    accent: '#993556',
-    badge: 'Original'
-  },
-  {
-    id: 'tech',
-    nom: 'Tech',
-    description: 'Épuré et moderne pour les développeurs et ingénieurs',
-    couleur: '#534AB7',
-    accent: '#534AB7',
-    badge: 'IT & Dev'
-  },
-  {
-    id: 'minimaliste',
-    nom: 'Minimaliste',
-    description: 'Ultra clean, laisse le contenu parler de lui-même',
-    couleur: '#888780',
-    accent: '#888780',
-    badge: 'Élégant'
+    badge: 'Design'
   }
 ]
 
