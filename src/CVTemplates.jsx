@@ -42,7 +42,7 @@ export function TemplateFinance({ cvData }) {
 export function TemplateLinkedIn({ cvData }) {
   return (
     <div id="cv-to-print" style={{fontFamily:'"Segoe UI",Arial,sans-serif',color:'#191919',fontSize:'11px',lineHeight:'1.6',background:'#fff',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden'}}>
-      <div style={{background:'#0a66c2',padding:'28px 32px',marginBottom:'0'}}>
+      <div style={{background:'#0a66c2',padding:'28px 32px'}}>
         <div style={{display:'flex',alignItems:'flex-start',gap:'20px'}}>
           <div style={{width:'64px',height:'64px',borderRadius:'50%',background:'rgba(255,255,255,0.2)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px',fontWeight:'700',color:'#fff',flexShrink:'0'}}>{cvData.prenom[0]}{cvData.nom[0]}</div>
           <div style={{flex:1}}>
@@ -50,7 +50,6 @@ export function TemplateLinkedIn({ cvData }) {
             <div style={{fontSize:'13px',color:'rgba(255,255,255,0.85)',marginBottom:'8px'}}>{cvData.titre}</div>
             <div style={{display:'flex',gap:'16px',flexWrap:'wrap',fontSize:'10px',color:'rgba(255,255,255,0.75)'}}>
               <span>✉ {cvData.email}</span><span>☎ {cvData.telephone}</span><span>📍 {cvData.ville}</span>
-              {cvData.linkedin && <span>🔗 {cvData.linkedin}</span>}
             </div>
           </div>
         </div>
@@ -58,11 +57,11 @@ export function TemplateLinkedIn({ cvData }) {
       <div style={{padding:'20px 32px'}}>
         {cvData.accroche && <div style={{marginBottom:'16px',padding:'12px 16px',background:'#f3f6f9',borderRadius:'8px',borderLeft:'4px solid #0a66c2'}}><p style={{fontSize:'10px',color:'#444',margin:0,lineHeight:'1.7'}}>{cvData.accroche}</p></div>}
         <div style={{marginBottom:'16px'}}>
-          <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'10px'}}><div style={{width:'4px',height:'18px',background:'#0a66c2',borderRadius:'2px'}}></div><div style={{fontSize:'12px',fontWeight:'700',color:'#191919',letterSpacing:'0.5px'}}>EXPÉRIENCES</div></div>
+          <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'10px'}}><div style={{width:'4px',height:'18px',background:'#0a66c2',borderRadius:'2px'}}></div><div style={{fontSize:'12px',fontWeight:'700',color:'#191919'}}>EXPÉRIENCES</div></div>
           {cvData.experiences.map((exp,i)=>(
             <div key={i} style={{marginBottom:'12px',paddingLeft:'12px',borderLeft:'2px solid #e0e0e0'}}>
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
-                <div><div style={{fontWeight:'700',fontSize:'11px',color:'#191919'}}>{exp.poste}</div><div style={{fontSize:'10px',color:'#0a66c2',fontWeight:'500'}}>{exp.entreprise} · {exp.lieu}</div></div>
+                <div><div style={{fontWeight:'700',fontSize:'11px'}}>{exp.poste}</div><div style={{fontSize:'10px',color:'#0a66c2',fontWeight:'500'}}>{exp.entreprise} · {exp.lieu}</div></div>
                 <div style={{fontSize:'10px',color:'#666',whiteSpace:'nowrap',background:'#f3f6f9',padding:'2px 8px',borderRadius:'10px'}}>{exp.periode}</div>
               </div>
               <ul style={{paddingLeft:'14px',marginTop:'6px'}}>{exp.missions.map((m,j)=><li key={j} style={{fontSize:'10px',color:'#444',marginBottom:'2px'}}>{m}</li>)}</ul>
@@ -70,7 +69,7 @@ export function TemplateLinkedIn({ cvData }) {
           ))}
         </div>
         <div style={{marginBottom:'16px'}}>
-          <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'10px'}}><div style={{width:'4px',height:'18px',background:'#0a66c2',borderRadius:'2px'}}></div><div style={{fontSize:'12px',fontWeight:'700',color:'#191919',letterSpacing:'0.5px'}}>FORMATION</div></div>
+          <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'10px'}}><div style={{width:'4px',height:'18px',background:'#0a66c2',borderRadius:'2px'}}></div><div style={{fontSize:'12px',fontWeight:'700',color:'#191919'}}>FORMATION</div></div>
           {cvData.formations.map((f,i)=>(
             <div key={i} style={{display:'flex',justifyContent:'space-between',marginBottom:'8px',paddingLeft:'12px',borderLeft:'2px solid #e0e0e0'}}>
               <div><div style={{fontWeight:'700',fontSize:'11px'}}>{f.diplome}</div><div style={{fontSize:'10px',color:'#0a66c2'}}>{f.etablissement}</div></div>
@@ -100,48 +99,46 @@ export function TemplateCanva({ cvData }) {
         <div style={{textAlign:'center',marginBottom:'24px',paddingBottom:'20px',borderBottom:'1px solid rgba(255,255,255,0.15)'}}>
           <div style={{width:'70px',height:'70px',borderRadius:'50%',background:'linear-gradient(135deg,#f093fb,#f5576c)',margin:'0 auto 12px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'24px',fontWeight:'700',color:'#fff'}}>{cvData.prenom[0]}{cvData.nom[0]}</div>
           <h1 style={{fontSize:'16px',fontWeight:'700',color:'#fff',margin:'0 0 4px',lineHeight:'1.2'}}>{cvData.prenom}<br/>{cvData.nom}</h1>
-          <div style={{fontSize:'10px',color:'rgba(255,255,255,0.7)',lineHeight:'1.4'}}>{cvData.titre}</div>
+          <div style={{fontSize:'10px',color:'rgba(255,255,255,0.7)'}}>{cvData.titre}</div>
         </div>
         <div style={{marginBottom:'20px'}}>
           <div style={{fontSize:'8px',fontWeight:'700',letterSpacing:'2px',color:'#f093fb',textTransform:'uppercase',marginBottom:'10px'}}>CONTACT</div>
-          <div style={{fontSize:'10px',color:'rgba(255,255,255,0.85)',marginBottom:'6px',display:'flex',alignItems:'center',gap:'6px'}}><span style={{color:'#f093fb'}}>✉</span>{cvData.email}</div>
-          <div style={{fontSize:'10px',color:'rgba(255,255,255,0.85)',marginBottom:'6px',display:'flex',alignItems:'center',gap:'6px'}}><span style={{color:'#f093fb'}}>☎</span>{cvData.telephone}</div>
-          <div style={{fontSize:'10px',color:'rgba(255,255,255,0.85)',marginBottom:'6px',display:'flex',alignItems:'center',gap:'6px'}}><span style={{color:'#f093fb'}}>📍</span>{cvData.ville}</div>
+          <div style={{fontSize:'9px',color:'rgba(255,255,255,0.85)',marginBottom:'6px'}}>✉ {cvData.email}</div>
+          <div style={{fontSize:'9px',color:'rgba(255,255,255,0.85)',marginBottom:'6px'}}>☎ {cvData.telephone}</div>
+          <div style={{fontSize:'9px',color:'rgba(255,255,255,0.85)',marginBottom:'6px'}}>📍 {cvData.ville}</div>
         </div>
         <div style={{marginBottom:'20px'}}>
           <div style={{fontSize:'8px',fontWeight:'700',letterSpacing:'2px',color:'#f093fb',textTransform:'uppercase',marginBottom:'10px'}}>COMPÉTENCES</div>
           {cvData.competences.map((c,i)=>(
             <div key={i} style={{marginBottom:'6px'}}>
               <div style={{fontSize:'9px',color:'rgba(255,255,255,0.85)',marginBottom:'3px'}}>{c}</div>
-              <div style={{height:'3px',background:'rgba(255,255,255,0.15)',borderRadius:'2px',overflow:'hidden'}}><div style={{height:'100%',width:`${75+i*3}%`,background:'linear-gradient(90deg,#f093fb,#f5576c)',borderRadius:'2px'}}></div></div>
+              <div style={{height:'3px',background:'rgba(255,255,255,0.15)',borderRadius:'2px'}}><div style={{height:'100%',width:`${75+i*3}%`,background:'linear-gradient(90deg,#f093fb,#f5576c)',borderRadius:'2px'}}></div></div>
             </div>
           ))}
         </div>
         <div>
           <div style={{fontSize:'8px',fontWeight:'700',letterSpacing:'2px',color:'#f093fb',textTransform:'uppercase',marginBottom:'10px'}}>LANGUES</div>
-          {cvData.langues.map((l,i)=><div key={i} style={{fontSize:'10px',color:'rgba(255,255,255,0.85)',marginBottom:'4px'}}><strong>{l.langue}</strong> — {l.niveau}</div>)}
+          {cvData.langues.map((l,i)=><div key={i} style={{fontSize:'9px',color:'rgba(255,255,255,0.85)',marginBottom:'4px'}}><strong>{l.langue}</strong> — {l.niveau}</div>)}
         </div>
       </div>
-      <div style={{padding:'28px 24px',background:'#fff'}}>
-        {cvData.accroche && <div style={{marginBottom:'18px',padding:'12px 16px',background:'#fff5fb',borderRadius:'8px',borderLeft:'4px solid #f093fb'}}><p style={{fontSize:'10px',color:'#444',margin:0,lineHeight:'1.7',fontStyle:'italic'}}>{cvData.accroche}</p></div>}
+      <div style={{padding:'28px 24px'}}>
+        {cvData.accroche && <div style={{marginBottom:'18px',padding:'12px 16px',background:'#fff5fb',borderRadius:'8px',borderLeft:'4px solid #f093fb'}}><p style={{fontSize:'10px',color:'#444',margin:0,fontStyle:'italic'}}>{cvData.accroche}</p></div>}
         <div style={{marginBottom:'18px'}}>
-          <div style={{fontSize:'11px',fontWeight:'700',color:'#2d2d2d',letterSpacing:'1px',textTransform:'uppercase',marginBottom:'12px',paddingBottom:'4px',borderBottom:'2px solid #f093fb'}}>EXPÉRIENCES</div>
+          <div style={{fontSize:'11px',fontWeight:'700',color:'#2d2d2d',textTransform:'uppercase',marginBottom:'12px',paddingBottom:'4px',borderBottom:'2px solid #f093fb'}}>EXPÉRIENCES</div>
           {cvData.experiences.map((exp,i)=>(
-            <div key={i} style={{marginBottom:'13px',position:'relative',paddingLeft:'12px'}}>
-              <div style={{position:'absolute',left:0,top:'4px',width:'4px',height:'4px',borderRadius:'50%',background:'#f093fb'}}></div>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
-                <div><div style={{fontWeight:'700',fontSize:'11px',color:'#2d2d2d'}}>{exp.poste}</div><div style={{fontSize:'10px',color:'#f5576c',fontWeight:'500'}}>{exp.entreprise} · {exp.lieu}</div></div>
-                <div style={{fontSize:'9px',color:'#999',whiteSpace:'nowrap',marginLeft:'8px'}}>{exp.periode}</div>
+            <div key={i} style={{marginBottom:'13px',paddingLeft:'12px',borderLeft:'3px solid #f093fb'}}>
+              <div style={{display:'flex',justifyContent:'space-between'}}>
+                <div><div style={{fontWeight:'700',fontSize:'11px'}}>{exp.poste}</div><div style={{fontSize:'10px',color:'#f5576c',fontWeight:'500'}}>{exp.entreprise} · {exp.lieu}</div></div>
+                <div style={{fontSize:'9px',color:'#999',whiteSpace:'nowrap'}}>{exp.periode}</div>
               </div>
               <ul style={{paddingLeft:'12px',marginTop:'4px'}}>{exp.missions.map((m,j)=><li key={j} style={{fontSize:'10px',color:'#555',marginBottom:'2px'}}>{m}</li>)}</ul>
             </div>
           ))}
         </div>
         <div>
-          <div style={{fontSize:'11px',fontWeight:'700',color:'#2d2d2d',letterSpacing:'1px',textTransform:'uppercase',marginBottom:'12px',paddingBottom:'4px',borderBottom:'2px solid #f093fb'}}>FORMATION</div>
+          <div style={{fontSize:'11px',fontWeight:'700',color:'#2d2d2d',textTransform:'uppercase',marginBottom:'12px',paddingBottom:'4px',borderBottom:'2px solid #f093fb'}}>FORMATION</div>
           {cvData.formations.map((f,i)=>(
-            <div key={i} style={{marginBottom:'10px',paddingLeft:'12px',position:'relative'}}>
-              <div style={{position:'absolute',left:0,top:'4px',width:'4px',height:'4px',borderRadius:'50%',background:'#f093fb'}}></div>
+            <div key={i} style={{marginBottom:'10px',paddingLeft:'12px',borderLeft:'3px solid #f093fb'}}>
               <div style={{fontWeight:'700',fontSize:'11px'}}>{f.diplome}</div>
               <div style={{fontSize:'10px',color:'#888'}}>{f.etablissement} · {f.periode}</div>
             </div>
@@ -159,7 +156,6 @@ export function TemplateHarvard({ cvData }) {
         <h1 style={{fontSize:'22px',fontWeight:'700',letterSpacing:'1px',textTransform:'uppercase',margin:'0 0 6px',fontFamily:'"Times New Roman",serif'}}>{cvData.prenom} {cvData.nom}</h1>
         <div style={{display:'flex',justifyContent:'center',gap:'16px',fontSize:'10px',color:'#333',flexWrap:'wrap'}}>
           <span>{cvData.email}</span><span>|</span><span>{cvData.telephone}</span><span>|</span><span>{cvData.ville}</span>
-          {cvData.linkedin && <><span>|</span><span>{cvData.linkedin}</span></>}
         </div>
       </div>
       {cvData.accroche && <div style={{marginBottom:'14px',textAlign:'center'}}><p style={{fontSize:'10px',color:'#444',fontStyle:'italic',margin:0}}>{cvData.accroche}</p></div>}
@@ -167,7 +163,7 @@ export function TemplateHarvard({ cvData }) {
         <div style={{fontSize:'11px',fontWeight:'700',textTransform:'uppercase',letterSpacing:'1px',borderBottom:'1px solid #111',paddingBottom:'2px',marginBottom:'8px'}}>Experience</div>
         {cvData.experiences.map((exp,i)=>(
           <div key={i} style={{marginBottom:'10px'}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
+            <div style={{display:'flex',justifyContent:'space-between'}}>
               <div style={{fontWeight:'700',fontSize:'11px'}}>{exp.entreprise}, {exp.lieu}</div>
               <div style={{fontSize:'10px',color:'#555'}}>{exp.periode}</div>
             </div>
@@ -180,7 +176,7 @@ export function TemplateHarvard({ cvData }) {
         <div style={{fontSize:'11px',fontWeight:'700',textTransform:'uppercase',letterSpacing:'1px',borderBottom:'1px solid #111',paddingBottom:'2px',marginBottom:'8px'}}>Education</div>
         {cvData.formations.map((f,i)=>(
           <div key={i} style={{display:'flex',justifyContent:'space-between',marginBottom:'6px'}}>
-            <div><div style={{fontWeight:'700',fontSize:'11px'}}>{f.etablissement}</div><div style={{fontSize:'10px',fontStyle:'italic',color:'#333'}}>{f.diplome}{f.mention && ` — ${f.mention}`}</div></div>
+            <div><div style={{fontWeight:'700',fontSize:'11px'}}>{f.etablissement}</div><div style={{fontSize:'10px',fontStyle:'italic',color:'#333'}}>{f.diplome}</div></div>
             <div style={{fontSize:'10px',color:'#555'}}>{f.periode}</div>
           </div>
         ))}
@@ -201,13 +197,12 @@ export function TemplateHarvard({ cvData }) {
 
 export function TemplateSiliconValley({ cvData }) {
   return (
-    <div id="cv-to-print" style={{fontFamily:'-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif',fontSize:'11px',lineHeight:'1.7',background:'#fff',color:'#1d1d1f',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden',padding:'40px 48px'}}>
+    <div id="cv-to-print" style={{fontFamily:'-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif',fontSize:'11px',lineHeight:'1.7',background:'#fff',color:'#1d1d1f',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden',padding:'40px 48px'}}>
       <div style={{marginBottom:'28px'}}>
         <h1 style={{fontSize:'32px',fontWeight:'700',letterSpacing:'-1px',color:'#1d1d1f',margin:'0 0 4px'}}>{cvData.prenom} {cvData.nom}</h1>
-        <div style={{fontSize:'14px',color:'#6e6e73',fontWeight:'400',marginBottom:'12px'}}>{cvData.titre}</div>
+        <div style={{fontSize:'14px',color:'#6e6e73',marginBottom:'12px'}}>{cvData.titre}</div>
         <div style={{display:'flex',gap:'20px',flexWrap:'wrap',fontSize:'11px',color:'#6e6e73'}}>
           <span>{cvData.email}</span><span>{cvData.telephone}</span><span>{cvData.ville}</span>
-          {cvData.linkedin && <span>{cvData.linkedin}</span>}
         </div>
         <div style={{width:'48px',height:'2px',background:'#1d1d1f',marginTop:'16px',borderRadius:'1px'}}></div>
       </div>
@@ -216,9 +211,9 @@ export function TemplateSiliconValley({ cvData }) {
         <div style={{fontSize:'9px',fontWeight:'600',letterSpacing:'2px',textTransform:'uppercase',color:'#6e6e73',marginBottom:'14px'}}>EXPÉRIENCES</div>
         {cvData.experiences.map((exp,i)=>(
           <div key={i} style={{display:'grid',gridTemplateColumns:'110px 1fr',gap:'16px',marginBottom:'14px'}}>
-            <div style={{fontSize:'10px',color:'#6e6e73',paddingTop:'1px',lineHeight:'1.4'}}>{exp.periode}</div>
+            <div style={{fontSize:'10px',color:'#6e6e73',paddingTop:'1px'}}>{exp.periode}</div>
             <div>
-              <div style={{fontWeight:'600',fontSize:'12px',color:'#1d1d1f'}}>{exp.poste}</div>
+              <div style={{fontWeight:'600',fontSize:'12px'}}>{exp.poste}</div>
               <div style={{fontSize:'10px',color:'#6e6e73',marginBottom:'5px'}}>{exp.entreprise} · {exp.lieu}</div>
               <ul style={{paddingLeft:'14px',margin:0}}>{exp.missions.map((m,j)=><li key={j} style={{fontSize:'10px',color:'#3d3d3f',marginBottom:'2px'}}>{m}</li>)}</ul>
             </div>
@@ -278,8 +273,8 @@ export function TemplateModerne({ cvData }) {
           {cvData.experiences.map((exp,i)=>(
             <div key={i} style={{marginBottom:'12px'}}>
               <div style={{display:'flex',justifyContent:'space-between'}}>
-                <div><div style={{fontWeight:'700',fontSize:'11px',color:'#111'}}>{exp.poste}</div><div style={{fontSize:'10px',color:'#0f6e56'}}>{exp.entreprise} — {exp.lieu}</div></div>
-                <div style={{fontSize:'9px',color:'#888',whiteSpace:'nowrap',background:'#f0fdf4',padding:'2px 8px',borderRadius:'10px',height:'fit-content'}}>{exp.periode}</div>
+                <div><div style={{fontWeight:'700',fontSize:'11px'}}>{exp.poste}</div><div style={{fontSize:'10px',color:'#0f6e56'}}>{exp.entreprise} — {exp.lieu}</div></div>
+                <div style={{fontSize:'9px',color:'#888',whiteSpace:'nowrap',background:'#f0fdf4',padding:'2px 8px',borderRadius:'10px'}}>{exp.periode}</div>
               </div>
               <ul style={{paddingLeft:'14px',marginTop:'4px'}}>{exp.missions.map((m,j)=><li key={j} style={{fontSize:'10px',color:'#444',marginBottom:'2px'}}>{m}</li>)}</ul>
             </div>
