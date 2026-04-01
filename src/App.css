@@ -487,3 +487,18 @@ footer p { font-size: 13px; color: var(--subtle); }
   color: #555;
   font-style: italic;
 }
+#cv-to-print {
+  width: 794px;
+  min-height: 1123px;
+  max-height: 1123px;
+  padding: 40px;
+  background: white;
+  font-size: 11px;
+  overflow: hidden;
+}
+#cv-to-print h1 { font-size: 20px !important; }
+#cv-to-print h2 { font-size: 13px !important; }
+#cv-to-print .cv-section-title { font-size: 10px !important; }
+#cv-to-print .cv-exp-poste { font-size: 11px !important; }
+#cv-to-print .cv-missions li { font-size: 10px !important; }
+#cv-to-print .cv-accroche { font-size: 10px !important; }
