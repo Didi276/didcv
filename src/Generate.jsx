@@ -1,3 +1,5 @@
+import { CVTemplate } from './CVTemplates'
+import { useSearchParams } from 'react-router-dom'
 import { useState } from 'react'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
@@ -14,6 +16,8 @@ function Generate() {
   const [cvTexte, setCvTexte] = useState('')
   const [loading, setLoading] = useState(false)
   const [cvData, setCvData] = useState(null)
+  const [searchParams] = useSearchParams()
+  const templateChoisi = searchParams.get('template') || 'finance'
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0]
@@ -46,16 +50,13 @@ function Generate() {
     try {
       const response = await fetch('/api/generate', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 3000,
-          messages: [
-            {
-              role: 'user',
-              content: `Tu es un expert en recrutement et optimisation de CV pour les systèmes ATS.
+          messages: [{
+            role: 'user',
+            content: `Tu es un expert en recrutement et optimisation de CV pour les systèmes ATS.
 
 Voici le CV actuel du candidat :
 ${cvTexte}
@@ -107,11 +108,10 @@ Règles strictes :
   ],
   "atouts": ["...", "...", "..."]
 }`
-            }
-          ]
+          }]
         })
       })
-const data = await response.json()
+      const data = await response.json()
       const texte = data.content[0].text
       const jsonPropre = texte.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
       const json = JSON.parse(jsonPropre)
@@ -123,7 +123,8 @@ const data = await response.json()
 
     setLoading(false)
   }
-const handleDownload = async () => {
+
+  const handleDownload = async () => {
     const element = document.getElementById('cv-to-print')
     const canvas = await html2canvas(element, { scale: 2 })
     const imgData = canvas.toDataURL('image/png')
@@ -133,10 +134,12 @@ const handleDownload = async () => {
     pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
     pdf.save('mon-cv-didcv.pdf')
   }
+
   return (
     <div className="generate-page">
       <nav>
         <a className="logo" href="/"><span>Did</span>CV</a>
+        <a href="/templates" className="btn-ghost" style={{marginLeft:'auto'}}>← Changer de template</a>
       </nav>
 
       <div className="generate-wrap">
@@ -147,12 +150,7 @@ const handleDownload = async () => {
           <div className="upload-box">
             <div className="upload-label">1. Ton CV actuel (PDF)</div>
             <label className="upload-zone">
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={handleFileChange}
-                style={{display:'none'}}
-              />
+              <input type="file" accept=".pdf" onChange={handleFileChange} style={{display:'none'}} />
               {cvFile ? (
                 <div className="upload-done">📄 {cvFile.name} ✓</div>
               ) : (
@@ -181,11 +179,7 @@ const handleDownload = async () => {
             />
           </div>
 
-          <button
-            className="btn-generate"
-            onClick={handleGenerate}
-            disabled={loading}
-          >
+          <button className="btn-generate" onClick={handleGenerate} disabled={loading}>
             {loading ? '⏳ Génération en cours...' : '⚡ Générer mon CV optimisé'}
           </button>
         </div>
@@ -193,84 +187,12 @@ const handleDownload = async () => {
         <div className="generate-right">
           <div className="result-box">
             <div className="result-header">
-              <span>Ton CV optimisé</span>
+              <span>Template : <strong>{templateChoisi}</strong></span>
               {cvData && <button className="btn-download" onClick={handleDownload}>📥 Télécharger PDF</button>}
             </div>
             <div className="result-content">
               {cvData ? (
-                <div className="cv-finance" id="cv-to-print">
-                  <div className="cv-header-finance">
-                    <h1>{cvData.prenom} {cvData.nom}</h1>
-                    <h2>{cvData.titre}</h2>
-                    <div className="cv-contact">
-                      <span>📧 {cvData.email}</span>
-                      <span>📞 {cvData.telephone}</span>
-                      <span>📍 {cvData.ville}</span>
-                      {cvData.linkedin && <span>🔗 {cvData.linkedin}</span>}
-                    </div>
-                  </div>
-
-                  {cvData.accroche && (
-                    <div className="cv-section">
-                      <h3 className="cv-section-title">Profil</h3>
-                      <p className="cv-accroche">{cvData.accroche}</p>
-                    </div>
-                  )}
-
-                  <div className="cv-section">
-                    <h3 className="cv-section-title">Expériences professionnelles</h3>
-                    {cvData.experiences.map((exp, i) => (
-                      <div key={i} className="cv-exp">
-                        <div className="cv-exp-header">
-                          <div>
-                            <div className="cv-exp-poste">{exp.poste}</div>
-                            <div className="cv-exp-entreprise">{exp.entreprise} — {exp.lieu}</div>
-                          </div>
-                          <div className="cv-exp-periode">{exp.periode}</div>
-                        </div>
-                        <ul className="cv-missions">
-                          {exp.missions.map((m, j) => <li key={j}>{m}</li>)}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="cv-section">
-                    <h3 className="cv-section-title">Formation</h3>
-                    {cvData.formations.map((f, i) => (
-                      <div key={i} className="cv-exp">
-                        <div className="cv-exp-header">
-                          <div>
-                            <div className="cv-exp-poste">{f.diplome}</div>
-                            <div className="cv-exp-entreprise">{f.etablissement}</div>
-                          </div>
-                          <div className="cv-exp-periode">{f.periode}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="cv-bottom">
-                    <div className="cv-section">
-                      <h3 className="cv-section-title">Compétences</h3>
-                      <div className="cv-competences">
-                        {cvData.competences.map((c, i) => (
-                          <span key={i} className="cv-tag">{c}</span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="cv-section">
-                      <h3 className="cv-section-title">Langues</h3>
-                      {cvData.langues.map((l, i) => (
-                        <div key={i} className="cv-langue">
-                          <span>{l.langue}</span>
-                          <span className="cv-niveau">{l.niveau}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                <CVTemplate cvData={cvData} template={templateChoisi} />
               ) : (
                 <div className="result-empty">
                   <div className="empty-icon">✨</div>
