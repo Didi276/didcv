@@ -11,7 +11,7 @@ function Home() {
           <a href="#pricing">Tarifs</a>
         </div>
         <div className="nav-btns">
-          <a href="#" className="btn-ghost">Se connecter</a>
+          <a href="/auth" className="btn-ghost">Se connecter</a>
           <a href="/templates" className="btn-blue">Commencer gratuitement</a>
         </div>
       </nav>
