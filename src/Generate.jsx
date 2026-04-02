@@ -1,3 +1,4 @@
+import { supabase } from './supabase'
 import { CVTemplate } from './CVTemplates'
 import { useSearchParams } from 'react-router-dom'
 import { useState } from 'react'
@@ -116,6 +117,15 @@ Règles strictes :
       const jsonPropre = texte.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
       const json = JSON.parse(jsonPropre)
       setCvData(json)
+
+const { data: { user } } = await supabase.auth.getUser()
+if (user) {
+  await supabase.from('cvs').insert({
+    user_id: user.id,
+    template: templateChoisi,
+    cv_data: json
+  })
+}
     } catch (error) {
       alert('Une erreur est survenue. Vérifie ta clé API.')
       console.error(error)

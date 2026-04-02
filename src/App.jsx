@@ -3,6 +3,7 @@ import Home from './Home'
 import Generate from './Generate'
 import Templates from './Templates'
 import Auth from './Auth'
+import Dashboard from './Dashboard'
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/auth" element={<Auth />} />
         <Route path="/templates" element={<Templates />} />
         <Route path="/generate" element={<Generate />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </BrowserRouter>
   )
