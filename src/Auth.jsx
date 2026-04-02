@@ -21,7 +21,8 @@ function Auth() {
       } else {
         const { error } = await supabase.auth.signUp({ email, password })
         if (error) throw error
-        setMessage('✅ Compte créé ! Vérifie ton email pour confirmer.')
+        setMessage('✅ Compte créé ! Tu peux maintenant te connecter.')
+setIsLogin(true)
       }
     } catch (error) {
       setMessage('❌ ' + error.message)
