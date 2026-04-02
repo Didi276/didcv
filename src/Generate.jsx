@@ -149,6 +149,7 @@ if (user) {
     <div className="generate-page">
       <nav>
         <a className="logo" href="/"><span>Did</span>CV</a>
+<a href="/dashboard" className="btn-ghost" style={{marginLeft:'auto', marginRight:'12px'}}>Mon dashboard</a>
         <a href="/templates" className="btn-ghost" style={{marginLeft:'auto'}}>← Changer de template</a>
       </nav>
 
