@@ -116,7 +116,9 @@ Règles strictes :
       const texte = data.content[0].text
       const jsonPropre = texte.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
       const json = JSON.parse(jsonPropre)
-      setCvData(json)
+      setTimeout(() => {
+  window.location.href = '/dashboard'
+}, 3000)
 
 const { data: { user } } = await supabase.auth.getUser()
 if (user) {
