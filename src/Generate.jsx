@@ -137,15 +137,23 @@ if (user) {
   }
 
   const handleDownload = async () => {
-    const element = document.getElementById('cv-to-print')
-    const canvas = await html2canvas(element, { scale: 2 })
-    const imgData = canvas.toDataURL('image/png')
-    const pdf = new jsPDF('p', 'mm', 'a4')
-    const pdfWidth = pdf.internal.pageSize.getWidth()
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
-    pdf.save('mon-cv-didcv.pdf')
-  }
+  const element = document.getElementById('cv-to-print')
+  if (!element) return
+  
+  const canvas = await html2canvas(element, {
+    scale: 2,
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: '#ffffff',
+    width: 794,
+    height: 1123
+  })
+  
+  const imgData = canvas.toDataURL('image/png')
+  const pdf = new jsPDF('p', 'mm', 'a4')
+  pdf.addImage(imgData, 'PNG', 0, 0, 210, 297)
+  pdf.save(`CV-DidCV-${cvData.prenom}-${cvData.nom}.pdf`)
+}
 
   return (
     <div className="generate-page">
