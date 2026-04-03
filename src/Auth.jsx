@@ -17,7 +17,7 @@ function Auth() {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) throw error
-        window.location.href = '/templates'
+       window.location.href = '/dashboard'
       } else {
         const { error } = await supabase.auth.signUp({ email, password })
         if (error) throw error
