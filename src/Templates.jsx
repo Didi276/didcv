@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+import { supabase } from './supabase'
 import './App.css'
 import { useNavigate } from 'react-router-dom'
 
@@ -54,6 +56,15 @@ const templates = [
 
 function Templates() {
   const navigate = useNavigate()
+  useEffect(() => {
+  const checkUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      window.location.href = '/auth'
+    }
+  }
+  checkUser()
+}, [])
 
   const choisirTemplate = (templateId) => {
     navigate(`/generate?template=${templateId}`)
