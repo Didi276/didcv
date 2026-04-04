@@ -1,12 +1,20 @@
 import { useState, useEffect } from 'react'
 import { supabase } from './supabase'
 import './App.css'
+import * as pdfjsLib from 'pdfjs-dist'
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url
+).toString()
 
 function Profile() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [importing, setImporting] = useState(false)
+  const [importFile, setImportFile] = useState(null)
   const [profile, setProfile] = useState({
     prenom: '', nom: '', email: '', telephone: '', ville: '', linkedin: '', titre: '', accroche: '',
     experiences: [], formations: [], competences: [], langues: [], certifications: []
@@ -25,6 +33,64 @@ function Profile() {
     }
     fetchProfile()
   }, [])
+
+  const handleImportCV = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    setImportFile(file)
+    setImporting(true)
+    const reader = new FileReader()
+    reader.onload = async (event) => {
+      const typedArray = new Uint8Array(event.target.result)
+      const pdf = await pdfjsLib.getDocument(typedArray).promise
+      let texteComplet = ''
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i)
+        const content = await page.getTextContent()
+        const texte = content.items.map(item => item.str).join(' ')
+        texteComplet += texte + '\n'
+      }
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 3000,
+          messages: [{
+            role: 'user',
+            content: `Tu es un expert en recrutement. Analyse ce CV et extrait toutes les informations.
+
+Voici le CV :
+${texteComplet}
+
+Retourne UNIQUEMENT un objet JSON valide avec cette structure exacte :
+{
+  "prenom": "...",
+  "nom": "...",
+  "email": "...",
+  "telephone": "...",
+  "ville": "...",
+  "linkedin": "...",
+  "titre": "...",
+  "accroche": "...",
+  "experiences": [{"poste":"...","entreprise":"...","periode":"...","lieu":"...","missions":["...","...","..."]}],
+  "formations": [{"diplome":"...","etablissement":"...","periode":"...","mention":"..."}],
+  "competences": ["..."],
+  "langues": [{"langue":"...","niveau":"..."}],
+  "certifications": []
+}`
+          }]
+        })
+      })
+      const data = await response.json()
+      const texte = data.content[0].text
+      const jsonPropre = texte.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+      const json = JSON.parse(jsonPropre)
+      setProfile(p => ({ ...p, ...json }))
+      setImporting(false)
+    }
+    reader.readAsArrayBuffer(file)
+  }
 
   const handleSave = async () => {
     setSaving(true)
@@ -133,9 +199,24 @@ function Profile() {
           <p className="profile-sub">Remplis ton profil une fois — génère des CV illimités sans uploader ton CV à chaque fois.</p>
         </div>
 
-        <div className="profile-sections">
+        <div className="import-cv-box">
+          <label className="import-cv-label">
+            <input type="file" accept=".pdf" onChange={handleImportCV} style={{display:'none'}} />
+            {importing ? (
+              <div className="import-cv-loading">⏳ Analyse de ton CV en cours...</div>
+            ) : importFile ? (
+              <div className="import-cv-done">✅ Profil importé depuis {importFile.name} — vérifie et sauvegarde !</div>
+            ) : (
+              <div className="import-cv-placeholder">
+                <div style={{fontSize:'32px', marginBottom:'8px'}}>📄</div>
+                <div style={{fontWeight:'600', marginBottom:'4px'}}>Importer mon CV PDF</div>
+                <div style={{fontSize:'13px', color:'var(--muted)'}}>L'IA remplit ton profil automatiquement</div>
+              </div>
+            )}
+          </label>
+        </div>
 
-          {/* Infos personnelles */}
+        <div className="profile-sections">
           <div className="profile-section">
             <h3 className="profile-section-title">👤 Informations personnelles</h3>
             <div className="profile-grid">
@@ -174,7 +255,6 @@ function Profile() {
             </div>
           </div>
 
-          {/* Expériences */}
           <div className="profile-section">
             <div className="profile-section-header">
               <h3 className="profile-section-title">💼 Expériences professionnelles</h3>
@@ -214,7 +294,6 @@ function Profile() {
             ))}
           </div>
 
-          {/* Formations */}
           <div className="profile-section">
             <div className="profile-section-header">
               <h3 className="profile-section-title">🎓 Formations</h3>
@@ -248,7 +327,6 @@ function Profile() {
             ))}
           </div>
 
-          {/* Compétences */}
           <div className="profile-section">
             <div className="profile-section-header">
               <h3 className="profile-section-title">⚡ Compétences</h3>
@@ -264,7 +342,6 @@ function Profile() {
             </div>
           </div>
 
-          {/* Langues */}
           <div className="profile-section">
             <div className="profile-section-header">
               <h3 className="profile-section-title">🌍 Langues</h3>
@@ -290,7 +367,6 @@ function Profile() {
             ))}
           </div>
 
-          {/* Certifications */}
           <div className="profile-section">
             <div className="profile-section-header">
               <h3 className="profile-section-title">🏆 Certifications</h3>
@@ -319,7 +395,6 @@ function Profile() {
               </div>
             ))}
           </div>
-
         </div>
 
         <div className="profile-save">
