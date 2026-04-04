@@ -1,3 +1,5 @@
+import ReactQuill from 'react-quill'
+import 'react-quill/dist/quill.snow.css'
 import { useState, useEffect } from 'react'
 import { supabase } from './supabase'
 import { CVTemplate } from './CVTemplates'
@@ -228,11 +230,20 @@ const [lettreEditee, setLettreEditee] = useState('')
   <div style={{padding:'40px', maxWidth:'700px', margin:'0 auto', width:'100%'}}>
     {editingLettre ? (
       <div>
-        <textarea
-          value={lettreEditee}
-          onChange={e => setLettreEditee(e.target.value)}
-          style={{width:'100%', minHeight:'400px', fontFamily:'Georgia,serif', fontSize:'14px', lineHeight:'1.8', color:'#222', border:'1px solid var(--border)', borderRadius:'8px', padding:'16px', outline:'none', resize:'vertical'}}
-        />
+        <ReactQuill
+  value={lettreEditee}
+  onChange={setLettreEditee}
+  style={{height:'350px', marginBottom:'50px'}}
+  modules={{
+    toolbar: [
+      ['bold', 'italic', 'underline'],
+      [{ 'size': ['small', false, 'large', 'huge'] }],
+      [{ 'color': [] }],
+      [{ 'align': [] }],
+      ['clean']
+    ]
+  }}
+/>
         <div style={{display:'flex', gap:'8px', marginTop:'12px'}}>
           <button className="btn-generate" style={{width:'auto', padding:'10px 24px'}} onClick={async () => {
             await supabase.from('cvs').update({ lettre_motivation: lettreEditee }).eq('id', selectedCv.id)
