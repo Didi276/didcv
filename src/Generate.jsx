@@ -121,12 +121,14 @@ Règles strictes :
 }, 3000)
 
 const { data: { user } } = await supabase.auth.getUser()
+console.log('User:', user)
 if (user) {
-  await supabase.from('cvs').insert({
+  const { error } = await supabase.from('cvs').insert({
     user_id: user.id,
     template: templateChoisi,
     cv_data: json
   })
+  console.log('Erreur Supabase:', error)
 }
     } catch (error) {
       alert('Une erreur est survenue. Vérifie ta clé API.')
