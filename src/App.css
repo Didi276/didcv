@@ -1071,3 +1071,32 @@ footer p { font-size: 13px; color: var(--subtle); }
   .profile-wrap { padding: 24px; }
   .profile-grid { grid-template-columns: 1fr; }
 }
+.profile-loaded-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--blue-light);
+  border: 1px solid var(--blue-mid);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.profile-loaded-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-loaded-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--blue);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+}

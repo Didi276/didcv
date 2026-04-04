@@ -1,7 +1,7 @@
 import { supabase } from './supabase'
 import { CVTemplate } from './CVTemplates'
 import { useSearchParams } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import * as pdfjsLib from 'pdfjs-dist'
@@ -18,8 +18,22 @@ function Generate() {
   const [loading, setLoading] = useState(false)
   const [cvData, setCvData] = useState(null)
   const [lettre, setLettre] = useState('')
+  const [profile, setProfile] = useState(null)
+  const [user, setUser] = useState(null)
   const [searchParams] = useSearchParams()
   const templateChoisi = searchParams.get('template') || 'finance'
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+      if (user) {
+        const { data } = await supabase.from('profiles').select('*').eq('user_id', user.id).single()
+        if (data && data.prenom) setProfile(data)
+      }
+    }
+    fetchProfile()
+  }, [])
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0]
@@ -41,16 +55,54 @@ function Generate() {
     reader.readAsArrayBuffer(file)
   }
 
+  const buildProfileText = (profile) => {
+    let text = `Prénom: ${profile.prenom}\nNom: ${profile.nom}\nEmail: ${profile.email}\nTéléphone: ${profile.telephone}\nVille: ${profile.ville}\nLinkedIn: ${profile.linkedin}\nTitre: ${profile.titre}\nAccroche: ${profile.accroche}\n\n`
+    
+    if (profile.experiences?.length > 0) {
+      text += 'EXPÉRIENCES:\n'
+      profile.experiences.forEach(exp => {
+        text += `- ${exp.poste} chez ${exp.entreprise} (${exp.periode}) à ${exp.lieu}\n`
+        exp.missions?.forEach(m => { if(m) text += `  • ${m}\n` })
+      })
+    }
+    
+    if (profile.formations?.length > 0) {
+      text += '\nFORMATIONS:\n'
+      profile.formations.forEach(f => {
+        text += `- ${f.diplome} à ${f.etablissement} (${f.periode})\n`
+      })
+    }
+    
+    if (profile.competences?.length > 0) {
+      text += '\nCOMPÉTENCES:\n' + profile.competences.filter(c => c).join(', ') + '\n'
+    }
+    
+    if (profile.langues?.length > 0) {
+      text += '\nLANGUES:\n'
+      profile.langues.forEach(l => { text += `- ${l.langue}: ${l.niveau}\n` })
+    }
+
+    if (profile.certifications?.length > 0) {
+      text += '\nCERTIFICATIONS:\n'
+      profile.certifications.forEach(c => { text += `- ${c.titre} (${c.organisme}, ${c.annee})\n` })
+    }
+
+    return text
+  }
+
   const handleGenerate = async () => {
-    if (!cvFile || !offreEmploi) {
-      alert('Merci d\'uploader ton CV et de coller une offre d\'emploi !')
+    if (!offreEmploi) {
+      alert('Merci de coller une offre d\'emploi !')
+      return
+    }
+    if (!profile && !cvFile) {
+      alert('Merci d\'uploader ton CV ou de remplir ton profil !')
       return
     }
     setLoading(true)
     setCvData(null)
     setLettre('')
 
-    const { data: { user } } = await supabase.auth.getUser()
     if (user) {
       const { count } = await supabase
         .from('cvs')
@@ -65,6 +117,8 @@ function Generate() {
       }
     }
 
+    const sourceCV = profile ? buildProfileText(profile) : cvTexte
+
     try {
       const [responseCV, responseLM] = await Promise.all([
         fetch('/api/generate', {
@@ -77,8 +131,8 @@ function Generate() {
               role: 'user',
               content: `Tu es un expert en recrutement et optimisation de CV pour les systèmes ATS.
 
-Voici le CV actuel du candidat :
-${cvTexte}
+Voici le profil du candidat :
+${sourceCV}
 
 Voici l'offre d'emploi ciblée :
 ${offreEmploi}
@@ -120,8 +174,8 @@ Règles strictes :
               role: 'user',
               content: `Tu es un expert en recrutement.
 
-Voici le CV du candidat :
-${cvTexte}
+Voici le profil du candidat :
+${sourceCV}
 
 Voici l'offre d'emploi :
 ${offreEmploi}
@@ -160,8 +214,6 @@ Règles :
           offre_titre: offreTitre
         })
       }
-
-      // plus de redirection automatique
 
     } catch (error) {
       alert('Une erreur est survenue. Vérifie ta clé API.')
@@ -207,31 +259,46 @@ Règles :
       <div className="generate-wrap">
         <div className="generate-left">
           <h2>Génère ton CV optimisé</h2>
-          <p className="generate-sub">Upload ton CV PDF et colle l'offre — l'IA génère ton CV et ta lettre de motivation.</p>
+          <p className="generate-sub">
+            {profile ? `Bonjour ${profile.prenom} ! Ton profil est chargé — colle juste l'offre d'emploi.` : 'Upload ton CV PDF et colle l\'offre — l\'IA génère ton CV et ta lettre de motivation.'}
+          </p>
 
-          <div className="upload-box">
-            <div className="upload-label">1. Ton CV actuel (PDF)</div>
-            <label className="upload-zone">
-              <input type="file" accept=".pdf" onChange={handleFileChange} style={{display:'none'}} />
-              {cvFile ? (
-                <div className="upload-done">📄 {cvFile.name} ✓</div>
-              ) : (
-                <div className="upload-placeholder">
-                  <div className="upload-icon">📁</div>
-                  <div>Clique pour uploader ton CV</div>
-                  <div className="upload-hint">PDF uniquement</div>
+          {profile ? (
+            <div className="profile-loaded-box">
+              <div className="profile-loaded-info">
+                <div className="profile-loaded-avatar">{profile.prenom[0]}{profile.nom[0]}</div>
+                <div>
+                  <div style={{fontWeight:'600', fontSize:'14px'}}>{profile.prenom} {profile.nom}</div>
+                  <div style={{fontSize:'12px', color:'var(--muted)'}}>{profile.titre}</div>
+                </div>
+              </div>
+              <a href="/profile" style={{fontSize:'12px', color:'var(--blue)'}}>Modifier mon profil →</a>
+            </div>
+          ) : (
+            <div className="upload-box">
+              <div className="upload-label">1. Ton CV actuel (PDF)</div>
+              <label className="upload-zone">
+                <input type="file" accept=".pdf" onChange={handleFileChange} style={{display:'none'}} />
+                {cvFile ? (
+                  <div className="upload-done">📄 {cvFile.name} ✓</div>
+                ) : (
+                  <div className="upload-placeholder">
+                    <div className="upload-icon">📁</div>
+                    <div>Clique pour uploader ton CV</div>
+                    <div className="upload-hint">PDF uniquement</div>
+                  </div>
+                )}
+              </label>
+              {cvTexte && (
+                <div style={{marginTop:'8px', fontSize:'12px', color:'#16a34a'}}>
+                  ✓ CV lu avec succès — {cvTexte.length} caractères extraits
                 </div>
               )}
-            </label>
-            {cvTexte && (
-              <div style={{marginTop:'8px', fontSize:'12px', color:'#16a34a'}}>
-                ✓ CV lu avec succès — {cvTexte.length} caractères extraits
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
           <div className="offre-box">
-            <div className="upload-label">2. L'offre d'emploi</div>
+            <div className="upload-label">{profile ? '1.' : '2.'} L'offre d'emploi</div>
             <textarea
               className="offre-textarea"
               placeholder="Colle ici le texte complet de l'offre d'emploi..."
@@ -244,6 +311,12 @@ Règles :
           <button className="btn-generate" onClick={handleGenerate} disabled={loading}>
             {loading ? '⏳ Génération en cours...' : '⚡ Générer mon CV + Lettre de motivation'}
           </button>
+
+          {cvData && (
+            <a href="/dashboard" style={{display:'block', textAlign:'center', textDecoration:'none', marginTop:'12px', padding:'14px', background:'#16a34a', color:'#fff', borderRadius:'10px', fontSize:'15px', fontWeight:'500'}}>
+              ✅ Terminer → Aller au dashboard
+            </a>
+          )}
         </div>
 
         <div className="generate-right">
@@ -276,15 +349,7 @@ Règles :
                 <button className="btn-download" onClick={handleDownloadLettre}>📄 Télécharger</button>
               </div>
               <div className="result-content" style={{alignItems:'flex-start'}}>
-                <div style={{
-                  fontFamily:'Georgia,serif',
-                  fontSize:'13px',
-                  lineHeight:'1.8',
-                  color:'#222',
-                  whiteSpace:'pre-wrap',
-                  width:'100%',
-                  padding:'8px'
-                }}>
+                <div style={{fontFamily:'Georgia,serif', fontSize:'13px', lineHeight:'1.8', color:'#222', whiteSpace:'pre-wrap', width:'100%', padding:'8px'}}>
                   {lettre}
                 </div>
               </div>
