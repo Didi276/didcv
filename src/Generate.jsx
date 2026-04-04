@@ -265,6 +265,12 @@ Règles :
 
           {profile ? (
             <div className="profile-loaded-box">
+              <button 
+  onClick={() => setProfile(null)} 
+  style={{fontSize:'12px', color:'var(--muted)', background:'none', border:'none', cursor:'pointer', marginTop:'8px', textDecoration:'underline'}}
+>
+  Utiliser un CV PDF à la place →
+</button>
               <div className="profile-loaded-info">
                 <div className="profile-loaded-avatar">{profile.prenom[0]}{profile.nom[0]}</div>
                 <div>
