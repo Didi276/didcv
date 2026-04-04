@@ -74,6 +74,7 @@ function Dashboard() {
         <a className="logo" href="/"><span>Did</span>CV</a>
         <div className="nav-btns">
           <a href="/templates" className="btn-ghost">+ Nouveau CV</a>
+          <a href="/lettre" className="btn-ghost">✉️ Lettre de motivation</a>
           <button className="btn-ghost" onClick={handleLogout}>Se déconnecter</button>
         </div>
       </nav>
