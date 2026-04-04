@@ -42,7 +42,7 @@ function Home() {
                 <div className="input-label">Offre d'emploi</div>
                 <div className="textarea-fake">Nous recherchons un(e) Contrôleur de Gestion. Vous maîtrisez Excel, SAP et l'analyse financière...</div>
               </div>
-              <button className="card-generate">⚡ Générer mon CV optimisé</button>
+              <button className="card-generate">⚡ Générer CV + Lettre de motivation</button>
               <div className="card-score">
                 <div className="score-row"><span>Score ATS</span><strong>95% — Excellent ✓</strong></div>
                 <div className="score-track"><div className="score-fill"></div></div>
@@ -54,7 +54,7 @@ function Home() {
 
       <div className="stats-row">
         <div className="stat"><div className="stat-num">95%</div><div className="stat-label">taux de passage ATS</div></div>
-        <div className="stat"><div className="stat-num">&lt;30s</div><div className="stat-label">pour générer ton CV</div></div>
+        <div className="stat"><div className="stat-num">&lt;30s</div><div className="stat-label">pour générer CV + lettre de motivation</div></div>
         <div className="stat"><div className="stat-num">6</div><div className="stat-label">templates professionnels</div></div>
         <div className="stat"><div className="stat-num">100%</div><div className="stat-label">modifiable en ligne</div></div>
       </div>
@@ -74,7 +74,7 @@ function Home() {
           <div className="section-label">Fonctionnalités</div>
           <h2 className="section-title">Tout ce qu'il faut<br/>pour <em>décrocher l'entretien</em>.</h2>
           <div className="feat-grid">
-            <div className="feat-card"><div className="feat-icon">🤖</div><h3>CV optimisé ATS en quelques secondes</h3><p>L'IA analyse l'offre d'emploi et génère un CV sur mesure qui passe tous les filtres ATS. Une lettre de motivation personnalisée est également générée automatiquement.</p></div>
+            <div className="feat-card"><div className="feat-icon">🤖</div><h3>CV + Lettre de motivation en quelques secondes</h3><p>L'IA analyse l'offre d'emploi et génère un CV sur mesure qui passe tous les filtres ATS. Une lettre de motivation personnalisée est également générée automatiquement.</p></div>
             <div className="feat-card"><div className="feat-icon">✏️</div><h3>Éditeur intégré</h3><p>Modifie chaque section de ton CV et ta lettre de motivation directement sur le site — missions, compétences, formations, mise en forme.</p></div>
             <div className="feat-card"><div className="feat-icon">👤</div><h3>Profil centralisé</h3><p>Crée ton profil une fois. Génère autant de CV que tu veux en collant juste l'offre — plus besoin d'uploader ton CV à chaque fois.</p></div>
             <div className="feat-card"><div className="feat-icon">🎨</div><h3>6 templates professionnels</h3><p>Finance, LinkedIn, Harvard, Silicon Valley, Canva, Moderne — des designs validés par des recruteurs pour tous les secteurs.</p></div>
