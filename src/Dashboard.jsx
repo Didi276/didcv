@@ -194,7 +194,7 @@ const [cvEdite, setCvEdite] = useState(null)
                   <div className="dashboard-card2-bottom">
                     <div className="dashboard-card2-date">{formatDate(cv.created_at)}</div>
                     <div className="dashboard-card2-actions">
-                      <button className="dash-btn dash-btn-primary" onClick={() => handleDownloadCV(cv)}>📥 CV</button>
+                      <button className="dash-btn dash-btn-primary" onClick={() => { setSelectedCv(cv); setShowLettre(false) }}>👁 CV</button>
                       {cv.lettre_motivation && (
                         <button className="dash-btn dash-btn-secondary" onClick={() => { setSelectedCv(cv); setShowLettre(true) }}>✉️ Lettre</button>
                       )}
