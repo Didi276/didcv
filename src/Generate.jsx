@@ -1,3 +1,4 @@
+import CVEditor from './CVEditor'
 import { supabase } from './supabase'
 import { CVTemplate } from './CVTemplates'
 import { useSearchParams } from 'react-router-dom'
@@ -21,6 +22,7 @@ function Generate() {
   const [profile, setProfile] = useState(null)
   const [user, setUser] = useState(null)
   const [searchParams] = useSearchParams()
+  const [showEditor, setShowEditor] = useState(false)
   const templateChoisi = searchParams.get('template') || 'finance'
 
   useEffect(() => {
@@ -284,9 +286,14 @@ Règles :
           </button>
 
           {cvData && (
-            <a href="/dashboard" style={{display:'block', textAlign:'center', textDecoration:'none', marginTop:'12px', padding:'14px', background:'#16a34a', color:'#fff', borderRadius:'10px', fontSize:'15px', fontWeight:'500'}}>
-              ✅ Terminer → Aller au dashboard
-            </a>
+            <div style={{display:'flex', flexDirection:'column', gap:'8px', marginTop:'12px'}}>
+              <button onClick={() => setShowEditor(true)} style={{display:'block', textAlign:'center', width:'100%', padding:'14px', background:'#1a56db', color:'#fff', borderRadius:'10px', fontSize:'15px', fontWeight:'500', border:'none', cursor:'pointer'}}>
+                ✏️ Modifier mon CV
+              </button>
+              <a href="/dashboard" style={{display:'block', textAlign:'center', textDecoration:'none', padding:'14px', background:'#16a34a', color:'#fff', borderRadius:'10px', fontSize:'15px', fontWeight:'500'}}>
+                ✅ Terminer → Aller au dashboard
+              </a>
+            </div>
           )}
         </div>
 
@@ -328,6 +335,18 @@ Règles :
           )}
         </div>
       </div>
+
+      {showEditor && cvData && (
+        <CVEditor
+          cvData={cvData}
+          template={templateChoisi}
+          onSave={(cvModifie) => {
+            setCvData(cvModifie)
+            setShowEditor(false)
+          }}
+          onClose={() => setShowEditor(false)}
+        />
+      )}
     </div>
   )
 }
