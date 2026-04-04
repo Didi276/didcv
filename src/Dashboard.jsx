@@ -62,12 +62,12 @@ function Dashboard() {
 
   const handleDownloadLettre = (cv) => {
     if (!cv.lettre_motivation) return
-    const blob = new Blob([cv.lettre_motivation], { type: 'text/plain;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `Lettre-${cv.cv_data.prenom}-${cv.cv_data.nom}.txt`
-    a.click()
+    const pdf = new jsPDF('p', 'mm', 'a4')
+    pdf.setFont('helvetica', 'normal')
+    pdf.setFontSize(12)
+    const lignes = pdf.splitTextToSize(cv.lettre_motivation, 170)
+    pdf.text(lignes, 20, 20)
+    pdf.save(`Lettre-${cv.cv_data.prenom}-${cv.cv_data.nom}.pdf`)
   }
 
   const formatDate = (dateStr) => {
