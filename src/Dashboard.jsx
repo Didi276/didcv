@@ -343,14 +343,28 @@ const [cvEdite, setCvEdite] = useState(null)
                   </div>
                 ))}
               </div>
-              <label style={{fontSize:'11px', fontWeight:'600', color:'var(--muted)', textTransform:'uppercase', display:'block', marginBottom:'6px'}}>Missions</label>
-              {exp.missions?.map((m, j) => (
-                <input key={j} className="profile-input" style={{marginBottom:'6px'}} value={m || ''} onChange={e => {
-                  const exps = [...cvEdite.experiences]
-                  exps[i].missions[j] = e.target.value
-                  setCvEdite({...cvEdite, experiences: exps})
-                }} />
-              ))}
+              <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'6px'}}>
+  <label style={{fontSize:'11px', fontWeight:'600', color:'var(--muted)', textTransform:'uppercase'}}>Missions</label>
+  <button className="btn-add" style={{fontSize:'11px', padding:'3px 10px'}} onClick={() => {
+    const exps = [...cvEdite.experiences]
+    exps[i].missions = [...(exps[i].missions || []), '']
+    setCvEdite({...cvEdite, experiences: exps})
+  }}>+ Mission</button>
+</div>
+{exp.missions?.map((m, j) => (
+  <div key={j} style={{display:'flex', gap:'6px', marginBottom:'6px'}}>
+    <input className="profile-input" value={m || ''} onChange={e => {
+      const exps = [...cvEdite.experiences]
+      exps[i].missions[j] = e.target.value
+      setCvEdite({...cvEdite, experiences: exps})
+    }} />
+    <button className="btn-remove" onClick={() => {
+      const exps = [...cvEdite.experiences]
+      exps[i].missions = exps[i].missions.filter((_, k) => k !== j)
+      setCvEdite({...cvEdite, experiences: exps})
+    }}>✕</button>
+  </div>
+))}
             </div>
           ))}
         </div>
