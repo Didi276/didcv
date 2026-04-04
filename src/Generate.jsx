@@ -54,12 +54,15 @@ if (user) {
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
   
-  if (count >= 1) {
-    alert('Tu as utilisé ton CV gratuit ! Passe au plan Pro pour générer des CV illimités.')
-    setLoading(false)
-    return
-  }
+  const adminEmails = ['fernandochokki@gmail.com', 'chokkifernando@gmail.com', 'carlinazon@gmail.com']
+
+if (count >= 1 && !adminEmails.includes(user.email)) {
+  alert('Tu as utilisé ton CV gratuit ! Passe au plan Pro pour générer des CV illimités.')
+  setLoading(false)
+  return
 }
+  }
+
     try {
       const response = await fetch('/api/generate', {
         method: 'POST',
@@ -132,7 +135,6 @@ Règles strictes :
   window.location.href = '/dashboard'
 }, 3000)
 
-const { data: { user } } = await supabase.auth.getUser()
 console.log('User:', user)
 if (user) {
   const { error } = await supabase.from('cvs').insert({
