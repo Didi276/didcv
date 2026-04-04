@@ -142,7 +142,7 @@ function Dashboard() {
                     )}
                     <button className="btn-view" onClick={() => handleDownloadCV(cv)}>📥 PDF</button>
                     {cv.lettre_motivation && (
-                      <button className="btn-view" onClick={() => handleDownloadLettre(cv)}>📄</button>
+                      <button className="btn-view" onClick={() => handleDownloadLettre(cv)}>📥 LM</button>
                     )}
                     <button className="btn-delete" onClick={() => handleDelete(cv.id)}>🗑</button>
                   </div>
