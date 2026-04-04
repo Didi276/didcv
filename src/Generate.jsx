@@ -161,9 +161,7 @@ Règles :
         })
       }
 
-      setTimeout(() => {
-        window.location.href = '/dashboard'
-      }, 5000)
+      // plus de redirection automatique
 
     } catch (error) {
       alert('Une erreur est survenue. Vérifie ta clé API.')

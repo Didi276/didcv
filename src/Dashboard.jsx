@@ -10,6 +10,7 @@ function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(null)
   const [selectedCv, setSelectedCv] = useState(null)
+  const [showLettre, setShowLettre] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,8 +39,9 @@ function Dashboard() {
     setCvs(cvs.filter(cv => cv.id !== id))
   }
 
-  const handleDownload = async (cv) => {
+  const handleDownloadCV = async (cv) => {
     setSelectedCv(cv)
+    setShowLettre(false)
     setTimeout(async () => {
       const element = document.getElementById('cv-to-print')
       if (!element) return
@@ -58,6 +60,16 @@ function Dashboard() {
     }, 500)
   }
 
+  const handleDownloadLettre = (cv) => {
+    if (!cv.lettre_motivation) return
+    const blob = new Blob([cv.lettre_motivation], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `Lettre-${cv.cv_data.prenom}-${cv.cv_data.nom}.txt`
+    a.click()
+  }
+
   const formatDate = (dateStr) => {
     if (!dateStr) return ''
     const date = new Date(dateStr)
@@ -74,7 +86,6 @@ function Dashboard() {
         <a className="logo" href="/"><span>Did</span>CV</a>
         <div className="nav-btns">
           <a href="/templates" className="btn-ghost">+ Nouveau CV</a>
-          <a href="/lettre" className="btn-ghost">✉️ Lettre de motivation</a>
           <button className="btn-ghost" onClick={handleLogout}>Se déconnecter</button>
         </div>
       </nav>
@@ -102,14 +113,19 @@ function Dashboard() {
           <div className="dashboard-grid">
             {cvs.map((cv) => (
               <div key={cv.id} className="dashboard-card">
-                <div className="dashboard-card-preview" onClick={() => setSelectedCv(cv)}>
+                <div className="dashboard-card-preview" onClick={() => { setSelectedCv(cv); setShowLettre(false) }}>
                   <div className="cv-preview-mini">
                     <div style={{fontSize:'11px', fontWeight:'700', marginBottom:'4px'}}>
                       {cv.cv_data.prenom} {cv.cv_data.nom}
                     </div>
-                    <div style={{fontSize:'10px', color:'#666', marginBottom:'8px'}}>
+                    <div style={{fontSize:'10px', color:'#666', marginBottom:'6px'}}>
                       {cv.cv_data.titre}
                     </div>
+                    {cv.offre_titre && (
+                      <div style={{fontSize:'9px', color:'#1a56db', background:'#eff4ff', padding:'2px 8px', borderRadius:'10px', display:'inline-block', marginBottom:'4px'}}>
+                        🎯 {cv.offre_titre}
+                      </div>
+                    )}
                     <div style={{fontSize:'9px', color:'#888', background:'#f0f0f0', padding:'2px 8px', borderRadius:'10px', display:'inline-block'}}>
                       {cv.template}
                     </div>
@@ -120,8 +136,14 @@ function Dashboard() {
                     {formatDate(cv.created_at)}
                   </div>
                   <div className="dashboard-card-actions">
-                    <button className="btn-view" onClick={() => setSelectedCv(cv)}>👁 Voir</button>
-                    <button className="btn-view" onClick={() => handleDownload(cv)}>📥 PDF</button>
+                    <button className="btn-view" onClick={() => { setSelectedCv(cv); setShowLettre(false) }}>👁 CV</button>
+                    {cv.lettre_motivation && (
+                      <button className="btn-view" onClick={() => { setSelectedCv(cv); setShowLettre(true) }}>✉️ Lettre</button>
+                    )}
+                    <button className="btn-view" onClick={() => handleDownloadCV(cv)}>📥 PDF</button>
+                    {cv.lettre_motivation && (
+                      <button className="btn-view" onClick={() => handleDownloadLettre(cv)}>📄</button>
+                    )}
                     <button className="btn-delete" onClick={() => handleDelete(cv.id)}>🗑</button>
                   </div>
                 </div>
@@ -135,11 +157,32 @@ function Dashboard() {
         <div className="cv-modal" onClick={() => setSelectedCv(null)}>
           <div className="cv-modal-content" onClick={e => e.stopPropagation()}>
             <div className="cv-modal-header">
-              <span>{selectedCv.cv_data.prenom} {selectedCv.cv_data.nom} — {selectedCv.template}</span>
+              <div style={{display:'flex', gap:'8px', alignItems:'center'}}>
+                <button
+                  onClick={() => setShowLettre(false)}
+                  style={{padding:'4px 12px', borderRadius:'6px', border:'none', cursor:'pointer', background: !showLettre ? '#1a56db' : '#f0f0f0', color: !showLettre ? '#fff' : '#333', fontSize:'12px'}}
+                >
+                  📄 CV
+                </button>
+                {selectedCv.lettre_motivation && (
+                  <button
+                    onClick={() => setShowLettre(true)}
+                    style={{padding:'4px 12px', borderRadius:'6px', border:'none', cursor:'pointer', background: showLettre ? '#1a56db' : '#f0f0f0', color: showLettre ? '#fff' : '#333', fontSize:'12px'}}
+                  >
+                    ✉️ Lettre
+                  </button>
+                )}
+              </div>
               <button className="cv-modal-close" onClick={() => setSelectedCv(null)}>✕</button>
             </div>
             <div className="cv-modal-body">
-              <CVTemplate cvData={selectedCv.cv_data} template={selectedCv.template} />
+              {showLettre ? (
+                <div style={{fontFamily:'Georgia,serif', fontSize:'14px', lineHeight:'1.8', color:'#222', whiteSpace:'pre-wrap', padding:'20px', maxWidth:'700px', margin:'0 auto'}}>
+                  {selectedCv.lettre_motivation}
+                </div>
+              ) : (
+                <CVTemplate cvData={selectedCv.cv_data} template={selectedCv.template} />
+              )}
             </div>
           </div>
         </div>
