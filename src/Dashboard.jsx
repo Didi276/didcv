@@ -1,5 +1,3 @@
-import ReactQuill from 'react-quill'
-import 'react-quill/dist/quill.snow.css'
 import { useState, useEffect } from 'react'
 import { supabase } from './supabase'
 import { CVTemplate } from './CVTemplates'
@@ -15,7 +13,7 @@ function Dashboard() {
   const [selectedCv, setSelectedCv] = useState(null)
   const [showLettre, setShowLettre] = useState(false)
   const [editingLettre, setEditingLettre] = useState(false)
-const [lettreEditee, setLettreEditee] = useState('')
+  const [lettreEditee, setLettreEditee] = useState('')
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,7 +26,6 @@ const [lettreEditee, setLettreEditee] = useState('')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
         setCvs(cvData || [])
-
         const { data: profileData } = await supabase
           .from('profiles')
           .select('*')
@@ -59,11 +56,7 @@ const [lettreEditee, setLettreEditee] = useState('')
       const element = document.getElementById('cv-to-print')
       if (!element) return
       const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#ffffff',
-        width: 794,
-        height: 1123
+        scale: 2, useCORS: true, backgroundColor: '#ffffff', width: 794, height: 1123
       })
       const imgData = canvas.toDataURL('image/png')
       const pdf = new jsPDF('p', 'mm', 'a4')
@@ -91,12 +84,8 @@ const [lettreEditee, setLettreEditee] = useState('')
   }
 
   const templateColors = {
-    finance: '#1a1a1a',
-    linkedin: '#0a66c2',
-    canva: '#f093fb',
-    harvard: '#A51C30',
-    siliconvalley: '#1d1d1f',
-    moderne: '#0f6e56'
+    finance: '#1a1a1a', linkedin: '#0a66c2', canva: '#f093fb',
+    harvard: '#A51C30', siliconvalley: '#1d1d1f', moderne: '#0f6e56'
   }
 
   if (loading) return (
@@ -118,8 +107,6 @@ const [lettreEditee, setLettreEditee] = useState('')
       </nav>
 
       <div className="dashboard-wrap">
-
-        {/* Header */}
         <div className="dashboard-hero">
           <div>
             <h2>Bonjour {profile?.prenom || user?.email?.split('@')[0]} 👋</h2>
@@ -143,7 +130,6 @@ const [lettreEditee, setLettreEditee] = useState('')
           </div>
         </div>
 
-        {/* Profil incomplet */}
         {!profile?.prenom && (
           <div className="dashboard-banner">
             <div>
@@ -154,7 +140,6 @@ const [lettreEditee, setLettreEditee] = useState('')
           </div>
         )}
 
-        {/* CV List */}
         {cvs.length === 0 ? (
           <div className="dashboard-empty">
             <div style={{fontSize:'64px', marginBottom:'16px'}}>📄</div>
@@ -179,9 +164,7 @@ const [lettreEditee, setLettreEditee] = useState('')
                     <div className="dashboard-card2-info">
                       <div className="dashboard-card2-name">{cv.cv_data.prenom} {cv.cv_data.nom}</div>
                       <div className="dashboard-card2-titre">{cv.cv_data.titre}</div>
-                      {cv.offre_titre && (
-                        <div className="dashboard-card2-offre">🎯 {cv.offre_titre}</div>
-                      )}
+                      {cv.offre_titre && <div className="dashboard-card2-offre">🎯 {cv.offre_titre}</div>}
                     </div>
                     <div className="dashboard-card2-template" style={{background: templateColors[cv.template] + '15', color: templateColors[cv.template] || '#1a56db'}}>
                       {cv.template}
@@ -204,7 +187,6 @@ const [lettreEditee, setLettreEditee] = useState('')
         )}
       </div>
 
-      {/* Modal */}
       {selectedCv && (
         <div className="cv-modal" onClick={() => setSelectedCv(null)}>
           <div className="cv-modal-content" onClick={e => e.stopPropagation()}>
@@ -227,44 +209,44 @@ const [lettreEditee, setLettreEditee] = useState('')
             </div>
             <div className="cv-modal-body">
               {showLettre ? (
-  <div style={{padding:'40px', maxWidth:'700px', margin:'0 auto', width:'100%'}}>
-    {editingLettre ? (
-      <div>
-        <ReactQuill
-  value={lettreEditee}
-  onChange={setLettreEditee}
-  style={{height:'350px', marginBottom:'50px'}}
-  modules={{
-    toolbar: [
-      ['bold', 'italic', 'underline'],
-      [{ 'size': ['small', false, 'large', 'huge'] }],
-      [{ 'color': [] }],
-      [{ 'align': [] }],
-      ['clean']
-    ]
-  }}
-/>
-        <div style={{display:'flex', gap:'8px', marginTop:'12px'}}>
-          <button className="btn-generate" style={{width:'auto', padding:'10px 24px'}} onClick={async () => {
-            await supabase.from('cvs').update({ lettre_motivation: lettreEditee }).eq('id', selectedCv.id)
-            setCvs(cvs.map(cv => cv.id === selectedCv.id ? {...cv, lettre_motivation: lettreEditee} : cv))
-            setSelectedCv({...selectedCv, lettre_motivation: lettreEditee})
-            setEditingLettre(false)
-          }}>✅ Sauvegarder</button>
-          <button className="btn-ghost" onClick={() => setEditingLettre(false)}>Annuler</button>
-        </div>
-      </div>
-    ) : (
-      <div>
-        <div style={{fontFamily:'Georgia,serif', fontSize:'14px', lineHeight:'1.8', color:'#222', whiteSpace:'pre-wrap', marginBottom:'16px'}}>
-          {selectedCv.lettre_motivation}
-        </div>
-        <button className="btn-ghost" onClick={() => { setLettreEditee(selectedCv.lettre_motivation); setEditingLettre(true) }}>
-          ✏️ Modifier la lettre
-        </button>
-      </div>
-    )}
-  </div>
+                <div style={{padding:'40px', maxWidth:'700px', margin:'0 auto', width:'100%'}}>
+                  {editingLettre ? (
+                    <div>
+                      <div style={{border:'1px solid var(--border)', borderRadius:'8px', overflow:'hidden'}}>
+                        <div style={{background:'var(--bg2)', padding:'8px 12px', borderBottom:'1px solid var(--border)', display:'flex', gap:'8px'}}>
+                          <button type="button" style={{padding:'3px 10px', borderRadius:'4px', border:'1px solid var(--border)', background:'#fff', fontWeight:'700', cursor:'pointer'}} onClick={() => document.execCommand('bold')}>G</button>
+                          <button type="button" style={{padding:'3px 10px', borderRadius:'4px', border:'1px solid var(--border)', background:'#fff', fontStyle:'italic', cursor:'pointer'}} onClick={() => document.execCommand('italic')}>I</button>
+                          <button type="button" style={{padding:'3px 10px', borderRadius:'4px', border:'1px solid var(--border)', background:'#fff', textDecoration:'underline', cursor:'pointer'}} onClick={() => document.execCommand('underline')}>S</button>
+                        </div>
+                        <div
+                          contentEditable
+                          suppressContentEditableWarning
+                          onInput={e => setLettreEditee(e.currentTarget.innerHTML)}
+                          dangerouslySetInnerHTML={{__html: lettreEditee}}
+                          style={{minHeight:'350px', padding:'16px', fontFamily:'Georgia,serif', fontSize:'14px', lineHeight:'1.8', color:'#222', outline:'none'}}
+                        />
+                      </div>
+                      <div style={{display:'flex', gap:'8px', marginTop:'12px'}}>
+                        <button className="btn-generate" style={{width:'auto', padding:'10px 24px'}} onClick={async () => {
+                          await supabase.from('cvs').update({ lettre_motivation: lettreEditee }).eq('id', selectedCv.id)
+                          setCvs(cvs.map(cv => cv.id === selectedCv.id ? {...cv, lettre_motivation: lettreEditee} : cv))
+                          setSelectedCv({...selectedCv, lettre_motivation: lettreEditee})
+                          setEditingLettre(false)
+                        }}>✅ Sauvegarder</button>
+                        <button className="btn-ghost" onClick={() => setEditingLettre(false)}>Annuler</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <div style={{fontFamily:'Georgia,serif', fontSize:'14px', lineHeight:'1.8', color:'#222', whiteSpace:'pre-wrap', marginBottom:'16px'}}>
+                        {selectedCv.lettre_motivation}
+                      </div>
+                      <button className="btn-ghost" onClick={() => { setLettreEditee(selectedCv.lettre_motivation); setEditingLettre(true) }}>
+                        ✏️ Modifier la lettre
+                      </button>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <CVTemplate cvData={selectedCv.cv_data} template={selectedCv.template} />
               )}
