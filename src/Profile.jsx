@@ -196,7 +196,7 @@ Retourne UNIQUEMENT un objet JSON valide avec cette structure exacte :
       <div className="profile-wrap">
         <div className="profile-header">
           <h2>Mon <em>profil</em></h2>
-          <p className="profile-sub">Remplis ton profil une fois — génère des CV illimités sans uploader ton CV à chaque fois.</p>
+          <p className="profile-sub">Importe ton CV PDF pour remplir ton profil automatiquement, puis complète et modifie les informations à ta guise. Une fois sauvegardé, tu n'auras plus besoin d'uploader ton CV pour générer de nouveaux CV !</p>
         </div>
 
         <div className="import-cv-box">
@@ -205,7 +205,10 @@ Retourne UNIQUEMENT un objet JSON valide avec cette structure exacte :
             {importing ? (
               <div className="import-cv-loading">⏳ Analyse de ton CV en cours...</div>
             ) : importFile ? (
-              <div className="import-cv-done">✅ Profil importé depuis {importFile.name} — vérifie et sauvegarde !</div>
+              <div className="import-cv-done">
+  ✅ Profil importé depuis {importFile.name} !<br/>
+  <span style={{fontSize:'12px', color:'#555'}}>Certaines informations peuvent manquer — vérifie et complète les sections vides avant de sauvegarder.</span>
+</div>
             ) : (
               <div className="import-cv-placeholder">
                 <div style={{fontSize:'32px', marginBottom:'8px'}}>📄</div>
