@@ -375,20 +375,28 @@ const [cvEdite, setCvEdite] = useState(null)
             <div key={i} style={{background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:'10px', padding:'16px', marginBottom:'12px'}}>
               <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px'}}>
                 {[
-                  {label:'Diplôme', key:'diplome'},
-                  {label:'Établissement', key:'etablissement'},
-                  {label:'Période', key:'periode'},
-                  {label:'Mention', key:'mention'},
-                ].map(({label, key}) => (
-                  <div key={key}>
-                    <label style={{fontSize:'11px', fontWeight:'600', color:'var(--muted)', textTransform:'uppercase', display:'block', marginBottom:'4px'}}>{label}</label>
-                    <input className="profile-input" value={f[key] || ''} onChange={e => {
-                      const fors = [...cvEdite.formations]
-                      fors[i] = {...fors[i], [key]: e.target.value}
-                      setCvEdite({...cvEdite, formations: fors})
-                    }} />
-                  </div>
-                ))}
+  {label:'Diplôme', key:'diplome'},
+  {label:'Établissement', key:'etablissement'},
+  {label:'Période', key:'periode'},
+  {label:'Mention', key:'mention'},
+].map(({label, key}) => (
+  <div key={key}>
+    <label style={{fontSize:'11px', fontWeight:'600', color:'var(--muted)', textTransform:'uppercase', display:'block', marginBottom:'4px'}}>{label}</label>
+    <input className="profile-input" value={f[key] || ''} onChange={e => {
+      const fors = [...cvEdite.formations]
+      fors[i] = {...fors[i], [key]: e.target.value}
+      setCvEdite({...cvEdite, formations: fors})
+    }} />
+  </div>
+))}
+<div style={{gridColumn:'1/-1', marginTop:'8px'}}>
+  <label style={{fontSize:'11px', fontWeight:'600', color:'var(--muted)', textTransform:'uppercase', display:'block', marginBottom:'4px'}}>Description</label>
+  <textarea className="profile-input" rows={3} value={f.description || ''} onChange={e => {
+    const fors = [...cvEdite.formations]
+    fors[i] = {...fors[i], description: e.target.value}
+    setCvEdite({...cvEdite, formations: fors})
+  }} placeholder="Décris tes cours, projets, spécialités..." />
+</div>
               </div>
             </div>
           ))}
