@@ -196,7 +196,9 @@ Retourne UNIQUEMENT un objet JSON valide avec cette structure exacte :
       <div className="profile-wrap">
         <div className="profile-header">
           <h2>Mon <em>profil</em></h2>
-          <p className="profile-sub">Importe ton CV PDF pour remplir ton profil automatiquement, puis complète et modifie les informations à ta guise. Une fois sauvegardé, tu n'auras plus besoin d'uploader ton CV pour générer de nouveaux CV !</p>
+          <p className="profile-sub">
+            Importe ton CV PDF pour pré-remplir ton profil automatiquement. ⚠️ La lecture automatique n'est pas parfaite — les expériences et missions peuvent être mélangées selon la mise en page de ton CV. <strong>Vérifie et corrige chaque section avant de sauvegarder.</strong>
+          </p>
         </div>
 
         <div className="import-cv-box">
