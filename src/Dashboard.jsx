@@ -41,16 +41,10 @@ function Dashboard() {
       setUser(user)
       if (user) {
         const { data: cvData } = await supabase
-          .from('cvs')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
+          .from('cvs').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
         setCvs(cvData || [])
         const { data: profileData } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('user_id', user.id)
-          .single()
+          .from('profiles').select('*').eq('user_id', user.id).single()
         setProfile(profileData)
       }
       setLoading(false)
@@ -75,9 +69,7 @@ function Dashboard() {
     setTimeout(async () => {
       const element = document.getElementById('cv-to-print')
       if (!element) return
-      const canvas = await html2canvas(element, {
-        scale: 2, useCORS: true, backgroundColor: '#ffffff', width: 794, height: 1123
-      })
+      const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff', width: 794, height: 1123 })
       const imgData = canvas.toDataURL('image/png')
       const pdf = new jsPDF('p', 'mm', 'a4')
       pdf.addImage(imgData, 'PNG', 0, 0, 210, 297)
@@ -98,15 +90,26 @@ function Dashboard() {
 
   const formatDate = (dateStr) => {
     if (!dateStr) return ''
-    return new Date(dateStr).toLocaleDateString('fr-FR', {
-      day: '2-digit', month: 'long', year: 'numeric'
-    })
+    return new Date(dateStr).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })
   }
 
   const templateColors = {
     finance: '#1a1a1a', linkedin: '#0a66c2', canva: '#f093fb',
     harvard: '#A51C30', siliconvalley: '#1d1d1f', moderne: '#0f6e56'
   }
+
+  const ToolbarBtn = ({ onClick, active, children, title }) => (
+    <button type="button" title={title} onClick={onClick} style={{
+      width:'32px', height:'32px', borderRadius:'6px', border:'1px solid',
+      borderColor: active ? '#1a56db' : '#e5e7ef',
+      background: active ? '#eff4ff' : '#fff',
+      color: active ? '#1a56db' : '#374151',
+      cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
+      fontSize:'13px', fontWeight:'600', transition:'all 0.15s'
+    }}>
+      {children}
+    </button>
+  )
 
   if (loading) return (
     <div style={{display:'flex', alignItems:'center', justifyContent:'center', height:'100vh', flexDirection:'column', gap:'12px'}}>
@@ -173,11 +176,7 @@ function Dashboard() {
             <div className="dashboard-grid">
               {cvs.map((cv) => (
                 <div key={cv.id} className="dashboard-card2">
-                  <div
-                    className="dashboard-card2-top"
-                    style={{borderTop: `4px solid ${templateColors[cv.template] || '#1a56db'}`}}
-                    onClick={() => { setSelectedCv(cv); setShowLettre(false) }}
-                  >
+                  <div className="dashboard-card2-top" style={{borderTop: `4px solid ${templateColors[cv.template] || '#1a56db'}`}} onClick={() => { setSelectedCv(cv); setShowLettre(false) }}>
                     <div className="dashboard-card2-avatar" style={{background: templateColors[cv.template] || '#1a56db'}}>
                       {cv.cv_data.prenom?.[0]}{cv.cv_data.nom?.[0]}
                     </div>
@@ -212,13 +211,9 @@ function Dashboard() {
           <div className="cv-modal-content" onClick={e => e.stopPropagation()}>
             <div className="cv-modal-header">
               <div style={{display:'flex', gap:'8px', alignItems:'center'}}>
-                <button onClick={() => setShowLettre(false)} style={{padding:'6px 14px', borderRadius:'8px', border:'none', cursor:'pointer', background: !showLettre ? '#1a56db' : '#f0f0f0', color: !showLettre ? '#fff' : '#333', fontSize:'13px', fontWeight:'500'}}>
-                  📄 CV
-                </button>
+                <button onClick={() => setShowLettre(false)} style={{padding:'6px 14px', borderRadius:'8px', border:'none', cursor:'pointer', background: !showLettre ? '#1a56db' : '#f0f0f0', color: !showLettre ? '#fff' : '#333', fontSize:'13px', fontWeight:'500'}}>📄 CV</button>
                 {selectedCv.lettre_motivation && (
-                  <button onClick={() => setShowLettre(true)} style={{padding:'6px 14px', borderRadius:'8px', border:'none', cursor:'pointer', background: showLettre ? '#1a56db' : '#f0f0f0', color: showLettre ? '#fff' : '#333', fontSize:'13px', fontWeight:'500'}}>
-                    ✉️ Lettre
-                  </button>
+                  <button onClick={() => setShowLettre(true)} style={{padding:'6px 14px', borderRadius:'8px', border:'none', cursor:'pointer', background: showLettre ? '#1a56db' : '#f0f0f0', color: showLettre ? '#fff' : '#333', fontSize:'13px', fontWeight:'500'}}>✉️ Lettre</button>
                 )}
               </div>
               <div style={{display:'flex', gap:'8px', alignItems:'center'}}>
@@ -232,27 +227,43 @@ function Dashboard() {
                 <div style={{padding:'40px', maxWidth:'700px', margin:'0 auto', width:'100%'}}>
                   {editingLettre ? (
                     <div>
-                      <div style={{border:'1px solid var(--border)', borderRadius:'8px', overflow:'hidden'}}>
-                        <div style={{background:'var(--bg2)', padding:'8px 12px', borderBottom:'1px solid var(--border)', display:'flex', gap:'6px', flexWrap:'wrap', alignItems:'center'}}>
-                          <button type="button" title="Gras" onClick={() => editor.chain().focus().toggleBold().run()} style={{padding:'4px 10px', borderRadius:'4px', border:'1px solid var(--border)', background: editor?.isActive('bold') ? '#e0e7ff' : '#fff', fontWeight:'700', cursor:'pointer', fontSize:'13px'}}>G</button>
-                          <button type="button" title="Italique" onClick={() => editor.chain().focus().toggleItalic().run()} style={{padding:'4px 10px', borderRadius:'4px', border:'1px solid var(--border)', background: editor?.isActive('italic') ? '#e0e7ff' : '#fff', fontStyle:'italic', cursor:'pointer', fontSize:'13px'}}>I</button>
-                          <button type="button" title="Souligné" onClick={() => editor.chain().focus().toggleUnderline().run()} style={{padding:'4px 10px', borderRadius:'4px', border:'1px solid var(--border)', background: editor?.isActive('underline') ? '#e0e7ff' : '#fff', textDecoration:'underline', cursor:'pointer', fontSize:'13px'}}>S</button>
-                          <div style={{width:'1px', height:'24px', background:'var(--border)', margin:'0 4px'}}></div>
-                          <button type="button" title="Aligner gauche" onClick={() => editor.chain().focus().setTextAlign('left').run()} style={{padding:'4px 10px', borderRadius:'4px', border:'1px solid var(--border)', background: editor?.isActive({textAlign:'left'}) ? '#e0e7ff' : '#fff', cursor:'pointer', fontSize:'12px'}}>≡</button>
-                          <button type="button" title="Centrer" onClick={() => editor.chain().focus().setTextAlign('center').run()} style={{padding:'4px 10px', borderRadius:'4px', border:'1px solid var(--border)', background: editor?.isActive({textAlign:'center'}) ? '#e0e7ff' : '#fff', cursor:'pointer', fontSize:'12px'}}>≡</button>
-                          <button type="button" title="Aligner droite" onClick={() => editor.chain().focus().setTextAlign('right').run()} style={{padding:'4px 10px', borderRadius:'4px', border:'1px solid var(--border)', background: editor?.isActive({textAlign:'right'}) ? '#e0e7ff' : '#fff', cursor:'pointer', fontSize:'12px'}}>≡</button>
-                          <div style={{width:'1px', height:'24px', background:'var(--border)', margin:'0 4px'}}></div>
-                          <button type="button" title="Titre" onClick={() => editor.chain().focus().toggleHeading({level:2}).run()} style={{padding:'4px 10px', borderRadius:'4px', border:'1px solid var(--border)', background: editor?.isActive('heading') ? '#e0e7ff' : '#fff', cursor:'pointer', fontSize:'13px', fontWeight:'600'}}>H</button>
-                          <button type="button" title="Liste" onClick={() => editor.chain().focus().toggleBulletList().run()} style={{padding:'4px 10px', borderRadius:'4px', border:'1px solid var(--border)', background: editor?.isActive('bulletList') ? '#e0e7ff' : '#fff', cursor:'pointer', fontSize:'13px'}}>• Liste</button>
-                          <div style={{width:'1px', height:'24px', background:'var(--border)', margin:'0 4px'}}></div>
-                          <input type="color" title="Couleur" onChange={e => editor.chain().focus().setColor(e.target.value).run()} style={{width:'32px', height:'28px', padding:'2px', border:'1px solid var(--border)', borderRadius:'4px', cursor:'pointer'}} />
+                      <div style={{border:'1px solid #e5e7ef', borderRadius:'8px', overflow:'hidden', boxShadow:'0 2px 8px rgba(0,0,0,0.06)'}}>
+                        <div style={{background:'#f8fafc', padding:'10px 14px', borderBottom:'1px solid #e5e7ef', display:'flex', gap:'4px', flexWrap:'wrap', alignItems:'center'}}>
+                          <ToolbarBtn onClick={() => editor.chain().focus().toggleBold().run()} active={editor?.isActive('bold')} title="Gras">
+                            <span style={{fontWeight:'900'}}>B</span>
+                          </ToolbarBtn>
+                          <ToolbarBtn onClick={() => editor.chain().focus().toggleItalic().run()} active={editor?.isActive('italic')} title="Italique">
+                            <span style={{fontStyle:'italic'}}>I</span>
+                          </ToolbarBtn>
+                          <ToolbarBtn onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor?.isActive('underline')} title="Souligné">
+                            <span style={{textDecoration:'underline'}}>U</span>
+                          </ToolbarBtn>
+                          <div style={{width:'1px', height:'24px', background:'#e5e7ef', margin:'0 4px'}}></div>
+                          <ToolbarBtn onClick={() => editor.chain().focus().setTextAlign('left').run()} active={editor?.isActive({textAlign:'left'})} title="Aligner gauche">
+                            <span>⬅</span>
+                          </ToolbarBtn>
+                          <ToolbarBtn onClick={() => editor.chain().focus().setTextAlign('center').run()} active={editor?.isActive({textAlign:'center'})} title="Centrer">
+                            <span>↔</span>
+                          </ToolbarBtn>
+                          <ToolbarBtn onClick={() => editor.chain().focus().setTextAlign('right').run()} active={editor?.isActive({textAlign:'right'})} title="Aligner droite">
+                            <span>➡</span>
+                          </ToolbarBtn>
+                          <div style={{width:'1px', height:'24px', background:'#e5e7ef', margin:'0 4px'}}></div>
+                          <ToolbarBtn onClick={() => editor.chain().focus().toggleHeading({level:2}).run()} active={editor?.isActive('heading')} title="Titre">
+                            <span>H2</span>
+                          </ToolbarBtn>
+                          <ToolbarBtn onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor?.isActive('bulletList')} title="Liste à puces">
+                            <span>≡</span>
+                          </ToolbarBtn>
+                          <div style={{width:'1px', height:'24px', background:'#e5e7ef', margin:'0 4px'}}></div>
+                          <div style={{display:'flex', alignItems:'center', gap:'4px'}}>
+                            <span style={{fontSize:'12px', color:'#6b7280'}}>A</span>
+                            <input type="color" title="Couleur du texte" onChange={e => editor.chain().focus().setColor(e.target.value).run()} style={{width:'28px', height:'28px', padding:'2px', border:'1px solid #e5e7ef', borderRadius:'6px', cursor:'pointer'}} />
+                          </div>
                         </div>
-                        <EditorContent
-                          editor={editor}
-                          style={{minHeight:'350px', padding:'16px', fontFamily:'Georgia,serif', fontSize:'14px', lineHeight:'1.8', color:'#222'}}
-                        />
+                        <EditorContent editor={editor} style={{minHeight:'350px', padding:'20px', fontFamily:'Georgia,serif', fontSize:'14px', lineHeight:'1.8', color:'#222'}} />
                       </div>
-                      <div style={{display:'flex', gap:'8px', marginTop:'12px'}}>
+                      <div style={{display:'flex', gap:'8px', marginTop:'16px'}}>
                         <button className="btn-generate" style={{width:'auto', padding:'10px 24px'}} onClick={async () => {
                           await supabase.from('cvs').update({ lettre_motivation: lettreEditee }).eq('id', selectedCv.id)
                           setCvs(cvs.map(cv => cv.id === selectedCv.id ? {...cv, lettre_motivation: lettreEditee} : cv))
@@ -271,9 +282,7 @@ function Dashboard() {
                         setLettreEditee(selectedCv.lettre_motivation)
                         editor?.commands.setContent(selectedCv.lettre_motivation)
                         setEditingLettre(true)
-                      }}>
-                        ✏️ Modifier la lettre
-                      </button>
+                      }}>✏️ Modifier la lettre</button>
                     </div>
                   )}
                 </div>
