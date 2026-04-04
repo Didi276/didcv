@@ -20,7 +20,7 @@ function Home() {
         <div className="hero">
           <div>
             <h1>Ton CV <em>et ta lettre</em><br/>taillés pour<br/>chaque offre.</h1>
-            <p className="hero-sub">Upload ton CV ou crée ton profil — l'IA génère en quelques secondes un CV optimisé ATS et une lettre de motivation personnalisée. Modifie, télécharge, postule.</p>
+            <p className="hero-sub">Upload ton CV ou crée ton profil — l'IA génère en quelques secondes un CV optimisé ATS et une Lettre de motivation personnalisée. Modifie, télécharge, postule.</p>
             <div className="hero-actions">
               <a href="/auth" className="btn-primary-lg">Essayer gratuitement →</a>
               <a href="#how" className="btn-outline-lg">Voir comment ça marche</a>
@@ -65,7 +65,7 @@ function Home() {
         <div className="steps-grid">
           <div className="step"><div className="step-num">ÉTAPE 01</div><div className="step-icon">👤</div><h3>Crée ton profil</h3><p>Remplis ton profil une fois ou uploade ton CV PDF. L'IA extrait toutes tes informations automatiquement.</p></div>
           <div className="step"><div className="step-num">ÉTAPE 02</div><div className="step-icon">🎯</div><h3>Colle l'offre d'emploi</h3><p>Copie-colle le texte de l'offre. L'IA analyse les mots-clés, les compétences et adapte ton profil.</p></div>
-          <div className="step"><div className="step-num">ÉTAPE 03</div><div className="step-icon">✅</div><h3>Télécharge et postule</h3><p>Ton CV optimisé et ta lettre de motivation sont prêts en quelques secondes. Modifie-les et télécharge en PDF.</p></div>
+          <div className="step"><div className="step-num">ÉTAPE 03</div><div className="step-icon">✅</div><h3>Télécharge et postule</h3><p>Ton CV optimisé et ta Lettre de motivation sont prêts en quelques secondes. Modifie-les et télécharge en PDF.</p></div>
         </div>
       </section>
 
@@ -74,7 +74,7 @@ function Home() {
           <div className="section-label">Fonctionnalités</div>
           <h2 className="section-title">Tout ce qu'il faut<br/>pour <em>décrocher l'entretien</em>.</h2>
           <div className="feat-grid">
-            <div className="feat-card"><div className="feat-icon">🤖</div><h3>CV + Lettre générés ensemble</h3><p>L'IA génère simultanément ton CV optimisé ATS et une lettre de motivation personnalisée adaptée à chaque offre.</p></div>
+            <div className="feat-card"><div className="feat-icon">🤖</div><h3>CV + Lettre générés ensemble</h3><p>L'IA génère simultanément ton CV optimisé ATS et une Lettre de motivation personnalisée adaptée à chaque offre.</p></div>
             <div className="feat-card"><div className="feat-icon">✏️</div><h3>Éditeur intégré</h3><p>Modifie chaque section de ton CV et ta lettre directement sur le site — missions, compétences, formations, mise en forme.</p></div>
             <div className="feat-card"><div className="feat-icon">👤</div><h3>Profil centralisé</h3><p>Crée ton profil une fois. Génère autant de CV que tu veux en collant juste l'offre — plus besoin d'uploader ton CV à chaque fois.</p></div>
             <div className="feat-card"><div className="feat-icon">🎨</div><h3>6 templates professionnels</h3><p>Finance, LinkedIn, Harvard, Silicon Valley, Canva, Moderne — des designs validés par des recruteurs pour tous les secteurs.</p></div>
