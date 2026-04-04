@@ -12,6 +12,8 @@ function Dashboard() {
   const [profile, setProfile] = useState(null)
   const [selectedCv, setSelectedCv] = useState(null)
   const [showLettre, setShowLettre] = useState(false)
+  const [editingLettre, setEditingLettre] = useState(false)
+const [lettreEditee, setLettreEditee] = useState('')
 
   useEffect(() => {
     const fetchData = async () => {
@@ -223,9 +225,35 @@ function Dashboard() {
             </div>
             <div className="cv-modal-body">
               {showLettre ? (
-                <div style={{fontFamily:'Georgia,serif', fontSize:'14px', lineHeight:'1.8', color:'#222', whiteSpace:'pre-wrap', padding:'40px', maxWidth:'700px', margin:'0 auto'}}>
-                  {selectedCv.lettre_motivation}
-                </div>
+  <div style={{padding:'40px', maxWidth:'700px', margin:'0 auto', width:'100%'}}>
+    {editingLettre ? (
+      <div>
+        <textarea
+          value={lettreEditee}
+          onChange={e => setLettreEditee(e.target.value)}
+          style={{width:'100%', minHeight:'400px', fontFamily:'Georgia,serif', fontSize:'14px', lineHeight:'1.8', color:'#222', border:'1px solid var(--border)', borderRadius:'8px', padding:'16px', outline:'none', resize:'vertical'}}
+        />
+        <div style={{display:'flex', gap:'8px', marginTop:'12px'}}>
+          <button className="btn-generate" style={{width:'auto', padding:'10px 24px'}} onClick={async () => {
+            await supabase.from('cvs').update({ lettre_motivation: lettreEditee }).eq('id', selectedCv.id)
+            setCvs(cvs.map(cv => cv.id === selectedCv.id ? {...cv, lettre_motivation: lettreEditee} : cv))
+            setSelectedCv({...selectedCv, lettre_motivation: lettreEditee})
+            setEditingLettre(false)
+          }}>✅ Sauvegarder</button>
+          <button className="btn-ghost" onClick={() => setEditingLettre(false)}>Annuler</button>
+        </div>
+      </div>
+    ) : (
+      <div>
+        <div style={{fontFamily:'Georgia,serif', fontSize:'14px', lineHeight:'1.8', color:'#222', whiteSpace:'pre-wrap', marginBottom:'16px'}}>
+          {selectedCv.lettre_motivation}
+        </div>
+        <button className="btn-ghost" onClick={() => { setLettreEditee(selectedCv.lettre_motivation); setEditingLettre(true) }}>
+          ✏️ Modifier la lettre
+        </button>
+      </div>
+    )}
+  </div>
               ) : (
                 <CVTemplate cvData={selectedCv.cv_data} template={selectedCv.template} />
               )}
