@@ -57,7 +57,6 @@ function Generate() {
 
   const buildProfileText = (profile) => {
     let text = `Prénom: ${profile.prenom}\nNom: ${profile.nom}\nEmail: ${profile.email}\nTéléphone: ${profile.telephone}\nVille: ${profile.ville}\nLinkedIn: ${profile.linkedin}\nTitre: ${profile.titre}\nAccroche: ${profile.accroche}\n\n`
-    
     if (profile.experiences?.length > 0) {
       text += 'EXPÉRIENCES:\n'
       profile.experiences.forEach(exp => {
@@ -65,28 +64,21 @@ function Generate() {
         exp.missions?.forEach(m => { if(m) text += `  • ${m}\n` })
       })
     }
-    
     if (profile.formations?.length > 0) {
       text += '\nFORMATIONS:\n'
-      profile.formations.forEach(f => {
-        text += `- ${f.diplome} à ${f.etablissement} (${f.periode})\n`
-      })
+      profile.formations.forEach(f => { text += `- ${f.diplome} à ${f.etablissement} (${f.periode})\n` })
     }
-    
     if (profile.competences?.length > 0) {
       text += '\nCOMPÉTENCES:\n' + profile.competences.filter(c => c).join(', ') + '\n'
     }
-    
     if (profile.langues?.length > 0) {
       text += '\nLANGUES:\n'
       profile.langues.forEach(l => { text += `- ${l.langue}: ${l.niveau}\n` })
     }
-
     if (profile.certifications?.length > 0) {
       text += '\nCERTIFICATIONS:\n'
       profile.certifications.forEach(c => { text += `- ${c.titre} (${c.organisme}, ${c.annee})\n` })
     }
-
     return text
   }
 
@@ -108,7 +100,6 @@ function Generate() {
         .from('cvs')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', user.id)
-      
       const adminEmails = ['fernandochokki@gmail.com', 'chokkifernando@gmail.com', 'carlinazon@gmail.com']
       if (count >= 1 && !adminEmails.includes(user.email)) {
         alert('Tu as utilisé ton CV gratuit ! Passe au plan Pro pour générer des CV illimités.')
@@ -226,13 +217,7 @@ Règles :
   const handleDownloadCV = async () => {
     const element = document.getElementById('cv-to-print')
     if (!element) return
-    const canvas = await html2canvas(element, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: '#ffffff',
-      width: 794,
-      height: 1123
-    })
+    const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff', width: 794, height: 1123 })
     const imgData = canvas.toDataURL('image/png')
     const pdf = new jsPDF('p', 'mm', 'a4')
     pdf.addImage(imgData, 'PNG', 0, 0, 210, 297)
@@ -264,21 +249,23 @@ Règles :
           </p>
 
           {profile ? (
-            <div className="profile-loaded-box">
-              <button 
-  onClick={() => setProfile(null)} 
-  style={{fontSize:'12px', color:'var(--muted)', background:'none', border:'none', cursor:'pointer', marginTop:'8px', textDecoration:'underline'}}
->
-  Utiliser un CV PDF à la place →
-</button>
-              <div className="profile-loaded-info">
-                <div className="profile-loaded-avatar">{profile.prenom[0]}{profile.nom[0]}</div>
-                <div>
-                  <div style={{fontWeight:'600', fontSize:'14px'}}>{profile.prenom} {profile.nom}</div>
-                  <div style={{fontSize:'12px', color:'var(--muted)'}}>{profile.titre}</div>
+            <div style={{marginBottom:'24px'}}>
+              <div className="profile-loaded-box">
+                <div className="profile-loaded-info">
+                  <div className="profile-loaded-avatar">{profile.prenom[0]}{profile.nom[0]}</div>
+                  <div>
+                    <div style={{fontWeight:'600', fontSize:'14px'}}>{profile.prenom} {profile.nom}</div>
+                    <div style={{fontSize:'12px', color:'var(--muted)'}}>{profile.titre}</div>
+                  </div>
                 </div>
+                <a href="/profile" style={{fontSize:'12px', color:'var(--blue)'}}>Modifier mon profil →</a>
               </div>
-              <a href="/profile" style={{fontSize:'12px', color:'var(--blue)'}}>Modifier mon profil →</a>
+              <button
+                onClick={() => setProfile(null)}
+                style={{fontSize:'12px', color:'var(--muted)', background:'none', border:'none', cursor:'pointer', marginTop:'8px', textDecoration:'underline', display:'block'}}
+              >
+                Utiliser un CV PDF à la place →
+              </button>
             </div>
           ) : (
             <div className="upload-box">
