@@ -20,6 +20,8 @@ function Dashboard() {
   const [showLettre, setShowLettre] = useState(false)
   const [editingLettre, setEditingLettre] = useState(false)
   const [lettreEditee, setLettreEditee] = useState('')
+  const [editingCV, setEditingCV] = useState(false)
+const [cvEdite, setCvEdite] = useState(null)
 
   const editor = useEditor({
     extensions: [
@@ -287,8 +289,158 @@ function Dashboard() {
                   )}
                 </div>
               ) : (
-                <CVTemplate cvData={selectedCv.cv_data} template={selectedCv.template} />
-              )}
+  <div>
+    {editingCV && cvEdite ? (
+      <div style={{padding:'24px'}}>
+        <h3 style={{fontSize:'16px', fontWeight:'600', marginBottom:'20px', color:'var(--text)'}}>✏️ Modifier le CV</h3>
+        
+        <div style={{marginBottom:'20px'}}>
+          <div style={{fontSize:'12px', fontWeight:'700', color:'var(--blue)', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'12px'}}>Informations personnelles</div>
+          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
+            {[
+              {label:'Prénom', key:'prenom'},
+              {label:'Nom', key:'nom'},
+              {label:'Email', key:'email'},
+              {label:'Téléphone', key:'telephone'},
+              {label:'Ville', key:'ville'},
+              {label:'LinkedIn', key:'linkedin'},
+            ].map(({label, key}) => (
+              <div key={key}>
+                <label style={{fontSize:'11px', fontWeight:'600', color:'var(--muted)', textTransform:'uppercase', display:'block', marginBottom:'4px'}}>{label}</label>
+                <input className="profile-input" value={cvEdite[key] || ''} onChange={e => setCvEdite({...cvEdite, [key]: e.target.value})} />
+              </div>
+            ))}
+            <div style={{gridColumn:'1/-1'}}>
+              <label style={{fontSize:'11px', fontWeight:'600', color:'var(--muted)', textTransform:'uppercase', display:'block', marginBottom:'4px'}}>Titre</label>
+              <input className="profile-input" value={cvEdite.titre || ''} onChange={e => setCvEdite({...cvEdite, titre: e.target.value})} />
+            </div>
+            <div style={{gridColumn:'1/-1'}}>
+              <label style={{fontSize:'11px', fontWeight:'600', color:'var(--muted)', textTransform:'uppercase', display:'block', marginBottom:'4px'}}>Accroche</label>
+              <textarea className="profile-input" rows={3} value={cvEdite.accroche || ''} onChange={e => setCvEdite({...cvEdite, accroche: e.target.value})} />
+            </div>
+          </div>
+        </div>
+
+        <div style={{marginBottom:'20px'}}>
+          <div style={{fontSize:'12px', fontWeight:'700', color:'var(--blue)', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'12px'}}>Expériences</div>
+          {cvEdite.experiences?.map((exp, i) => (
+            <div key={i} style={{background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:'10px', padding:'16px', marginBottom:'12px'}}>
+              <div style={{fontWeight:'600', fontSize:'13px', color:'var(--blue)', marginBottom:'10px'}}>Expérience {i+1}</div>
+              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px', marginBottom:'10px'}}>
+                {[
+                  {label:'Poste', key:'poste'},
+                  {label:'Entreprise', key:'entreprise'},
+                  {label:'Période', key:'periode'},
+                  {label:'Lieu', key:'lieu'},
+                ].map(({label, key}) => (
+                  <div key={key}>
+                    <label style={{fontSize:'11px', fontWeight:'600', color:'var(--muted)', textTransform:'uppercase', display:'block', marginBottom:'4px'}}>{label}</label>
+                    <input className="profile-input" value={exp[key] || ''} onChange={e => {
+                      const exps = [...cvEdite.experiences]
+                      exps[i] = {...exps[i], [key]: e.target.value}
+                      setCvEdite({...cvEdite, experiences: exps})
+                    }} />
+                  </div>
+                ))}
+              </div>
+              <label style={{fontSize:'11px', fontWeight:'600', color:'var(--muted)', textTransform:'uppercase', display:'block', marginBottom:'6px'}}>Missions</label>
+              {exp.missions?.map((m, j) => (
+                <input key={j} className="profile-input" style={{marginBottom:'6px'}} value={m || ''} onChange={e => {
+                  const exps = [...cvEdite.experiences]
+                  exps[i].missions[j] = e.target.value
+                  setCvEdite({...cvEdite, experiences: exps})
+                }} />
+              ))}
+            </div>
+          ))}
+        </div>
+
+        <div style={{marginBottom:'20px'}}>
+          <div style={{fontSize:'12px', fontWeight:'700', color:'var(--blue)', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'12px'}}>Formations</div>
+          {cvEdite.formations?.map((f, i) => (
+            <div key={i} style={{background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:'10px', padding:'16px', marginBottom:'12px'}}>
+              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px'}}>
+                {[
+                  {label:'Diplôme', key:'diplome'},
+                  {label:'Établissement', key:'etablissement'},
+                  {label:'Période', key:'periode'},
+                  {label:'Mention', key:'mention'},
+                ].map(({label, key}) => (
+                  <div key={key}>
+                    <label style={{fontSize:'11px', fontWeight:'600', color:'var(--muted)', textTransform:'uppercase', display:'block', marginBottom:'4px'}}>{label}</label>
+                    <input className="profile-input" value={f[key] || ''} onChange={e => {
+                      const fors = [...cvEdite.formations]
+                      fors[i] = {...fors[i], [key]: e.target.value}
+                      setCvEdite({...cvEdite, formations: fors})
+                    }} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{marginBottom:'20px'}}>
+          <div style={{fontSize:'12px', fontWeight:'700', color:'var(--blue)', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'12px'}}>Compétences</div>
+          <div style={{display:'flex', flexWrap:'wrap', gap:'8px'}}>
+            {cvEdite.competences?.map((c, i) => (
+              <div key={i} style={{display:'flex', alignItems:'center', gap:'4px'}}>
+                <input className="profile-input" style={{width:'140px'}} value={c || ''} onChange={e => {
+                  const comps = [...cvEdite.competences]
+                  comps[i] = e.target.value
+                  setCvEdite({...cvEdite, competences: comps})
+                }} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{marginBottom:'24px'}}>
+          <div style={{fontSize:'12px', fontWeight:'700', color:'var(--blue)', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'12px'}}>Langues</div>
+          {cvEdite.langues?.map((l, i) => (
+            <div key={i} style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px', marginBottom:'8px'}}>
+              <div>
+                <label style={{fontSize:'11px', fontWeight:'600', color:'var(--muted)', textTransform:'uppercase', display:'block', marginBottom:'4px'}}>Langue</label>
+                <input className="profile-input" value={l.langue || ''} onChange={e => {
+                  const langs = [...cvEdite.langues]
+                  langs[i] = {...langs[i], langue: e.target.value}
+                  setCvEdite({...cvEdite, langues: langs})
+                }} />
+              </div>
+              <div>
+                <label style={{fontSize:'11px', fontWeight:'600', color:'var(--muted)', textTransform:'uppercase', display:'block', marginBottom:'4px'}}>Niveau</label>
+                <input className="profile-input" value={l.niveau || ''} onChange={e => {
+                  const langs = [...cvEdite.langues]
+                  langs[i] = {...langs[i], niveau: e.target.value}
+                  setCvEdite({...cvEdite, langues: langs})
+                }} />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{display:'flex', gap:'8px'}}>
+          <button className="btn-generate" style={{width:'auto', padding:'10px 24px'}} onClick={async () => {
+            await supabase.from('cvs').update({ cv_data: cvEdite }).eq('id', selectedCv.id)
+            setCvs(cvs.map(cv => cv.id === selectedCv.id ? {...cv, cv_data: cvEdite} : cv))
+            setSelectedCv({...selectedCv, cv_data: cvEdite})
+            setEditingCV(false)
+          }}>✅ Sauvegarder le CV</button>
+          <button className="btn-ghost" onClick={() => setEditingCV(false)}>Annuler</button>
+        </div>
+      </div>
+    ) : (
+      <div>
+        <CVTemplate cvData={selectedCv.cv_data} template={selectedCv.template} />
+        <div style={{padding:'16px', textAlign:'center', borderTop:'1px solid var(--border)'}}>
+          <button className="btn-ghost" onClick={() => { setCvEdite({...selectedCv.cv_data}); setEditingCV(true) }}>
+            ✏️ Modifier ce CV
+          </button>
+        </div>
+      </div>
+    )}
+  </div>
+)}
             </div>
           </div>
         </div>
