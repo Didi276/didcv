@@ -341,6 +341,10 @@ Retourne UNIQUEMENT un objet JSON valide avec cette structure exacte :
                     <label>Mention</label>
                     <input className="profile-input" value={f.mention} onChange={e => updateFormation(i, 'mention', e.target.value)} placeholder="Très bien" />
                   </div>
+                  <div className="profile-field" style={{gridColumn:'1/-1'}}>
+                    <label>Description</label>
+                    <textarea className="profile-input" rows={3} value={f.description || ''} onChange={e => updateFormation(i, 'description', e.target.value)} placeholder="Décris tes cours, projets, spécialités..." />
+                  </div>
                 </div>
               </div>
             ))}
