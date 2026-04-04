@@ -17,6 +17,7 @@ function Generate() {
   const [cvTexte, setCvTexte] = useState('')
   const [loading, setLoading] = useState(false)
   const [cvData, setCvData] = useState(null)
+  const [lettre, setLettre] = useState('')
   const [searchParams] = useSearchParams()
   const templateChoisi = searchParams.get('template') || 'finance'
 
@@ -47,32 +48,34 @@ function Generate() {
     }
     setLoading(true)
     setCvData(null)
-const { data: { user } } = await supabase.auth.getUser()
-if (user) {
-  const { count } = await supabase
-    .from('cvs')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-  
-  const adminEmails = ['fernandochokki@gmail.com', 'chokkifernando@gmail.com', 'carlinazon@gmail.com']
+    setLettre('')
 
-if (count >= 1 && !adminEmails.includes(user.email)) {
-  alert('Tu as utilisé ton CV gratuit ! Passe au plan Pro pour générer des CV illimités.')
-  setLoading(false)
-  return
-}
-  }
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      const { count } = await supabase
+        .from('cvs')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+      
+      const adminEmails = ['fernandochokki@gmail.com', 'chokkifernando@gmail.com', 'carlinazon@gmail.com']
+      if (count >= 1 && !adminEmails.includes(user.email)) {
+        alert('Tu as utilisé ton CV gratuit ! Passe au plan Pro pour générer des CV illimités.')
+        setLoading(false)
+        return
+      }
+    }
 
     try {
-      const response = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-haiku-4-5-20251001',
-          max_tokens: 3000,
-          messages: [{
-            role: 'user',
-            content: `Tu es un expert en recrutement et optimisation de CV pour les systèmes ATS.
+      const [responseCV, responseLM] = await Promise.all([
+        fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-haiku-4-5-20251001',
+            max_tokens: 3000,
+            messages: [{
+              role: 'user',
+              content: `Tu es un expert en recrutement et optimisation de CV pour les systèmes ATS.
 
 Voici le CV actuel du candidat :
 ${cvTexte}
@@ -98,52 +101,70 @@ Règles strictes :
   "ville": "...",
   "linkedin": "...",
   "accroche": "...",
-  "experiences": [
-    {
-      "poste": "...",
-      "entreprise": "...",
-      "periode": "...",
-      "lieu": "...",
-      "missions": ["...", "...", "..."]
-    }
-  ],
-  "formations": [
-    {
-      "diplome": "...",
-      "etablissement": "...",
-      "periode": "...",
-      "mention": "..."
-    }
-  ],
-  "competences": ["...", "...", "..."],
-  "langues": [
-    {
-      "langue": "...",
-      "niveau": "..."
-    }
-  ],
-  "atouts": ["...", "...", "..."]
+  "experiences": [{"poste":"...","entreprise":"...","periode":"...","lieu":"...","missions":["...","...","..."]}],
+  "formations": [{"diplome":"...","etablissement":"...","periode":"...","mention":"..."}],
+  "competences": ["..."],
+  "langues": [{"langue":"...","niveau":"..."}],
+  "atouts": ["..."]
 }`
-          }]
-        })
-      })
-      const data = await response.json()
-      const texte = data.content[0].text
-      const jsonPropre = texte.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-      const json = JSON.parse(jsonPropre)
-      setTimeout(() => {
-  window.location.href = '/dashboard'
-}, 3000)
+            }]
+          })
+        }),
+        fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-haiku-4-5-20251001',
+            max_tokens: 1000,
+            messages: [{
+              role: 'user',
+              content: `Tu es un expert en recrutement.
 
-console.log('User:', user)
-if (user) {
-  const { error } = await supabase.from('cvs').insert({
-    user_id: user.id,
-    template: templateChoisi,
-    cv_data: json
-  })
-  console.log('Erreur Supabase:', error)
-}
+Voici le CV du candidat :
+${cvTexte}
+
+Voici l'offre d'emploi :
+${offreEmploi}
+
+Rédige une lettre de motivation professionnelle et personnalisée.
+
+Règles :
+- Commence par "Madame, Monsieur,"
+- 3 paragraphes maximum
+- Ton professionnel mais humain
+- Maximum 300 mots
+- Termine par "Cordialement," suivi du prénom et nom
+- Retourne UNIQUEMENT le texte de la lettre`
+            }]
+          })
+        })
+      ])
+
+      const dataCV = await responseCV.json()
+      const dataLM = await responseLM.json()
+      const texteCV = dataCV.content[0].text
+      const jsonPropre = texteCV.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+      const json = JSON.parse(jsonPropre)
+      const lettreGeneree = dataLM.content[0].text
+
+      setCvData(json)
+      setLettre(lettreGeneree)
+
+      if (user) {
+        const offreTitre = offreEmploi.substring(0, 60).trim()
+        await supabase.from('cvs').insert({
+          user_id: user.id,
+          template: templateChoisi,
+          cv_data: json,
+          lettre_motivation: lettreGeneree,
+          offre_titre: offreTitre
+        })
+      }
+
+      setTimeout(() => {
+        window.location.href = '/dashboard'
+      }, 5000)
+
     } catch (error) {
       alert('Une erreur est survenue. Vérifie ta clé API.')
       console.error(error)
@@ -152,37 +173,43 @@ if (user) {
     setLoading(false)
   }
 
-  const handleDownload = async () => {
-  const element = document.getElementById('cv-to-print')
-  if (!element) return
-  
-  const canvas = await html2canvas(element, {
-    scale: 2,
-    useCORS: true,
-    allowTaint: true,
-    backgroundColor: '#ffffff',
-    width: 794,
-    height: 1123
-  })
-  
-  const imgData = canvas.toDataURL('image/png')
-  const pdf = new jsPDF('p', 'mm', 'a4')
-  pdf.addImage(imgData, 'PNG', 0, 0, 210, 297)
-  pdf.save(`CV-DidCV-${cvData.prenom}-${cvData.nom}.pdf`)
-}
+  const handleDownloadCV = async () => {
+    const element = document.getElementById('cv-to-print')
+    if (!element) return
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      width: 794,
+      height: 1123
+    })
+    const imgData = canvas.toDataURL('image/png')
+    const pdf = new jsPDF('p', 'mm', 'a4')
+    pdf.addImage(imgData, 'PNG', 0, 0, 210, 297)
+    pdf.save(`CV-DidCV-${cvData.prenom}-${cvData.nom}.pdf`)
+  }
+
+  const handleDownloadLettre = () => {
+    const blob = new Blob([lettre], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `Lettre-Motivation-${cvData.prenom}-${cvData.nom}.txt`
+    a.click()
+  }
 
   return (
     <div className="generate-page">
       <nav>
         <a className="logo" href="/"><span>Did</span>CV</a>
-<a href="/dashboard" className="btn-ghost" style={{marginLeft:'auto', marginRight:'12px'}}>Mon dashboard</a>
-        <a href="/templates" className="btn-ghost" style={{marginLeft:'auto'}}>← Changer de template</a>
+        <a href="/dashboard" className="btn-ghost" style={{marginLeft:'auto', marginRight:'12px'}}>Mon dashboard</a>
+        <a href="/templates" className="btn-ghost">← Changer de template</a>
       </nav>
 
       <div className="generate-wrap">
         <div className="generate-left">
           <h2>Génère ton CV optimisé</h2>
-          <p className="generate-sub">Upload ton CV PDF et colle l'offre d'emploi — l'IA fait le reste.</p>
+          <p className="generate-sub">Upload ton CV PDF et colle l'offre — l'IA génère ton CV et ta lettre de motivation.</p>
 
           <div className="upload-box">
             <div className="upload-label">1. Ton CV actuel (PDF)</div>
@@ -217,7 +244,7 @@ if (user) {
           </div>
 
           <button className="btn-generate" onClick={handleGenerate} disabled={loading}>
-            {loading ? '⏳ Génération en cours...' : '⚡ Générer mon CV optimisé'}
+            {loading ? '⏳ Génération en cours...' : '⚡ Générer mon CV + Lettre de motivation'}
           </button>
         </div>
 
@@ -225,7 +252,12 @@ if (user) {
           <div className="result-box">
             <div className="result-header">
               <span>Template : <strong>{templateChoisi}</strong></span>
-              {cvData && <button className="btn-download" onClick={handleDownload}>📥 Télécharger PDF</button>}
+              {cvData && (
+                <div style={{display:'flex', gap:'8px'}}>
+                  <button className="btn-download" onClick={handleDownloadCV}>📥 CV PDF</button>
+                  {lettre && <button className="btn-download" onClick={handleDownloadLettre}>📄 Lettre</button>}
+                </div>
+              )}
             </div>
             <div className="result-content">
               {cvData ? (
@@ -233,11 +265,33 @@ if (user) {
               ) : (
                 <div className="result-empty">
                   <div className="empty-icon">✨</div>
-                  <div>{loading ? 'L\'IA génère ton CV...' : 'Ton CV optimisé apparaîtra ici'}</div>
+                  <div>{loading ? 'L\'IA génère ton CV et ta lettre...' : 'Ton CV optimisé apparaîtra ici'}</div>
                 </div>
               )}
             </div>
           </div>
+
+          {lettre && (
+            <div className="result-box" style={{marginTop:'20px'}}>
+              <div className="result-header">
+                <span>✉️ Lettre de motivation</span>
+                <button className="btn-download" onClick={handleDownloadLettre}>📄 Télécharger</button>
+              </div>
+              <div className="result-content" style={{alignItems:'flex-start'}}>
+                <div style={{
+                  fontFamily:'Georgia,serif',
+                  fontSize:'13px',
+                  lineHeight:'1.8',
+                  color:'#222',
+                  whiteSpace:'pre-wrap',
+                  width:'100%',
+                  padding:'8px'
+                }}>
+                  {lettre}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
