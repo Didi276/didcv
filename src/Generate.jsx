@@ -47,7 +47,19 @@ function Generate() {
     }
     setLoading(true)
     setCvData(null)
-
+const { data: { user } } = await supabase.auth.getUser()
+if (user) {
+  const { count } = await supabase
+    .from('cvs')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+  
+  if (count >= 1) {
+    alert('Tu as utilisé ton CV gratuit ! Passe au plan Pro pour générer des CV illimités.')
+    setLoading(false)
+    return
+  }
+}
     try {
       const response = await fetch('/api/generate', {
         method: 'POST',
