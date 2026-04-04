@@ -12,7 +12,7 @@ function Home() {
         </div>
         <div className="nav-btns">
           <a href="/auth" className="btn-ghost">Se connecter</a>
-          <a href="/templates" className="btn-blue">Commencer gratuitement</a>
+          <a href="/auth" className="btn-blue">Commencer gratuitement</a>
         </div>
       </nav>
 
@@ -22,7 +22,7 @@ function Home() {
             <h1>Ton CV <em>taillé</em><br/>pour chaque offre.<br/>En 30 secondes.</h1>
             <p className="hero-sub">Upload ton CV, colle une offre d'emploi — l'IA génère un CV optimisé pour passer les filtres ATS et décrocher l'entretien.</p>
             <div className="hero-actions">
-              <a href="/templates" className="btn-primary-lg">Générer mon CV gratuitement →</a>
+              <a href="/auth" className="btn-primary-lg">Générer mon CV gratuitement →</a>
               <a href="#how" className="btn-outline-lg">Voir comment ça marche</a>
             </div>
             <p className="hero-note">Gratuit — <span>2 CV offerts</span>, sans carte bancaire</p>
@@ -99,7 +99,7 @@ function Home() {
               <li className="dim"><span className="cx">✗</span> CV illimités</li>
               <li className="dim"><span className="cx">✗</span> Historique des CV</li>
             </ul>
-            <a href="/templates" className="btn-plan btn-plan-free">Commencer gratuitement</a>
+            <a href="/auth" className="btn-plan btn-plan-free">Commencer gratuitement</a>
           </div>
           <div className="price-card featured">
             <div className="pop-badge">Le plus populaire</div>
@@ -124,7 +124,7 @@ function Home() {
         <div className="cta-box">
           <h2>Prêt à dire<br/>"I Did it" ?</h2>
           <p>Rejoins des milliers de candidats qui ont décroché leur entretien grâce à DidCV.</p>
-          <a href="/templates" className="btn-white">Générer mon CV gratuitement →</a>
+          <a href="/auth" className="btn-white">Générer mon CV gratuitement →</a>
         </div>
       </div>
 
