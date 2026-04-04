@@ -19,8 +19,8 @@ function Home() {
       <div className="hero-wrap">
         <div className="hero">
           <div>
-            <h1>Ton CV <em>et ta lettre</em><br/>taillés pour<br/>chaque offre.</h1>
-            <p className="hero-sub">Upload ton CV ou crée ton profil — l'IA génère en quelques secondes un CV optimisé ATS et une Lettre de motivation personnalisée. Modifie, télécharge, postule.</p>
+            <h1>Ton CV <em>et ta Lettre de motivation</em><br/>taillés pour<br/>chaque offre.</h1>
+            <p className="hero-sub">Upload ton CV ou crée ton profil — l'IA génère en quelques secondes un CV optimisé ATS et une Lettre de motivation de motivation personnalisée. Modifie, télécharge, postule.</p>
             <div className="hero-actions">
               <a href="/auth" className="btn-primary-lg">Essayer gratuitement →</a>
               <a href="#how" className="btn-outline-lg">Voir comment ça marche</a>
@@ -42,7 +42,7 @@ function Home() {
                 <div className="input-label">Offre d'emploi</div>
                 <div className="textarea-fake">Nous recherchons un(e) Contrôleur de Gestion. Vous maîtrisez Excel, SAP et l'analyse financière...</div>
               </div>
-              <button className="card-generate">⚡ Générer CV + Lettre de motivation</button>
+              <button className="card-generate">⚡ Générer CV + Lettre de motivation de motivation</button>
               <div className="card-score">
                 <div className="score-row"><span>Score ATS</span><strong>95% — Excellent ✓</strong></div>
                 <div className="score-track"><div className="score-fill"></div></div>
@@ -54,18 +54,18 @@ function Home() {
 
       <div className="stats-row">
         <div className="stat"><div className="stat-num">95%</div><div className="stat-label">taux de passage ATS</div></div>
-        <div className="stat"><div className="stat-num">&lt;30s</div><div className="stat-label">pour générer CV + lettre</div></div>
+        <div className="stat"><div className="stat-num">&lt;30s</div><div className="stat-label">pour générer CV + Lettre de motivation</div></div>
         <div className="stat"><div className="stat-num">6</div><div className="stat-label">templates professionnels</div></div>
         <div className="stat"><div className="stat-num">100%</div><div className="stat-label">modifiable en ligne</div></div>
       </div>
 
       <section className="section" id="how">
         <div className="section-label">Comment ça marche</div>
-        <h2 className="section-title">3 étapes.<br/>Un CV et une lettre <em>parfaits</em>.</h2>
+        <h2 className="section-title">3 étapes.<br/>Un CV et une Lettre de motivation <em>parfaits</em>.</h2>
         <div className="steps-grid">
           <div className="step"><div className="step-num">ÉTAPE 01</div><div className="step-icon">👤</div><h3>Crée ton profil</h3><p>Remplis ton profil une fois ou uploade ton CV PDF. L'IA extrait toutes tes informations automatiquement.</p></div>
           <div className="step"><div className="step-num">ÉTAPE 02</div><div className="step-icon">🎯</div><h3>Colle l'offre d'emploi</h3><p>Copie-colle le texte de l'offre. L'IA analyse les mots-clés, les compétences et adapte ton profil.</p></div>
-          <div className="step"><div className="step-num">ÉTAPE 03</div><div className="step-icon">✅</div><h3>Télécharge et postule</h3><p>Ton CV optimisé et ta Lettre de motivation sont prêts en quelques secondes. Modifie-les et télécharge en PDF.</p></div>
+          <div className="step"><div className="step-num">ÉTAPE 03</div><div className="step-icon">✅</div><h3>Télécharge et postule</h3><p>Ton CV optimisé et ta Lettre de motivation de motivation sont prêts en quelques secondes. Modifie-les et télécharge en PDF.</p></div>
         </div>
       </section>
 
@@ -74,12 +74,12 @@ function Home() {
           <div className="section-label">Fonctionnalités</div>
           <h2 className="section-title">Tout ce qu'il faut<br/>pour <em>décrocher l'entretien</em>.</h2>
           <div className="feat-grid">
-            <div className="feat-card"><div className="feat-icon">🤖</div><h3>CV + Lettre générés ensemble</h3><p>L'IA génère simultanément ton CV optimisé ATS et une Lettre de motivation personnalisée adaptée à chaque offre.</p></div>
-            <div className="feat-card"><div className="feat-icon">✏️</div><h3>Éditeur intégré</h3><p>Modifie chaque section de ton CV et ta lettre directement sur le site — missions, compétences, formations, mise en forme.</p></div>
+            <div className="feat-card"><div className="feat-icon">🤖</div><h3>CV + Lettre de motivation générés ensemble</h3><p>L'IA génère simultanément ton CV optimisé ATS et une Lettre de motivation de motivation personnalisée adaptée à chaque offre.</p></div>
+            <div className="feat-card"><div className="feat-icon">✏️</div><h3>Éditeur intégré</h3><p>Modifie chaque section de ton CV et ta Lettre de motivation directement sur le site — missions, compétences, formations, mise en forme.</p></div>
             <div className="feat-card"><div className="feat-icon">👤</div><h3>Profil centralisé</h3><p>Crée ton profil une fois. Génère autant de CV que tu veux en collant juste l'offre — plus besoin d'uploader ton CV à chaque fois.</p></div>
             <div className="feat-card"><div className="feat-icon">🎨</div><h3>6 templates professionnels</h3><p>Finance, LinkedIn, Harvard, Silicon Valley, Canva, Moderne — des designs validés par des recruteurs pour tous les secteurs.</p></div>
-            <div className="feat-card"><div className="feat-icon">📥</div><h3>Export PDF sans filigrane</h3><p>Télécharge ton CV et ta lettre en PDF propre, compatible tous ATS. Prêt à envoyer immédiatement.</p></div>
-            <div className="feat-card"><div className="feat-icon">📊</div><h3>Dashboard personnel</h3><p>Retrouve tous tes CV et lettres générés, classés par offre d'emploi. Modifie-les à tout moment.</p></div>
+            <div className="feat-card"><div className="feat-icon">📥</div><h3>Export PDF sans filigrane</h3><p>Télécharge ton CV et ta Lettre de motivation en PDF propre, compatible tous ATS. Prêt à envoyer immédiatement.</p></div>
+            <div className="feat-card"><div className="feat-icon">📊</div><h3>Dashboard personnel</h3><p>Retrouve tous tes CV et Lettre de motivations générés, classés par offre d'emploi. Modifie-les à tout moment.</p></div>
           </div>
         </div>
       </div>
@@ -94,9 +94,9 @@ function Home() {
             <div className="price-sub">Essaie sans engagement</div>
             <div className="divider"></div>
             <ul className="feat-list">
-              <li><span className="ck">✓</span> CV + Lettre de motivation</li>
+              <li><span className="ck">✓</span> CV + Lettre de motivation de motivation</li>
               <li><span className="ck">✓</span> 6 templates professionnels</li>
-              <li><span className="ck">✓</span> Éditeur CV et lettre</li>
+              <li><span className="ck">✓</span> Éditeur CV et Lettre de motivation</li>
               <li><span className="ck">✓</span> Export PDF</li>
               <li className="dim"><span className="cx">✗</span> CV illimités</li>
               <li className="dim"><span className="cx">✗</span> Historique des CV</li>
@@ -110,7 +110,7 @@ function Home() {
             <div className="price-sub">Sans engagement — annulable à tout moment</div>
             <div className="divider"></div>
             <ul className="feat-list">
-              <li><span className="ck">✓</span> CV + Lettres illimités</li>
+              <li><span className="ck">✓</span> CV + Lettre de motivations illimités</li>
               <li><span className="ck">✓</span> 6 templates professionnels</li>
               <li><span className="ck">✓</span> Éditeur avancé</li>
               <li><span className="ck">✓</span> Export PDF illimité</li>
