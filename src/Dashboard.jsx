@@ -1,3 +1,9 @@
+import { useEditor, EditorContent } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import Underline from '@tiptap/extension-underline'
+import TextAlign from '@tiptap/extension-text-align'
+import Color from '@tiptap/extension-color'
+import TextStyle from '@tiptap/extension-text-style'
 import { useState, useEffect } from 'react'
 import { supabase } from './supabase'
 import { CVTemplate } from './CVTemplates'
@@ -14,6 +20,20 @@ function Dashboard() {
   const [showLettre, setShowLettre] = useState(false)
   const [editingLettre, setEditingLettre] = useState(false)
   const [lettreEditee, setLettreEditee] = useState('')
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      TextStyle,
+      Color,
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
+    ],
+    content: '',
+    onUpdate: ({ editor }) => {
+      setLettreEditee(editor.getHTML())
+    },
+  })
 
   useEffect(() => {
     const fetchData = async () => {
@@ -213,17 +233,23 @@ function Dashboard() {
                   {editingLettre ? (
                     <div>
                       <div style={{border:'1px solid var(--border)', borderRadius:'8px', overflow:'hidden'}}>
-                        <div style={{background:'var(--bg2)', padding:'8px 12px', borderBottom:'1px solid var(--border)', display:'flex', gap:'8px'}}>
-                          <button type="button" style={{padding:'3px 10px', borderRadius:'4px', border:'1px solid var(--border)', background:'#fff', fontWeight:'700', cursor:'pointer'}} onClick={() => document.execCommand('bold')}>G</button>
-                          <button type="button" style={{padding:'3px 10px', borderRadius:'4px', border:'1px solid var(--border)', background:'#fff', fontStyle:'italic', cursor:'pointer'}} onClick={() => document.execCommand('italic')}>I</button>
-                          <button type="button" style={{padding:'3px 10px', borderRadius:'4px', border:'1px solid var(--border)', background:'#fff', textDecoration:'underline', cursor:'pointer'}} onClick={() => document.execCommand('underline')}>S</button>
+                        <div style={{background:'var(--bg2)', padding:'8px 12px', borderBottom:'1px solid var(--border)', display:'flex', gap:'6px', flexWrap:'wrap', alignItems:'center'}}>
+                          <button type="button" title="Gras" onClick={() => editor.chain().focus().toggleBold().run()} style={{padding:'4px 10px', borderRadius:'4px', border:'1px solid var(--border)', background: editor?.isActive('bold') ? '#e0e7ff' : '#fff', fontWeight:'700', cursor:'pointer', fontSize:'13px'}}>G</button>
+                          <button type="button" title="Italique" onClick={() => editor.chain().focus().toggleItalic().run()} style={{padding:'4px 10px', borderRadius:'4px', border:'1px solid var(--border)', background: editor?.isActive('italic') ? '#e0e7ff' : '#fff', fontStyle:'italic', cursor:'pointer', fontSize:'13px'}}>I</button>
+                          <button type="button" title="Souligné" onClick={() => editor.chain().focus().toggleUnderline().run()} style={{padding:'4px 10px', borderRadius:'4px', border:'1px solid var(--border)', background: editor?.isActive('underline') ? '#e0e7ff' : '#fff', textDecoration:'underline', cursor:'pointer', fontSize:'13px'}}>S</button>
+                          <div style={{width:'1px', height:'24px', background:'var(--border)', margin:'0 4px'}}></div>
+                          <button type="button" title="Aligner gauche" onClick={() => editor.chain().focus().setTextAlign('left').run()} style={{padding:'4px 10px', borderRadius:'4px', border:'1px solid var(--border)', background: editor?.isActive({textAlign:'left'}) ? '#e0e7ff' : '#fff', cursor:'pointer', fontSize:'12px'}}>≡</button>
+                          <button type="button" title="Centrer" onClick={() => editor.chain().focus().setTextAlign('center').run()} style={{padding:'4px 10px', borderRadius:'4px', border:'1px solid var(--border)', background: editor?.isActive({textAlign:'center'}) ? '#e0e7ff' : '#fff', cursor:'pointer', fontSize:'12px'}}>≡</button>
+                          <button type="button" title="Aligner droite" onClick={() => editor.chain().focus().setTextAlign('right').run()} style={{padding:'4px 10px', borderRadius:'4px', border:'1px solid var(--border)', background: editor?.isActive({textAlign:'right'}) ? '#e0e7ff' : '#fff', cursor:'pointer', fontSize:'12px'}}>≡</button>
+                          <div style={{width:'1px', height:'24px', background:'var(--border)', margin:'0 4px'}}></div>
+                          <button type="button" title="Titre" onClick={() => editor.chain().focus().toggleHeading({level:2}).run()} style={{padding:'4px 10px', borderRadius:'4px', border:'1px solid var(--border)', background: editor?.isActive('heading') ? '#e0e7ff' : '#fff', cursor:'pointer', fontSize:'13px', fontWeight:'600'}}>H</button>
+                          <button type="button" title="Liste" onClick={() => editor.chain().focus().toggleBulletList().run()} style={{padding:'4px 10px', borderRadius:'4px', border:'1px solid var(--border)', background: editor?.isActive('bulletList') ? '#e0e7ff' : '#fff', cursor:'pointer', fontSize:'13px'}}>• Liste</button>
+                          <div style={{width:'1px', height:'24px', background:'var(--border)', margin:'0 4px'}}></div>
+                          <input type="color" title="Couleur" onChange={e => editor.chain().focus().setColor(e.target.value).run()} style={{width:'32px', height:'28px', padding:'2px', border:'1px solid var(--border)', borderRadius:'4px', cursor:'pointer'}} />
                         </div>
-                        <div
-                          contentEditable
-                          suppressContentEditableWarning
-                          onInput={e => setLettreEditee(e.currentTarget.innerHTML)}
-                          dangerouslySetInnerHTML={{__html: lettreEditee}}
-                          style={{minHeight:'350px', padding:'16px', fontFamily:'Georgia,serif', fontSize:'14px', lineHeight:'1.8', color:'#222', outline:'none'}}
+                        <EditorContent
+                          editor={editor}
+                          style={{minHeight:'350px', padding:'16px', fontFamily:'Georgia,serif', fontSize:'14px', lineHeight:'1.8', color:'#222'}}
                         />
                       </div>
                       <div style={{display:'flex', gap:'8px', marginTop:'12px'}}>
@@ -241,7 +267,11 @@ function Dashboard() {
                       <div style={{fontFamily:'Georgia,serif', fontSize:'14px', lineHeight:'1.8', color:'#222', whiteSpace:'pre-wrap', marginBottom:'16px'}}>
                         {selectedCv.lettre_motivation}
                       </div>
-                      <button className="btn-ghost" onClick={() => { setLettreEditee(selectedCv.lettre_motivation); setEditingLettre(true) }}>
+                      <button className="btn-ghost" onClick={() => {
+                        setLettreEditee(selectedCv.lettre_motivation)
+                        editor?.commands.setContent(selectedCv.lettre_motivation)
+                        setEditingLettre(true)
+                      }}>
                         ✏️ Modifier la lettre
                       </button>
                     </div>
