@@ -290,11 +290,25 @@ Retourne UNIQUEMENT un objet JSON valide avec cette structure exacte :
                   </div>
                 </div>
                 <div className="profile-field" style={{marginTop:'8px'}}>
-                  <label>Missions</label>
-                  {exp.missions.map((m, j) => (
-                    <input key={j} className="profile-input" style={{marginBottom:'6px'}} value={m} onChange={e => updateMission(i, j, e.target.value)} placeholder={`Mission ${j + 1}`} />
-                  ))}
-                </div>
+  <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'6px'}}>
+    <label>Missions</label>
+    <button className="btn-add" style={{fontSize:'11px', padding:'3px 10px'}} onClick={() => {
+      const exps = [...profile.experiences]
+      exps[i].missions = [...(exps[i].missions || []), '']
+      setProfile(p => ({ ...p, experiences: exps }))
+    }}>+ Mission</button>
+  </div>
+  {(exp.missions || []).map((m, j) => (
+    <div key={j} style={{display:'flex', gap:'6px', marginBottom:'6px'}}>
+      <input className="profile-input" value={m} onChange={e => updateMission(i, j, e.target.value)} placeholder={`Mission ${j + 1}`} />
+      <button className="btn-remove" onClick={() => {
+        const exps = [...profile.experiences]
+        exps[i].missions = exps[i].missions.filter((_, k) => k !== j)
+        setProfile(p => ({ ...p, experiences: exps }))
+      }}>✕</button>
+    </div>
+  ))}
+</div>
               </div>
             ))}
           </div>
