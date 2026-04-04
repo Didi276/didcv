@@ -83,23 +83,14 @@ function Generate() {
   }
 
   const handleGenerate = async () => {
-    if (!offreEmploi) {
-      alert('Merci de coller une offre d\'emploi !')
-      return
-    }
-    if (!profile && !cvFile) {
-      alert('Merci d\'uploader ton CV ou de remplir ton profil !')
-      return
-    }
+    if (!offreEmploi) { alert('Merci de coller une offre d\'emploi !'); return }
+    if (!profile && !cvFile) { alert('Merci d\'uploader ton CV ou de remplir ton profil !'); return }
     setLoading(true)
     setCvData(null)
     setLettre('')
 
     if (user) {
-      const { count } = await supabase
-        .from('cvs')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
+      const { count } = await supabase.from('cvs').select('*', { count: 'exact', head: true }).eq('user_id', user.id)
       const adminEmails = ['fernandochokki@gmail.com', 'chokkifernando@gmail.com', 'carlinazon@gmail.com']
       if (count >= 1 && !adminEmails.includes(user.email)) {
         alert('Tu as utilisé ton CV gratuit ! Passe au plan Pro pour générer des CV illimités.')
@@ -217,10 +208,10 @@ Règles :
   const handleDownloadCV = async () => {
     const element = document.getElementById('cv-to-print')
     if (!element) return
-    const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff', width: 794, height: 1123 })
+    const canvas = await html2canvas(element, { scale: 4, useCORS: true, backgroundColor: '#ffffff', width: 794, height: 1123, logging: false, imageTimeout: 0, allowTaint: true })
     const imgData = canvas.toDataURL('image/png')
-    const pdf = new jsPDF('p', 'mm', 'a4')
-    pdf.addImage(imgData, 'PNG', 0, 0, 210, 297)
+    const pdf = new jsPDF('p', 'mm', 'a4', true)
+    pdf.addImage(imgData, 'PNG', 0, 0, 210, 297, '', 'FAST')
     pdf.save(`CV-DidCV-${cvData.prenom}-${cvData.nom}.pdf`)
   }
 
@@ -260,10 +251,7 @@ Règles :
                 </div>
                 <a href="/profile" style={{fontSize:'12px', color:'var(--blue)'}}>Modifier mon profil →</a>
               </div>
-              <button
-                onClick={() => setProfile(null)}
-                style={{fontSize:'12px', color:'var(--muted)', background:'none', border:'none', cursor:'pointer', marginTop:'8px', textDecoration:'underline', display:'block'}}
-              >
+              <button onClick={() => setProfile(null)} style={{fontSize:'12px', color:'var(--muted)', background:'none', border:'none', cursor:'pointer', marginTop:'8px', textDecoration:'underline', display:'block'}}>
                 Utiliser un CV PDF à la place →
               </button>
             </div>
@@ -282,23 +270,13 @@ Règles :
                   </div>
                 )}
               </label>
-              {cvTexte && (
-                <div style={{marginTop:'8px', fontSize:'12px', color:'#16a34a'}}>
-                  ✓ CV lu avec succès — {cvTexte.length} caractères extraits
-                </div>
-              )}
+              {cvTexte && <div style={{marginTop:'8px', fontSize:'12px', color:'#16a34a'}}>✓ CV lu avec succès — {cvTexte.length} caractères extraits</div>}
             </div>
           )}
 
           <div className="offre-box">
             <div className="upload-label">{profile ? '1.' : '2.'} L'offre d'emploi</div>
-            <textarea
-              className="offre-textarea"
-              placeholder="Colle ici le texte complet de l'offre d'emploi..."
-              value={offreEmploi}
-              onChange={(e) => setOffreEmploi(e.target.value)}
-              rows={8}
-            />
+            <textarea className="offre-textarea" placeholder="Colle ici le texte complet de l'offre d'emploi..." value={offreEmploi} onChange={(e) => setOffreEmploi(e.target.value)} rows={8} />
           </div>
 
           <button className="btn-generate" onClick={handleGenerate} disabled={loading}>
