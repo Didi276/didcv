@@ -120,7 +120,7 @@ function Templates() {
 
       {/* Nav */}
       <nav style={{ background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '0 32px', height: '58px', display: 'flex', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-        <a href="/" style={{ textDecoration: 'none', fontWeight: '700', fontSize: '20px' }}>
+        <a href="/dashboard" style={{ textDecoration: 'none', fontWeight: '700', fontSize: '20px' }}>
           <span style={{ color: '#1a56db' }}>Did</span><span style={{ color: '#111' }}>CV</span>
         </a>
         <div style={{ marginLeft: 'auto' }}>
