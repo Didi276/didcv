@@ -152,7 +152,7 @@ function Dashboard() {
   return (
     <div className="dashboard-page">
       <nav>
-        <a className="logo" href="/"><span>Did</span>CV</a>
+        <a className="logo" href="/dashboard"><span>Did</span>CV</a>
         <div className="nav-btns">
           <a href="/profile" className="btn-ghost">👤 Mon profil</a>
           <a href="/templates" className="btn-blue">+ Nouveau CV</a>

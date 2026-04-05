@@ -1,6 +1,18 @@
+import { useEffect } from 'react'
+import { supabase } from './supabase'
 import './App.css'
 
 function Home() {
+
+  // ✅ Si l'utilisateur est déjà connecté → aller au dashboard directement
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) window.location.href = '/dashboard'
+    }
+    checkUser()
+  }, [])
+
   return (
     <>
       <nav>
@@ -55,7 +67,7 @@ function Home() {
       <div className="stats-row">
         <div className="stat"><div className="stat-num">95%</div><div className="stat-label">taux de passage ATS</div></div>
         <div className="stat"><div className="stat-num">&lt;30s</div><div className="stat-label">pour générer CV + lettre de motivation</div></div>
-        <div className="stat"><div className="stat-num">6</div><div className="stat-label">templates professionnels</div></div>
+        <div className="stat"><div className="stat-num">16</div><div className="stat-label">templates professionnels</div></div>
         <div className="stat"><div className="stat-num">100%</div><div className="stat-label">modifiable en ligne</div></div>
       </div>
 
@@ -77,7 +89,7 @@ function Home() {
             <div className="feat-card"><div className="feat-icon">🤖</div><h3>CV + Lettre de motivation en quelques secondes</h3><p>L'IA analyse l'offre d'emploi et génère un CV sur mesure qui passe tous les filtres ATS. Une lettre de motivation personnalisée est également générée automatiquement.</p></div>
             <div className="feat-card"><div className="feat-icon">✏️</div><h3>Éditeur intégré</h3><p>Modifie chaque section de ton CV et ta lettre de motivation directement sur le site — missions, compétences, formations, mise en forme.</p></div>
             <div className="feat-card"><div className="feat-icon">👤</div><h3>Profil centralisé</h3><p>Crée ton profil une fois. Génère autant de CV que tu veux en collant juste l'offre — plus besoin d'uploader ton CV à chaque fois.</p></div>
-            <div className="feat-card"><div className="feat-icon">🎨</div><h3>6 templates professionnels</h3><p>Finance, LinkedIn, Harvard, Silicon Valley, Canva, Moderne — des designs validés par des recruteurs pour tous les secteurs.</p></div>
+            <div className="feat-card"><div className="feat-icon">🎨</div><h3>16 templates professionnels</h3><p>Finance, LinkedIn, Harvard, Executive, Creative, Tech et bien d'autres — des designs validés par des recruteurs pour tous les secteurs.</p></div>
             <div className="feat-card"><div className="feat-icon">📥</div><h3>Export PDF sans filigrane</h3><p>Télécharge ton CV et ta lettre de motivation en PDF propre, compatible tous ATS. Prêt à envoyer immédiatement.</p></div>
             <div className="feat-card"><div className="feat-icon">📊</div><h3>Dashboard personnel</h3><p>Retrouve tous tes CV générés, classés par offre d'emploi. Modifie-les à tout moment depuis ton dashboard.</p></div>
           </div>
@@ -96,7 +108,7 @@ function Home() {
             <ul className="feat-list">
               <li><span className="ck">✓</span> 1 CV optimisé ATS</li>
               <li><span className="ck">✓</span> 1 lettre de motivation</li>
-              <li><span className="ck">✓</span> 6 templates professionnels</li>
+              <li><span className="ck">✓</span> 16 templates professionnels</li>
               <li><span className="ck">✓</span> Éditeur CV et lettre de motivation</li>
               <li><span className="ck">✓</span> Export PDF</li>
               <li className="dim"><span className="cx">✗</span> CV illimités</li>
@@ -112,7 +124,7 @@ function Home() {
             <ul className="feat-list">
               <li><span className="ck">✓</span> CV illimités</li>
               <li><span className="ck">✓</span> Lettres de motivation illimitées</li>
-              <li><span className="ck">✓</span> 6 templates professionnels</li>
+              <li><span className="ck">✓</span> 16 templates professionnels</li>
               <li><span className="ck">✓</span> Éditeur avancé</li>
               <li><span className="ck">✓</span> Export PDF illimité</li>
               <li><span className="ck">✓</span> Profil centralisé illimité</li>
