@@ -93,7 +93,7 @@ function Generate() {
 
     if (user) {
       const { count } = await supabase.from('cvs').select('*', { count: 'exact', head: true }).eq('user_id', user.id)
-      const adminEmails = ['fernandochokki@gmail.com', 'chokkifernando@gmail.com', 'carlinazon@gmail.com']
+      const adminEmails = ['fernandochokki@gmail.com', 'chokkifernando@gmail.com', 'carlinazon@gmail.com', 'bertrandgbenou1er@gmail.com']
       if (count >= 1 && !adminEmails.includes(user.email)) {
         alert('Tu as utilisé ton CV gratuit ! Passe au plan Pro pour générer des CV illimités.')
         setLoading(false)
