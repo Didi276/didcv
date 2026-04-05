@@ -174,7 +174,7 @@ Retourne UNIQUEMENT un objet JSON valide avec cette structure exacte :
   return (
     <div className="profile-page">
       <nav>
-        <a className="logo" href="/dashboard"><span>Did</span>CV</a>
+        <a className="logo" href="/"><span>Did</span>CV</a>
         <div className="nav-btns">
           <a href="/dashboard" className="btn-ghost">Mon dashboard</a>
           <a href="/templates" className="btn-ghost">+ Nouveau CV</a>
@@ -476,4 +476,4 @@ Retourne UNIQUEMENT un objet JSON valide avec cette structure exacte :
   )
 }
 
-export default Profiles
+export default Profile
