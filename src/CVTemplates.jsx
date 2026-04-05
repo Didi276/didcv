@@ -1,32 +1,33 @@
 // ============================================================
-// CVTemplates.jsx — 16 templates avec photo optionnelle
+// CVTemplates.jsx — 16 templates avec photo intelligente
 // ============================================================
 
-// ─── Composant Avatar réutilisable ──────────────────────────
-// Affiche la photo si disponible, sinon les initiales
-function Avatar({ cvData, size = 70, bg = '#1a56db', textColor = '#fff', shape = 'circle' }) {
+// ─── Photo de démo affichée par défaut ──────────────────────
+const PHOTO_DEMO = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop&crop=face'
+
+// ─── Composant Avatar ───────────────────────────────────────
+// undefined → photo de démo (pour montrer que c'est possible)
+// "data:..."  → vraie photo uploadée par l'utilisateur
+// null        → rien du tout (l'utilisateur a supprimé la photo)
+function Avatar({ cvData, size = 70, shape = 'circle' }) {
   const borderRadius = shape === 'circle' ? '50%' : shape === 'rounded' ? '12px' : '4px'
-  if (cvData.photo) {
-    return (
-      <img
-        src={cvData.photo}
-        alt="Photo"
-        style={{
-          width: size, height: size, borderRadius,
-          objectFit: 'cover', display: 'block', flexShrink: 0
-        }}
-      />
-    )
-  }
+
+  // L'utilisateur a explicitement supprimé la photo → rien
+  if (cvData.photo === null) return null
+
+  // Photo uploadée ou photo de démo
+  const src = cvData.photo || PHOTO_DEMO
+
   return (
-    <div style={{
-      width: size, height: size, borderRadius,
-      background: bg, display: 'flex', alignItems: 'center',
-      justifyContent: 'center', fontSize: size * 0.32,
-      fontWeight: '700', color: textColor, flexShrink: 0
-    }}>
-      {cvData.prenom?.[0]}{cvData.nom?.[0]}
-    </div>
+    <img
+      src={src}
+      alt="Photo"
+      style={{
+        width: size, height: size, borderRadius,
+        objectFit: 'cover', display: 'block', flexShrink: 0,
+        border: cvData.photo ? 'none' : '2px dashed rgba(128,128,128,0.25)'
+      }}
+    />
   )
 }
 
@@ -36,13 +37,11 @@ export function TemplateFinance({ cvData }) {
     <div id="cv-to-print" style={{fontFamily:'Georgia,serif',color:'#1a1a1a',fontSize:'11px',lineHeight:'1.6',padding:'40px',background:'#fff',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden'}}>
       <div style={{borderBottom:'3px solid #1a1a1a',paddingBottom:'14px',marginBottom:'20px'}}>
         <div style={{display:'flex',alignItems:'center',gap:'20px'}}>
-          {cvData.photo && (
-            <Avatar cvData={cvData} size={72} bg="#1a1a1a" shape="circle" />
-          )}
-          <div style={{flex:1,textAlign: cvData.photo ? 'left' : 'center'}}>
+          <Avatar cvData={cvData} size={72} shape="circle" />
+          <div style={{flex:1}}>
             <h1 style={{fontSize:'22px',fontWeight:'700',letterSpacing:'3px',textTransform:'uppercase',marginBottom:'4px',fontFamily:'Georgia,serif'}}>{cvData.prenom} {cvData.nom}</h1>
             <div style={{fontSize:'12px',color:'#555',letterSpacing:'1px',marginBottom:'8px'}}>{cvData.titre}</div>
-            <div style={{display:'flex',justifyContent: cvData.photo ? 'flex-start' : 'center',gap:'20px',flexWrap:'wrap',fontSize:'10px',color:'#666'}}>
+            <div style={{display:'flex',gap:'20px',flexWrap:'wrap',fontSize:'10px',color:'#666'}}>
               <span>✉ {cvData.email}</span><span>☎ {cvData.telephone}</span><span>📍 {cvData.ville}</span>
               {cvData.linkedin && <span>🔗 {cvData.linkedin}</span>}
             </div>
@@ -85,7 +84,7 @@ export function TemplateLinkedIn({ cvData }) {
     <div id="cv-to-print" style={{fontFamily:'"Segoe UI",Arial,sans-serif',color:'#191919',fontSize:'11px',lineHeight:'1.6',background:'#fff',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden'}}>
       <div style={{background:'#0a66c2',padding:'28px 32px'}}>
         <div style={{display:'flex',alignItems:'flex-start',gap:'20px'}}>
-          <Avatar cvData={cvData} size={68} bg="rgba(255,255,255,0.25)" textColor="#fff" shape="circle" />
+          <Avatar cvData={cvData} size={68} shape="circle" />
           <div style={{flex:1}}>
             <h1 style={{fontSize:'22px',fontWeight:'700',color:'#fff',margin:'0 0 4px'}}>{cvData.prenom} {cvData.nom}</h1>
             <div style={{fontSize:'13px',color:'rgba(255,255,255,0.85)',marginBottom:'8px'}}>{cvData.titre}</div>
@@ -134,7 +133,7 @@ export function TemplateCanva({ cvData }) {
       <div style={{background:'#2d2d2d',color:'#fff',padding:'32px 22px'}}>
         <div style={{textAlign:'center',marginBottom:'24px',paddingBottom:'20px',borderBottom:'1px solid rgba(255,255,255,0.15)'}}>
           <div style={{display:'flex',justifyContent:'center',marginBottom:'12px'}}>
-            <Avatar cvData={cvData} size={72} bg="linear-gradient(135deg,#f093fb,#f5576c)" textColor="#fff" shape="circle" />
+            <Avatar cvData={cvData} size={72} shape="circle" />
           </div>
           <h1 style={{fontSize:'16px',fontWeight:'700',color:'#fff',margin:'0 0 4px',lineHeight:'1.2'}}>{cvData.prenom}<br/>{cvData.nom}</h1>
           <div style={{fontSize:'10px',color:'rgba(255,255,255,0.7)'}}>{cvData.titre}</div>
@@ -178,7 +177,9 @@ export function TemplateHarvard({ cvData }) {
   return (
     <div id="cv-to-print" style={{fontFamily:'"Times New Roman",Times,serif',color:'#111',fontSize:'11px',lineHeight:'1.6',padding:'40px 48px',background:'#fff',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden'}}>
       <div style={{textAlign:'center',marginBottom:'16px',paddingBottom:'12px',borderBottom:'2px solid #111'}}>
-        {cvData.photo && <div style={{display:'flex',justifyContent:'center',marginBottom:'10px'}}><Avatar cvData={cvData} size={60} shape="circle" bg="#111" /></div>}
+        <div style={{display:'flex',justifyContent:'center',marginBottom:'10px'}}>
+          <Avatar cvData={cvData} size={60} shape="circle" />
+        </div>
         <h1 style={{fontSize:'22px',fontWeight:'700',letterSpacing:'1px',textTransform:'uppercase',margin:'0 0 6px',fontFamily:'"Times New Roman",serif'}}>{cvData.prenom} {cvData.nom}</h1>
         <div style={{display:'flex',justifyContent:'center',gap:'16px',fontSize:'10px',color:'#333',flexWrap:'wrap'}}><span>{cvData.email}</span><span>|</span><span>{cvData.telephone}</span><span>|</span><span>{cvData.ville}</span></div>
       </div>
@@ -210,7 +211,7 @@ export function TemplateSiliconValley({ cvData }) {
   return (
     <div id="cv-to-print" style={{fontFamily:'-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif',fontSize:'11px',lineHeight:'1.7',background:'#fff',color:'#1d1d1f',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden',padding:'40px 48px'}}>
       <div style={{marginBottom:'28px',display:'flex',alignItems:'center',gap:'20px'}}>
-        {cvData.photo && <Avatar cvData={cvData} size={72} bg="#1d1d1f" shape="circle" />}
+        <Avatar cvData={cvData} size={72} shape="circle" />
         <div>
           <h1 style={{fontSize:'32px',fontWeight:'700',letterSpacing:'-1px',color:'#1d1d1f',margin:'0 0 4px'}}>{cvData.prenom} {cvData.nom}</h1>
           <div style={{fontSize:'14px',color:'#6e6e73',marginBottom:'8px'}}>{cvData.titre}</div>
@@ -246,7 +247,7 @@ export function TemplateModerne({ cvData }) {
     <div id="cv-to-print" style={{display:'grid',gridTemplateColumns:'220px 1fr',fontFamily:'Helvetica,sans-serif',fontSize:'11px',lineHeight:'1.6',background:'#fff',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden'}}>
       <div style={{background:'#0f6e56',color:'#fff',padding:'28px 20px'}}>
         <div style={{marginBottom:'20px',paddingBottom:'16px',borderBottom:'1px solid rgba(255,255,255,0.2)',display:'flex',flexDirection:'column',alignItems:'center',gap:'10px'}}>
-          <Avatar cvData={cvData} size={68} bg="rgba(255,255,255,0.25)" textColor="#fff" shape="circle" />
+          <Avatar cvData={cvData} size={68} shape="circle" />
           <div style={{textAlign:'center'}}>
             <h1 style={{fontSize:'16px',fontWeight:'700',marginBottom:'4px',color:'#fff',lineHeight:'1.2'}}>{cvData.prenom}<br/>{cvData.nom}</h1>
             <div style={{fontSize:'10px',color:'rgba(255,255,255,0.8)'}}>{cvData.titre}</div>
@@ -270,7 +271,7 @@ export function TemplateExecutive({ cvData }) {
   return (
     <div id="cv-to-print" style={{fontFamily:'Georgia,serif',fontSize:'11px',lineHeight:'1.7',background:'#0d0d0d',color:'#e8e0cc',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden',padding:'48px 52px'}}>
       <div style={{borderBottom:'1px solid #c9a84c',paddingBottom:'20px',marginBottom:'24px',display:'flex',alignItems:'center',gap:'20px'}}>
-        {cvData.photo && <Avatar cvData={cvData} size={72} bg="#333" shape="rounded" />}
+        <Avatar cvData={cvData} size={72} shape="rounded" />
         <div>
           <h1 style={{fontSize:'26px',fontWeight:'400',letterSpacing:'5px',textTransform:'uppercase',color:'#c9a84c',margin:'0 0 6px',fontFamily:'Georgia,serif'}}>{cvData.prenom} {cvData.nom}</h1>
           <div style={{fontSize:'11px',letterSpacing:'3px',textTransform:'uppercase',color:'#888',marginBottom:'10px'}}>{cvData.titre}</div>
@@ -292,7 +293,7 @@ export function TemplateCreative({ cvData }) {
       <div style={{background:'linear-gradient(160deg,#667eea,#764ba2)',color:'#fff',padding:'32px 20px',display:'flex',flexDirection:'column',gap:'20px'}}>
         <div style={{textAlign:'center',paddingBottom:'20px',borderBottom:'1px solid rgba(255,255,255,0.2)'}}>
           <div style={{display:'flex',justifyContent:'center',marginBottom:'12px'}}>
-            <Avatar cvData={cvData} size={74} bg="rgba(255,255,255,0.25)" textColor="#fff" shape="circle" />
+            <Avatar cvData={cvData} size={74} shape="circle" />
           </div>
           <h1 style={{fontSize:'17px',fontWeight:'700',margin:'0 0 4px',lineHeight:'1.2'}}>{cvData.prenom}<br/>{cvData.nom}</h1>
           <div style={{fontSize:'10px',color:'rgba(255,255,255,0.8)',fontStyle:'italic'}}>{cvData.titre}</div>
@@ -315,7 +316,7 @@ export function TemplateMinimal({ cvData }) {
   return (
     <div id="cv-to-print" style={{fontFamily:'"Helvetica Neue",Arial,sans-serif',fontSize:'11px',lineHeight:'1.8',background:'#fff',color:'#222',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden',padding:'52px 60px'}}>
       <div style={{marginBottom:'36px',display:'flex',alignItems:'center',gap:'20px'}}>
-        {cvData.photo && <Avatar cvData={cvData} size={68} bg="#222" shape="circle" />}
+        <Avatar cvData={cvData} size={68} shape="circle" />
         <div>
           <h1 style={{fontSize:'30px',fontWeight:'300',letterSpacing:'1px',color:'#111',margin:'0 0 6px'}}>{cvData.prenom} <strong style={{fontWeight:'700'}}>{cvData.nom}</strong></h1>
           <div style={{fontSize:'13px',color:'#888',marginBottom:'10px',letterSpacing:'0.5px'}}>{cvData.titre}</div>
@@ -336,7 +337,7 @@ export function TemplateTech({ cvData }) {
     <div id="cv-to-print" style={{fontFamily:'"Courier New",monospace',fontSize:'11px',lineHeight:'1.7',background:'#fff',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden',display:'grid',gridTemplateColumns:'230px 1fr'}}>
       <div style={{background:'#0f172a',color:'#94a3b8',padding:'28px 18px'}}>
         <div style={{marginBottom:'20px',paddingBottom:'16px',borderBottom:'1px solid #1e293b',display:'flex',flexDirection:'column',alignItems:'center',gap:'10px'}}>
-          <Avatar cvData={cvData} size={68} bg="#1e293b" textColor="#22d3ee" shape="circle" />
+          <Avatar cvData={cvData} size={68} shape="circle" />
           <div style={{textAlign:'center'}}><div style={{fontSize:'10px',color:'#22d3ee',marginBottom:'4px',fontFamily:'monospace'}}>&gt; whoami</div><h1 style={{fontSize:'14px',fontWeight:'700',color:'#f1f5f9',margin:'0 0 4px',fontFamily:'sans-serif'}}>{cvData.prenom} {cvData.nom}</h1><div style={{fontSize:'9px',color:'#22d3ee'}}>{cvData.titre}</div></div>
         </div>
         <div style={{marginBottom:'18px'}}><div style={{fontSize:'8px',color:'#475569',textTransform:'uppercase',letterSpacing:'2px',marginBottom:'10px',fontFamily:'monospace'}}>{'//'} contact</div><div style={{fontSize:'9px',marginBottom:'5px'}}>📧 {cvData.email}</div><div style={{fontSize:'9px',marginBottom:'5px'}}>📱 {cvData.telephone}</div><div style={{fontSize:'9px',marginBottom:'5px'}}>📍 {cvData.ville}</div></div>
@@ -358,7 +359,7 @@ export function TemplateElegant({ cvData }) {
     <div id="cv-to-print" style={{fontFamily:'Georgia,serif',fontSize:'11px',lineHeight:'1.7',background:'#faf7f2',color:'#2c2416',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden',display:'grid',gridTemplateColumns:'230px 1fr'}}>
       <div style={{background:'#2c2416',padding:'36px 20px',color:'#e8d9b8'}}>
         <div style={{marginBottom:'24px',paddingBottom:'20px',borderBottom:'1px solid rgba(232,217,184,0.2)',display:'flex',flexDirection:'column',alignItems:'center',gap:'12px'}}>
-          <Avatar cvData={cvData} size={72} bg="#c9a87a" textColor="#2c2416" shape="circle" />
+          <Avatar cvData={cvData} size={72} shape="circle" />
           <div style={{textAlign:'center'}}><h1 style={{fontSize:'16px',fontWeight:'400',color:'#e8d9b8',margin:'0 0 6px',letterSpacing:'1px',lineHeight:'1.3',fontFamily:'Georgia,serif'}}>{cvData.prenom}<br/><strong>{cvData.nom}</strong></h1><div style={{fontSize:'10px',color:'#c9a87a',fontStyle:'italic'}}>{cvData.titre}</div></div>
         </div>
         <div style={{marginBottom:'22px'}}><div style={{fontSize:'8px',fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',color:'#c9a87a',marginBottom:'10px'}}>Coordonnées</div><div style={{fontSize:'9px',color:'#bbb',marginBottom:'6px'}}>{cvData.email}</div><div style={{fontSize:'9px',color:'#bbb',marginBottom:'6px'}}>{cvData.telephone}</div><div style={{fontSize:'9px',color:'#bbb',marginBottom:'6px'}}>{cvData.ville}</div></div>
@@ -380,7 +381,7 @@ export function TemplateBold({ cvData }) {
     <div id="cv-to-print" style={{fontFamily:'Arial,sans-serif',fontSize:'11px',lineHeight:'1.6',background:'#fff',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden'}}>
       <div style={{background:'#c0392b',padding:'28px 40px'}}>
         <div style={{display:'flex',alignItems:'center',gap:'20px'}}>
-          {cvData.photo && <Avatar cvData={cvData} size={72} bg="rgba(255,255,255,0.2)" textColor="#fff" shape="circle" />}
+          <Avatar cvData={cvData} size={72} shape="circle" />
           <div>
             <h1 style={{fontSize:'26px',fontWeight:'900',color:'#fff',margin:'0 0 6px',letterSpacing:'-0.5px',textTransform:'uppercase'}}>{cvData.prenom} {cvData.nom}</h1>
             <div style={{fontSize:'12px',color:'rgba(255,255,255,0.85)',marginBottom:'10px',fontWeight:'300',letterSpacing:'2px',textTransform:'uppercase'}}>{cvData.titre}</div>
@@ -409,7 +410,7 @@ export function TemplatePastel({ cvData }) {
     <div id="cv-to-print" style={{fontFamily:'"Helvetica Neue",Arial,sans-serif',fontSize:'11px',lineHeight:'1.7',background:'#fef9ff',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden',display:'grid',gridTemplateColumns:'240px 1fr'}}>
       <div style={{background:'#e8d5f5',padding:'32px 20px'}}>
         <div style={{textAlign:'center',marginBottom:'24px',paddingBottom:'20px',borderBottom:'1px solid #d4b8ec',display:'flex',flexDirection:'column',alignItems:'center',gap:'10px'}}>
-          <Avatar cvData={cvData} size={72} bg="linear-gradient(135deg,#c084fc,#e879f9)" textColor="#fff" shape="circle" />
+          <Avatar cvData={cvData} size={72} shape="circle" />
           <div><h1 style={{fontSize:'16px',fontWeight:'700',color:'#5b21b6',margin:'0 0 4px'}}>{cvData.prenom} {cvData.nom}</h1><div style={{fontSize:'10px',color:'#7c3aed',fontStyle:'italic'}}>{cvData.titre}</div></div>
         </div>
         <div style={{marginBottom:'20px'}}><div style={{fontSize:'8px',fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',color:'#7c3aed',marginBottom:'10px'}}>Contact</div><div style={{fontSize:'9px',color:'#5b21b6',marginBottom:'5px'}}>✉ {cvData.email}</div><div style={{fontSize:'9px',color:'#5b21b6',marginBottom:'5px'}}>☎ {cvData.telephone}</div><div style={{fontSize:'9px',color:'#5b21b6',marginBottom:'5px'}}>📍 {cvData.ville}</div></div>
@@ -432,7 +433,7 @@ export function TemplateCorporate({ cvData }) {
       <div style={{background:'#1e3a5f',borderBottom:'4px solid #f59e0b',padding:'24px 36px'}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'20px'}}>
           <div style={{display:'flex',alignItems:'center',gap:'16px'}}>
-            <Avatar cvData={cvData} size={68} bg="rgba(255,255,255,0.15)" textColor="#f59e0b" shape="circle" />
+            <Avatar cvData={cvData} size={68} shape="circle" />
             <div><h1 style={{fontSize:'22px',fontWeight:'700',color:'#fff',margin:'0 0 4px'}}>{cvData.prenom} {cvData.nom}</h1><div style={{fontSize:'12px',color:'#f59e0b',letterSpacing:'1px',textTransform:'uppercase',fontWeight:'300'}}>{cvData.titre}</div></div>
           </div>
           <div style={{textAlign:'right',fontSize:'10px',color:'rgba(255,255,255,0.7)'}}><div style={{marginBottom:'3px'}}>{cvData.email}</div><div style={{marginBottom:'3px'}}>{cvData.telephone}</div><div>{cvData.ville}</div></div>
@@ -461,7 +462,7 @@ export function TemplateSwiss({ cvData }) {
     <div id="cv-to-print" style={{fontFamily:'"Helvetica Neue",Helvetica,Arial,sans-serif',fontSize:'11px',lineHeight:'1.5',background:'#fff',color:'#000',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden',padding:'48px 52px'}}>
       <div style={{display:'grid',gridTemplateColumns:'1fr auto',alignItems:'end',marginBottom:'32px',paddingBottom:'8px',borderBottom:'3px solid #000'}}>
         <div style={{display:'flex',alignItems:'center',gap:'16px'}}>
-          {cvData.photo && <Avatar cvData={cvData} size={60} bg="#000" shape="square" />}
+          <Avatar cvData={cvData} size={60} shape="square" />
           <h1 style={{fontSize:'30px',fontWeight:'900',color:'#000',margin:0,letterSpacing:'-1px',lineHeight:'1'}}>{cvData.prenom?.toUpperCase()} {cvData.nom?.toUpperCase()}</h1>
         </div>
         <div style={{textAlign:'right',fontSize:'10px',color:'#555'}}><div>{cvData.email}</div><div>{cvData.telephone}</div><div>{cvData.ville}</div></div>
@@ -482,7 +483,7 @@ export function TemplateTimeline({ cvData }) {
       <div style={{background:'linear-gradient(135deg,#1e40af,#3b82f6)',padding:'24px 36px'}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'16px'}}>
           <div style={{display:'flex',alignItems:'center',gap:'16px'}}>
-            <Avatar cvData={cvData} size={64} bg="rgba(255,255,255,0.2)" textColor="#fff" shape="circle" />
+            <Avatar cvData={cvData} size={64} shape="circle" />
             <div><h1 style={{fontSize:'22px',fontWeight:'700',color:'#fff',margin:'0 0 4px'}}>{cvData.prenom} {cvData.nom}</h1><div style={{fontSize:'12px',color:'rgba(255,255,255,0.85)',letterSpacing:'1px'}}>{cvData.titre}</div></div>
           </div>
           <div style={{textAlign:'right',fontSize:'10px',color:'rgba(255,255,255,0.8)'}}><div style={{marginBottom:'3px'}}>✉ {cvData.email}</div><div style={{marginBottom:'3px'}}>☎ {cvData.telephone}</div><div>📍 {cvData.ville}</div></div>
