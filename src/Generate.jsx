@@ -23,6 +23,8 @@ function Generate() {
   const [user, setUser] = useState(null)
   const [searchParams] = useSearchParams()
   const [showEditor, setShowEditor] = useState(false)
+  // ✅ Photo manuelle quand pas de profil
+  const [photoManuelle, setPhotoManuelle] = useState(null)
   const templateChoisi = searchParams.get('template') || 'finance'
 
   useEffect(() => {
@@ -36,6 +38,17 @@ function Generate() {
     }
     fetchProfile()
   }, [])
+
+  // ✅ Upload photo manuelle → base64
+  const handlePhotoManuelle = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) { alert('Merci de choisir une image (JPG, PNG...)'); return }
+    if (file.size > 2 * 1024 * 1024) { alert('Image trop lourde — max 2 Mo'); return }
+    const reader = new FileReader()
+    reader.onload = (event) => setPhotoManuelle(event.target.result)
+    reader.readAsDataURL(file)
+  }
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0]
@@ -185,9 +198,11 @@ Règles :
       const json = JSON.parse(jsonPropre)
       const lettreGeneree = dataLM.content[0].text
 
-      // ✅ Injecter la photo du profil dans le cvData généré
+      // ✅ Priorité photo : profil > photo manuelle uploadée
       if (profile?.photo) {
         json.photo = profile.photo
+      } else if (photoManuelle) {
+        json.photo = photoManuelle
       }
 
       setCvData(json)
@@ -251,54 +266,113 @@ Règles :
               : "Upload ton CV PDF et colle l'offre — l'IA génère ton CV et ta lettre de motivation."}
           </p>
 
+          {/* ─── MODE PROFIL ─── */}
           {profile ? (
             <div style={{marginBottom:'24px'}}>
               <div className="profile-loaded-box">
                 <div className="profile-loaded-info">
-                  {/* ✅ Affiche la photo du profil si disponible */}
                   {profile.photo ? (
-                    <img src={profile.photo} alt="Photo" style={{width:'40px', height:'40px', borderRadius:'50%', objectFit:'cover', flexShrink:0}} />
+                    <img src={profile.photo} alt="Photo" style={{width:'40px',height:'40px',borderRadius:'50%',objectFit:'cover',flexShrink:0}} />
                   ) : (
                     <div className="profile-loaded-avatar">{profile.prenom[0]}{profile.nom[0]}</div>
                   )}
                   <div>
-                    <div style={{fontWeight:'600', fontSize:'14px'}}>{profile.prenom} {profile.nom}</div>
-                    <div style={{fontSize:'12px', color:'var(--muted)'}}>{profile.titre}</div>
+                    <div style={{fontWeight:'600',fontSize:'14px'}}>{profile.prenom} {profile.nom}</div>
+                    <div style={{fontSize:'12px',color:'var(--muted)'}}>{profile.titre}</div>
                   </div>
                 </div>
-                <a href="/profile" style={{fontSize:'12px', color:'var(--blue)'}}>Modifier mon profil →</a>
+                <a href="/profile" style={{fontSize:'12px',color:'var(--blue)'}}>Modifier mon profil →</a>
               </div>
+
+              {/* Suggestion d'ajouter une photo si elle manque */}
               {!profile.photo && (
-                <div style={{marginTop:'8px', padding:'8px 12px', background:'#fffbeb', border:'1px solid #fde68a', borderRadius:'8px', fontSize:'12px', color:'#92400e'}}>
-                  💡 Ajoute une photo dans ton <a href="/profile" style={{color:'#92400e', fontWeight:'600'}}>profil</a> pour l'inclure dans tes CV
+                <div style={{marginTop:'8px',padding:'8px 12px',background:'#fffbeb',border:'1px solid #fde68a',borderRadius:'8px',fontSize:'12px',color:'#92400e'}}>
+                  💡 Pas de photo dans ton profil —{' '}
+                  <a href="/profile" style={{color:'#92400e',fontWeight:'600',textDecoration:'underline'}}>ajoute-en une</a>
+                  {' '}pour qu'elle apparaisse sur tes CV
                 </div>
               )}
-              <button onClick={() => setProfile(null)} style={{fontSize:'12px', color:'var(--muted)', background:'none', border:'none', cursor:'pointer', marginTop:'8px', textDecoration:'underline', display:'block'}}>
+
+              <button onClick={() => setProfile(null)} style={{fontSize:'12px',color:'var(--muted)',background:'none',border:'none',cursor:'pointer',marginTop:'8px',textDecoration:'underline',display:'block'}}>
                 Utiliser un CV PDF à la place →
               </button>
             </div>
+
+          /* ─── MODE PDF (sans profil) ─── */
           ) : (
-            <div className="upload-box">
-              <div className="upload-label">1. Ton CV actuel (PDF)</div>
-              <label className="upload-zone">
-                <input type="file" accept=".pdf" onChange={handleFileChange} style={{display:'none'}} />
-                {cvFile ? (
-                  <div className="upload-done">📄 {cvFile.name} ✓</div>
-                ) : (
-                  <div className="upload-placeholder">
-                    <div className="upload-icon">📁</div>
-                    <div>Clique pour uploader ton CV</div>
-                    <div className="upload-hint">PDF uniquement</div>
+            <div style={{marginBottom:'24px'}}>
+              {/* Upload CV PDF */}
+              <div className="upload-box">
+                <div className="upload-label">1. Ton CV actuel (PDF)</div>
+                <label className="upload-zone">
+                  <input type="file" accept=".pdf" onChange={handleFileChange} style={{display:'none'}} />
+                  {cvFile ? (
+                    <div className="upload-done">📄 {cvFile.name} ✓</div>
+                  ) : (
+                    <div className="upload-placeholder">
+                      <div className="upload-icon">📁</div>
+                      <div>Clique pour uploader ton CV</div>
+                      <div className="upload-hint">PDF uniquement</div>
+                    </div>
+                  )}
+                </label>
+                {cvTexte && (
+                  <div style={{marginTop:'8px',fontSize:'12px',color:'#16a34a'}}>
+                    ✓ CV lu — {cvTexte.length} caractères extraits
                   </div>
                 )}
-              </label>
-              {cvTexte && <div style={{marginTop:'8px', fontSize:'12px', color:'#16a34a'}}>✓ CV lu avec succès — {cvTexte.length} caractères extraits</div>}
+              </div>
+
+              {/* ✅ Upload photo optionnelle */}
+              <div style={{marginTop:'12px',padding:'14px',background:'#f7f8fc',border:'1px solid #e5e7ef',borderRadius:'12px'}}>
+                <div style={{fontSize:'12px',fontWeight:'600',color:'var(--text)',marginBottom:'10px'}}>
+                  📷 Ta photo <span style={{fontWeight:'400',color:'var(--muted)'}}>— optionnelle</span>
+                </div>
+
+                <div style={{display:'flex',alignItems:'center',gap:'14px'}}>
+                  {/* Aperçu */}
+                  {photoManuelle ? (
+                    <img src={photoManuelle} alt="Photo" style={{width:'48px',height:'48px',borderRadius:'50%',objectFit:'cover',border:'2px solid var(--blue)',flexShrink:0}} />
+                  ) : (
+                    <div style={{width:'48px',height:'48px',borderRadius:'50%',background:'#e5e7ef',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'20px',flexShrink:0}}>👤</div>
+                  )}
+
+                  {/* Boutons */}
+                  <div style={{display:'flex',flexDirection:'column',gap:'6px',flex:1}}>
+                    <label style={{cursor:'pointer'}}>
+                      <input type="file" accept="image/*" onChange={handlePhotoManuelle} style={{display:'none'}} />
+                      <div style={{padding:'7px 14px',background:'#fff',border:'1px solid #c7d9ff',color:'#1a56db',borderRadius:'8px',fontSize:'12px',fontWeight:'500',display:'inline-block',cursor:'pointer'}}>
+                        {photoManuelle ? '🔄 Changer la photo' : '📷 Ajouter ma photo'}
+                      </div>
+                    </label>
+                    {photoManuelle && (
+                      <button onClick={() => setPhotoManuelle(null)} style={{background:'none',border:'none',color:'#dc2626',fontSize:'12px',cursor:'pointer',textAlign:'left',padding:0}}>
+                        🗑 Supprimer
+                      </button>
+                    )}
+                    <div style={{fontSize:'11px',color:'var(--muted)'}}>JPG, PNG · max 2 Mo</div>
+                  </div>
+                </div>
+
+                {photoManuelle && (
+                  <div style={{marginTop:'8px',fontSize:'11px',color:'#16a34a'}}>
+                    ✓ Photo ajoutée — elle apparaîtra sur ton CV généré
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
+          {/* Offre d'emploi */}
           <div className="offre-box">
             <div className="upload-label">{profile ? '1.' : '2.'} L'offre d'emploi</div>
-            <textarea className="offre-textarea" placeholder="Colle ici le texte complet de l'offre d'emploi..." value={offreEmploi} onChange={(e) => setOffreEmploi(e.target.value)} rows={8} />
+            <textarea
+              className="offre-textarea"
+              placeholder="Colle ici le texte complet de l'offre d'emploi..."
+              value={offreEmploi}
+              onChange={(e) => setOffreEmploi(e.target.value)}
+              rows={8}
+            />
           </div>
 
           <button className="btn-generate" onClick={handleGenerate} disabled={loading}>
@@ -306,23 +380,24 @@ Règles :
           </button>
 
           {cvData && (
-            <div style={{display:'flex', flexDirection:'column', gap:'8px', marginTop:'12px'}}>
-              <button onClick={() => setShowEditor(true)} style={{display:'block', textAlign:'center', width:'100%', padding:'14px', background:'#1a56db', color:'#fff', borderRadius:'10px', fontSize:'15px', fontWeight:'500', border:'none', cursor:'pointer'}}>
+            <div style={{display:'flex',flexDirection:'column',gap:'8px',marginTop:'12px'}}>
+              <button onClick={() => setShowEditor(true)} style={{display:'block',textAlign:'center',width:'100%',padding:'14px',background:'#1a56db',color:'#fff',borderRadius:'10px',fontSize:'15px',fontWeight:'500',border:'none',cursor:'pointer'}}>
                 ✏️ Modifier mon CV
               </button>
-              <a href="/dashboard" style={{display:'block', textAlign:'center', textDecoration:'none', padding:'14px', background:'#16a34a', color:'#fff', borderRadius:'10px', fontSize:'15px', fontWeight:'500'}}>
+              <a href="/dashboard" style={{display:'block',textAlign:'center',textDecoration:'none',padding:'14px',background:'#16a34a',color:'#fff',borderRadius:'10px',fontSize:'15px',fontWeight:'500'}}>
                 ✅ Terminer → Aller au dashboard
               </a>
             </div>
           )}
         </div>
 
+        {/* ─── APERÇU DROITE ─── */}
         <div className="generate-right">
           <div className="result-box">
             <div className="result-header">
               <span>Template : <strong>{templateChoisi}</strong></span>
               {cvData && (
-                <div style={{display:'flex', gap:'8px'}}>
+                <div style={{display:'flex',gap:'8px'}}>
                   <button className="btn-download" onClick={handleDownloadCV}>📥 CV PDF</button>
                   {lettre && <button className="btn-download" onClick={handleDownloadLettre}>📄 Lettre</button>}
                 </div>
@@ -334,7 +409,7 @@ Règles :
               ) : (
                 <div className="result-empty">
                   <div className="empty-icon">✨</div>
-                  <div>{loading ? 'L\'IA génère ton CV et ta lettre...' : 'Ton CV optimisé apparaîtra ici'}</div>
+                  <div>{loading ? "L'IA génère ton CV et ta lettre..." : 'Ton CV optimisé apparaîtra ici'}</div>
                 </div>
               )}
             </div>
@@ -347,7 +422,7 @@ Règles :
                 <button className="btn-download" onClick={handleDownloadLettre}>📄 Télécharger</button>
               </div>
               <div className="result-content" style={{alignItems:'flex-start'}}>
-                <div style={{fontFamily:'Georgia,serif', fontSize:'13px', lineHeight:'1.8', color:'#222', whiteSpace:'pre-wrap', width:'100%', padding:'8px'}}>
+                <div style={{fontFamily:'Georgia,serif',fontSize:'13px',lineHeight:'1.8',color:'#222',whiteSpace:'pre-wrap',width:'100%',padding:'8px'}}>
                   {lettre}
                 </div>
               </div>
