@@ -93,7 +93,7 @@ function Generate() {
 
     if (user) {
       const { count } = await supabase.from('cvs').select('*', { count: 'exact', head: true }).eq('user_id', user.id)
-      const adminEmails = ['fernandochokki@gmail.com', 'chokkifernando@gmail.com', 'carlinazon@gmail.com', 'bertrandgbenou1er@gmail.com']
+      const adminEmails = ['fernandochokki@gmail.com', 'chokkifernando@gmail.com', 'carlinazon@gmail.com']
       if (count >= 1 && !adminEmails.includes(user.email)) {
         alert('Tu as utilisé ton CV gratuit ! Passe au plan Pro pour générer des CV illimités.')
         setLoading(false)
@@ -185,6 +185,11 @@ Règles :
       const json = JSON.parse(jsonPropre)
       const lettreGeneree = dataLM.content[0].text
 
+      // ✅ Injecter la photo du profil dans le cvData généré
+      if (profile?.photo) {
+        json.photo = profile.photo
+      }
+
       setCvData(json)
       setLettre(lettreGeneree)
 
@@ -210,7 +215,10 @@ Règles :
   const handleDownloadCV = async () => {
     const element = document.getElementById('cv-to-print')
     if (!element) return
-    const canvas = await html2canvas(element, { scale: 4, useCORS: true, backgroundColor: '#ffffff', width: 794, height: 1123, logging: false, imageTimeout: 0, allowTaint: true })
+    const canvas = await html2canvas(element, {
+      scale: 4, useCORS: true, backgroundColor: '#ffffff',
+      width: 794, height: 1123, logging: false, imageTimeout: 0, allowTaint: true
+    })
     const imgData = canvas.toDataURL('image/png')
     const pdf = new jsPDF('p', 'mm', 'a4', true)
     pdf.addImage(imgData, 'PNG', 0, 0, 210, 297, '', 'FAST')
@@ -238,14 +246,21 @@ Règles :
         <div className="generate-left">
           <h2>Génère ton CV optimisé</h2>
           <p className="generate-sub">
-            {profile ? `Bonjour ${profile.prenom} ! Ton profil est chargé — colle juste l'offre d'emploi.` : 'Upload ton CV PDF et colle l\'offre — l\'IA génère ton CV et ta lettre de motivation.'}
+            {profile
+              ? `Bonjour ${profile.prenom} ! Ton profil est chargé${profile.photo ? ' 📷' : ''} — colle juste l'offre d'emploi.`
+              : "Upload ton CV PDF et colle l'offre — l'IA génère ton CV et ta lettre de motivation."}
           </p>
 
           {profile ? (
             <div style={{marginBottom:'24px'}}>
               <div className="profile-loaded-box">
                 <div className="profile-loaded-info">
-                  <div className="profile-loaded-avatar">{profile.prenom[0]}{profile.nom[0]}</div>
+                  {/* ✅ Affiche la photo du profil si disponible */}
+                  {profile.photo ? (
+                    <img src={profile.photo} alt="Photo" style={{width:'40px', height:'40px', borderRadius:'50%', objectFit:'cover', flexShrink:0}} />
+                  ) : (
+                    <div className="profile-loaded-avatar">{profile.prenom[0]}{profile.nom[0]}</div>
+                  )}
                   <div>
                     <div style={{fontWeight:'600', fontSize:'14px'}}>{profile.prenom} {profile.nom}</div>
                     <div style={{fontSize:'12px', color:'var(--muted)'}}>{profile.titre}</div>
@@ -253,6 +268,11 @@ Règles :
                 </div>
                 <a href="/profile" style={{fontSize:'12px', color:'var(--blue)'}}>Modifier mon profil →</a>
               </div>
+              {!profile.photo && (
+                <div style={{marginTop:'8px', padding:'8px 12px', background:'#fffbeb', border:'1px solid #fde68a', borderRadius:'8px', fontSize:'12px', color:'#92400e'}}>
+                  💡 Ajoute une photo dans ton <a href="/profile" style={{color:'#92400e', fontWeight:'600'}}>profil</a> pour l'inclure dans tes CV
+                </div>
+              )}
               <button onClick={() => setProfile(null)} style={{fontSize:'12px', color:'var(--muted)', background:'none', border:'none', cursor:'pointer', marginTop:'8px', textDecoration:'underline', display:'block'}}>
                 Utiliser un CV PDF à la place →
               </button>

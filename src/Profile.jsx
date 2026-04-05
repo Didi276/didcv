@@ -17,6 +17,7 @@ function Profile() {
   const [importFile, setImportFile] = useState(null)
   const [profile, setProfile] = useState({
     prenom: '', nom: '', email: '', telephone: '', ville: '', linkedin: '', titre: '', accroche: '',
+    photo: null,
     experiences: [], formations: [], competences: [], langues: [], certifications: []
   })
 
@@ -33,6 +34,19 @@ function Profile() {
     }
     fetchProfile()
   }, [])
+
+  // ✅ Upload photo → base64
+  const handlePhotoUpload = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) { alert('Merci de choisir une image (JPG, PNG...)'); return }
+    if (file.size > 2 * 1024 * 1024) { alert('Image trop lourde — max 2 Mo'); return }
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      setProfile(p => ({ ...p, photo: event.target.result }))
+    }
+    reader.readAsDataURL(file)
+  }
 
   const handleImportCV = async (e) => {
     const file = e.target.files[0]
@@ -86,7 +100,8 @@ Retourne UNIQUEMENT un objet JSON valide avec cette structure exacte :
       const texte = data.content[0].text
       const jsonPropre = texte.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
       const json = JSON.parse(jsonPropre)
-      setProfile(p => ({ ...p, ...json }))
+      // ✅ On garde la photo existante lors de l'import PDF
+      setProfile(p => ({ ...p, ...json, photo: p.photo }))
       setImporting(false)
     }
     reader.readAsArrayBuffer(file)
@@ -108,78 +123,51 @@ Retourne UNIQUEMENT un objet JSON valide avec cette structure exacte :
   const addExperience = () => {
     setProfile(p => ({ ...p, experiences: [...p.experiences, { poste: '', entreprise: '', periode: '', lieu: '', missions: ['', '', ''] }] }))
   }
-
   const updateExperience = (index, field, value) => {
     const exps = [...profile.experiences]
     exps[index] = { ...exps[index], [field]: value }
     setProfile(p => ({ ...p, experiences: exps }))
   }
-
   const updateMission = (expIndex, missionIndex, value) => {
     const exps = [...profile.experiences]
     exps[expIndex].missions[missionIndex] = value
     setProfile(p => ({ ...p, experiences: exps }))
   }
-
   const removeExperience = (index) => {
     setProfile(p => ({ ...p, experiences: p.experiences.filter((_, i) => i !== index) }))
   }
-
   const addFormation = () => {
     setProfile(p => ({ ...p, formations: [...p.formations, { diplome: '', etablissement: '', periode: '', mention: '' }] }))
   }
-
   const updateFormation = (index, field, value) => {
     const fors = [...profile.formations]
     fors[index] = { ...fors[index], [field]: value }
     setProfile(p => ({ ...p, formations: fors }))
   }
-
   const removeFormation = (index) => {
     setProfile(p => ({ ...p, formations: p.formations.filter((_, i) => i !== index) }))
   }
-
-  const addCompetence = () => {
-    setProfile(p => ({ ...p, competences: [...p.competences, ''] }))
-  }
-
+  const addCompetence = () => setProfile(p => ({ ...p, competences: [...p.competences, ''] }))
   const updateCompetence = (index, value) => {
     const comps = [...profile.competences]
     comps[index] = value
     setProfile(p => ({ ...p, competences: comps }))
   }
-
-  const removeCompetence = (index) => {
-    setProfile(p => ({ ...p, competences: p.competences.filter((_, i) => i !== index) }))
-  }
-
-  const addLangue = () => {
-    setProfile(p => ({ ...p, langues: [...p.langues, { langue: '', niveau: '' }] }))
-  }
-
+  const removeCompetence = (index) => setProfile(p => ({ ...p, competences: p.competences.filter((_, i) => i !== index) }))
+  const addLangue = () => setProfile(p => ({ ...p, langues: [...p.langues, { langue: '', niveau: '' }] }))
   const updateLangue = (index, field, value) => {
     const langs = [...profile.langues]
     langs[index] = { ...langs[index], [field]: value }
     setProfile(p => ({ ...p, langues: langs }))
   }
-
-  const removeLangue = (index) => {
-    setProfile(p => ({ ...p, langues: p.langues.filter((_, i) => i !== index) }))
-  }
-
-  const addCertification = () => {
-    setProfile(p => ({ ...p, certifications: [...p.certifications, { titre: '', organisme: '', annee: '' }] }))
-  }
-
+  const removeLangue = (index) => setProfile(p => ({ ...p, langues: p.langues.filter((_, i) => i !== index) }))
+  const addCertification = () => setProfile(p => ({ ...p, certifications: [...p.certifications, { titre: '', organisme: '', annee: '' }] }))
   const updateCertification = (index, field, value) => {
     const certs = [...profile.certifications]
     certs[index] = { ...certs[index], [field]: value }
     setProfile(p => ({ ...p, certifications: certs }))
   }
-
-  const removeCertification = (index) => {
-    setProfile(p => ({ ...p, certifications: p.certifications.filter((_, i) => i !== index) }))
-  }
+  const removeCertification = (index) => setProfile(p => ({ ...p, certifications: p.certifications.filter((_, i) => i !== index) }))
 
   if (loading) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh'}}>⏳ Chargement...</div>
 
@@ -197,10 +185,11 @@ Retourne UNIQUEMENT un objet JSON valide avec cette structure exacte :
         <div className="profile-header">
           <h2>Mon <em>profil</em></h2>
           <p className="profile-sub">
-            Importe ton CV PDF pour pré-remplir ton profil automatiquement. ⚠️ La lecture automatique n'est pas parfaite — les expériences et missions peuvent être mélangées selon la mise en page de ton CV. <strong>Vérifie et corrige chaque section avant de sauvegarder.</strong>
+            Importe ton CV PDF pour pré-remplir ton profil automatiquement. ⚠️ La lecture automatique n'est pas parfaite — vérifie et corrige chaque section avant de sauvegarder.
           </p>
         </div>
 
+        {/* Import PDF */}
         <div className="import-cv-box">
           <label className="import-cv-label">
             <input type="file" accept=".pdf" onChange={handleImportCV} style={{display:'none'}} />
@@ -208,9 +197,9 @@ Retourne UNIQUEMENT un objet JSON valide avec cette structure exacte :
               <div className="import-cv-loading">⏳ Analyse de ton CV en cours...</div>
             ) : importFile ? (
               <div className="import-cv-done">
-  ✅ Profil importé depuis {importFile.name} !<br/>
-  <span style={{fontSize:'12px', color:'#555'}}>Certaines informations peuvent manquer — vérifie et complète les sections vides avant de sauvegarder.</span>
-</div>
+                ✅ Profil importé depuis {importFile.name} !<br/>
+                <span style={{fontSize:'12px', color:'#555'}}>Vérifie et complète les sections vides avant de sauvegarder.</span>
+              </div>
             ) : (
               <div className="import-cv-placeholder">
                 <div style={{fontSize:'32px', marginBottom:'8px'}}>📄</div>
@@ -222,6 +211,58 @@ Retourne UNIQUEMENT un objet JSON valide avec cette structure exacte :
         </div>
 
         <div className="profile-sections">
+
+          {/* ✅ SECTION PHOTO */}
+          <div className="profile-section">
+            <h3 className="profile-section-title">📷 Photo de profil</h3>
+            <p style={{fontSize:'13px', color:'var(--muted)', marginBottom:'16px', marginTop:'-4px'}}>
+              Optionnelle — elle sera automatiquement ajoutée à tes CV générés.
+            </p>
+            <div style={{display:'flex', alignItems:'center', gap:'24px', flexWrap:'wrap'}}>
+
+              {/* Aperçu */}
+              <div style={{flexShrink:0}}>
+                {profile.photo ? (
+                  <img
+                    src={profile.photo}
+                    alt="Photo de profil"
+                    style={{width:'90px', height:'90px', borderRadius:'50%', objectFit:'cover', border:'3px solid var(--blue)', display:'block'}}
+                  />
+                ) : (
+                  <div style={{width:'90px', height:'90px', borderRadius:'50%', background:'var(--bg2)', border:'2px dashed var(--border)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'32px'}}>
+                    👤
+                  </div>
+                )}
+              </div>
+
+              {/* Boutons */}
+              <div style={{display:'flex', flexDirection:'column', gap:'10px'}}>
+                <label style={{cursor:'pointer'}}>
+                  <input type="file" accept="image/*" onChange={handlePhotoUpload} style={{display:'none'}} />
+                  <div style={{padding:'10px 20px', background:'var(--blue)', color:'#fff', borderRadius:'10px', fontSize:'14px', fontWeight:'500', display:'inline-block', cursor:'pointer'}}>
+                    {profile.photo ? '🔄 Changer la photo' : '📷 Ajouter une photo'}
+                  </div>
+                </label>
+                {profile.photo && (
+                  <button
+                    onClick={() => setProfile(p => ({...p, photo: null}))}
+                    style={{padding:'8px 16px', background:'#fef2f2', color:'#dc2626', border:'1px solid #fecaca', borderRadius:'10px', fontSize:'13px', cursor:'pointer', textAlign:'left'}}
+                  >
+                    🗑 Supprimer la photo
+                  </button>
+                )}
+                <div style={{fontSize:'12px', color:'var(--muted)'}}>JPG, PNG · Max 2 Mo</div>
+              </div>
+
+              {profile.photo && (
+                <div style={{padding:'10px 14px', background:'#f0fdf4', border:'1px solid #bbf7d0', borderRadius:'8px', fontSize:'12px', color:'#166534'}}>
+                  ✓ Photo enregistrée — elle apparaîtra dans tes CV
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Informations personnelles */}
           <div className="profile-section">
             <h3 className="profile-section-title">👤 Informations personnelles</h3>
             <div className="profile-grid">
@@ -260,6 +301,7 @@ Retourne UNIQUEMENT un objet JSON valide avec cette structure exacte :
             </div>
           </div>
 
+          {/* Expériences */}
           <div className="profile-section">
             <div className="profile-section-header">
               <h3 className="profile-section-title">💼 Expériences professionnelles</h3>
@@ -290,29 +332,30 @@ Retourne UNIQUEMENT un objet JSON valide avec cette structure exacte :
                   </div>
                 </div>
                 <div className="profile-field" style={{marginTop:'8px'}}>
-  <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'6px'}}>
-    <label>Missions</label>
-    <button className="btn-add" style={{fontSize:'11px', padding:'3px 10px'}} onClick={() => {
-      const exps = [...profile.experiences]
-      exps[i].missions = [...(exps[i].missions || []), '']
-      setProfile(p => ({ ...p, experiences: exps }))
-    }}>+ Mission</button>
-  </div>
-  {(exp.missions || []).map((m, j) => (
-    <div key={j} style={{display:'flex', gap:'6px', marginBottom:'6px'}}>
-      <input className="profile-input" value={m} onChange={e => updateMission(i, j, e.target.value)} placeholder={`Mission ${j + 1}`} />
-      <button className="btn-remove" onClick={() => {
-        const exps = [...profile.experiences]
-        exps[i].missions = exps[i].missions.filter((_, k) => k !== j)
-        setProfile(p => ({ ...p, experiences: exps }))
-      }}>✕</button>
-    </div>
-  ))}
-</div>
+                  <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'6px'}}>
+                    <label>Missions</label>
+                    <button className="btn-add" style={{fontSize:'11px', padding:'3px 10px'}} onClick={() => {
+                      const exps = [...profile.experiences]
+                      exps[i].missions = [...(exps[i].missions || []), '']
+                      setProfile(p => ({ ...p, experiences: exps }))
+                    }}>+ Mission</button>
+                  </div>
+                  {(exp.missions || []).map((m, j) => (
+                    <div key={j} style={{display:'flex', gap:'6px', marginBottom:'6px'}}>
+                      <input className="profile-input" value={m} onChange={e => updateMission(i, j, e.target.value)} placeholder={`Mission ${j + 1}`} />
+                      <button className="btn-remove" onClick={() => {
+                        const exps = [...profile.experiences]
+                        exps[i].missions = exps[i].missions.filter((_, k) => k !== j)
+                        setProfile(p => ({ ...p, experiences: exps }))
+                      }}>✕</button>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
 
+          {/* Formations */}
           <div className="profile-section">
             <div className="profile-section-header">
               <h3 className="profile-section-title">🎓 Formations</h3>
@@ -350,6 +393,7 @@ Retourne UNIQUEMENT un objet JSON valide avec cette structure exacte :
             ))}
           </div>
 
+          {/* Compétences */}
           <div className="profile-section">
             <div className="profile-section-header">
               <h3 className="profile-section-title">⚡ Compétences</h3>
@@ -365,6 +409,7 @@ Retourne UNIQUEMENT un objet JSON valide avec cette structure exacte :
             </div>
           </div>
 
+          {/* Langues */}
           <div className="profile-section">
             <div className="profile-section-header">
               <h3 className="profile-section-title">🌍 Langues</h3>
@@ -390,6 +435,7 @@ Retourne UNIQUEMENT un objet JSON valide avec cette structure exacte :
             ))}
           </div>
 
+          {/* Certifications */}
           <div className="profile-section">
             <div className="profile-section-header">
               <h3 className="profile-section-title">🏆 Certifications</h3>
