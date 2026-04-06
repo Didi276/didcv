@@ -198,11 +198,14 @@ Accroche: ${profile.accroche}\n\n`
 
   // ─── Calcul missions selon nb expériences ET type (stage vs poste) ───
   const getMissionsConfig = (nbExp) => {
-    if (nbExp <= 1) return { missionsPoste: 5, missionsStage: 2, note: "Peu d'expérience : enrichis chaque mission avec beaucoup de détails, contexte, chiffres et résultats concrets. Ajoute le contexte : taille de l'équipe, secteur, budget géré, enjeux." }
-    if (nbExp === 2) return { missionsPoste: 4, missionsStage: 2, note: "4 missions pour les postes permanents, 2 max pour les stages." }
-    if (nbExp === 3) return { missionsPoste: 3, missionsStage: 2, note: "3 missions pour les postes permanents, 2 max pour les stages." }
-    if (nbExp === 4) return { missionsPoste: 3, missionsStage: 2, note: "2-3 missions pour les postes, 2 max pour les stages. Sois concis." }
-    return { missionsPoste: 2, missionsStage: 1, note: "2 missions max pour les postes, 1 pour les stages. Très concis, priorise les plus récentes." }
+    // Postes CDI/CDD : toujours 4 missions pour bien remplir le CV
+    // Stages : 2 max car moins de responsabilités
+    // Si beaucoup d'expériences (5+), réduire à 3 pour tenir sur 1 page
+    if (nbExp <= 1) return { missionsPoste: 5, missionsStage: 2, note: "Peu d'expérience : génère exactement 5 missions très détaillées avec chiffres, contexte (taille équipe, budget géré, secteur) et résultats concrets. Remplis bien le CV." }
+    if (nbExp === 2) return { missionsPoste: 4, missionsStage: 2, note: "Exactement 4 missions par poste permanent avec chiffres, 2 missions par stage." }
+    if (nbExp === 3) return { missionsPoste: 4, missionsStage: 2, note: "Exactement 4 missions par poste CDI/CDD avec chiffres obligatoires, 2 missions par stage." }
+    if (nbExp === 4) return { missionsPoste: 3, missionsStage: 2, note: "3 missions par poste permanent avec chiffres, 2 missions par stage. Reste concis." }
+    return { missionsPoste: 2, missionsStage: 1, note: "2 missions max par poste, 1 par stage. Très concis, priorise les postes les plus récents." }
   }
 
   const handleGenerate = async () => {
@@ -274,26 +277,34 @@ RÈGLES ABSOLUES — respecte-les toutes sans exception :
    Verbes d'action forts obligatoires : Piloté, Développé, Optimisé, Managé, Négocié, Réduit, Augmenté, Structuré, Déployé, Coordonné...
 
 2. DISTINCTION STAGE / POSTE PERMANENT :
-   - Poste permanent (CDI, CDD, alternance longue) : ${missionsPoste} missions maximum, détaillées avec chiffres
-   - Stage (mention "Stage", "Stagiaire", durée < 6 mois) : ${missionsStage} missions maximum, plus concises
+   - Poste permanent (CDI, CDD, alternance longue) : ${missionsPoste} missions (vise exactement ce nombre), chacune avec chiffre
+   - Stage (mention "Stage", "Stagiaire", durée < 6 mois) : ${missionsStage} missions maximum, concises mais avec résultat mesurable
    - ${noteExp}
 
 3. COMPÉTENCES — FORMAT ATS STRICT :
    Chaque compétence = 1 à 3 mots MAXIMUM. Termes techniques précis reconnus par les ATS.
    INTERDIT : "Suivi budgétaire et analyse financière" (trop long, non-ATS)
    OBLIGATOIRE : "Power BI", "SAP FI", "Excel VBA", "IFRS", "Contrôle de gestion", "Reporting financier"
-   Maximum 8 compétences, toutes tirées des mots-clés de l'offre.
+   Entre 8 et 12 compétences — priorise les mots-clés EXACTS de l'offre, puis les compétences techniques clés du candidat.
 
-4. ACCROCHE / PROFIL — PERCUTANTE ET HUMAINE (3 à 5 lignes) :
-   Ce bloc est LA première chose qu'un recruteur lit. Il doit être fort, humain et ciblé.
+4. ACCROCHE / PROFIL — HONNÊTE, VALORISANT ET PERCUTANT (3 à 5 phrases) :
+   Ce bloc est LA première chose qu'un recruteur lit. Il valorise SANS mentir.
+
+   RÈGLE ABSOLUE D'HONNÊTETÉ : N'attribue JAMAIS au candidat un titre ou poste qu'il n'a pas occupé.
+   Par exemple : si le candidat postule à "Contrôleur de gestion" mais n'a jamais eu ce titre, 
+   NE PAS écrire "Contrôleur de gestion avec X ans d'expérience". 
+   À la place : décrire ses compétences réelles qui l'amènent vers ce poste.
+
    Structure obligatoire :
-   - Phrase 1 : qui est le candidat en une phrase puissante (profil + années d'expérience + secteur)
-   - Phrase 2 : sa valeur ajoutée principale avec UN chiffre concret
-   - Phrase 3 : ce qui le rend unique ou différent des autres candidats
-   - Phrase 4-5 (optionnelles) : ambition professionnelle alignée avec le poste visé, ton humain et engagé
-   INTERDIT : commencer par "Actuellement...", "Doté de...", "Fort de..."
-   INTERDIT : réduire à 2 phrases génériques — ce profil doit être mémorable
-   OBLIGATOIRE : utiliser 2 mots-clés EXACTS de l'offre dans ce bloc
+   - Phrase 1 : qui est vraiment le candidat (formation + domaine d'expertise réel + années d'expérience)
+   - Phrase 2 : sa réalisation la plus forte avec UN chiffre concret tiré de ses vraies expériences
+   - Phrase 3 : ses compétences clés qui font de lui le bon profil pour CE poste (avec mots-clés de l'offre)
+   - Phrase 4-5 (optionnelles) : sa motivation pour évoluer vers ce poste + ce qu'il apporte concrètement
+   
+   INTERDIT : commencer par "Actuellement...", "Doté de...", "Fort de...", "Je suis..."
+   INTERDIT : mentir sur le titre, les années d'expérience dans un poste non occupé
+   INTERDIT : écrire moins de 3 phrases — le profil doit être complet et mémorable
+   OBLIGATOIRE : ton humain, engagé, pas robotique — le recruteur doit avoir envie de rencontrer cette personne
 
 5. LINKEDIN :
    Si linkedin est vide ou absent dans le profil, mets "" dans le JSON.
@@ -302,10 +313,12 @@ RÈGLES ABSOLUES — respecte-les toutes sans exception :
 
 7. CERTIFICATIONS : ${hasCertifications ? "Inclus TOUTES les certifications — éléments différenciants importants." : "Tableau vide []."}
 
-10. FORMATIONS — DESCRIPTION ENRICHIE :
-   Pour chaque formation, génère une description courte (1 phrase) qui mentionne les matières principales, spécialités ou projets notables.
-   Exemple : "Spécialisation en analyse financière, contrôle de gestion, économétrie et finance d'entreprise."
-   Cette description apparaît sur le CV et aide à remplir l'espace si le candidat a peu d'expériences.
+10. FORMATIONS — DESCRIPTION OBLIGATOIRE :
+   Pour CHAQUE formation, génère une description (1 phrase courte) mentionnant les matières principales, spécialités ou compétences acquises.
+   OBLIGATOIRE même si le candidat ne l'a pas renseignée — infère-la à partir du nom du diplôme et de l'établissement.
+   Exemple Master Éco : "Spécialisation en analyse financière, contrôle de gestion, économétrie et stratégie d'entreprise."
+   Exemple Master Gestion : "Formation en comptabilité, audit, gestion financière, fiscalité et contrôle de gestion."
+   Cette description est affichée sur le CV sous le nom de l'établissement.
 
 8. CENTRES D'INTÉRÊT : ${hasCentresInteret ? "Inclus les centres d'intérêt du candidat." : "Tableau vide []. NE PAS inventer de centres d'intérêt."}
 

@@ -35,12 +35,16 @@ function getFontConfig(cvData) {
     ? allMissions.reduce((acc, m) => acc + (m?.length || 0), 0) / allMissions.length
     : 60
 
-  // Score de densité
+  // Score de densité — inclut formations et leurs descriptions
+  const nbFormations = cvData.formations?.length || 0
+  const hasFormDesc = cvData.formations?.some(f => f.description) || false
   const density = nbExp
     + totalMissions * 0.3
     + totalMissions * (avgMissionLen / 80) * 0.2
     + (hasCert ? 1.5 : 0)
     + (hasCI ? 1 : 0)
+    + nbFormations * 0.5
+    + (hasFormDesc ? 1 : 0)
 
   // ⚠️ Police max = 11px pour éviter les débordements dans les templates à largeur fixe (794px)
   // On joue sur lineHeight et padding pour remplir la page quand le contenu est léger
@@ -89,59 +93,81 @@ function SectionCentresInteret({ cvData, couleur = '#1a1a1a', style = {} }) {
 export function TemplateFinance({ cvData }) {
   const f = getFontConfig(cvData)
   return (
-    <div id="cv-to-print" style={{fontFamily:'Georgia,serif',color:'#1a1a1a',fontSize:f.base,lineHeight:f.lineH,padding:'36px 40px',background:'#fff',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden'}}>
-      <div style={{borderBottom:'3px solid #1a1a1a',paddingBottom:'12px',marginBottom:'14px'}}>
-        <div style={{display:'flex',alignItems:'center',gap:'16px'}}>
-          <Avatar cvData={cvData} size={68} shape="circle" />
-          <div style={{flex:1}}>
-            <div style={{fontSize:f.xsmall,fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',color:'#555',marginBottom:'2px'}}>{cvData.titre}</div>
-            <h1 style={{fontSize:'22px',fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',marginBottom:'6px',fontFamily:'Georgia,serif',lineHeight:'1.1'}}>{cvData.prenom} {cvData.nom}</h1>
-            <div style={{display:'flex',gap:'16px',flexWrap:'wrap',fontSize:f.xsmall,color:'#666'}}>
-              <span>✉ {cvData.email}</span><span>☎ {cvData.telephone}</span><span>📍 {cvData.ville}</span>
+    <div id="cv-to-print" style={{fontFamily:'Georgia,serif',color:'#1a1a1a',fontSize:f.base,lineHeight:f.lineH,padding:'36px 40px',background:'#fff',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden',boxSizing:'border-box'}}>
+
+      {/* ─── EN-TÊTE ─── */}
+      <div style={{borderBottom:'3px solid #1a1a1a',paddingBottom:'14px',marginBottom:'14px'}}>
+        <div style={{display:'flex',alignItems:'center',gap:'20px'}}>
+          {/* Photo plus grande */}
+          <Avatar cvData={cvData} size={88} shape="circle" />
+          <div style={{flex:1,minWidth:0}}>
+            {/* Titre en petit au-dessus */}
+            <div style={{fontSize:'9px',fontWeight:'700',letterSpacing:'2.5px',textTransform:'uppercase',color:'#888',marginBottom:'4px'}}>{cvData.titre}</div>
+            {/* Nom en grand — SANS h1 pour éviter les conflits CSS */}
+            <div style={{fontSize:'24px',fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',fontFamily:'Georgia,serif',lineHeight:'1.1',color:'#1a1a1a',marginBottom:'8px'}}>{cvData.prenom} {cvData.nom}</div>
+            <div style={{display:'flex',gap:'18px',flexWrap:'wrap',fontSize:'9px',color:'#666'}}>
+              <span>✉ {cvData.email}</span>
+              <span>☎ {cvData.telephone}</span>
+              <span>📍 {cvData.ville}</span>
               {cvData.linkedin && <span>🔗 {cvData.linkedin}</span>}
             </div>
           </div>
         </div>
       </div>
 
+      {/* ─── PROFIL ─── */}
       {cvData.accroche && (
         <div style={{marginBottom:'12px'}}>
-          <div style={{fontSize:f.xsmall,fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',borderBottom:'1px solid #1a1a1a',paddingBottom:'2px',marginBottom:'6px'}}>PROFIL</div>
-          <p style={{fontSize:f.small,color:'#333',fontStyle:'italic',margin:0,lineHeight:f.lineH}}>{cvData.accroche}</p>
+          <div style={{fontSize:'8px',fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',borderBottom:'1px solid #1a1a1a',paddingBottom:'2px',marginBottom:'7px'}}>PROFIL</div>
+          <p style={{fontSize:f.small,color:'#333',fontStyle:'italic',margin:0,lineHeight:'1.7'}}>{cvData.accroche}</p>
         </div>
       )}
 
+      {/* ─── EXPÉRIENCES ─── */}
       <div style={{marginBottom:'12px'}}>
-        <div style={{fontSize:f.xsmall,fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',borderBottom:'1px solid #1a1a1a',paddingBottom:'2px',marginBottom:'8px'}}>EXPÉRIENCES PROFESSIONNELLES</div>
+        <div style={{fontSize:'8px',fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',borderBottom:'1px solid #1a1a1a',paddingBottom:'2px',marginBottom:'8px'}}>EXPÉRIENCES PROFESSIONNELLES</div>
         {cvData.experiences?.map((exp,i)=>(
           <div key={i} style={{marginBottom:f.mb}}>
-            <div style={{display:'flex',justifyContent:'space-between'}}>
-              <div><div style={{fontWeight:'700',fontSize:f.base}}>{exp.poste}</div><div style={{fontSize:f.small,color:'#555',fontStyle:'italic'}}>{exp.entreprise} — {exp.lieu}</div></div>
-              <div style={{fontSize:f.xsmall,color:'#777',whiteSpace:'nowrap'}}>{exp.periode}</div>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontWeight:'700',fontSize:f.base,color:'#1a1a1a'}}>{exp.poste}</div>
+                <div style={{fontSize:f.small,color:'#555',fontStyle:'italic'}}>{exp.entreprise} — {exp.lieu}</div>
+              </div>
+              <div style={{fontSize:'9px',color:'#777',whiteSpace:'nowrap',marginLeft:'12px'}}>{exp.periode}</div>
             </div>
-            <ul style={{paddingLeft:'14px',marginTop:'3px',marginBottom:0}}>{exp.missions?.map((m,j)=><li key={j} style={{fontSize:f.small,color:'#333',marginBottom:'1px'}}>{m}</li>)}</ul>
+            <ul style={{paddingLeft:'16px',marginTop:'4px',marginBottom:0}}>
+              {exp.missions?.map((m,j)=><li key={j} style={{fontSize:f.small,color:'#333',marginBottom:'2px',lineHeight:'1.5'}}>{m}</li>)}
+            </ul>
           </div>
         ))}
       </div>
 
+      {/* ─── FORMATION ─── */}
       <div style={{marginBottom:'12px'}}>
-        <div style={{fontSize:f.xsmall,fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',borderBottom:'1px solid #1a1a1a',paddingBottom:'2px',marginBottom:'8px'}}>FORMATION</div>
+        <div style={{fontSize:'8px',fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',borderBottom:'1px solid #1a1a1a',paddingBottom:'2px',marginBottom:'8px'}}>FORMATION</div>
         {cvData.formations?.map((f2,i)=>(
-          <div key={i} style={{display:'flex',justifyContent:'space-between',marginBottom:'5px'}}>
-            <div><div style={{fontWeight:'700',fontSize:f.base}}>{f2.diplome}</div><div style={{fontSize:f.small,color:'#555'}}>{f2.etablissement}{f2.mention ? ` — ${f2.mention}` : ''}</div></div>
-            <div style={{fontSize:f.xsmall,color:'#777'}}>{f2.periode}</div>
+          <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'7px'}}>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontWeight:'700',fontSize:f.base,color:'#1a1a1a'}}>{f2.diplome}</div>
+              <div style={{fontSize:f.small,color:'#555'}}>{f2.etablissement}{f2.mention ? ` — ${f2.mention}` : ''}</div>
+              {f2.description && <div style={{fontSize:f.xsmall,color:'#888',fontStyle:'italic',marginTop:'1px'}}>{f2.description}</div>}
+            </div>
+            <div style={{fontSize:'9px',color:'#777',whiteSpace:'nowrap',marginLeft:'12px'}}>{f2.periode}</div>
           </div>
         ))}
       </div>
 
+      {/* ─── COMPÉTENCES + LANGUES ─── */}
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'14px',marginBottom:'10px'}}>
         <div>
-          <div style={{fontSize:f.xsmall,fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',borderBottom:'1px solid #1a1a1a',paddingBottom:'2px',marginBottom:'6px'}}>COMPÉTENCES</div>
-          <div style={{display:'flex',flexWrap:'wrap',gap:'3px'}}>{cvData.competences?.map((c,i)=><span key={i} style={{background:'#f0f0f0',border:'1px solid #ddd',padding:'1px 7px',borderRadius:'2px',fontSize:f.xsmall,color:'#333'}}>{c}</span>)}</div>
+          <div style={{fontSize:'8px',fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',borderBottom:'1px solid #1a1a1a',paddingBottom:'2px',marginBottom:'7px'}}>COMPÉTENCES</div>
+          <div style={{display:'flex',flexWrap:'wrap',gap:'4px'}}>
+            {cvData.competences?.map((c,i)=><span key={i} style={{background:'#f0f0f0',border:'1px solid #ddd',padding:'2px 8px',borderRadius:'2px',fontSize:'9px',color:'#333'}}>{c}</span>)}
+          </div>
         </div>
         <div>
-          <div style={{fontSize:f.xsmall,fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',borderBottom:'1px solid #1a1a1a',paddingBottom:'2px',marginBottom:'6px'}}>LANGUES</div>
-          {cvData.langues?.map((l,i)=><div key={i} style={{display:'flex',justifyContent:'space-between',fontSize:f.small,borderBottom:'1px solid #eee',padding:'1px 0'}}><span>{l.langue}</span><span style={{color:'#777',fontStyle:'italic'}}>{l.niveau}</span></div>)}
+          <div style={{fontSize:'8px',fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',borderBottom:'1px solid #1a1a1a',paddingBottom:'2px',marginBottom:'7px'}}>LANGUES</div>
+          {cvData.langues?.map((l,i)=><div key={i} style={{display:'flex',justifyContent:'space-between',fontSize:f.small,borderBottom:'1px solid #eee',padding:'2px 0'}}><span>{l.langue}</span><span style={{color:'#777',fontStyle:'italic'}}>{l.niveau}</span></div>)}
         </div>
       </div>
 
