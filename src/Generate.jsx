@@ -232,13 +232,13 @@ Accroche: ${profile.accroche}\n\n`
     return new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
   }
 
-  // ─── Calcul intelligent du nombre de missions selon les expériences ───
+  // ─── Calcul missions selon nb expériences ET type (stage vs poste) ───
   const getMissionsConfig = (nbExp) => {
-    if (nbExp <= 1) return { missions: 5, note: "Le candidat a peu d'expérience, enrichis chaque mission avec beaucoup de détails, contexte, chiffres et résultats. Ajoute du contexte sur l'équipe, le secteur, les enjeux." }
-    if (nbExp === 2) return { missions: 4, note: "3-4 missions détaillées par expérience avec résultats chiffrés." }
-    if (nbExp === 3) return { missions: 3, note: "3 missions concises mais percutantes par expérience." }
-    if (nbExp === 4) return { missions: 3, note: "2-3 missions très concises par expérience. Garde l'essentiel." }
-    return { missions: 2, note: "2 missions maximum par expérience. Sois très concis, priorise les plus récentes." }
+    if (nbExp <= 1) return { missionsPoste: 5, missionsStage: 2, note: "Peu d'expérience : enrichis chaque mission avec beaucoup de détails, contexte, chiffres et résultats concrets. Ajoute le contexte : taille de l'équipe, secteur, budget géré, enjeux." }
+    if (nbExp === 2) return { missionsPoste: 4, missionsStage: 2, note: "4 missions pour les postes permanents, 2 max pour les stages." }
+    if (nbExp === 3) return { missionsPoste: 3, missionsStage: 2, note: "3 missions pour les postes permanents, 2 max pour les stages." }
+    if (nbExp === 4) return { missionsPoste: 3, missionsStage: 2, note: "2-3 missions pour les postes, 2 max pour les stages. Sois concis." }
+    return { missionsPoste: 2, missionsStage: 1, note: "2 missions max pour les postes, 1 pour les stages. Très concis, priorise les plus récentes." }
   }
 
   const handleGenerate = async () => {
@@ -260,10 +260,24 @@ Accroche: ${profile.accroche}\n\n`
 
     const sourceCV = profile ? buildProfileText(profile) : cvTexte
     const nbExp = profile?.experiences?.length || 3
-    const { missions: nbMissions, note: noteExp } = getMissionsConfig(nbExp)
+    const { missionsPoste, missionsStage, note: noteExp } = getMissionsConfig(nbExp)
     const dateJour = getDateJour()
     const hasCertifications = profile?.certifications?.filter(c => c.titre).length > 0
     const hasCentresInteret = profile?.centres_interet?.filter(c => c).length > 0
+
+    // Fonction de génération avec retry automatique
+    const fetchWithRetry = async (url, options, retries = 1) => {
+      for (let i = 0; i <= retries; i++) {
+        try {
+          const res = await fetch(url, options)
+          if (!res.ok) throw new Error(`HTTP ${res.status}`)
+          return res
+        } catch (err) {
+          if (i === retries) throw err
+          await new Promise(r => setTimeout(r, 1500)) // attente 1.5s avant retry
+        }
+      }
+    }
 
     try {
       const [responseCV, responseLM] = await Promise.all([
@@ -271,82 +285,84 @@ Accroche: ${profile.accroche}\n\n`
         // ════════════════════════════════════════════════════
         // PROMPT CV — Béton, 1 page garantie, tout inclus
         // ════════════════════════════════════════════════════
-        fetch('/api/generate', {
+        fetchWithRetry('/api/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             model: 'claude-haiku-4-5-20251001',
-            max_tokens: 4000,
+            max_tokens: 6000,
+            system: `Tu es un expert RH senior et consultant en optimisation de CV avec 15 ans d'expérience. Tu maîtrises parfaitement les ATS (Applicant Tracking System). Tu retournes TOUJOURS et UNIQUEMENT un JSON valide, sans texte avant ou après, sans balises markdown. Jamais de JSON tronqué.`,
             messages: [{
               role: 'user',
-              content: `Tu es un expert RH senior et consultant en optimisation de CV avec 15 ans d'expérience. Tu maîtrises parfaitement les ATS (Applicant Tracking System) et tu sais exactement quels mots-clés, quelle structure et quel contenu maximisent les chances de passer les filtres automatiques ET de convaincre un recruteur humain.
-
-━━━ PROFIL DU CANDIDAT ━━━
+              content: `PROFIL DU CANDIDAT :
 ${sourceCV}
 
-━━━ OFFRE D'EMPLOI CIBLÉE ━━━
+OFFRE D'EMPLOI CIBLÉE :
 ${offreEmploi}
 
-━━━ RÈGLES ABSOLUES ━━━
+RÈGLES ABSOLUES — respecte-les toutes sans exception :
 
-1. EXPÉRIENCES — TOUTES sans exception :
-   - Inclus les ${nbExp} expérience(s) dans l'ordre chronologique inverse
-   - ${nbMissions} missions maximum par expérience
+1. CHIFFRES OBLIGATOIRES DANS CHAQUE MISSION :
+   Chaque mission DOIT contenir au minimum 1 chiffre ou résultat mesurable.
+   INTERDIT : "Optimisé les processus administratifs" → trop vague
+   OBLIGATOIRE : "Optimisé les processus administratifs réduisant les délais de clôture de 3 jours"
+   Si le candidat ne donne pas de chiffres, estime des ordres de grandeur plausibles selon le contexte (taille d'entreprise, secteur, poste).
+   Verbes d'action forts obligatoires : Piloté, Développé, Optimisé, Managé, Négocié, Réduit, Augmenté, Structuré, Déployé, Coordonné...
+
+2. DISTINCTION STAGE / POSTE PERMANENT :
+   - Poste permanent (CDI, CDD, alternance longue) : ${missionsPoste} missions maximum, détaillées avec chiffres
+   - Stage (mention "Stage", "Stagiaire", durée < 6 mois) : ${missionsStage} missions maximum, plus concises
    - ${noteExp}
-   - Chaque mission commence par un verbe d'action fort (Piloté, Développé, Optimisé, Managé, Négocié, Conçu...)
-   - Ajoute des chiffres et résultats concrets quand possible
 
-2. PAGE UNIQUE OBLIGATOIRE :
-   - Le CV DOIT tenir sur exactement une page A4 (794x1123 pixels)
-   - Calibre la densité du contenu en fonction du nombre d'expériences
-   - Ne jamais dépasser ${nbMissions} missions par expérience
-   - L'accroche : 2 phrases maximum
-   - Les compétences : 8 maximum
+3. COMPÉTENCES — FORMAT ATS STRICT :
+   Chaque compétence = 1 à 3 mots MAXIMUM. Termes techniques précis reconnus par les ATS.
+   INTERDIT : "Suivi budgétaire et analyse financière" (trop long, non-ATS)
+   OBLIGATOIRE : "Power BI", "SAP FI", "Excel VBA", "IFRS", "Contrôle de gestion", "Reporting financier"
+   Maximum 8 compétences, toutes tirées des mots-clés de l'offre.
 
-3. ACCROCHE ATS :
-   - 2 phrases percutantes qui utilisent les mots-clés EXACTS de l'offre
-   - Met en avant les 2-3 compétences les plus pertinentes pour CE poste
-   - Mentionne les années d'expérience si significatif
+4. ACCROCHE ULTRA-CIBLÉE :
+   2 phrases MAXIMUM. Doit contenir :
+   - Le titre EXACT du poste visé
+   - Au moins 1 chiffre clé (années d'expérience, % d'amélioration, montant géré...)
+   - 2 mots-clés EXACTS de l'offre d'emploi
+   INTERDIT : commencer par "Actuellement..." ou "Doté de..."
+   OBLIGATOIRE : commencer par le profil ou une réalisation forte
 
-4. CERTIFICATIONS : ${hasCertifications ? "Inclus TOUTES les certifications du candidat — ce sont des éléments différenciants importants." : "Le candidat n'a pas de certifications. Mets un tableau vide : []"}
+5. LINKEDIN :
+   Si linkedin est vide ou absent dans le profil, mets "" dans le JSON.
 
-5. CENTRES D'INTÉRÊT : ${hasCentresInteret ? "Inclus les centres d'intérêt du candidat." : "Le candidat n'a pas renseigné de centres d'intérêt. Mets un tableau vide : []  NE génère PAS de centres d'intérêt inventés."}
+6. EXPÉRIENCES : Inclus les ${nbExp} expériences dans l'ordre chronologique inverse (plus récente en premier).
 
-6. OPTIMISATION ATS :
-   - Reprends les mots-clés EXACTS de l'offre dans les missions et compétences
-   - Le titre du candidat doit correspondre exactement ou très proche du poste visé
-   - Score ATS cible : 90%+
+7. CERTIFICATIONS : ${hasCertifications ? "Inclus TOUTES les certifications — éléments différenciants importants." : "Tableau vide []."}
 
-Retourne UNIQUEMENT un objet JSON valide, sans texte ni markdown autour :
+8. CENTRES D'INTÉRÊT : ${hasCentresInteret ? "Inclus les centres d'intérêt du candidat." : "Tableau vide []. NE PAS inventer de centres d'intérêt."}
+
+9. OPTIMISATION ATS : Score cible 95%+. Mots-clés EXACTS de l'offre dans missions et compétences.
+
+Retourne UNIQUEMENT ce JSON valide et complet :
 
 {
   "prenom": "...",
   "nom": "...",
-  "titre": "Titre calqué sur le poste visé",
+  "titre": "Titre EXACT calqué sur le poste visé",
   "email": "...",
   "telephone": "...",
   "ville": "...",
-  "linkedin": "...",
-  "accroche": "2 phrases max ultra-ciblées avec mots-clés ATS",
+  "linkedin": "",
+  "accroche": "1 phrase forte avec chiffre + mots-clés ATS. 1 phrase sur valeur ajoutée pour ce poste.",
   "experiences": [
     {
       "poste": "...",
       "entreprise": "...",
       "periode": "...",
       "lieu": "...",
-      "missions": ["Verbe d'action + détail + résultat chiffré", "...", "..."]
+      "missions": ["Verbe d'action + contexte + CHIFFRE obligatoire", "Verbe + résultat mesurable", "..."]
     }
   ],
   "formations": [
-    {
-      "diplome": "...",
-      "etablissement": "...",
-      "periode": "...",
-      "mention": "...",
-      "description": "..."
-    }
+    {"diplome": "...", "etablissement": "...", "periode": "...", "mention": "...", "description": "..."}
   ],
-  "competences": ["max 8 compétences clés de l'offre"],
+  "competences": ["Mot-clé ATS court", "Excel VBA", "Power BI", "SAP", "..."],
   "langues": [{"langue": "...", "niveau": "..."}],
   "certifications": [],
   "centres_interet": [],
@@ -359,7 +375,7 @@ Retourne UNIQUEMENT un objet JSON valide, sans texte ni markdown autour :
         // ════════════════════════════════════════════════════
         // PROMPT LETTRE — Vraie lettre pro avec destinataire intelligent
         // ════════════════════════════════════════════════════
-        fetch('/api/generate', {
+        fetchWithRetry('/api/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -435,7 +451,26 @@ RÈGLES IMPORTANTES :
       const dataLM = await responseLM.json()
       const texteCV = dataCV.content[0].text
       const jsonPropre = texteCV.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-      const json = JSON.parse(jsonPropre)
+
+      let json
+      try {
+        json = JSON.parse(jsonPropre)
+      } catch (parseError) {
+        // Tentative de récupération : extraire le JSON entre { et }
+        const match = jsonPropre.match(/\{[\s\S]*\}/)
+        if (match) {
+          try { json = JSON.parse(match[0]) }
+          catch { throw new Error('Le CV généré est incomplet. Réessaie — l'offre est peut-être trop longue.') }
+        } else {
+          throw new Error('Le CV généré est incomplet. Réessaie — l'offre est peut-être trop longue.')
+        }
+      }
+
+      // Vérification champs obligatoires
+      if (!json.prenom || !json.experiences || !Array.isArray(json.experiences)) {
+        throw new Error('CV généré invalide. Réessaie.')
+      }
+
       const lettreGeneree = dataLM.content[0].text
 
       // Photo
@@ -464,7 +499,10 @@ RÈGLES IMPORTANTES :
       }
 
     } catch (error) {
-      alert('Une erreur est survenue. Vérifie ta clé API.')
+      const msg = error.message?.includes('incomplet') || error.message?.includes('invalide')
+        ? error.message
+        : 'Une erreur est survenue lors de la génération. Réessaie dans quelques secondes.'
+      alert(msg)
       console.error(error)
     }
 

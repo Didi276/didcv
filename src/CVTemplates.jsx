@@ -21,18 +21,36 @@ function Avatar({ cvData, size = 70, shape = 'circle' }) {
 }
 
 // ─── Option B : calcul taille de police dynamique ────────────
+// Logique inversée : peu de contenu → grande police pour remplir la page
+// Beaucoup de contenu → petite police pour tenir sur 1 page
 function getFontConfig(cvData) {
   const nbExp = cvData.experiences?.length || 0
   const hasCert = cvData.certifications?.length > 0
   const hasCI = cvData.centres_interet?.length > 0
   const totalMissions = cvData.experiences?.reduce((acc, e) => acc + (e.missions?.length || 0), 0) || 0
-  const density = nbExp + totalMissions * 0.3 + (hasCert ? 1 : 0) + (hasCI ? 0.5 : 0)
 
-  if (density < 8)  return { base: '11px', small: '10px', xsmall: '9px', lineH: '1.65' }
-  if (density < 12) return { base: '10.5px', small: '9.5px', xsmall: '8.5px', lineH: '1.6' }
-  if (density < 16) return { base: '10px', small: '9px', xsmall: '8px', lineH: '1.55' }
-  if (density < 20) return { base: '9.5px', small: '8.5px', xsmall: '7.5px', lineH: '1.5' }
-  return { base: '9px', small: '8px', xsmall: '7px', lineH: '1.45' }
+  // Longueur moyenne des missions (proxy de densité textuelle)
+  const allMissions = cvData.experiences?.flatMap(e => e.missions || []) || []
+  const avgMissionLen = allMissions.length > 0
+    ? allMissions.reduce((acc, m) => acc + (m?.length || 0), 0) / allMissions.length
+    : 60
+
+  // Score de densité : plus il est élevé, plus le contenu est dense
+  const density = nbExp
+    + totalMissions * 0.3
+    + totalMissions * (avgMissionLen / 80) * 0.2
+    + (hasCert ? 1.5 : 0)
+    + (hasCI ? 1 : 0)
+
+  // Seuils : density faible = police grande / density élevée = police petite
+  if (density < 4)  return { base: '13px',   small: '12px',   xsmall: '10.5px', lineH: '1.8'  }
+  if (density < 6)  return { base: '12.5px',  small: '11.5px',  xsmall: '10px',   lineH: '1.75' }
+  if (density < 8)  return { base: '12px',   small: '11px',   xsmall: '9.5px',  lineH: '1.7'  }
+  if (density < 10) return { base: '11.5px', small: '10.5px', xsmall: '9px',    lineH: '1.65' }
+  if (density < 13) return { base: '11px',   small: '10px',   xsmall: '8.5px',  lineH: '1.6'  }
+  if (density < 16) return { base: '10.5px', small: '9.5px',  xsmall: '8px',    lineH: '1.55' }
+  if (density < 20) return { base: '10px',   small: '9px',    xsmall: '7.5px',  lineH: '1.5'  }
+  return                    { base: '9.5px',  small: '8.5px',  xsmall: '7px',    lineH: '1.45' }
 }
 
 // ─── Sections conditionnelles réutilisables ──────────────────
