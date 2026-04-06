@@ -14,101 +14,65 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 
 
 // ─── Composant affichage lettre avec en-tête pro ────────────
-// ─── Affichage lettre format pro (comme un vrai courrier) ────
-// Format : expéditeur en haut à gauche, destinataire en haut à droite
-// Puis date à droite, objet centré, corps de la lettre
+// ─── LettreRenderer — parsing par marqueurs stricts ─────────
+// Le prompt génère : ||EXP|| ... ||DEST|| ... ||DATE|| ... ||BODY||
 function LettreRenderer({ lettre }) {
-  const lines = lettre.split('\n')
-  
-  // Trouver la ligne Objet
-  const objetIdx = lines.findIndex(l => l.trim().toLowerCase().startsWith('objet'))
-  if (objetIdx === -1) {
+  const hasTags = lettre.includes('||EXP||')
+
+  if (!hasTags) {
+    // Fallback si pas de marqueurs : affichage simple
     return (
-      <div style={{fontFamily:'Georgia,serif',fontSize:'13px',lineHeight:'1.8',color:'#222',whiteSpace:'pre-wrap',width:'100%',padding:'16px 20px'}}>
+      <div style={{fontFamily:'Georgia,serif',fontSize:'13px',lineHeight:'1.9',color:'#222',whiteSpace:'pre-wrap',width:'100%',padding:'20px 28px'}}>
         {lettre}
       </div>
     )
   }
 
-  // Tout ce qui est avant "Objet" = en-tête
-  const headerLines = lines.slice(0, objetIdx).filter(l => l.trim())
-  // Tout ce qui est à partir de "Objet" = corps
-  const bodyLines = lines.slice(objetIdx)
-
-  // Parser l'en-tête :
-  // - Lignes expéditeur : nom, adresse, ville/CP, email, téléphone, linkedin
-  // - Ligne date : contient "le " + un chiffre
-  // - Lignes destinataire : entreprise, service, adresse destinataire
-  // 
-  // Heuristique : on split à la première ligne qui ressemble à une entreprise/service
-  // (après les coordonnées perso = nom + adresse + email/tel)
-  
-  let expediteurLines = []
-  let destinataireLines = []
-  let dateLine = ''
-  let phase = 'expediteur' // expediteur → destinataire
-  let expediteurCount = 0
-
-  for (const line of headerLines) {
-    const t = line.trim()
-    // Ligne de date : "Ville, le XX mois XXXX" ou similaire
-    if (/le\s+\d{1,2}\s+\w+\s+\d{4}/i.test(t) || /le\s+\d{2}\/\d{2}\/\d{4}/i.test(t)) {
-      dateLine = t
-      continue
-    }
-    // Email ou téléphone = encore expéditeur
-    if (/[@+]|^\d{2}\s/.test(t) && phase === 'expediteur') {
-      expediteurLines.push(t)
-      expediteurCount++
-      continue
-    }
-    // Après 3-5 lignes expéditeur (nom + adresse + email/tel), on passe au destinataire
-    if (phase === 'expediteur' && expediteurCount >= 2 && !/@/.test(t) && !/^\+/.test(t) && !/^\d{2}\s/.test(t) && !/linkedin/i.test(t)) {
-      // Si ça ressemble à un nom d'entreprise ou service → destinataire
-      phase = 'destinataire'
-    }
-    if (phase === 'expediteur') {
-      expediteurLines.push(t)
-      expediteurCount++
-    } else {
-      destinataireLines.push(t)
-    }
+  const extract = (tag, nextTag) => {
+    const start = lettre.indexOf(tag) + tag.length
+    const end = nextTag ? lettre.indexOf(nextTag) : lettre.length
+    return lettre.slice(start, end).trim()
   }
 
+  const expStr   = extract('||EXP||',  '||DEST||')
+  const destStr  = extract('||DEST||', '||DATE||')
+  const dateStr  = extract('||DATE||', '||BODY||')
+  const bodyStr  = extract('||BODY||', null)
+
+  const expLines  = expStr.split('\n').filter(l => l.trim())
+  const destLines = destStr.split('\n').filter(l => l.trim())
+
   return (
-    <div style={{fontFamily:'Georgia,serif',fontSize:'13px',lineHeight:'1.85',color:'#222',width:'100%',padding:'24px 28px',background:'#fff'}}>
-      
+    <div style={{fontFamily:'Georgia,serif',fontSize:'13px',lineHeight:'1.9',color:'#222',width:'100%',padding:'24px 32px',background:'#fff'}}>
+
       {/* ─── EN-TÊTE : Expéditeur gauche | Destinataire droite ─── */}
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px',marginBottom:'20px'}}>
-        
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'24px',marginBottom:'24px'}}>
+
         {/* Gauche — Expéditeur */}
         <div>
-          {expediteurLines.map((l, i) => (
-            <div key={i} style={{
-              fontSize:'13px', color:'#222',
-              fontWeight: i === 0 ? '700' : '400'
-            }}>{l}</div>
+          {expLines.map((l, i) => (
+            <div key={i} style={{fontSize:'13px',color:'#222',fontWeight: i === 0 ? '700' : '400',lineHeight:'1.7'}}>
+              {l}
+            </div>
           ))}
         </div>
 
-        {/* Droite — Destinataire */}
+        {/* Droite — Destinataire + date */}
         <div>
-          {destinataireLines.map((l, i) => (
-            <div key={i} style={{
-              fontSize:'13px', color:'#222',
-              fontWeight: i === 0 ? '700' : '400'
-            }}>{l}</div>
+          {destLines.map((l, i) => (
+            <div key={i} style={{fontSize:'13px',color:'#222',fontWeight: i === 0 ? '700' : '400',lineHeight:'1.7'}}>
+              {l}
+            </div>
           ))}
-          {/* Date en bas à droite */}
-          {dateLine && (
-            <div style={{fontSize:'13px',color:'#333',marginTop:'12px'}}>{dateLine}</div>
+          {dateStr && (
+            <div style={{fontSize:'13px',color:'#333',marginTop:'14px'}}>{dateStr}</div>
           )}
         </div>
       </div>
 
-      {/* ─── OBJET + CORPS ─── */}
-      <div style={{whiteSpace:'pre-wrap',lineHeight:'1.85',fontSize:'13px'}}>
-        {bodyLines.join('\n')}
+      {/* ─── CORPS ─── */}
+      <div style={{whiteSpace:'pre-wrap',lineHeight:'1.9',fontSize:'13px'}}>
+        {bodyStr}
       </div>
     </div>
   )
@@ -320,13 +284,16 @@ RÈGLES ABSOLUES — respecte-les toutes sans exception :
    OBLIGATOIRE : "Power BI", "SAP FI", "Excel VBA", "IFRS", "Contrôle de gestion", "Reporting financier"
    Maximum 8 compétences, toutes tirées des mots-clés de l'offre.
 
-4. ACCROCHE ULTRA-CIBLÉE :
-   2 phrases MAXIMUM. Doit contenir :
-   - Le titre EXACT du poste visé
-   - Au moins 1 chiffre clé (années d'expérience, % d'amélioration, montant géré...)
-   - 2 mots-clés EXACTS de l'offre d'emploi
-   INTERDIT : commencer par "Actuellement..." ou "Doté de..."
-   OBLIGATOIRE : commencer par le profil ou une réalisation forte
+4. ACCROCHE / PROFIL — PERCUTANTE ET HUMAINE (3 à 5 lignes) :
+   Ce bloc est LA première chose qu'un recruteur lit. Il doit être fort, humain et ciblé.
+   Structure obligatoire :
+   - Phrase 1 : qui est le candidat en une phrase puissante (profil + années d'expérience + secteur)
+   - Phrase 2 : sa valeur ajoutée principale avec UN chiffre concret
+   - Phrase 3 : ce qui le rend unique ou différent des autres candidats
+   - Phrase 4-5 (optionnelles) : ambition professionnelle alignée avec le poste visé, ton humain et engagé
+   INTERDIT : commencer par "Actuellement...", "Doté de...", "Fort de..."
+   INTERDIT : réduire à 2 phrases génériques — ce profil doit être mémorable
+   OBLIGATOIRE : utiliser 2 mots-clés EXACTS de l'offre dans ce bloc
 
 5. LINKEDIN :
    Si linkedin est vide ou absent dans le profil, mets "" dans le JSON.
@@ -334,6 +301,11 @@ RÈGLES ABSOLUES — respecte-les toutes sans exception :
 6. EXPÉRIENCES : Inclus les ${nbExp} expériences dans l'ordre chronologique inverse (plus récente en premier).
 
 7. CERTIFICATIONS : ${hasCertifications ? "Inclus TOUTES les certifications — éléments différenciants importants." : "Tableau vide []."}
+
+10. FORMATIONS — DESCRIPTION ENRICHIE :
+   Pour chaque formation, génère une description courte (1 phrase) qui mentionne les matières principales, spécialités ou projets notables.
+   Exemple : "Spécialisation en analyse financière, contrôle de gestion, économétrie et finance d'entreprise."
+   Cette description apparaît sur le CV et aide à remplir l'espace si le candidat a peu d'expériences.
 
 8. CENTRES D'INTÉRÊT : ${hasCentresInteret ? "Inclus les centres d'intérêt du candidat." : "Tableau vide []. NE PAS inventer de centres d'intérêt."}
 
@@ -349,7 +321,7 @@ Retourne UNIQUEMENT ce JSON valide et complet :
   "telephone": "...",
   "ville": "...",
   "linkedin": "",
-  "accroche": "1 phrase forte avec chiffre + mots-clés ATS. 1 phrase sur valeur ajoutée pour ce poste.",
+  "accroche": "Profil en 3-5 phrases : qui je suis + chiffre fort + valeur unique + ambition ciblée sur le poste. Ton humain et percutant, pas générique.",
   "experiences": [
     {
       "poste": "...",
@@ -383,65 +355,56 @@ Retourne UNIQUEMENT ce JSON valide et complet :
             max_tokens: 1500,
             messages: [{
               role: 'user',
-              content: `Tu es un expert en rédaction de lettres de motivation professionnelles. Tu as aidé des milliers de candidats à décrocher des entretiens.
+              content: `Tu es un expert en rédaction de lettres de motivation professionnelles.
 
-━━━ PROFIL DU CANDIDAT ━━━
+PROFIL DU CANDIDAT :
 ${sourceCV}
 
-━━━ OFFRE D'EMPLOI COMPLÈTE ━━━
+OFFRE D'EMPLOI :
 ${offreEmploi}
 
-━━━ DATE DU JOUR ━━━
-${dateJour}
+DATE DU JOUR : ${dateJour}
 
-━━━ TA MISSION ━━━
-Rédige une lettre de motivation parfaite en analysant intelligemment l'offre pour extraire les informations du destinataire.
+MISSION : Rédige une lettre de motivation parfaite avec le format ci-dessous.
 
-ÉTAPE 1 — ANALYSE DE L'OFFRE :
-Cherche dans l'offre :
-- Le nom de l'entreprise (obligatoire)
-- L'adresse de l'entreprise (si mentionnée)
-- Le service destinataire (si mentionné : "Service RH", "Direction Marketing", etc.)
-- Le nom du recruteur (si mentionné : "Madame X", "Monsieur Y")
-- L'intitulé exact du poste
+ANALYSE L'OFFRE pour trouver : nom de l'entreprise (obligatoire), service destinataire, nom du recruteur si mentionné, intitulé exact du poste.
 
-ÉTAPE 2 — RÉDIGE LA LETTRE avec ce format EXACT (respecte l'alignement gauche/droite) :
+GÉNÈRE LA LETTRE avec ces marqueurs EXACTS dans cet ordre — ne change pas les marqueurs :
 
-[Prénom Nom du candidat]                                    [Nom de l'entreprise]
-[Email du candidat]                                         [Adresse si trouvée dans l'offre]
-[Téléphone du candidat]                                     [Service RH ou service mentionné]
-[LinkedIn si disponible]
-
-                                                            [Ville du candidat], le [date du jour]
-
+||EXP||
+[Prénom Nom]
+[Email]
+[Téléphone]
+[Ville du candidat]
+||DEST||
+[Nom de l'entreprise]
+[Service RH ou service trouvé dans l'offre]
+[Adresse de l'entreprise si trouvée, sinon rien]
+||DATE||
+[Ville du candidat], le ${dateJour}
+||BODY||
 Objet : Candidature au poste de [intitulé EXACT du poste]
 
-[Si nom du recruteur trouvé: "Madame [Nom]," ou "Monsieur [Nom]," — sinon: "Madame, Monsieur,"]
+[Madame, Monsieur, — ou Madame [Nom], si recruteur identifié]
 
-[PARAGRAPHE 1 — ACCROCHE ET MOTIVATION — 3 phrases]
-Phrase d'accroche qui montre ta connaissance de l'entreprise ou du secteur (cherche des indices dans l'offre : leur mission, leurs valeurs, leur marché). Exprime une motivation sincère et spécifique. Mentionne un élément concret de l'offre qui t'attire particulièrement.
+[PARAGRAPHE 1 — 3 phrases : accroche forte montrant la connaissance de l'entreprise/secteur, motivation sincère et spécifique, élément concret de l'offre qui attire]
 
-[PARAGRAPHE 2 — TON PROFIL ET COMPÉTENCES — 4-5 phrases]
-Présente tes expériences les plus pertinentes AVEC des chiffres et résultats concrets (obligatoire). Fais le lien direct entre tes réalisations et les besoins exprimés dans l'offre. Utilise les mots-clés EXACTS de l'offre. Mets en avant ta valeur différenciante.
+[PARAGRAPHE 2 — 4 phrases : expériences pertinentes AVEC chiffres obligatoires, lien direct avec les besoins de l'offre, mots-clés EXACTS de l'offre, valeur différenciante]
 
-[PARAGRAPHE 3 — VALEUR AJOUTÉE — 3 phrases]
-Explique ce que tu apportes de spécifique à cette équipe/entreprise. Montre que tu comprends les enjeux du poste et du secteur. Démontre ton adéquation culturelle si possible.
+[PARAGRAPHE 3 — 3 phrases : ce qui différencie le candidat, compréhension des enjeux du poste, adéquation avec la culture de l'entreprise]
 
-[PARAGRAPHE 4 — CONCLUSION — 2 phrases]
-Exprime ta disponibilité pour un entretien. Remercie chaleureusement pour l'attention portée à ta candidature.
+[PARAGRAPHE 4 — 2 phrases : disponibilité pour entretien, remerciement chaleureux]
 
 Cordialement,
 
 [Prénom Nom]
 
-RÈGLES IMPORTANTES :
-- Corps de la lettre : 300 à 380 mots exactement (hors en-tête et signature)
-- Ton adapté au secteur : formel pour finance/droit/administration, dynamique pour tech/marketing/commercial
-- JAMAIS de formules creuses : "Je me permets de vous adresser ma candidature"  est INTERDIT
-- Les chiffres dans le paragraphe 2 sont OBLIGATOIRES
-- Si l'adresse de l'entreprise n'est pas dans l'offre, ne mets pas de ligne adresse
-- Si le service destinataire n'est pas mentionné, mets "Service des Ressources Humaines"
-- Retourne UNIQUEMENT le texte de la lettre formatée, sans commentaires ni explications`
+RÈGLES :
+- NE PAS commencer par "Actuellement" ou "Je me permets" — INTERDIT
+- Corps de la lettre : 300 à 380 mots
+- Ton adapté au secteur (formel pour finance/droit, dynamique pour tech/marketing)
+- Chiffres dans le paragraphe 2 : OBLIGATOIRES
+- Retourne UNIQUEMENT le texte avec les marqueurs, rien d'autre`
             }]
           })
         })
