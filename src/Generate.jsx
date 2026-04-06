@@ -14,72 +14,100 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 
 
 // ─── Composant affichage lettre avec en-tête pro ────────────
+// ─── Affichage lettre format pro (comme un vrai courrier) ────
+// Format : expéditeur en haut à gauche, destinataire en haut à droite
+// Puis date à droite, objet centré, corps de la lettre
 function LettreRenderer({ lettre }) {
-  // Sépare l'en-tête du corps de la lettre
-  // L'en-tête se termine à la ligne "Objet :"
   const lines = lettre.split('\n')
-  const objetIdx = lines.findIndex(l => l.trim().startsWith('Objet :'))
   
+  // Trouver la ligne Objet
+  const objetIdx = lines.findIndex(l => l.trim().toLowerCase().startsWith('objet'))
   if (objetIdx === -1) {
-    // Fallback : affichage simple
     return (
-      <div style={{fontFamily:'Georgia,serif',fontSize:'13px',lineHeight:'1.8',color:'#222',whiteSpace:'pre-wrap',width:'100%',padding:'8px'}}>
+      <div style={{fontFamily:'Georgia,serif',fontSize:'13px',lineHeight:'1.8',color:'#222',whiteSpace:'pre-wrap',width:'100%',padding:'16px 20px'}}>
         {lettre}
       </div>
     )
   }
 
-  const headerLines = lines.slice(0, objetIdx)
+  // Tout ce qui est avant "Objet" = en-tête
+  const headerLines = lines.slice(0, objetIdx).filter(l => l.trim())
+  // Tout ce qui est à partir de "Objet" = corps
   const bodyLines = lines.slice(objetIdx)
 
-  // Parsing de l'en-tête : on cherche les blocs gauche/droite
-  // Le séparateur est une ligne vide ou des espaces
-  // Bloc gauche = expéditeur, Bloc droite = destinataire + date
-  const nonEmpty = headerLines.filter(l => l.trim())
+  // Parser l'en-tête :
+  // - Lignes expéditeur : nom, adresse, ville/CP, email, téléphone, linkedin
+  // - Ligne date : contient "le " + un chiffre
+  // - Lignes destinataire : entreprise, service, adresse destinataire
+  // 
+  // Heuristique : on split à la première ligne qui ressemble à une entreprise/service
+  // (après les coordonnées perso = nom + adresse + email/tel)
   
-  // Heuristique : les 3-4 premières lignes non vides = expéditeur
-  // Les suivantes jusqu'à la date = destinataire
-  let expediteur = []
-  let destinataire = []
-  let dateVille = ''
-  let inDestinataire = false
+  let expediteurLines = []
+  let destinataireLines = []
+  let dateLine = ''
+  let phase = 'expediteur' // expediteur → destinataire
+  let expediteurCount = 0
 
-  nonEmpty.forEach(line => {
+  for (const line of headerLines) {
     const t = line.trim()
-    if (t.match(/^[A-Z][a-z]+ .+, le \d/)) {
-      dateVille = t
-      inDestinataire = false
-    } else if (!inDestinataire && expediteur.length < 4 && !t.match(/(Service|RH|Ressources|Direction|Département)/i) && !t.match(/^\d/) ) {
-      expediteur.push(t)
-    } else {
-      inDestinataire = true
-      destinataire.push(t)
+    // Ligne de date : "Ville, le XX mois XXXX" ou similaire
+    if (/le\s+\d{1,2}\s+\w+\s+\d{4}/i.test(t) || /le\s+\d{2}\/\d{2}\/\d{4}/i.test(t)) {
+      dateLine = t
+      continue
     }
-  })
+    // Email ou téléphone = encore expéditeur
+    if (/[@+]|^\d{2}\s/.test(t) && phase === 'expediteur') {
+      expediteurLines.push(t)
+      expediteurCount++
+      continue
+    }
+    // Après 3-5 lignes expéditeur (nom + adresse + email/tel), on passe au destinataire
+    if (phase === 'expediteur' && expediteurCount >= 2 && !/@/.test(t) && !/^\+/.test(t) && !/^\d{2}\s/.test(t) && !/linkedin/i.test(t)) {
+      // Si ça ressemble à un nom d'entreprise ou service → destinataire
+      phase = 'destinataire'
+    }
+    if (phase === 'expediteur') {
+      expediteurLines.push(t)
+      expediteurCount++
+    } else {
+      destinataireLines.push(t)
+    }
+  }
 
   return (
-    <div style={{fontFamily:'Georgia,serif',fontSize:'13px',lineHeight:'1.8',color:'#222',width:'100%',padding:'16px 20px',background:'#fff'}}>
-      {/* En-tête : expéditeur gauche, destinataire droite */}
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'20px',marginBottom:'20px'}}>
+    <div style={{fontFamily:'Georgia,serif',fontSize:'13px',lineHeight:'1.85',color:'#222',width:'100%',padding:'24px 28px',background:'#fff'}}>
+      
+      {/* ─── EN-TÊTE : Expéditeur gauche | Destinataire droite ─── */}
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px',marginBottom:'20px'}}>
+        
         {/* Gauche — Expéditeur */}
         <div>
-          {expediteur.map((l, i) => (
-            <div key={i} style={{fontSize:'13px',color:'#222',fontWeight: i === 0 ? '700' : '400'}}>{l}</div>
+          {expediteurLines.map((l, i) => (
+            <div key={i} style={{
+              fontSize:'13px', color:'#222',
+              fontWeight: i === 0 ? '700' : '400'
+            }}>{l}</div>
           ))}
         </div>
-        {/* Droite — Destinataire + date */}
-        <div style={{textAlign:'right'}}>
-          {destinataire.map((l, i) => (
-            <div key={i} style={{fontSize:'13px',color:'#222',fontWeight: i === 0 ? '700' : '400'}}>{l}</div>
+
+        {/* Droite — Destinataire */}
+        <div>
+          {destinataireLines.map((l, i) => (
+            <div key={i} style={{
+              fontSize:'13px', color:'#222',
+              fontWeight: i === 0 ? '700' : '400'
+            }}>{l}</div>
           ))}
-          {dateVille && (
-            <div style={{fontSize:'13px',color:'#555',marginTop:'8px',fontStyle:'italic'}}>{dateVille}</div>
+          {/* Date en bas à droite */}
+          {dateLine && (
+            <div style={{fontSize:'13px',color:'#333',marginTop:'12px'}}>{dateLine}</div>
           )}
         </div>
       </div>
 
-      {/* Corps de la lettre */}
-      <div style={{whiteSpace:'pre-wrap',lineHeight:'1.8'}}>
+      {/* ─── OBJET + CORPS ─── */}
+      <div style={{whiteSpace:'pre-wrap',lineHeight:'1.85',fontSize:'13px'}}>
         {bodyLines.join('\n')}
       </div>
     </div>
@@ -457,12 +485,71 @@ RÈGLES IMPORTANTES :
   }
 
   const handleDownloadLettre = () => {
-    const blob = new Blob([lettre], { type: 'text/plain;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `Lettre-Motivation-${cvData.prenom}-${cvData.nom}.txt`
-    a.click()
+    const pdf = new jsPDF('p', 'mm', 'a4')
+    pdf.setFont('helvetica', 'normal')
+    
+    const lines = lettre.split('\n')
+    const objetIdx = lines.findIndex(l => l.trim().toLowerCase().startsWith('objet'))
+    
+    const headerLines = objetIdx > -1 ? lines.slice(0, objetIdx).filter(l => l.trim()) : []
+    const bodyLines = objetIdx > -1 ? lines.slice(objetIdx) : lines
+    
+    // Parser expéditeur / destinataire / date
+    let expediteurLines = []
+    let destinataireLines = []
+    let dateLine = ''
+    let phase = 'expediteur'
+    let count = 0
+    for (const line of headerLines) {
+      const t = line.trim()
+      if (/le\s+\d{1,2}\s+\w+\s+\d{4}/i.test(t) || /le\s+\d{2}\/\d{2}\/\d{4}/i.test(t)) { dateLine = t; continue }
+      if (/@|^\+/.test(t) && phase === 'expediteur') { expediteurLines.push(t); count++; continue }
+      if (phase === 'expediteur' && count >= 2 && !/@/.test(t) && !/^\+/.test(t) && !/linkedin/i.test(t)) phase = 'destinataire'
+      if (phase === 'expediteur') { expediteurLines.push(t); count++ }
+      else destinataireLines.push(t)
+    }
+    
+    const marginL = 20
+    const marginR = 190
+    let y = 20
+    
+    // ─ Expéditeur (gauche) ─
+    expediteurLines.forEach((l, i) => {
+      pdf.setFontSize(11)
+      pdf.setFont('helvetica', i === 0 ? 'bold' : 'normal')
+      pdf.text(l, marginL, y)
+      y += 5.5
+    })
+    
+    // ─ Destinataire (droite) au même niveau que l'expéditeur ─
+    let yRight = 20
+    destinataireLines.forEach((l, i) => {
+      pdf.setFontSize(11)
+      pdf.setFont('helvetica', i === 0 ? 'bold' : 'normal')
+      pdf.text(l, marginR, yRight, { align: 'right' })
+      yRight += 5.5
+    })
+    
+    // ─ Date (droite, sous le destinataire) ─
+    if (dateLine) {
+      pdf.setFont('helvetica', 'normal')
+      pdf.setFontSize(11)
+      pdf.text(dateLine, marginR, yRight + 4, { align: 'right' })
+    }
+    
+    // ─ Corps de la lettre ─
+    y = Math.max(y, yRight + (dateLine ? 10 : 0)) + 12
+    pdf.setFont('helvetica', 'normal')
+    pdf.setFontSize(11)
+    const bodyText = bodyLines.join('\n')
+    const splitBody = pdf.splitTextToSize(bodyText, 170)
+    splitBody.forEach(line => {
+      if (y > 280) { pdf.addPage(); y = 20 }
+      pdf.text(line, marginL, y)
+      y += 5.5
+    })
+    
+    pdf.save(`Lettre-Motivation-${cvData.prenom}-${cvData.nom}.pdf`)
   }
 
   return (

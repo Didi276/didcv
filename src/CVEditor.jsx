@@ -87,24 +87,41 @@ function CVEditor({ cvData, template, onSave, onClose }) {
             {activeSection === 'photo' && (
               <div style={{display:'flex',flexDirection:'column',gap:'16px'}}>
                 <div style={{fontSize:'13px',color:'#6b7280',lineHeight:'1.6'}}>
-                  La photo est <strong>100% optionnelle</strong>. Elle apparaîtra dans le coin du template si tu en ajoutes une.
+                  La photo est <strong>100% optionnelle</strong>. Une photo de démonstration est affichée par défaut — tu peux la remplacer par la tienne ou choisir de ne pas en mettre du tout.
                 </div>
 
-                {/* Aperçu photo actuelle */}
-                {cv.photo ? (
+                {/* État actuel de la photo */}
+                {cv.photo === null ? (
+                  /* null = pas de photo du tout */
+                  <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'8px'}}>
+                    <div style={{width:'100px',height:'100px',borderRadius:'50%',background:'#f0f0f0',border:'2px dashed #ccc',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'32px'}}>
+                      🚫
+                    </div>
+                    <div style={{fontSize:'12px',color:'#6b7280',textAlign:'center'}}>Aucune photo sur le CV</div>
+                    <button onClick={() => setCv({...cv, photo: undefined})} style={{padding:'6px 14px',background:'#f0f2f8',color:'#374151',border:'1px solid #e5e7ef',borderRadius:'8px',cursor:'pointer',fontSize:'12px'}}>
+                      ↩ Réafficher la photo de démo
+                    </button>
+                  </div>
+                ) : cv.photo ? (
+                  /* Vraie photo uploadée */
                   <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'12px'}}>
                     <img src={cv.photo} alt="Photo CV" style={{width:'100px',height:'100px',borderRadius:'50%',objectFit:'cover',border:'3px solid #1a56db'}} />
-                    <div style={{fontSize:'12px',color:'#16a34a',fontWeight:'500'}}>✓ Photo ajoutée</div>
+                    <div style={{fontSize:'12px',color:'#16a34a',fontWeight:'500'}}>✓ Ta photo est ajoutée</div>
                     <button onClick={() => setCv({...cv, photo: null})} style={{padding:'8px 16px',background:'#fef2f2',color:'#dc2626',border:'1px solid #fecaca',borderRadius:'8px',cursor:'pointer',fontSize:'13px'}}>
-                      🗑 Supprimer la photo
+                      🗑 Supprimer — ne pas mettre de photo
                     </button>
                   </div>
                 ) : (
+                  /* undefined = photo de démo affichée */
                   <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'12px'}}>
-                    <div style={{width:'100px',height:'100px',borderRadius:'50%',background:'#e5e7ef',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'32px',color:'#9ca3af'}}>
-                      👤
+                    <div style={{position:'relative'}}>
+                      <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop&crop=face" alt="Photo démo" style={{width:'100px',height:'100px',borderRadius:'50%',objectFit:'cover',border:'2px dashed #aaa',opacity:0.7}} />
+                      <div style={{position:'absolute',bottom:0,right:0,background:'#fbbf24',borderRadius:'50%',width:'24px',height:'24px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px'}}>📷</div>
                     </div>
-                    <div style={{fontSize:'12px',color:'#9ca3af'}}>Aucune photo</div>
+                    <div style={{fontSize:'11px',color:'#9ca3af',textAlign:'center'}}>Photo de démonstration — remplace-la par la tienne</div>
+                    <button onClick={() => setCv({...cv, photo: null})} style={{padding:'8px 16px',background:'#fef2f2',color:'#dc2626',border:'1px solid #fecaca',borderRadius:'8px',cursor:'pointer',fontSize:'12px'}}>
+                      🚫 Ne pas mettre de photo sur mon CV
+                    </button>
                   </div>
                 )}
 
@@ -118,7 +135,7 @@ function CVEditor({ cvData, template, onSave, onClose }) {
                   }}>
                     <div style={{fontSize:'32px',marginBottom:'8px'}}>📷</div>
                     <div style={{fontSize:'13px',fontWeight:'600',color:'#1a56db',marginBottom:'4px'}}>
-                      {cv.photo ? 'Changer la photo' : 'Ajouter une photo'}
+                      {cv.photo ? 'Changer ma photo' : 'Uploader ma photo'}
                     </div>
                     <div style={{fontSize:'11px',color:'#6b7280'}}>JPG, PNG · Max 2 Mo</div>
                   </div>
