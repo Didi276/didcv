@@ -460,9 +460,9 @@ RÈGLES IMPORTANTES :
         const match = jsonPropre.match(/\{[\s\S]*\}/)
         if (match) {
           try { json = JSON.parse(match[0]) }
-          catch { throw new Error('Le CV généré est incomplet. Réessaie — l'offre est peut-être trop longue.') }
+          catch { throw new Error("Le CV généré est incomplet. Réessaie — l'offre est peut-être trop longue.") }
         } else {
-          throw new Error('Le CV généré est incomplet. Réessaie — l'offre est peut-être trop longue.')
+          throw new Error("Le CV généré est incomplet. Réessaie — l'offre est peut-être trop longue.")
         }
       }
 
