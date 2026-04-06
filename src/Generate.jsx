@@ -12,6 +12,80 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url
 ).toString()
 
+
+// ─── Composant affichage lettre avec en-tête pro ────────────
+function LettreRenderer({ lettre }) {
+  // Sépare l'en-tête du corps de la lettre
+  // L'en-tête se termine à la ligne "Objet :"
+  const lines = lettre.split('\n')
+  const objetIdx = lines.findIndex(l => l.trim().startsWith('Objet :'))
+  
+  if (objetIdx === -1) {
+    // Fallback : affichage simple
+    return (
+      <div style={{fontFamily:'Georgia,serif',fontSize:'13px',lineHeight:'1.8',color:'#222',whiteSpace:'pre-wrap',width:'100%',padding:'8px'}}>
+        {lettre}
+      </div>
+    )
+  }
+
+  const headerLines = lines.slice(0, objetIdx)
+  const bodyLines = lines.slice(objetIdx)
+
+  // Parsing de l'en-tête : on cherche les blocs gauche/droite
+  // Le séparateur est une ligne vide ou des espaces
+  // Bloc gauche = expéditeur, Bloc droite = destinataire + date
+  const nonEmpty = headerLines.filter(l => l.trim())
+  
+  // Heuristique : les 3-4 premières lignes non vides = expéditeur
+  // Les suivantes jusqu'à la date = destinataire
+  let expediteur = []
+  let destinataire = []
+  let dateVille = ''
+  let inDestinataire = false
+
+  nonEmpty.forEach(line => {
+    const t = line.trim()
+    if (t.match(/^[A-Z][a-z]+ .+, le \d/)) {
+      dateVille = t
+      inDestinataire = false
+    } else if (!inDestinataire && expediteur.length < 4 && !t.match(/(Service|RH|Ressources|Direction|Département)/i) && !t.match(/^\d/) ) {
+      expediteur.push(t)
+    } else {
+      inDestinataire = true
+      destinataire.push(t)
+    }
+  })
+
+  return (
+    <div style={{fontFamily:'Georgia,serif',fontSize:'13px',lineHeight:'1.8',color:'#222',width:'100%',padding:'16px 20px',background:'#fff'}}>
+      {/* En-tête : expéditeur gauche, destinataire droite */}
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'20px',marginBottom:'20px'}}>
+        {/* Gauche — Expéditeur */}
+        <div>
+          {expediteur.map((l, i) => (
+            <div key={i} style={{fontSize:'13px',color:'#222',fontWeight: i === 0 ? '700' : '400'}}>{l}</div>
+          ))}
+        </div>
+        {/* Droite — Destinataire + date */}
+        <div style={{textAlign:'right'}}>
+          {destinataire.map((l, i) => (
+            <div key={i} style={{fontSize:'13px',color:'#222',fontWeight: i === 0 ? '700' : '400'}}>{l}</div>
+          ))}
+          {dateVille && (
+            <div style={{fontSize:'13px',color:'#555',marginTop:'8px',fontStyle:'italic'}}>{dateVille}</div>
+          )}
+        </div>
+      </div>
+
+      {/* Corps de la lettre */}
+      <div style={{whiteSpace:'pre-wrap',lineHeight:'1.8'}}>
+        {bodyLines.join('\n')}
+      </div>
+    </div>
+  )
+}
+
 function Generate() {
   const [offreEmploi, setOffreEmploi] = useState('')
   const [cvFile, setCvFile] = useState(null)
@@ -287,16 +361,14 @@ Cherche dans l'offre :
 - Le nom du recruteur (si mentionné : "Madame X", "Monsieur Y")
 - L'intitulé exact du poste
 
-ÉTAPE 2 — RÉDIGE LA LETTRE avec ce format EXACT :
+ÉTAPE 2 — RÉDIGE LA LETTRE avec ce format EXACT (respecte l'alignement gauche/droite) :
 
-[Prénom Nom du candidat]
-[Ville du candidat], le [date du jour]
-[Email du candidat] | [Téléphone du candidat]
+[Prénom Nom du candidat]                                    [Nom de l'entreprise]
+[Email du candidat]                                         [Adresse si trouvée dans l'offre]
+[Téléphone du candidat]                                     [Service RH ou service mentionné]
 [LinkedIn si disponible]
 
-[Nom de l'entreprise extraite de l'offre]
-[Adresse de l'entreprise si trouvée dans l'offre]
-[Service RH / ou service mentionné dans l'offre]
+                                                            [Ville du candidat], le [date du jour]
 
 Objet : Candidature au poste de [intitulé EXACT du poste]
 
@@ -548,9 +620,7 @@ RÈGLES IMPORTANTES :
                 <button className="btn-download" onClick={handleDownloadLettre}>📄 Télécharger</button>
               </div>
               <div className="result-content" style={{alignItems:'flex-start'}}>
-                <div style={{fontFamily:'Georgia,serif',fontSize:'13px',lineHeight:'1.8',color:'#222',whiteSpace:'pre-wrap',width:'100%',padding:'8px'}}>
-                  {lettre}
-                </div>
+                <LettreRenderer lettre={lettre} />
               </div>
             </div>
           )}
