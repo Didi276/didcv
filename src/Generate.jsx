@@ -473,9 +473,18 @@ RÈGLES IMPORTANTES :
 
       const lettreGeneree = dataLM.content[0].text
 
-      // Photo
-      if (profile?.photo) json.photo = profile.photo
-      else if (photoManuelle) json.photo = photoManuelle
+      // Photo — 3 cas :
+      // profile.photo === null → supprimée explicitement → null (pas de photo sur le CV)
+      // profile.photo = base64 → vraie photo du profil → on l'utilise
+      // photoManuelle          → uploadée manuellement → on l'utilise
+      // undefined              → photo de démo s'affiche dans le template
+      if (profile?.photo === null) {
+        json.photo = null
+      } else if (profile?.photo) {
+        json.photo = profile.photo
+      } else if (photoManuelle) {
+        json.photo = photoManuelle
+      }
 
       // Garder certifications et centres_interet vides si non renseignés
       if (!json.certifications) json.certifications = []
