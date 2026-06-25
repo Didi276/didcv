@@ -93,7 +93,7 @@ function SectionCentresInteret({ cvData, couleur = '#1a1a1a', style = {} }) {
 export function TemplateFinance({ cvData }) {
   const f = getFontConfig(cvData)
   return (
-    <div id="cv-to-print" style={{fontFamily:'Georgia,serif',color:'#1a1a1a',fontSize:f.base,lineHeight:f.lineH,padding:'36px 40px',background:'#fff',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden',boxSizing:'border-box'}}>
+    <div id="cv-to-print" style={{fontFamily:'Georgia,serif',color:'#1a1a1a',fontSize:f.base,lineHeight:f.lineH,padding:'36px 40px',background:'#fff',width:'794px',height:'1123px',overflow:'hidden',boxSizing:'border-box'}}>
 
       {/* ─── EN-TÊTE ─── */}
       <div style={{borderBottom:'3px solid #1a1a1a',paddingBottom:'14px',marginBottom:'14px'}}>
@@ -181,7 +181,7 @@ export function TemplateFinance({ cvData }) {
 export function TemplateLinkedIn({ cvData }) {
   const f = getFontConfig(cvData)
   return (
-    <div id="cv-to-print" style={{fontFamily:'"Segoe UI",Arial,sans-serif',color:'#191919',fontSize:f.base,lineHeight:f.lineH,background:'#fff',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden'}}>
+    <div id="cv-to-print" style={{fontFamily:'"Segoe UI",Arial,sans-serif',color:'#191919',fontSize:f.base,lineHeight:f.lineH,background:'#fff',width:'794px',height:'1123px',overflow:'hidden'}}>
       <div style={{background:'#0a66c2',padding:'22px 28px'}}>
         <div style={{display:'flex',alignItems:'flex-start',gap:'16px'}}>
           <Avatar cvData={cvData} size={62} shape="circle" />
@@ -240,7 +240,7 @@ export function TemplateLinkedIn({ cvData }) {
 export function TemplateCanva({ cvData }) {
   const f = getFontConfig(cvData)
   return (
-    <div id="cv-to-print" style={{fontFamily:'"Helvetica Neue",Helvetica,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden',display:'grid',gridTemplateColumns:'250px 1fr'}}>
+    <div id="cv-to-print" style={{fontFamily:'"Helvetica Neue",Helvetica,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',width:'794px',height:'1123px',overflow:'hidden',display:'grid',gridTemplateColumns:'250px 1fr'}}>
       <div style={{background:'#2d2d2d',color:'#fff',padding:'28px 20px'}}>
         <div style={{textAlign:'center',marginBottom:'20px',paddingBottom:'16px',borderBottom:'1px solid rgba(255,255,255,0.15)'}}>
           <div style={{display:'flex',justifyContent:'center',marginBottom:'10px'}}><Avatar cvData={cvData} size={68} shape="circle" /></div>
@@ -297,7 +297,7 @@ export function TemplateCanva({ cvData }) {
 export function TemplateHarvard({ cvData }) {
   const f = getFontConfig(cvData)
   return (
-    <div id="cv-to-print" style={{fontFamily:'"Times New Roman",Times,serif',color:'#111',fontSize:f.base,lineHeight:f.lineH,padding:'36px 44px',background:'#fff',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden'}}>
+    <div id="cv-to-print" style={{fontFamily:'"Times New Roman",Times,serif',color:'#111',fontSize:f.base,lineHeight:f.lineH,padding:'36px 44px',background:'#fff',width:'794px',height:'1123px',overflow:'hidden'}}>
       <div style={{textAlign:'center',marginBottom:'14px',paddingBottom:'10px',borderBottom:'2px solid #111'}}>
         <div style={{display:'flex',justifyContent:'center',marginBottom:'8px'}}><Avatar cvData={cvData} size={56} shape="circle" /></div>
         <div style={{fontSize:f.xsmall,fontWeight:'400',letterSpacing:'2px',textTransform:'uppercase',color:'#555',marginBottom:'3px',fontFamily:'"Times New Roman",serif'}}>{cvData.titre}</div>
@@ -343,7 +343,7 @@ export function TemplateHarvard({ cvData }) {
 export function TemplateSiliconValley({ cvData }) {
   const f = getFontConfig(cvData)
   return (
-    <div id="cv-to-print" style={{fontFamily:'-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',color:'#1d1d1f',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden',padding:'36px 44px'}}>
+    <div id="cv-to-print" style={{fontFamily:'-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',color:'#1d1d1f',width:'794px',height:'1123px',overflow:'hidden',padding:'36px 44px'}}>
       <div style={{marginBottom:'22px',display:'flex',alignItems:'center',gap:'18px'}}>
         <Avatar cvData={cvData} size={68} shape="circle" />
         <div>
@@ -381,7 +381,7 @@ export function TemplateSiliconValley({ cvData }) {
 export function TemplateModerne({ cvData }) {
   const f = getFontConfig(cvData)
   return (
-    <div id="cv-to-print" style={{display:'grid',gridTemplateColumns:'210px 1fr',fontFamily:'Helvetica,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden'}}>
+    <div id="cv-to-print" style={{display:'grid',gridTemplateColumns:'210px 1fr',fontFamily:'Helvetica,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',width:'794px',height:'1123px',overflow:'hidden'}}>
       <div style={{background:'#0f6e56',color:'#fff',padding:'24px 18px'}}>
         <div style={{marginBottom:'18px',paddingBottom:'14px',borderBottom:'1px solid rgba(255,255,255,0.2)',display:'flex',flexDirection:'column',alignItems:'center',gap:'8px'}}>
           <Avatar cvData={cvData} size={64} shape="circle" />
@@ -406,7 +406,7 @@ export function TemplateModerne({ cvData }) {
 export function TemplateExecutive({ cvData }) {
   const f = getFontConfig(cvData)
   return (
-    <div id="cv-to-print" style={{fontFamily:'Georgia,serif',fontSize:f.base,lineHeight:f.lineH,background:'#0d0d0d',color:'#e8e0cc',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden',padding:'44px 48px'}}>
+    <div id="cv-to-print" style={{fontFamily:'Georgia,serif',fontSize:f.base,lineHeight:f.lineH,background:'#0d0d0d',color:'#e8e0cc',width:'794px',height:'1123px',overflow:'hidden',padding:'44px 48px'}}>
       <div style={{borderBottom:'1px solid #c9a84c',paddingBottom:'18px',marginBottom:'20px',display:'flex',alignItems:'center',gap:'18px'}}>
         <Avatar cvData={cvData} size={68} shape="rounded" />
         <div><div style={{fontSize:f.xsmall,letterSpacing:'3px',textTransform:'uppercase',color:'#888',marginBottom:'4px'}}>{cvData.titre}</div><h1 style={{fontSize:'26px',fontWeight:'400',letterSpacing:'4px',textTransform:'uppercase',color:'#c9a84c',margin:'0 0 8px',fontFamily:'Georgia,serif'}}>{cvData.prenom} {cvData.nom}</h1><div style={{display:'flex',gap:'18px',flexWrap:'wrap',fontSize:f.xsmall,color:'#777'}}><span>{cvData.email}</span><span>·</span><span>{cvData.telephone}</span><span>·</span><span>{cvData.ville}</span></div></div>
@@ -425,7 +425,7 @@ export function TemplateExecutive({ cvData }) {
 export function TemplateCreative({ cvData }) {
   const f = getFontConfig(cvData)
   return (
-    <div id="cv-to-print" style={{fontFamily:'"Helvetica Neue",Arial,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden',display:'grid',gridTemplateColumns:'230px 1fr'}}>
+    <div id="cv-to-print" style={{fontFamily:'"Helvetica Neue",Arial,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',width:'794px',height:'1123px',overflow:'hidden',display:'grid',gridTemplateColumns:'230px 1fr'}}>
       <div style={{background:'linear-gradient(160deg,#667eea,#764ba2)',color:'#fff',padding:'28px 18px',display:'flex',flexDirection:'column',gap:'16px'}}>
         <div style={{textAlign:'center',paddingBottom:'16px',borderBottom:'1px solid rgba(255,255,255,0.2)'}}>
           <div style={{display:'flex',justifyContent:'center',marginBottom:'10px'}}><Avatar cvData={cvData} size={70} shape="circle" /></div>
@@ -450,7 +450,7 @@ export function TemplateCreative({ cvData }) {
 export function TemplateMinimal({ cvData }) {
   const f = getFontConfig(cvData)
   return (
-    <div id="cv-to-print" style={{fontFamily:'"Helvetica Neue",Arial,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',color:'#222',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden',padding:'48px 56px'}}>
+    <div id="cv-to-print" style={{fontFamily:'"Helvetica Neue",Arial,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',color:'#222',width:'794px',height:'1123px',overflow:'hidden',padding:'48px 56px'}}>
       <div style={{marginBottom:'30px',display:'flex',alignItems:'center',gap:'18px'}}>
         <Avatar cvData={cvData} size={64} shape="circle" />
         <div><h1 style={{fontSize:'28px',fontWeight:'300',letterSpacing:'1px',color:'#111',margin:'0 0 5px'}}>{cvData.prenom} <strong style={{fontWeight:'700'}}>{cvData.nom}</strong></h1><div style={{fontSize:'12px',color:'#888',marginBottom:'8px',letterSpacing:'0.5px'}}>{cvData.titre}</div><div style={{display:'flex',gap:'20px',fontSize:f.xsmall,color:'#aaa',flexWrap:'wrap'}}><span>{cvData.email}</span><span>{cvData.telephone}</span><span>{cvData.ville}</span></div></div>
@@ -469,7 +469,7 @@ export function TemplateMinimal({ cvData }) {
 export function TemplateTech({ cvData }) {
   const f = getFontConfig(cvData)
   return (
-    <div id="cv-to-print" style={{fontFamily:'"Courier New",monospace',fontSize:f.base,lineHeight:f.lineH,background:'#fff',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden',display:'grid',gridTemplateColumns:'220px 1fr'}}>
+    <div id="cv-to-print" style={{fontFamily:'"Courier New",monospace',fontSize:f.base,lineHeight:f.lineH,background:'#fff',width:'794px',height:'1123px',overflow:'hidden',display:'grid',gridTemplateColumns:'220px 1fr'}}>
       <div style={{background:'#0f172a',color:'#94a3b8',padding:'24px 16px'}}>
         <div style={{marginBottom:'18px',paddingBottom:'14px',borderBottom:'1px solid #1e293b',display:'flex',flexDirection:'column',alignItems:'center',gap:'8px'}}>
           <Avatar cvData={cvData} size={64} shape="circle" />
@@ -494,7 +494,7 @@ export function TemplateTech({ cvData }) {
 export function TemplateElegant({ cvData }) {
   const f = getFontConfig(cvData)
   return (
-    <div id="cv-to-print" style={{fontFamily:'Georgia,serif',fontSize:f.base,lineHeight:f.lineH,background:'#faf7f2',color:'#2c2416',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden',display:'grid',gridTemplateColumns:'220px 1fr'}}>
+    <div id="cv-to-print" style={{fontFamily:'Georgia,serif',fontSize:f.base,lineHeight:f.lineH,background:'#faf7f2',color:'#2c2416',width:'794px',height:'1123px',overflow:'hidden',display:'grid',gridTemplateColumns:'220px 1fr'}}>
       <div style={{background:'#2c2416',padding:'32px 18px',color:'#e8d9b8'}}>
         <div style={{marginBottom:'20px',paddingBottom:'18px',borderBottom:'1px solid rgba(232,217,184,0.2)',display:'flex',flexDirection:'column',alignItems:'center',gap:'10px'}}>
           <Avatar cvData={cvData} size={68} shape="circle" />
@@ -519,7 +519,7 @@ export function TemplateElegant({ cvData }) {
 export function TemplateBold({ cvData }) {
   const f = getFontConfig(cvData)
   return (
-    <div id="cv-to-print" style={{fontFamily:'Arial,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden'}}>
+    <div id="cv-to-print" style={{fontFamily:'Arial,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',width:'794px',height:'1123px',overflow:'hidden'}}>
       <div style={{background:'#c0392b',padding:'24px 36px'}}>
         <div style={{display:'flex',alignItems:'center',gap:'18px'}}>
           <Avatar cvData={cvData} size={68} shape="circle" />
@@ -547,7 +547,7 @@ export function TemplateBold({ cvData }) {
 export function TemplatePastel({ cvData }) {
   const f = getFontConfig(cvData)
   return (
-    <div id="cv-to-print" style={{fontFamily:'"Helvetica Neue",Arial,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fef9ff',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden',display:'grid',gridTemplateColumns:'230px 1fr'}}>
+    <div id="cv-to-print" style={{fontFamily:'"Helvetica Neue",Arial,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fef9ff',width:'794px',height:'1123px',overflow:'hidden',display:'grid',gridTemplateColumns:'230px 1fr'}}>
       <div style={{background:'#e8d5f5',padding:'28px 18px'}}>
         <div style={{textAlign:'center',marginBottom:'20px',paddingBottom:'16px',borderBottom:'1px solid #d4b8ec',display:'flex',flexDirection:'column',alignItems:'center',gap:'8px'}}>
           <Avatar cvData={cvData} size={68} shape="circle" />
@@ -572,7 +572,7 @@ export function TemplatePastel({ cvData }) {
 export function TemplateCorporate({ cvData }) {
   const f = getFontConfig(cvData)
   return (
-    <div id="cv-to-print" style={{fontFamily:'Arial,Helvetica,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden'}}>
+    <div id="cv-to-print" style={{fontFamily:'Arial,Helvetica,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',width:'794px',height:'1123px',overflow:'hidden'}}>
       <div style={{background:'#1e3a5f',borderBottom:'4px solid #f59e0b',padding:'20px 32px'}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'18px'}}>
           <div style={{display:'flex',alignItems:'center',gap:'14px'}}>
@@ -605,7 +605,7 @@ export function TemplateCorporate({ cvData }) {
 export function TemplateSwiss({ cvData }) {
   const f = getFontConfig(cvData)
   return (
-    <div id="cv-to-print" style={{fontFamily:'"Helvetica Neue",Helvetica,Arial,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',color:'#000',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden',padding:'44px 48px'}}>
+    <div id="cv-to-print" style={{fontFamily:'"Helvetica Neue",Helvetica,Arial,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',color:'#000',width:'794px',height:'1123px',overflow:'hidden',padding:'44px 48px'}}>
       <div style={{display:'grid',gridTemplateColumns:'1fr auto',alignItems:'end',marginBottom:'28px',paddingBottom:'7px',borderBottom:'3px solid #000'}}>
         <div style={{display:'flex',alignItems:'center',gap:'14px'}}>
           <Avatar cvData={cvData} size={56} shape="square" />
@@ -628,7 +628,7 @@ export function TemplateSwiss({ cvData }) {
 export function TemplateTimeline({ cvData }) {
   const f = getFontConfig(cvData)
   return (
-    <div id="cv-to-print" style={{fontFamily:'"Helvetica Neue",Arial,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#f8faff',width:'794px',minHeight:'1123px',maxHeight:'1123px',overflow:'hidden'}}>
+    <div id="cv-to-print" style={{fontFamily:'"Helvetica Neue",Arial,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#f8faff',width:'794px',height:'1123px',overflow:'hidden'}}>
       <div style={{background:'linear-gradient(135deg,#1e40af,#3b82f6)',padding:'20px 32px'}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'14px'}}>
           <div style={{display:'flex',alignItems:'center',gap:'14px'}}>
