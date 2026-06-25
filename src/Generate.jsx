@@ -1,4 +1,4 @@
-import CVEditor from './CVEditor'
+import CVEditorBlocks from './CVEditorBlocks'
 import { supabase } from './supabase'
 import { CVTemplate } from './CVTemplates'
 import { useSearchParams } from 'react-router-dom'
