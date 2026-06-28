@@ -5,6 +5,9 @@ import Templates from './Templates'
 import Auth from './Auth'
 import Dashboard from './Dashboard'
 import Profile from './Profile'
+import Offres from './Offres'
+// Dans les routes :
+<Route path="/offres" element={<Offres />} />
 
 function App() {
   return (

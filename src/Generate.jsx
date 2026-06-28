@@ -6,7 +6,6 @@ import { useState, useEffect } from 'react'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import * as pdfjsLib from 'pdfjs-dist'
-import OffreSearch from './OffreSearch'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
@@ -77,6 +76,8 @@ function Generate() {
       }
     }
     fetchProfile()
+    const prefill = sessionStorage.getItem('offre_prefill')
+if (prefill) { setOffreEmploi(prefill); sessionStorage.removeItem('offre_prefill') }
   }, [])
 
   const handlePhotoManuelle = (e) => {
@@ -588,7 +589,7 @@ RÈGLES :
             </div>
           )}
 
-          <OffreSearch onSelectOffre={(texte) => setOffreEmploi(texte)} />
+      
 
           <div className="offre-box">
             <div className="upload-label">{profile ? '1.' : '2.'} L'offre d'emploi</div>
