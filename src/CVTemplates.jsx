@@ -34,14 +34,14 @@ function getFontConfig(cvData) {
 
   // Valeurs calibrées pour remplir une page A4 sans trous structurels
   // L'espace se distribue via l'interligne (lineH) et les marges (mb)
-  if (density < 5)  return { base: '11px', small: '10px', xsmall: '9px', lineH: '3.2', mb: '28px' }
-  if (density < 7)  return { base: '11px', small: '10px', xsmall: '9px', lineH: '2.8', mb: '22px' }
-  if (density < 9)  return { base: '11px', small: '10px', xsmall: '9px', lineH: '2.4', mb: '18px' }
-  if (density < 11) return { base: '11px', small: '10px', xsmall: '9px', lineH: '2.1', mb: '15px' }
-  if (density < 14) return { base: '11px', small: '10px', xsmall: '8.5px', lineH: '1.95', mb: '13px' }
-  if (density < 17) return { base: '10.5px', small: '9.5px', xsmall: '8px', lineH: '1.7', mb: '9px' }
-  if (density < 21) return { base: '10px', small: '9px', xsmall: '7.5px', lineH: '1.5', mb: '6px' }
-  return                    { base: '9.5px', small: '8.5px', xsmall: '7px', lineH: '1.4', mb: '4px' }
+  if (density < 5)  return { base: '11px', small: '10px', xsmall: '9px', lineH: '3.0', mb: '24px' }
+  if (density < 7)  return { base: '11px', small: '10px', xsmall: '9px', lineH: '2.65', mb: '19px' }
+  if (density < 9)  return { base: '11px', small: '10px', xsmall: '9px', lineH: '2.28', mb: '15px' }
+  if (density < 11) return { base: '11px', small: '10px', xsmall: '9px', lineH: '2.0', mb: '12px' }
+  if (density < 14) return { base: '11px', small: '10px', xsmall: '8.5px', lineH: '1.85', mb: '10px' }
+  if (density < 17) return { base: '10.5px', small: '9.5px', xsmall: '8px', lineH: '1.62', mb: '7px' }
+  if (density < 21) return { base: '10px', small: '9px', xsmall: '7.5px', lineH: '1.43', mb: '5px' }
+  return                    { base: '9.5px', small: '8.5px', xsmall: '7px', lineH: '1.35', mb: '3px' }
 }
 
 function SectionCertifications({ cvData, couleur = '#1a1a1a', style = {} }) {
