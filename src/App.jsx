@@ -6,8 +6,6 @@ import Auth from './Auth'
 import Dashboard from './Dashboard'
 import Profile from './Profile'
 import Offres from './Offres'
-// Dans les routes :
-<Route path="/offres" element={<Offres />} />
 
 function App() {
   return (
@@ -19,6 +17,7 @@ function App() {
         <Route path="/generate" element={<Generate />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/offres" element={<Offres />} />
       </Routes>
     </BrowserRouter>
   )
