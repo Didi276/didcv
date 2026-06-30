@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Navbar from './Navbar'
 
 const CATEGORIES = [
   'Comptabilité', 'Finance', 'Ressources Humaines', 'Marketing', 'Commercial',
@@ -53,16 +54,7 @@ export default function Offres() {
   return (
     <div style={{ minHeight: '100vh', background: '#f8faff', fontFamily: 'inherit' }}>
 
-      {/* NAV */}
-      <nav style={{ background: '#fff', borderBottom: '1px solid #e5e7ef', padding: '0 32px', height: '60px', display: 'flex', alignItems: 'center', gap: '24px' }}>
-        <a href="/dashboard" style={{ fontWeight: '800', fontSize: '20px', textDecoration: 'none', color: '#1a1a1a' }}>
-          <span style={{ color: '#1a56db' }}>Did</span>CV
-        </a>
-        <div style={{ flex: 1 }} />
-        <a href="/offres" style={{ fontSize: '14px', color: '#1a56db', textDecoration: 'none', fontWeight: '700', borderBottom: '2px solid #1a56db', paddingBottom: '2px' }}>🔍 Offres</a>
-        <a href="/generate" style={{ fontSize: '14px', color: '#555', textDecoration: 'none', fontWeight: '500' }}>⚡ Générer CV</a>
-        <a href="/dashboard" style={{ fontSize: '14px', color: '#555', textDecoration: 'none' }}>Dashboard</a>
-      </nav>
+      <Navbar currentPage="offres" />
 
       {/* HERO */}
       <div style={{ background: 'linear-gradient(135deg, #1a56db, #3b82f6)', padding: '48px 32px', textAlign: 'center' }}>

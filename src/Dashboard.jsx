@@ -1,4 +1,4 @@
-import CVEditor from './CVEditor'
+import CVEditorBlocks from './CVEditorBlocks'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
@@ -10,6 +10,7 @@ import { supabase } from './supabase'
 import { CVTemplate } from './CVTemplates'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
+import Navbar from './Navbar'
 import './App.css'
 
 function Dashboard() {
@@ -21,23 +22,16 @@ function Dashboard() {
   const [showLettre, setShowLettre] = useState(false)
   const [editingLettre, setEditingLettre] = useState(false)
   const [lettreEditee, setLettreEditee] = useState('')
-
-  // ✅ CVEditor plein écran (même composant que Generate.jsx)
   const [showCVEditor, setShowCVEditor] = useState(false)
   const [cvToEdit, setCvToEdit] = useState(null)
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
-      Underline,
-      TextStyle,
-      Color,
+      StarterKit, Underline, TextStyle, Color,
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
     ],
     content: '',
-    onUpdate: ({ editor }) => {
-      setLettreEditee(editor.getHTML())
-    },
+    onUpdate: ({ editor }) => setLettreEditee(editor.getHTML()),
   })
 
   useEffect(() => {
@@ -57,25 +51,18 @@ function Dashboard() {
     fetchData()
   }, [])
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    window.location.href = '/'
-  }
-
   const handleDelete = async (id) => {
     if (!confirm('Supprimer ce CV ?')) return
     await supabase.from('cvs').delete().eq('id', id)
     setCvs(cvs.filter(cv => cv.id !== id))
   }
 
-  // ✅ Ouvrir CVEditor plein écran pour un CV existant
   const handleEditCV = (cv) => {
     setCvToEdit(cv)
     setShowCVEditor(true)
-    setSelectedCv(null) // fermer la modale si ouverte
+    setSelectedCv(null)
   }
 
-  // ✅ Sauvegarder depuis CVEditor → met à jour Supabase + state local
   const handleSaveCVEditor = async (cvDataModifie) => {
     if (!cvToEdit) return
     await supabase.from('cvs').update({ cv_data: cvDataModifie }).eq('id', cvToEdit.id)
@@ -84,7 +71,6 @@ function Dashboard() {
     setCvToEdit(null)
   }
 
-  // ✅ PDF haute qualité scale 4
   const handleDownloadCV = async (cv) => {
     setSelectedCv(cv)
     setShowLettre(false)
@@ -92,14 +78,8 @@ function Dashboard() {
       const element = document.getElementById('cv-to-print')
       if (!element) return
       const canvas = await html2canvas(element, {
-        scale: 4,
-        useCORS: true,
-        backgroundColor: '#ffffff',
-        width: 794,
-        height: 1123,
-        logging: false,
-        imageTimeout: 0,
-        allowTaint: true
+        scale: 4, useCORS: true, backgroundColor: '#ffffff',
+        width: 794, height: 1123, logging: false, imageTimeout: 0, allowTaint: true
       })
       const imgData = canvas.toDataURL('image/png')
       const pdf = new jsPDF('p', 'mm', 'a4', true)
@@ -136,7 +116,7 @@ function Dashboard() {
       background: active ? '#eff4ff' : '#fff',
       color: active ? '#1a56db' : '#374151',
       cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: '13px', fontWeight: '600', transition: 'all 0.15s'
+      fontSize: '13px', fontWeight: '600'
     }}>
       {children}
     </button>
@@ -151,14 +131,7 @@ function Dashboard() {
 
   return (
     <div className="dashboard-page">
-      <nav>
-        <a className="logo" href="/dashboard"><span>Did</span>CV</a>
-        <div className="nav-btns">
-          <a href="/profile" className="btn-ghost">👤 Mon profil</a>
-          <a href="/templates" className="btn-blue">+ Nouveau CV</a>
-          <button className="btn-ghost" onClick={handleLogout}>Déconnexion</button>
-        </div>
-      </nav>
+      <Navbar currentPage="dashboard" />
 
       <div className="dashboard-wrap">
         <div className="dashboard-hero">
@@ -222,28 +195,17 @@ function Dashboard() {
                       <div className="dashboard-card2-titre">{cv.cv_data.titre}</div>
                       {cv.offre_titre && <div className="dashboard-card2-offre">🎯 {cv.offre_titre}</div>}
                     </div>
-                    <div className="dashboard-card2-template" style={{ background: templateColors[cv.template] + '15', color: templateColors[cv.template] || '#1a56db' }}>
+                    <div className="dashboard-card2-template" style={{ background: (templateColors[cv.template] || '#1a56db') + '15', color: templateColors[cv.template] || '#1a56db' }}>
                       {cv.template}
                     </div>
                   </div>
                   <div className="dashboard-card2-bottom">
                     <div className="dashboard-card2-date">{formatDate(cv.created_at)}</div>
                     <div className="dashboard-card2-actions">
-                      <button className="dash-btn dash-btn-primary" onClick={() => { setSelectedCv(cv); setShowLettre(false) }}>
-                        👁 CV
-                      </button>
-                      {/* ✅ Bouton Modifier → CVEditor plein écran avec aperçu live */}
-                      <button
-                        className="dash-btn"
-                        style={{ background: '#eff4ff', color: '#1a56db', border: '1px solid #c7d9ff' }}
-                        onClick={() => handleEditCV(cv)}
-                      >
-                        ✏️ Modifier
-                      </button>
+                      <button className="dash-btn dash-btn-primary" onClick={() => { setSelectedCv(cv); setShowLettre(false) }}>👁 CV</button>
+                      <button className="dash-btn" style={{ background: '#eff4ff', color: '#1a56db', border: '1px solid #c7d9ff' }} onClick={() => handleEditCV(cv)}>✏️ Modifier</button>
                       {cv.lettre_motivation && (
-                        <button className="dash-btn dash-btn-secondary" onClick={() => { setSelectedCv(cv); setShowLettre(true) }}>
-                          ✉️ Lettre
-                        </button>
+                        <button className="dash-btn dash-btn-secondary" onClick={() => { setSelectedCv(cv); setShowLettre(true) }}>✉️ Lettre</button>
                       )}
                       <button className="dash-btn dash-btn-danger" onClick={() => handleDelete(cv.id)}>🗑</button>
                     </div>
@@ -255,9 +217,8 @@ function Dashboard() {
         )}
       </div>
 
-      {/* ✅ CVEditor plein écran — identique à Generate.jsx */}
       {showCVEditor && cvToEdit && (
-        <CVEditor
+        <CVEditorBlocks
           cvData={cvToEdit.cv_data}
           template={cvToEdit.template}
           onSave={handleSaveCVEditor}
@@ -265,73 +226,33 @@ function Dashboard() {
         />
       )}
 
-      {/* Modale aperçu CV + Lettre */}
       {selectedCv && !showCVEditor && (
         <div className="cv-modal" onClick={() => setSelectedCv(null)}>
           <div className="cv-modal-content" onClick={e => e.stopPropagation()}>
             <div className="cv-modal-header">
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <button onClick={() => setShowLettre(false)} style={{
-                  padding: '6px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                  background: !showLettre ? '#1a56db' : '#f0f0f0',
-                  color: !showLettre ? '#fff' : '#333',
-                  fontSize: '13px', fontWeight: '500'
-                }}>📄 CV</button>
+                <button onClick={() => setShowLettre(false)} style={{ padding: '6px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer', background: !showLettre ? '#1a56db' : '#f0f0f0', color: !showLettre ? '#fff' : '#333', fontSize: '13px', fontWeight: '500' }}>📄 CV</button>
                 {selectedCv.lettre_motivation && (
-                  <button onClick={() => setShowLettre(true)} style={{
-                    padding: '6px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                    background: showLettre ? '#1a56db' : '#f0f0f0',
-                    color: showLettre ? '#fff' : '#333',
-                    fontSize: '13px', fontWeight: '500'
-                  }}>✉️ Lettre</button>
+                  <button onClick={() => setShowLettre(true)} style={{ padding: '6px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer', background: showLettre ? '#1a56db' : '#f0f0f0', color: showLettre ? '#fff' : '#333', fontSize: '13px', fontWeight: '500' }}>✉️ Lettre</button>
                 )}
               </div>
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                {/* ✅ Bouton Modifier dans la modale aussi */}
-                {!showLettre && (
-                  <button
-                    onClick={() => handleEditCV(selectedCv)}
-                    style={{ padding: '6px 14px', borderRadius: '8px', border: '1px solid #c7d9ff', cursor: 'pointer', background: '#eff4ff', color: '#1a56db', fontSize: '13px', fontWeight: '500' }}
-                  >✏️ Modifier</button>
-                )}
-                {!showLettre && (
-                  <button className="btn-download" onClick={() => handleDownloadCV(selectedCv)}>📥 Télécharger CV</button>
-                )}
-                {showLettre && (
-                  <button className="btn-download" onClick={() => handleDownloadLettre(selectedCv)}>📥 Télécharger Lettre</button>
-                )}
+                {!showLettre && <button onClick={() => handleEditCV(selectedCv)} style={{ padding: '6px 14px', borderRadius: '8px', border: '1px solid #c7d9ff', cursor: 'pointer', background: '#eff4ff', color: '#1a56db', fontSize: '13px', fontWeight: '500' }}>✏️ Modifier</button>}
+                {!showLettre && <button className="btn-download" onClick={() => handleDownloadCV(selectedCv)}>📥 Télécharger CV</button>}
+                {showLettre && <button className="btn-download" onClick={() => handleDownloadLettre(selectedCv)}>📥 Télécharger Lettre</button>}
                 <button className="cv-modal-close" onClick={() => setSelectedCv(null)}>✕</button>
               </div>
             </div>
-
             <div className="cv-modal-body">
               {showLettre ? (
                 <div style={{ padding: '40px', maxWidth: '700px', margin: '0 auto', width: '100%' }}>
                   {editingLettre ? (
                     <div>
-                      <div style={{ border: '1px solid #e5e7ef', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                      <div style={{ border: '1px solid #e5e7ef', borderRadius: '8px', overflow: 'hidden' }}>
                         <div style={{ background: '#f8fafc', padding: '10px 14px', borderBottom: '1px solid #e5e7ef', display: 'flex', gap: '4px', flexWrap: 'wrap', alignItems: 'center' }}>
-                          <ToolbarBtn onClick={() => editor.chain().focus().toggleBold().run()} active={editor?.isActive('bold')} title="Gras">
-                            <span style={{ fontWeight: '900' }}>B</span>
-                          </ToolbarBtn>
-                          <ToolbarBtn onClick={() => editor.chain().focus().toggleItalic().run()} active={editor?.isActive('italic')} title="Italique">
-                            <span style={{ fontStyle: 'italic' }}>I</span>
-                          </ToolbarBtn>
-                          <ToolbarBtn onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor?.isActive('underline')} title="Souligné">
-                            <span style={{ textDecoration: 'underline' }}>U</span>
-                          </ToolbarBtn>
-                          <div style={{ width: '1px', height: '24px', background: '#e5e7ef', margin: '0 4px' }}></div>
-                          <ToolbarBtn onClick={() => editor.chain().focus().setTextAlign('left').run()} active={editor?.isActive({ textAlign: 'left' })} title="Gauche">⬅</ToolbarBtn>
-                          <ToolbarBtn onClick={() => editor.chain().focus().setTextAlign('center').run()} active={editor?.isActive({ textAlign: 'center' })} title="Centrer">↔</ToolbarBtn>
-                          <ToolbarBtn onClick={() => editor.chain().focus().setTextAlign('right').run()} active={editor?.isActive({ textAlign: 'right' })} title="Droite">➡</ToolbarBtn>
-                          <div style={{ width: '1px', height: '24px', background: '#e5e7ef', margin: '0 4px' }}></div>
-                          <ToolbarBtn onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor?.isActive('heading')} title="Titre">H2</ToolbarBtn>
-                          <ToolbarBtn onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor?.isActive('bulletList')} title="Liste">≡</ToolbarBtn>
-                          <div style={{ width: '1px', height: '24px', background: '#e5e7ef', margin: '0 4px' }}></div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <span style={{ fontSize: '12px', color: '#6b7280' }}>A</span>
-                            <input type="color" title="Couleur" onChange={e => editor.chain().focus().setColor(e.target.value).run()} style={{ width: '28px', height: '28px', padding: '2px', border: '1px solid #e5e7ef', borderRadius: '6px', cursor: 'pointer' }} />
-                          </div>
+                          <ToolbarBtn onClick={() => editor.chain().focus().toggleBold().run()} active={editor?.isActive('bold')} title="Gras"><span style={{ fontWeight: '900' }}>B</span></ToolbarBtn>
+                          <ToolbarBtn onClick={() => editor.chain().focus().toggleItalic().run()} active={editor?.isActive('italic')} title="Italique"><span style={{ fontStyle: 'italic' }}>I</span></ToolbarBtn>
+                          <ToolbarBtn onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor?.isActive('underline')} title="Souligné"><span style={{ textDecoration: 'underline' }}>U</span></ToolbarBtn>
                         </div>
                         <EditorContent editor={editor} style={{ minHeight: '350px', padding: '20px', fontFamily: 'Georgia,serif', fontSize: '14px', lineHeight: '1.8', color: '#222' }} />
                       </div>
@@ -347,14 +268,8 @@ function Dashboard() {
                     </div>
                   ) : (
                     <div>
-                      <div style={{ fontFamily: 'Georgia,serif', fontSize: '14px', lineHeight: '1.8', color: '#222', whiteSpace: 'pre-wrap', marginBottom: '16px' }}>
-                        {selectedCv.lettre_motivation}
-                      </div>
-                      <button className="btn-ghost" onClick={() => {
-                        setLettreEditee(selectedCv.lettre_motivation)
-                        editor?.commands.setContent(selectedCv.lettre_motivation)
-                        setEditingLettre(true)
-                      }}>✏️ Modifier la lettre</button>
+                      <div style={{ fontFamily: 'Georgia,serif', fontSize: '14px', lineHeight: '1.8', color: '#222', whiteSpace: 'pre-wrap', marginBottom: '16px' }}>{selectedCv.lettre_motivation}</div>
+                      <button className="btn-ghost" onClick={() => { setLettreEditee(selectedCv.lettre_motivation); editor?.commands.setContent(selectedCv.lettre_motivation); setEditingLettre(true) }}>✏️ Modifier la lettre</button>
                     </div>
                   )}
                 </div>

@@ -7,6 +7,7 @@ import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import * as pdfjsLib from 'pdfjs-dist'
 import OffreSearch from './OffreSearch'
+import Navbar from './Navbar'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
@@ -496,9 +497,7 @@ RÈGLES :
   return (
     <div className="generate-page">
       <nav>
-        <a className="logo" href="/dashboard"><span>Did</span>CV</a>
-        <a href="/dashboard" className="btn-ghost" style={{marginLeft:'auto', marginRight:'12px'}}>Mon dashboard</a>
-        <a href="/templates" className="btn-ghost">← Changer de template</a>
+        <Navbar currentPage="generate" />
       </nav>
 
       <div className="generate-wrap">
