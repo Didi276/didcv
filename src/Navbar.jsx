@@ -14,52 +14,63 @@ export default function Navbar({ currentPage = '' }) {
     window.location.href = '/'
   }
 
-  const linkStyle = (page) => ({
-    fontSize: '14px',
-    fontWeight: currentPage === page ? '700' : '500',
-    color: currentPage === page ? '#1a56db' : '#555',
-    textDecoration: 'none',
-    padding: '6px 12px',
-    borderRadius: '8px',
-    background: currentPage === page ? '#eff4ff' : 'transparent',
-    border: currentPage === page ? '1px solid #c7d9ff' : '1px solid transparent',
-    transition: 'all 0.15s',
-  })
+  const links = [
+    { page: 'dashboard', label: 'Dashboard', href: '/dashboard' },
+    { page: 'offres',    label: 'Offres',     href: '/offres'    },
+    { page: 'generate',  label: 'Générer CV', href: '/templates' },
+    { page: 'profile',   label: 'Profil',     href: '/profile'   },
+  ]
 
   return (
     <nav style={{
       background: '#fff',
-      borderBottom: '1px solid #e5e7ef',
-      padding: '0 28px',
-      height: '60px',
+      borderBottom: '1px solid #ebebeb',
+      padding: '0 32px',
+      height: '58px',
       display: 'flex',
       alignItems: 'center',
-      gap: '8px',
+      gap: '4px',
       position: 'sticky',
       top: 0,
       zIndex: 100,
-      boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
     }}>
       {/* Logo */}
-      <a href="/dashboard" style={{ fontWeight: '800', fontSize: '20px', textDecoration: 'none', color: '#1a1a1a', marginRight: '12px' }}>
+      <a href="/dashboard" style={{
+        fontWeight: '800', fontSize: '19px', textDecoration: 'none',
+        color: '#1a1a1a', marginRight: '20px', letterSpacing: '-0.5px'
+      }}>
         <span style={{ color: '#1a56db' }}>Did</span>CV
       </a>
 
-      {/* Liens principaux */}
-      <a href="/dashboard" style={linkStyle('dashboard')}>🏠 Dashboard</a>
-      <a href="/offres" style={linkStyle('offres')}>🔍 Offres</a>
-      <a href="/templates" style={linkStyle('generate')}>⚡ Générer CV</a>
-      <a href="/profile" style={linkStyle('profile')}>👤 Profil</a>
+      {/* Liens */}
+      {links.map(({ page, label, href }) => {
+        const active = currentPage === page
+        return (
+          <a key={page} href={href} style={{
+            fontSize: '14px',
+            fontWeight: '500',
+            color: active ? '#1a56db' : '#444',
+            textDecoration: 'none',
+            padding: '6px 14px',
+            borderRadius: '8px',
+            background: 'transparent',
+            borderBottom: active ? '2px solid #1a56db' : '2px solid transparent',
+            transition: 'color 0.15s',
+            marginBottom: active ? '-2px' : '0',
+          }}>
+            {label}
+          </a>
+        )
+      })}
 
-      {/* Spacer */}
       <div style={{ flex: 1 }} />
 
       {/* Déconnexion */}
       {user && (
         <button onClick={handleLogout} style={{
-          fontSize: '13px', color: '#555', background: 'none',
-          border: '1px solid #e5e7ef', borderRadius: '8px',
-          padding: '6px 14px', cursor: 'pointer', fontFamily: 'inherit'
+          fontSize: '13px', color: '#666', background: 'none',
+          border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+          padding: '6px 8px',
         }}>
           Déconnexion
         </button>
