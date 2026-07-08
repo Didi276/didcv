@@ -35,7 +35,7 @@ export default function Navbar({ currentPage = '' }) {
       zIndex: 100,
     }}>
       {/* Logo */}
-      <a href="/dashboard" style={{
+      <a href="/" style={{
         fontWeight: '800', fontSize: '19px', textDecoration: 'none',
         color: '#1a1a1a', marginRight: '20px', letterSpacing: '-0.5px'
       }}>
