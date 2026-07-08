@@ -598,23 +598,33 @@ export function TemplateTimeline({ cvData }) {
 }
 
 // ─── ROUTER ──────────────────────────────────────────────────
+import { TemplateEtudiant, TemplateAlternance, TemplatePortfolio, TemplateSante, TemplateCommercial, TemplateStartup, TemplateClassique, TemplateInternational } from './CVTemplatesExtra'
+
 export function CVTemplate({ cvData, template }) {
   switch(template) {
-    case 'linkedin':      return <TemplateLinkedIn cvData={cvData} />
-    case 'canva':         return <TemplateCanva cvData={cvData} />
-    case 'harvard':       return <TemplateHarvard cvData={cvData} />
-    case 'siliconvalley': return <TemplateSiliconValley cvData={cvData} />
-    case 'moderne':       return <TemplateModerne cvData={cvData} />
-    case 'executive':     return <TemplateExecutive cvData={cvData} />
-    case 'creative':      return <TemplateCreative cvData={cvData} />
-    case 'minimal':       return <TemplateMinimal cvData={cvData} />
-    case 'tech':          return <TemplateTech cvData={cvData} />
-    case 'elegant':       return <TemplateElegant cvData={cvData} />
-    case 'bold':          return <TemplateBold cvData={cvData} />
-    case 'pastel':        return <TemplatePastel cvData={cvData} />
-    case 'corporate':     return <TemplateCorporate cvData={cvData} />
-    case 'swiss':         return <TemplateSwiss cvData={cvData} />
-    case 'timeline':      return <TemplateTimeline cvData={cvData} />
-    default:              return <TemplateFinance cvData={cvData} />
+    case 'linkedin':       return <TemplateLinkedIn cvData={cvData} />
+    case 'canva':          return <TemplateCanva cvData={cvData} />
+    case 'harvard':        return <TemplateHarvard cvData={cvData} />
+    case 'siliconvalley':  return <TemplateSiliconValley cvData={cvData} />
+    case 'moderne':        return <TemplateModerne cvData={cvData} />
+    case 'executive':      return <TemplateExecutive cvData={cvData} />
+    case 'creative':       return <TemplateCreative cvData={cvData} />
+    case 'minimal':        return <TemplateMinimal cvData={cvData} />
+    case 'tech':           return <TemplateTech cvData={cvData} />
+    case 'elegant':        return <TemplateElegant cvData={cvData} />
+    case 'bold':           return <TemplateBold cvData={cvData} />
+    case 'pastel':         return <TemplatePastel cvData={cvData} />
+    case 'corporate':      return <TemplateCorporate cvData={cvData} />
+    case 'swiss':          return <TemplateSwiss cvData={cvData} />
+    case 'timeline':       return <TemplateTimeline cvData={cvData} />
+    case 'etudiant':       return <TemplateEtudiant cvData={cvData} />
+    case 'alternance':     return <TemplateAlternance cvData={cvData} />
+    case 'portfolio':      return <TemplatePortfolio cvData={cvData} />
+    case 'sante':          return <TemplateSante cvData={cvData} />
+    case 'commercial':     return <TemplateCommercial cvData={cvData} />
+    case 'startup':        return <TemplateStartup cvData={cvData} />
+    case 'classique':      return <TemplateClassique cvData={cvData} />
+    case 'international':  return <TemplateInternational cvData={cvData} />
+    default:               return <TemplateFinance cvData={cvData} />
   }
 }
