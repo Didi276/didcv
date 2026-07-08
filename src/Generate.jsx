@@ -6,8 +6,8 @@ import { useState, useEffect } from 'react'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import * as pdfjsLib from 'pdfjs-dist'
-import OffreSearch from './OffreSearch'
 import Navbar from './Navbar'
+import { detecterSecteur, getSecteurConfig, buildPromptCV } from './secteurConfig'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
@@ -66,6 +66,7 @@ function Generate() {
   const [searchParams] = useSearchParams()
   const [showEditor, setShowEditor] = useState(false)
   const [photoManuelle, setPhotoManuelle] = useState(null)
+  const [secteurDetecte, setSecteurDetecte] = useState(null)
   const templateChoisi = searchParams.get('template') || 'finance'
 
   useEffect(() => {
@@ -78,7 +79,19 @@ function Generate() {
       }
     }
     fetchProfile()
+    const prefill = sessionStorage.getItem('offre_prefill')
+    if (prefill) { setOffreEmploi(prefill); sessionStorage.removeItem('offre_prefill') }
   }, [])
+
+  // Détecter le secteur en temps réel quand l'offre change
+  useEffect(() => {
+    if (offreEmploi.length > 50) {
+      const secteur = detecterSecteur(offreEmploi, '')
+      setSecteurDetecte(secteur)
+    } else {
+      setSecteurDetecte(null)
+    }
+  }, [offreEmploi])
 
   const handlePhotoManuelle = (e) => {
     const file = e.target.files[0]
@@ -123,11 +136,7 @@ Accroche: ${profile.accroche}\n\n`
     if (profile.experiences?.length > 0) {
       text += `EXPÉRIENCES (${profile.experiences.length} au total):\n`
       profile.experiences.forEach((exp, i) => {
-        text += `\n[Expérience ${i+1}]\n`
-        text += `Poste: ${exp.poste}\n`
-        text += `Entreprise: ${exp.entreprise}\n`
-        text += `Période: ${exp.periode}\n`
-        text += `Lieu: ${exp.lieu}\n`
+        text += `\n[Expérience ${i+1}]\nPoste: ${exp.poste}\nEntreprise: ${exp.entreprise}\nPériode: ${exp.periode}\nLieu: ${exp.lieu}\n`
         if (exp.missions?.filter(m => m).length > 0) {
           text += `Missions:\n`
           exp.missions.filter(m => m).forEach(m => { text += `  • ${m}\n` })
@@ -159,17 +168,7 @@ Accroche: ${profile.accroche}\n\n`
     return text
   }
 
-  const getDateJour = () => {
-    return new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
-  }
-
-  const getMissionsConfig = (nbExp) => {
-    if (nbExp <= 1) return { missionsPoste: 5, missionsStage: 2, note: "Peu d'expérience : génère exactement 5 missions très détaillées avec chiffres, contexte (taille équipe, budget géré, secteur) et résultats concrets. Remplis bien le CV." }
-    if (nbExp === 2) return { missionsPoste: 4, missionsStage: 2, note: "Exactement 4 missions par poste permanent avec chiffres, 2 missions par stage." }
-    if (nbExp === 3) return { missionsPoste: 4, missionsStage: 2, note: "Exactement 4 missions par poste CDI/CDD avec chiffres obligatoires, 2 missions par stage." }
-    if (nbExp === 4) return { missionsPoste: 3, missionsStage: 2, note: "3 missions par poste permanent avec chiffres, 2 missions par stage. Reste concis." }
-    return { missionsPoste: 2, missionsStage: 1, note: "2 missions max par poste, 1 par stage. Très concis, priorise les postes les plus récents." }
-  }
+  const getDateJour = () => new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 
   const handleGenerate = async () => {
     if (!offreEmploi) { alert("Merci de coller une offre d'emploi !"); return }
@@ -189,11 +188,15 @@ Accroche: ${profile.accroche}\n\n`
     }
 
     const sourceCV = profile ? buildProfileText(profile) : cvTexte
-    const nbExp = profile?.experiences?.length || 3
-    const { missionsPoste, missionsStage, note: noteExp } = getMissionsConfig(nbExp)
+    const nbExp = profile?.experiences?.length || 0
     const dateJour = getDateJour()
     const hasCertifications = profile?.certifications?.filter(c => c.titre).length > 0
     const hasCentresInteret = profile?.centres_interet?.filter(c => c).length > 0
+
+    // ─── Détection secteur + config spécialisée ───
+    const secteur = detecterSecteur(offreEmploi, sourceCV)
+    const config = getSecteurConfig(secteur, nbExp, profile)
+    const promptCV = buildPromptCV(sourceCV, offreEmploi, secteur, config, nbExp, hasCertifications, hasCentresInteret)
 
     const fetchWithRetry = async (url, options, retries = 1) => {
       for (let i = 0; i <= retries; i++) {
@@ -216,91 +219,8 @@ Accroche: ${profile.accroche}\n\n`
           body: JSON.stringify({
             model: 'claude-haiku-4-5-20251001',
             max_tokens: 6000,
-            system: `Tu es un expert RH senior et consultant en optimisation de CV avec 15 ans d'expérience. Tu maîtrises parfaitement les ATS (Applicant Tracking System). Tu retournes TOUJOURS et UNIQUEMENT un JSON valide, sans texte avant ou après, sans balises markdown. Jamais de JSON tronqué.`,
-            messages: [{
-              role: 'user',
-              content: `PROFIL DU CANDIDAT :
-${sourceCV}
-
-OFFRE D'EMPLOI CIBLÉE :
-${offreEmploi}
-
-RÈGLES ABSOLUES — respecte-les toutes sans exception :
-
-1. CHIFFRES OBLIGATOIRES DANS CHAQUE MISSION :
-   Chaque mission DOIT contenir au minimum 1 chiffre ou résultat mesurable.
-   INTERDIT : "Optimisé les processus administratifs" → trop vague
-   OBLIGATOIRE : "Optimisé les processus administratifs réduisant les délais de clôture de 3 jours"
-   Si le candidat ne donne pas de chiffres, estime des ordres de grandeur plausibles selon le contexte (taille d'entreprise, secteur, poste).
-   Verbes d'action forts obligatoires : Piloté, Développé, Optimisé, Managé, Négocié, Réduit, Augmenté, Structuré, Déployé, Coordonné...
-
-2. DISTINCTION STAGE / POSTE PERMANENT :
-   - Poste permanent (CDI, CDD, alternance longue) : ${missionsPoste} missions (vise exactement ce nombre), chacune avec chiffre
-   - Stage (mention "Stage", "Stagiaire", durée < 6 mois) : ${missionsStage} missions maximum, concises mais avec résultat mesurable
-   - ${noteExp}
-
-3. COMPÉTENCES — FORMAT ATS STRICT :
-   Chaque compétence = 1 à 3 mots MAXIMUM. Termes techniques précis reconnus par les ATS.
-   INTERDIT : "Suivi budgétaire et analyse financière" (trop long, non-ATS)
-   OBLIGATOIRE : "Power BI", "SAP FI", "Excel VBA", "IFRS", "Contrôle de gestion", "Reporting financier"
-   Entre 8 et 12 compétences — priorise les mots-clés EXACTS de l'offre, puis les compétences techniques clés du candidat.
-
-4. ACCROCHE / PROFIL — HONNÊTE, VALORISANT ET PERCUTANT (3 à 5 phrases) :
-   Ce bloc est LA première chose qu'un recruteur lit. Il valorise SANS mentir.
-   RÈGLE ABSOLUE D'HONNÊTETÉ : N'attribue JAMAIS au candidat un titre ou poste qu'il n'a pas occupé.
-   Structure obligatoire :
-   - Phrase 1 : qui est vraiment le candidat (formation + domaine d'expertise réel + années d'expérience)
-   - Phrase 2 : sa réalisation la plus forte avec UN chiffre concret tiré de ses vraies expériences
-   - Phrase 3 : ses compétences clés qui font de lui le bon profil pour CE poste (avec mots-clés de l'offre)
-   - Phrase 4-5 (optionnelles) : sa motivation pour évoluer vers ce poste + ce qu'il apporte concrètement
-   INTERDIT : commencer par "Actuellement...", "Doté de...", "Fort de...", "Je suis..."
-   INTERDIT : mentir sur le titre, les années d'expérience dans un poste non occupé
-   OBLIGATOIRE : ton humain, engagé, pas robotique
-
-5. LINKEDIN : Si linkedin est vide ou absent dans le profil, mets "" dans le JSON.
-
-6. EXPÉRIENCES : Inclus les ${nbExp} expériences dans l'ordre chronologique inverse (plus récente en premier).
-
-7. CERTIFICATIONS : ${hasCertifications ? "Inclus TOUTES les certifications — éléments différenciants importants." : "Tableau vide []."}
-
-8. CENTRES D'INTÉRÊT : ${hasCentresInteret ? "Inclus les centres d'intérêt du candidat." : "Tableau vide []. NE PAS inventer de centres d'intérêt."}
-
-9. OPTIMISATION ATS : Score cible 95%+. Mots-clés EXACTS de l'offre dans missions et compétences.
-
-10. FORMATIONS — DESCRIPTION OBLIGATOIRE :
-   Pour CHAQUE formation, génère une description (1 phrase courte) mentionnant les matières principales.
-   OBLIGATOIRE même si le candidat ne l'a pas renseignée.
-
-Retourne UNIQUEMENT ce JSON valide et complet :
-
-{
-  "prenom": "...",
-  "nom": "...",
-  "titre": "Titre EXACT calqué sur le poste visé",
-  "email": "...",
-  "telephone": "...",
-  "ville": "...",
-  "linkedin": "",
-  "accroche": "Profil en 3-5 phrases percutant et honnête.",
-  "experiences": [
-    {
-      "poste": "...",
-      "entreprise": "...",
-      "periode": "...",
-      "lieu": "...",
-      "missions": ["Verbe d'action + contexte + CHIFFRE obligatoire", "..."]
-    }
-  ],
-  "formations": [
-    {"diplome": "...", "etablissement": "...", "periode": "...", "mention": "...", "description": "..."}
-  ],
-  "competences": ["Mot-clé ATS court", "Excel VBA", "Power BI", "SAP", "..."],
-  "langues": [{"langue": "...", "niveau": "..."}],
-  "certifications": [],
-  "centres_interet": [],
-  "atouts": ["Atout 1", "Atout 2", "Atout 3"]
-}`
-            }]
+            system: `Tu es un expert RH senior et consultant en optimisation de CV avec 15 ans d'expérience dans le secteur ${config.label}. Tu maîtrises parfaitement les ATS et les codes de chaque secteur professionnel. Tu retournes TOUJOURS et UNIQUEMENT un JSON valide, sans texte avant ou après, sans balises markdown. Jamais de JSON tronqué.`,
+            messages: [{ role: 'user', content: promptCV }]
           })
         }),
 
@@ -312,7 +232,7 @@ Retourne UNIQUEMENT ce JSON valide et complet :
             max_tokens: 1500,
             messages: [{
               role: 'user',
-              content: `Tu es un expert en rédaction de lettres de motivation professionnelles.
+              content: `Tu es un expert en rédaction de lettres de motivation pour le secteur ${config.label}.
 
 PROFIL DU CANDIDAT :
 ${sourceCV}
@@ -322,11 +242,7 @@ ${offreEmploi}
 
 DATE DU JOUR : ${dateJour}
 
-MISSION : Rédige une lettre de motivation parfaite avec le format ci-dessous.
-
-ANALYSE L'OFFRE pour trouver : nom de l'entreprise (obligatoire), service destinataire, nom du recruteur si mentionné, intitulé exact du poste.
-
-GÉNÈRE LA LETTRE avec ces marqueurs EXACTS dans cet ordre — ne change pas les marqueurs :
+GÉNÈRE LA LETTRE avec ces marqueurs EXACTS :
 
 ||EXP||
 [Prénom Nom]
@@ -335,32 +251,26 @@ GÉNÈRE LA LETTRE avec ces marqueurs EXACTS dans cet ordre — ne change pas le
 [Ville du candidat]
 ||DEST||
 [Nom de l'entreprise]
-[Service RH ou service trouvé dans l'offre]
-[Adresse de l'entreprise si trouvée, sinon rien]
+[Service RH]
 ||DATE||
-[Ville du candidat], le ${dateJour}
+[Ville], le ${dateJour}
 ||BODY||
 Objet : Candidature au poste de [intitulé EXACT du poste]
 
 [Madame, Monsieur,]
 
-[PARAGRAPHE 1 — 3 phrases : accroche forte montrant la connaissance de l'entreprise/secteur]
+[PARAGRAPHE 1 — 3 phrases : accroche adaptée au secteur ${config.label}, connaissance de l'entreprise]
 
-[PARAGRAPHE 2 — 4 phrases : expériences pertinentes AVEC chiffres obligatoires]
+[PARAGRAPHE 2 — 4 phrases : expériences pertinentes AVEC chiffres, vocabulaire du secteur ${config.label}]
 
-[PARAGRAPHE 3 — 3 phrases : ce qui différencie le candidat]
+[PARAGRAPHE 3 — 3 phrases : valeur ajoutée, adéquation avec le poste]
 
-[PARAGRAPHE 4 — 2 phrases : disponibilité pour entretien, remerciement]
+[PARAGRAPHE 4 — 2 phrases : disponibilité, remerciement]
 
 Cordialement,
-
 [Prénom Nom]
 
-RÈGLES :
-- NE PAS commencer par "Actuellement" ou "Je me permets" — INTERDIT
-- Corps de la lettre : 300 à 380 mots
-- Chiffres dans le paragraphe 2 : OBLIGATOIRES
-- Retourne UNIQUEMENT le texte avec les marqueurs, rien d'autre`
+RÈGLES : 300 à 380 mots. Ton adapté au secteur. Chiffres obligatoires. Retourne UNIQUEMENT le texte avec les marqueurs.`
             }]
           })
         })
@@ -378,9 +288,9 @@ RÈGLES :
         const match = jsonPropre.match(/\{[\s\S]*\}/)
         if (match) {
           try { json = JSON.parse(match[0]) }
-          catch { throw new Error("Le CV généré est incomplet. Réessaie — l'offre est peut-être trop longue.") }
+          catch { throw new Error("Le CV généré est incomplet. Réessaie.") }
         } else {
-          throw new Error("Le CV généré est incomplet. Réessaie — l'offre est peut-être trop longue.")
+          throw new Error("Le CV généré est incomplet. Réessaie.")
         }
       }
 
@@ -401,6 +311,7 @@ RÈGLES :
       if (!json.certifications) json.certifications = []
       if (!json.centres_interet) json.centres_interet = []
       json._nbExp = json.experiences?.length || 0
+      json._secteur = secteur
 
       setCvData(json)
       setLettre(lettreGeneree)
@@ -419,7 +330,7 @@ RÈGLES :
     } catch (error) {
       const msg = error.message?.includes('incomplet') || error.message?.includes('invalide')
         ? error.message
-        : 'Une erreur est survenue lors de la génération. Réessaie dans quelques secondes.'
+        : 'Une erreur est survenue. Réessaie dans quelques secondes.'
       alert(msg)
       console.error(error)
     }
@@ -447,58 +358,39 @@ RÈGLES :
     const objetIdx = lines.findIndex(l => l.trim().toLowerCase().startsWith('objet'))
     const headerLines = objetIdx > -1 ? lines.slice(0, objetIdx).filter(l => l.trim()) : []
     const bodyLines = objetIdx > -1 ? lines.slice(objetIdx) : lines
-    let expediteurLines = []
-    let destinataireLines = []
-    let dateLine = ''
-    let phase = 'expediteur'
-    let count = 0
+    let expediteurLines = [], destinataireLines = [], dateLine = '', phase = 'expediteur', count = 0
     for (const line of headerLines) {
       const t = line.trim()
-      if (/le\s+\d{1,2}\s+\w+\s+\d{4}/i.test(t) || /le\s+\d{2}\/\d{2}\/\d{4}/i.test(t)) { dateLine = t; continue }
+      if (/le\s+\d{1,2}\s+\w+\s+\d{4}/i.test(t)) { dateLine = t; continue }
       if (/@|^\+/.test(t) && phase === 'expediteur') { expediteurLines.push(t); count++; continue }
-      if (phase === 'expediteur' && count >= 2 && !/@/.test(t) && !/^\+/.test(t) && !/linkedin/i.test(t)) phase = 'destinataire'
+      if (phase === 'expediteur' && count >= 2 && !/@/.test(t) && !/^\+/.test(t)) phase = 'destinataire'
       if (phase === 'expediteur') { expediteurLines.push(t); count++ }
       else destinataireLines.push(t)
     }
-    const marginL = 20
-    const marginR = 190
+    const marginL = 20, marginR = 190
     let y = 20
-    expediteurLines.forEach((l, i) => {
-      pdf.setFontSize(11)
-      pdf.setFont('helvetica', i === 0 ? 'bold' : 'normal')
-      pdf.text(l, marginL, y)
-      y += 5.5
-    })
+    expediteurLines.forEach((l, i) => { pdf.setFontSize(11); pdf.setFont('helvetica', i === 0 ? 'bold' : 'normal'); pdf.text(l, marginL, y); y += 5.5 })
     let yRight = 20
-    destinataireLines.forEach((l, i) => {
-      pdf.setFontSize(11)
-      pdf.setFont('helvetica', i === 0 ? 'bold' : 'normal')
-      pdf.text(l, marginR, yRight, { align: 'right' })
-      yRight += 5.5
-    })
-    if (dateLine) {
-      pdf.setFont('helvetica', 'normal')
-      pdf.setFontSize(11)
-      pdf.text(dateLine, marginR, yRight + 4, { align: 'right' })
-    }
+    destinataireLines.forEach((l, i) => { pdf.setFontSize(11); pdf.setFont('helvetica', i === 0 ? 'bold' : 'normal'); pdf.text(l, marginR, yRight, { align: 'right' }); yRight += 5.5 })
+    if (dateLine) { pdf.setFont('helvetica', 'normal'); pdf.setFontSize(11); pdf.text(dateLine, marginR, yRight + 4, { align: 'right' }) }
     y = Math.max(y, yRight + (dateLine ? 10 : 0)) + 12
-    pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(11)
-    const bodyText = bodyLines.join('\n')
-    const splitBody = pdf.splitTextToSize(bodyText, 170)
-    splitBody.forEach(line => {
-      if (y > 280) { pdf.addPage(); y = 20 }
-      pdf.text(line, marginL, y)
-      y += 5.5
-    })
+    pdf.setFont('helvetica', 'normal'); pdf.setFontSize(11)
+    const splitBody = pdf.splitTextToSize(bodyLines.join('\n'), 170)
+    splitBody.forEach(line => { if (y > 280) { pdf.addPage(); y = 20 } pdf.text(line, marginL, y); y += 5.5 })
     pdf.save(`Lettre-Motivation-${cvData.prenom}-${cvData.nom}.pdf`)
+  }
+
+  // Labels lisibles pour les secteurs
+  const secteurLabels = {
+    tech: '💻 Tech', sante: '🏥 Santé', btp: '🏗️ BTP', restauration: '🍽️ Restauration',
+    commerce: '🛒 Commerce', transport: '🚛 Transport', creatif: '🎨 Créatif',
+    securite: '🔒 Sécurité', beaute: '💅 Beauté', junior: '🎓 Junior/Étudiant',
+    cadre: '👔 Cadre', tertiaire: '📊 Tertiaire'
   }
 
   return (
     <div className="generate-page">
-      <nav>
-        <Navbar currentPage="generate" />
-      </nav>
+      <Navbar currentPage="generate" />
 
       <div className="generate-wrap">
         <div className="generate-left">
@@ -524,7 +416,6 @@ RÈGLES :
                     {profile.experiences?.length > 0 && (
                       <div style={{fontSize:'11px',color:'#16a34a',marginTop:'2px'}}>
                         ✓ {profile.experiences.length} expérience{profile.experiences.length > 1 ? 's' : ''}
-                        {profile.certifications?.filter(c=>c.titre).length > 0 && ` · ${profile.certifications.filter(c=>c.titre).length} certification${profile.certifications.filter(c=>c.titre).length > 1 ? 's' : ''}`}
                       </div>
                     )}
                   </div>
@@ -587,17 +478,25 @@ RÈGLES :
             </div>
           )}
 
-          <OffreSearch onSelectOffre={(texte) => setOffreEmploi(texte)} />
-
           <div className="offre-box">
             <div className="upload-label">{profile ? '1.' : '2.'} L'offre d'emploi</div>
             <textarea
               className="offre-textarea"
-              placeholder="Colle ici le texte complet de l'offre d'emploi, ou cherche une offre ci-dessus..."
+              placeholder="Colle ici le texte complet de l'offre d'emploi..."
               value={offreEmploi}
               onChange={(e) => setOffreEmploi(e.target.value)}
               rows={8}
             />
+            {/* Badge secteur détecté */}
+            {secteurDetecte && (
+              <div style={{marginTop:'8px',display:'flex',alignItems:'center',gap:'6px',fontSize:'12px',color:'#555'}}>
+                <span>Secteur détecté :</span>
+                <span style={{background:'#eff4ff',color:'#1a56db',border:'1px solid #c7d9ff',padding:'2px 10px',borderRadius:'20px',fontWeight:'600'}}>
+                  {secteurLabels[secteurDetecte] || secteurDetecte}
+                </span>
+                <span style={{color:'#9ca3af'}}>— prompt IA adapté automatiquement</span>
+              </div>
+            )}
           </div>
 
           <button className="btn-generate" onClick={handleGenerate} disabled={loading}>
