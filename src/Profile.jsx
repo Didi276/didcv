@@ -31,6 +31,8 @@ export default function Profile() {
   const [activeSection, setActiveSection] = useState('import')
   const [importing, setImporting] = useState(false)
   const [importDone, setImportDone] = useState(false)
+  const [savedCvs, setSavedCvs] = useState([])
+  const [showSavedCvs, setShowSavedCvs] = useState(false)
 
   const [prenom, setPrenom] = useState('')
   const [nom, setNom] = useState('')
@@ -73,11 +75,43 @@ export default function Profile() {
         if (data.centres_interet?.length) setCentresInteret(data.centres_interet)
         if (data.prenom) setImportDone(true)
       }
+
+      // Charger les CVs sauvegardés pour import rapide
+      const { data: cvsData } = await supabase
+        .from('cvs').select('id, cv_data, template, offre_titre, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(5)
+      if (cvsData?.length) setSavedCvs(cvsData)
     }
     init()
   }, [])
 
   // ─── IMPORT PDF ─────────────────────────────────────────────
+  const importFromSavedCV = (cv) => {
+    const d = cv.cv_data
+    // Infos de base — toujours sans erreur même si absent
+    setPrenom(d.prenom || '')
+    setNom(d.nom || '')
+    setEmail(d.email || '')
+    setTelephone(d.telephone || '')
+    setVille(d.ville || '')
+    setLinkedin(d.linkedin || '')
+    setTitre(d.titre || '')
+    setAccroche(d.accroche || '')
+    // Sections optionnelles — ne plante pas si vides
+    if (d.experiences?.length) setExperiences(d.experiences)
+    if (d.formations?.length) setFormations(d.formations)
+    if (d.competences?.filter(c => c).length) setCompetences(d.competences.filter(c => c))
+    if (d.langues?.filter(l => l.langue).length) setLangues(d.langues.filter(l => l.langue))
+    if (d.certifications?.filter(c => c.titre).length) setCertifications(d.certifications.filter(c => c.titre))
+    // centres_interet est optionnel — pas d'erreur si absent
+    if (d.centres_interet?.filter(c => c).length) setCentresInteret(d.centres_interet.filter(c => c))
+    setImportDone(true)
+    setShowSavedCvs(false)
+    setActiveSection('verification')
+  }
+
   const handleImportCV = async (e) => {
     const file = e.target.files[0]
     if (!file) return
@@ -163,27 +197,30 @@ Retourne UNIQUEMENT ce JSON valide:
         else throw new Error('JSON invalide dans la reponse IA')
       }
 
-      // 3. Remplir les champs
-      if (json.prenom) setPrenom(json.prenom)
-      if (json.nom) setNom(json.nom)
-      if (json.email) setEmail(json.email)
-      if (json.telephone) setTelephone(json.telephone)
-      if (json.ville) setVille(json.ville)
-      if (json.linkedin) setLinkedin(json.linkedin)
-      if (json.titre) setTitre(json.titre)
-      if (json.accroche) setAccroche(json.accroche)
-      if (json.experiences?.length) setExperiences(json.experiences.map(exp => ({
-        ...exp,
-        missions: exp.missions?.filter(m => m) || ['']
-      })))
-      if (json.formations?.length) setFormations(json.formations)
+      // 3. Remplir les champs - toujours sans erreur même si section absente
+      setPrenom(json.prenom || '')
+      setNom(json.nom || '')
+      setEmail(json.email || email)
+      setTelephone(json.telephone || '')
+      setVille(json.ville || '')
+      setLinkedin(json.linkedin || '')
+      setTitre(json.titre || '')
+      setAccroche(json.accroche || '')
+      if (json.experiences?.filter(e => e.poste || e.entreprise).length) {
+        setExperiences(json.experiences.map(exp => ({
+          ...exp,
+          missions: exp.missions?.filter(m => m) || ['']
+        })))
+      }
+      if (json.formations?.filter(f => f.diplome || f.etablissement).length) setFormations(json.formations)
       if (json.competences?.filter(c => c).length) setCompetences(json.competences.filter(c => c))
       if (json.langues?.filter(l => l.langue).length) setLangues(json.langues.filter(l => l.langue))
+      // Sections optionnelles — ne plante pas si absentes du CV
       if (json.certifications?.filter(c => c.titre).length) setCertifications(json.certifications.filter(c => c.titre))
       if (json.centres_interet?.filter(c => c).length) setCentresInteret(json.centres_interet.filter(c => c))
 
       setImportDone(true)
-      setActiveSection('infos')
+      setActiveSection('verification') // Rediriger vers écran de vérification
 
     } catch (err) {
       console.error('Erreur import CV:', err)
@@ -261,12 +298,13 @@ Retourne UNIQUEMENT ce JSON valide:
   const blurStyle = (e) => { e.target.style.borderColor = '#e5e7eb' }
 
   const SECTIONS = [
-    { id: 'import',      label: '📥 Import PDF' },
-    { id: 'infos',       label: '👤 Infos' },
-    { id: 'experiences', label: '💼 Experiences' },
-    { id: 'formations',  label: '🎓 Formations' },
-    { id: 'competences', label: '⚡ Competences' },
-    { id: 'plus',        label: '➕ Langues & Plus' },
+    { id: 'import',       label: '📥 Import PDF' },
+    { id: 'verification', label: '✅ Vérification' },
+    { id: 'infos',        label: '👤 Infos' },
+    { id: 'experiences',  label: '💼 Experiences' },
+    { id: 'formations',   label: '🎓 Formations' },
+    { id: 'competences',  label: '⚡ Competences' },
+    { id: 'plus',         label: '➕ Langues & Plus' },
   ]
 
   return (
@@ -302,51 +340,157 @@ Retourne UNIQUEMENT ce JSON valide:
 
         {/* ─── IMPORT PDF ─── */}
         {activeSection === 'import' && (
-          <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '40px', textAlign: 'center' }}>
+          <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '32px' }}>
             {importing ? (
-              <div>
+              <div style={{ textAlign: 'center', padding: '20px' }}>
                 <div style={{ width: '48px', height: '48px', border: '4px solid #ede9fe', borderTop: '4px solid #4f46e5', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 20px' }} />
-                <div style={{ fontSize: '18px', fontWeight: '700', color: '#111', marginBottom: '8px' }}>Analyse de ton CV en cours...</div>
-                <div style={{ fontSize: '14px', color: '#9ca3af' }}>L\'IA extrait toutes tes informations</div>
+                <div style={{ fontSize: '18px', fontWeight: '700', color: '#111', marginBottom: '8px' }}>Analyse en cours...</div>
+                <div style={{ fontSize: '14px', color: '#9ca3af' }}>L'IA extrait tes informations</div>
                 <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
               </div>
             ) : importDone ? (
-              <div>
-                <div style={{ fontSize: '56px', marginBottom: '16px' }}>✅</div>
-                <div style={{ fontSize: '20px', fontWeight: '700', color: '#111', marginBottom: '8px' }}>Profil importe avec succes !</div>
-                <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '28px' }}>Verifie et ajuste tes informations dans les onglets a cote.</div>
-                <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '48px', marginBottom: '14px' }}>✅</div>
+                <div style={{ fontSize: '18px', fontWeight: '700', color: '#111', marginBottom: '8px' }}>Profil importé avec succès !</div>
+                <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '24px' }}>Vérifie et ajuste tes informations dans les onglets.</div>
+                <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
                   <button onClick={() => setActiveSection('infos')}
-                    style={{ padding: '12px 24px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
-                    Verifier mes infos
+                    style={{ padding: '11px 22px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+                    Vérifier mes infos
                   </button>
-                  <label style={{ padding: '12px 24px', background: '#f3f4f6', color: '#374151', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>
+                  <label style={{ padding: '11px 22px', background: '#f3f4f6', color: '#374151', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>
                     <input type="file" accept=".pdf" onChange={handleImportCV} style={{ display: 'none' }} />
-                    Reimporter un nouveau CV
+                    Importer un autre PDF
                   </label>
                 </div>
               </div>
             ) : (
               <div>
-                <div style={{ fontSize: '56px', marginBottom: '16px' }}>📄</div>
-                <div style={{ fontSize: '20px', fontWeight: '700', color: '#111', marginBottom: '8px' }}>Importe ton CV actuel</div>
-                <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px', lineHeight: '1.6' }}>
-                  L'IA analyse ton CV PDF et remplit automatiquement<br />toutes les sections de ton profil.
+                <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#111', margin: '0 0 6px', textAlign: 'center' }}>Remplis ton profil automatiquement</h3>
+                <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 28px', textAlign: 'center', lineHeight: '1.6' }}>
+                  Choisis une source pour importer tes informations
+                </p>
+
+                {/* Option 1 : CV sauvegardé sur DidCV */}
+                {savedCvs.length > 0 && (
+                  <div style={{ marginBottom: '20px', padding: '20px', background: '#f8f9ff', borderRadius: '12px', border: '1px solid #ede9fe' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+                      <div>
+                        <div style={{ fontSize: '14px', fontWeight: '700', color: '#4f46e5', marginBottom: '2px' }}>⚡ Depuis un CV DidCV</div>
+                        <div style={{ fontSize: '12px', color: '#9ca3af' }}>Recommandé — import instantané sans IA</div>
+                      </div>
+                    </div>
+                    {!showSavedCvs ? (
+                      <button onClick={() => setShowSavedCvs(true)}
+                        style={{ width: '100%', padding: '11px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+                        Choisir parmi mes CV générés ({savedCvs.length})
+                      </button>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {savedCvs.map(cv => (
+                          <button key={cv.id} onClick={() => importFromSavedCV(cv)}
+                            style={{ padding: '10px 14px', background: '#fff', border: '1.5px solid #ede9fe', borderRadius: '9px', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div>
+                              <div style={{ fontSize: '13px', fontWeight: '600', color: '#111' }}>{cv.cv_data.prenom} {cv.cv_data.nom}</div>
+                              <div style={{ fontSize: '11px', color: '#9ca3af' }}>{cv.cv_data.titre} · {cv.template}</div>
+                            </div>
+                            <span style={{ fontSize: '12px', color: '#4f46e5', fontWeight: '600' }}>Importer →</span>
+                          </button>
+                        ))}
+                        <button onClick={() => setShowSavedCvs(false)}
+                          style={{ background: 'none', border: 'none', color: '#9ca3af', fontSize: '12px', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline', textAlign: 'center', padding: '4px' }}>
+                          Annuler
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Option 2 : PDF externe */}
+                <div style={{ padding: '20px', background: '#fafafa', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
+                  <div style={{ fontSize: '14px', fontWeight: '700', color: '#374151', marginBottom: '4px' }}>📄 Depuis un CV PDF externe</div>
+                  <div style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '14px', lineHeight: '1.5' }}>
+                    Fonctionne avec les CVs Word exportés en PDF, les PDFs textuels.<br />
+                    <span style={{ color: '#f59e0b', fontWeight: '600' }}>⚠️ Ne fonctionne pas</span> avec les CVs générés par DidCV (image).
+                  </div>
+                  <label style={{ display: 'block', padding: '11px', background: '#fff', border: '1.5px dashed #d1d5db', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', textAlign: 'center', color: '#374151' }}>
+                    <input type="file" accept=".pdf" onChange={handleImportCV} style={{ display: 'none' }} />
+                    📥 Choisir un fichier PDF
+                  </label>
                 </div>
-                <div style={{ fontSize: '13px', color: '#9ca3af', marginBottom: '32px' }}>
-                  Tu pourras ensuite verifier et ajuster chaque information.
-                </div>
-                <label style={{ display: 'inline-block', padding: '14px 32px', background: '#4f46e5', color: '#fff', borderRadius: '10px', fontSize: '15px', fontWeight: '700', cursor: 'pointer' }}>
-                  <input type="file" accept=".pdf" onChange={handleImportCV} style={{ display: 'none' }} />
-                  📥 Importer mon CV PDF
-                </label>
-                <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '16px' }}>PDF uniquement - max 10 Mo</div>
+
                 <button onClick={() => setActiveSection('infos')}
                   style={{ display: 'block', margin: '16px auto 0', background: 'none', border: 'none', color: '#9ca3af', fontSize: '13px', cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit' }}>
                   Remplir manuellement
                 </button>
               </div>
             )}
+          </div>
+        )}
+
+        {/* ─── VÉRIFICATION ─── */}
+        {activeSection === 'verification' && (
+          <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '32px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+              <div style={{ fontSize: '48px', marginBottom: '14px' }}>🎉</div>
+              <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#111', margin: '0 0 10px' }}>
+                Profil importé avec succès !
+              </h2>
+              <p style={{ fontSize: '14px', color: '#6b7280', margin: 0, lineHeight: '1.6' }}>
+                L'IA a extrait tes informations. Vérifie que tout est correct avant de sauvegarder.
+              </p>
+            </div>
+
+            {/* Récap des infos importées */}
+            <div style={{ background: '#f8f9ff', borderRadius: '12px', border: '1px solid #ede9fe', padding: '20px', marginBottom: '24px' }}>
+              <div style={{ fontSize: '13px', fontWeight: '700', color: '#4f46e5', marginBottom: '14px' }}>
+                📋 Informations importées
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', fontSize: '13px' }}>
+                {[
+                  ['Prénom', prenom], ['Nom', nom], ['Email', email],
+                  ['Téléphone', telephone], ['Ville', ville], ['Titre', titre],
+                ].map(([label, val]) => (
+                  <div key={label} style={{ display: 'flex', gap: '6px' }}>
+                    <span style={{ color: '#9ca3af', minWidth: '70px' }}>{label} :</span>
+                    <span style={{ color: val ? '#111' : '#f59e0b', fontWeight: val ? '500' : '400' }}>
+                      {val || '⚠️ Non trouvé'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginTop: '12px', display: 'flex', gap: '16px', fontSize: '13px' }}>
+                <span style={{ color: '#16a34a' }}>✓ {experiences.filter(e => e.poste).length} expérience(s)</span>
+                <span style={{ color: '#16a34a' }}>✓ {formations.filter(f => f.diplome).length} formation(s)</span>
+                <span style={{ color: '#16a34a' }}>✓ {competences.filter(c => c).length} compétence(s)</span>
+                <span style={{ color: '#16a34a' }}>✓ {langues.filter(l => l.langue).length} langue(s)</span>
+              </div>
+            </div>
+
+            {/* Avertissement */}
+            <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '10px', padding: '14px 16px', marginBottom: '24px', display: 'flex', gap: '10px' }}>
+              <span style={{ fontSize: '18px', flexShrink: 0 }}>⚠️</span>
+              <div style={{ fontSize: '13px', color: '#92400e', lineHeight: '1.6' }}>
+                <strong>Vérifie bien tes informations avant de sauvegarder.</strong><br />
+                L'IA peut faire des erreurs — contrôle les dates, les intitulés de poste et les missions. Corrige ce qui ne va pas dans les onglets.
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              <button onClick={() => setActiveSection('infos')}
+                style={{ flex: 1, padding: '12px 20px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+                👤 Vérifier mes infos
+              </button>
+              <button onClick={() => setActiveSection('experiences')}
+                style={{ flex: 1, padding: '12px 20px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
+                💼 Vérifier mes expériences
+              </button>
+            </div>
+            <button onClick={handleSave}
+              style={{ width: '100%', marginTop: '10px', padding: '12px', background: '#16a34a', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+              {saving ? '⏳ Sauvegarde...' : saved ? '✅ Sauvegardé !' : '💾 Tout semble bon — Sauvegarder'}
+            </button>
           </div>
         )}
 
