@@ -99,7 +99,7 @@ export default function Home() {
           {/* Texte gauche */}
           <div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#ede9fe', color: '#5b21b6', padding: '5px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '600', marginBottom: '24px', letterSpacing: '0.3px' }}>
-              ✨ Propulsé par l'IA — Gratuit pour commencer
+              ✨ Propulsé par l'IA - Gratuit pour commencer
             </div>
             <h1 style={{ fontSize: '52px', fontWeight: '800', lineHeight: '1.1', letterSpacing: '-2px', margin: '0 0 20px', color: '#0f0f1a' }}>
               Crée ton CV<br />
@@ -107,7 +107,7 @@ export default function Home() {
               30 secondes.
             </h1>
             <p style={{ fontSize: '17px', color: '#6b7280', lineHeight: '1.7', margin: '0 0 36px', maxWidth: '440px' }}>
-              Choisis un template, colle ton offre d'emploi — l'IA génère un CV optimisé ATS et une lettre de motivation personnalisée. Télécharge, postule.
+              Choisis un template, colle ton offre d'emploi - l'IA génère un CV optimisé ATS et une lettre de motivation personnalisée. Télécharge, postule.
             </p>
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '20px' }}>
               <a href="/auth" style={{
@@ -152,7 +152,7 @@ export default function Home() {
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#22c55e', flexShrink: 0 }} />
               <div>
                 <div style={{ fontSize: '11px', fontWeight: '700', color: '#111' }}>Score ATS</div>
-                <div style={{ fontSize: '10px', color: '#6b7280' }}>95% — Excellent</div>
+                <div style={{ fontSize: '10px', color: '#6b7280' }}>95% - Excellent</div>
               </div>
             </div>
 
@@ -184,7 +184,7 @@ export default function Home() {
             27 templates professionnels
           </h2>
           <p style={{ fontSize: '16px', color: '#6b7280', margin: 0 }}>
-            Pour tous les profils — bureau, terrain, santé, création, junior...
+            Pour tous les profils - bureau, terrain, santé, création, junior...
           </p>
         </div>
 
@@ -276,7 +276,7 @@ export default function Home() {
               { icon: '🤖', title: 'CV généré par IA', desc: "L'IA analyse l'offre et génère un CV taillé pour passer tous les filtres ATS. Score 95%+." },
               { icon: '✉️', title: 'Lettre de motivation', desc: "Lettre personnalisée générée automatiquement, adaptée au poste et à l'entreprise." },
               { icon: '🎨', title: '27 templates', desc: 'Pour tous les profils : tertiaire, tech, santé, BTP, restauration, étudiant, international...' },
-              { icon: '✏️', title: 'Éditeur intégré', desc: 'Modifie chaque section directement en ligne — missions, compétences, mise en forme.' },
+              { icon: '✏️', title: 'Éditeur intégré', desc: 'Modifie chaque section directement en ligne - missions, compétences, mise en forme.' },
               { icon: '🔍', title: 'Recherche d\'offres', desc: 'Parcours des milliers d\'offres en temps réel et génère ton CV pour postuler en 1 clic.' },
               { icon: '📊', title: 'Dashboard personnel', desc: 'Tous tes CV classés par offre. Modifie, télécharge, duplique à tout moment.' },
             ].map(f => (
