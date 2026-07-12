@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
@@ -10,6 +10,16 @@ import Navbar from './Navbar'
 import { detecterSecteur, getSecteurConfig, buildPromptCV } from './secteurConfig'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString()
+
+function useWidth() {
+  const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
+  useEffect(() => {
+    const fn = () => setW(window.innerWidth)
+    window.addEventListener('resize', fn)
+    return () => window.removeEventListener('resize', fn)
+  }, [])
+  return w
+}
 
 const ADMIN_EMAILS = ['fernandochokki@gmail.com', 'chokkifernando@gmail.com', 'carlinazon@gmail.com']
 
@@ -56,6 +66,9 @@ function LettreRenderer({ lettre }) {
 export default function Generate() {
   const [searchParams] = useSearchParams()
   const templateChoisi = searchParams.get('template') || 'finance'
+  const w = useWidth()
+  const isMobile = w < 768
+  const [mobileTab, setMobileTab] = useState('form')
 
   const [user, setUser] = useState(null)
   const [profile, setProfile] = useState(null)
@@ -341,10 +354,22 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
     <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
       <Navbar currentPage="generate" />
 
-      <div style={{ display: 'grid', gridTemplateColumns: '380px 1fr', height: 'calc(100vh - 58px)' }}>
+      {/* Onglets mobile */}
+      {isMobile && (
+        <div style={{ display: 'flex', background: '#fff', borderBottom: '1px solid #f0f0f0', position: 'sticky', top: '58px', zIndex: 50 }}>
+          {[['form', '📝 Formulaire'], ['preview', '👁 Apercu']].map(([tab, label]) => (
+            <button key={tab} onClick={() => setMobileTab(tab)}
+              style={{ flex: 1, padding: '12px', border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '700', color: mobileTab === tab ? '#4f46e5' : '#9ca3af', borderBottom: mobileTab === tab ? '2px solid #4f46e5' : '2px solid transparent', transition: 'all 0.15s' }}>
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div style={{ display: isMobile ? 'block' : 'grid', gridTemplateColumns: '380px 1fr', height: isMobile ? 'auto' : 'calc(100vh - 58px)' }}>
 
         {/* ─── PANNEAU GAUCHE ─────────────────────────────── */}
-        <div style={{ background: '#fff', borderRight: '1px solid #f0f0f0', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ background: '#fff', borderRight: isMobile ? 'none' : '1px solid #f0f0f0', overflowY: 'auto', display: isMobile && mobileTab !== 'form' ? 'none' : 'flex', flexDirection: 'column', height: isMobile ? 'auto' : '100%' }}>
 
           {/* Header panneau */}
           <div style={{ padding: '24px 24px 0', flexShrink: 0 }}>
@@ -550,6 +575,12 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
 
             {cvData && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '10px' }}>
+                {isMobile && (
+                  <button onClick={() => setMobileTab('preview')}
+                    style={{ padding: '11px', background: '#f0fdf4', color: '#16a34a', border: '1.5px solid #86efac', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+                    👁 Voir mon CV
+                  </button>
+                )}
                 <button onClick={() => setShowEditor(true)}
                   style={{ padding: '11px', background: '#fff', color: '#4f46e5', border: '1.5px solid #4f46e5', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
                   ✏️ Modifier mon CV
@@ -563,7 +594,7 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
         </div>
 
         {/* ─── PANNEAU DROIT ──────────────────────────────── */}
-        <div style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', background: '#f0f0f5' }}>
+        <div style={{ overflowY: 'auto', display: isMobile && mobileTab !== 'preview' ? 'none' : 'flex', flexDirection: 'column', background: '#f0f0f5', minHeight: isMobile ? '80vh' : 'auto' }}>
 
           {cvData ? (
             <>
@@ -594,9 +625,9 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
               </div>
 
               {/* Contenu */}
-              <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '32px 24px' }}>
+              <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: isMobile ? '16px' : '32px 24px' }}>
                 {activeTab === 'cv' ? (
-                  <div style={{ boxShadow: '0 8px 40px rgba(0,0,0,0.15)', borderRadius: '4px', overflow: 'hidden' }}>
+                  <div style={{ transform: isMobile ? `scale(${Math.min(0.45, (w-32)/794)})` : 'scale(1)', transformOrigin: 'top center', boxShadow: '0 8px 40px rgba(0,0,0,0.15)', borderRadius: '4px', overflow: 'hidden', marginBottom: isMobile ? `-${Math.round(1123*(1-Math.min(0.45,(w-32)/794)))}px` : 0 }}>
                     <CVTemplate cvData={cvData} template={templateChoisi} customColor={customColor} />
                   </div>
                 ) : (
