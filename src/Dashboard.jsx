@@ -3,8 +3,7 @@ import { supabase } from './supabase'
 import { CVTemplate } from './CVTemplates'
 import CVEditorBlocks from './CVEditorBlocks'
 import Navbar from './Navbar'
-import jsPDF from 'jspdf'
-import html2canvas from 'html2canvas'
+import { downloadCVasPDF, downloadLettreasePDF } from './pdfUtils'
 
 function useWidth() {
   const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
@@ -51,20 +50,17 @@ export default function Dashboard() {
     if (selectedCv?.id === id) setSelectedCv(null)
   }
 
-  const handleDownloadCV = async (cv, e) => {
+  const handleDownloadCV = (cv, e) => {
     e?.stopPropagation()
     setDownloading(cv.id)
     setSelectedCv(cv)
     setShowLettre(false)
-    setTimeout(async () => {
+    setTimeout(() => {
       const element = document.getElementById('cv-to-print')
       if (!element) { setDownloading(null); return }
-      const canvas = await html2canvas(element, { scale: 4, useCORS: true, backgroundColor: '#ffffff', width: 794, height: 1123, logging: false })
-      const pdf = new jsPDF('p', 'mm', 'a4', true)
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 210, 297, '', 'FAST')
-      pdf.save(`CV-${cv.cv_data.prenom}-${cv.cv_data.nom}.pdf`)
+      downloadCVasPDF(element, cv.cv_data.prenom, cv.cv_data.nom)
       setDownloading(null)
-    }, 600)
+    }, 400)
   }
 
   const handleEdit = (cv, e) => {

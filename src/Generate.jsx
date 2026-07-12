@@ -1,13 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import jsPDF from 'jspdf'
-import html2canvas from 'html2canvas'
 import * as pdfjsLib from 'pdfjs-dist'
 import { supabase } from './supabase'
 import { CVTemplate } from './CVTemplates'
 import CVEditorBlocks from './CVEditorBlocks'
 import Navbar from './Navbar'
 import { detecterSecteur, getSecteurConfig, buildPromptCV } from './secteurConfig'
+import { downloadCVasPDF, downloadLettreasePDF } from './pdfUtils'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString()
 
@@ -331,23 +330,13 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
     setProgress('')
   }
 
-  const handleDownloadCV = async () => {
+  const handleDownloadCV = () => {
     const el = document.getElementById('cv-to-print')
-    if (!el) return
-    const canvas = await html2canvas(el, { scale: 4, useCORS: true, backgroundColor: '#ffffff', width: 794, height: 1123, logging: false })
-    const pdf = new jsPDF('p', 'mm', 'a4', true)
-    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 210, 297, '', 'FAST')
-    pdf.save(`CV-${cvData.prenom}-${cvData.nom}.pdf`)
+    downloadCVasPDF(el, cvData.prenom, cvData.nom)
   }
 
   const handleDownloadLettre = () => {
-    const pdf = new jsPDF('p', 'mm', 'a4')
-    pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(11)
-    const lines = pdf.splitTextToSize(lettre.replace(/\|\|[A-Z]+\|\|/g, ''), 170)
-    let y = 20
-    lines.forEach(line => { if (y > 280) { pdf.addPage(); y = 20 } pdf.text(line, 20, y); y += 6 })
-    pdf.save(`Lettre-${cvData?.prenom}-${cvData?.nom}.pdf`)
+    downloadLettreasePDF(lettre, cvData?.prenom, cvData?.nom)
   }
 
   return (
