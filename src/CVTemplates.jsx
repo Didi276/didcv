@@ -149,11 +149,12 @@ export function TemplateLinkedIn({ cvData, color }) {
 }
 
 // ─── 3. CANVA ────────────────────────────────────────────────
-export function TemplateCanva({ cvData }) {
+export function TemplateCanva({ cvData, color }) {
+  const C = color || '#f093fb'
   const f = getFontConfig(cvData)
   return (
     <div id="cv-to-print" style={{fontFamily:'"Helvetica Neue",Helvetica,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',width:'794px',height:'1123px',overflow:'hidden',display:'grid',gridTemplateColumns:'250px 1fr'}}>
-      <div style={{background:'#2d2d2d',color:'#fff',padding:'28px 20px'}}>
+      <div style={{background:C==='#f093fb'?'#2d2d2d':C,color:'#fff',padding:'28px 20px'}}>
         <div style={{textAlign:'center',marginBottom:'20px',paddingBottom:'16px',borderBottom:'1px solid rgba(255,255,255,0.15)'}}><div style={{display:'flex',justifyContent:'center',marginBottom:'10px'}}><Avatar cvData={cvData} size={68} shape="circle" /></div><div style={{fontSize:'7px',color:'rgba(255,255,255,0.5)',letterSpacing:'1.5px',textTransform:'uppercase',marginBottom:'3px'}}>{cvData.titre}</div><h1 style={{fontSize:'17px',fontWeight:'700',color:'#fff',margin:'0',lineHeight:'1.15'}}>{cvData.prenom}<br/>{cvData.nom}</h1></div>
         <div style={{marginBottom:f.mb}}><div style={{fontSize:'7px',fontWeight:'700',letterSpacing:'2px',color:'#f093fb',textTransform:'uppercase',marginBottom:'8px'}}>CONTACT</div><div style={{fontSize:f.xsmall,color:'rgba(255,255,255,0.85)',marginBottom:'4px'}}>✉ {cvData.email}</div><div style={{fontSize:f.xsmall,color:'rgba(255,255,255,0.85)',marginBottom:'4px'}}>☎ {cvData.telephone}</div><div style={{fontSize:f.xsmall,color:'rgba(255,255,255,0.85)',marginBottom:'4px'}}>📍 {cvData.ville}</div></div>
         <div style={{marginBottom:f.mb}}><div style={{fontSize:'7px',fontWeight:'700',letterSpacing:'2px',color:'#f093fb',textTransform:'uppercase',marginBottom:'8px'}}>COMPÉTENCES</div>{cvData.competences?.map((c,i)=><div key={i} style={{marginBottom:'5px'}}><div style={{fontSize:f.xsmall,color:'rgba(255,255,255,0.85)',marginBottom:'2px'}}>{c}</div><div style={{height:'2px',background:'rgba(255,255,255,0.15)',borderRadius:'1px'}}><div style={{height:'100%',width:`${75+i*2}%`,background:'linear-gradient(90deg,#f093fb,#f5576c)',borderRadius:'1px'}}></div></div></div>)}</div>
@@ -171,7 +172,8 @@ export function TemplateCanva({ cvData }) {
 }
 
 // ─── 4. HARVARD ──────────────────────────────────────────────
-export function TemplateHarvard({ cvData }) {
+export function TemplateHarvard({ cvData, color }) {
+  const C = color || '#A51C30'
   const f = getFontConfig(cvData)
   return (
     <div id="cv-to-print" style={{fontFamily:'"Times New Roman",Times,serif',color:'#111',fontSize:f.base,lineHeight:f.lineH,padding:'36px 44px',background:'#fff',width:'794px',height:'1123px',overflow:'hidden',boxSizing:'border-box'}}>
@@ -187,7 +189,8 @@ export function TemplateHarvard({ cvData }) {
 }
 
 // ─── 5. SILICON VALLEY ───────────────────────────────────────
-export function TemplateSiliconValley({ cvData }) {
+export function TemplateSiliconValley({ cvData, color }) {
+  const C = color || '#1d1d1f'
   const f = getFontConfig(cvData)
   return (
     <div id="cv-to-print" style={{fontFamily:'-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',color:'#1d1d1f',width:'794px',height:'1123px',overflow:'hidden',padding:'36px 44px',boxSizing:'border-box'}}>
@@ -229,25 +232,27 @@ export function TemplateModerne({ cvData, color }) {
 }
 
 // ─── 7. EXECUTIVE ────────────────────────────────────────────
-export function TemplateExecutive({ cvData }) {
+export function TemplateExecutive({ cvData, color }) {
+  const C = color || '#c9a84c'
   const f = getFontConfig(cvData)
   return (
     <div id="cv-to-print" style={{fontFamily:'Georgia,serif',fontSize:f.base,lineHeight:f.lineH,background:'#0d0d0d',color:'#e8e0cc',width:'794px',height:'1123px',overflow:'hidden',padding:'44px 48px',boxSizing:'border-box'}}>
-      <div style={{borderBottom:'1px solid #c9a84c',paddingBottom:'18px',marginBottom:'20px',display:'flex',alignItems:'center',gap:'18px'}}><Avatar cvData={cvData} size={68} shape="rounded" /><div><div style={{fontSize:f.xsmall,letterSpacing:'3px',textTransform:'uppercase',color:'#888',marginBottom:'4px'}}>{cvData.titre}</div><h1 style={{fontSize:'26px',fontWeight:'400',letterSpacing:'4px',textTransform:'uppercase',color:'#c9a84c',margin:'0 0 8px'}}>{cvData.prenom} {cvData.nom}</h1><div style={{display:'flex',gap:'18px',flexWrap:'wrap',fontSize:f.xsmall,color:'#777'}}><span>{cvData.email}</span><span>·</span><span>{cvData.telephone}</span><span>·</span><span>{cvData.ville}</span></div></div></div>
+      <div style={{borderBottom:'1px solid #c9a84c',paddingBottom:'18px',marginBottom:'20px',display:'flex',alignItems:'center',gap:'18px'}}><Avatar cvData={cvData} size={68} shape="rounded" /><div><div style={{fontSize:f.xsmall,letterSpacing:'3px',textTransform:'uppercase',color:'#888',marginBottom:'4px'}}>{cvData.titre}</div><h1 style={{fontSize:'26px',fontWeight:'400',letterSpacing:'4px',textTransform:'uppercase',color:C,margin:'0 0 8px'}}>{cvData.prenom} {cvData.nom}</h1><div style={{display:'flex',gap:'18px',flexWrap:'wrap',fontSize:f.xsmall,color:'#777'}}><span>{cvData.email}</span><span>·</span><span>{cvData.telephone}</span><span>·</span><span>{cvData.ville}</span></div></div></div>
       {cvData.accroche&&<div style={{marginBottom:f.mb,padding:'14px 18px',border:'1px solid #333',borderLeft:'3px solid #c9a84c'}}><p style={{fontSize:f.small,color:'#bbb',fontStyle:'italic',margin:0,lineHeight:f.lineH}}>{cvData.accroche}</p></div>}
-      <div style={{marginBottom:f.mb}}><div style={{fontSize:f.xsmall,fontWeight:'700',letterSpacing:'3px',textTransform:'uppercase',color:'#c9a84c',marginBottom:'12px',paddingBottom:'5px',borderBottom:'1px solid #333'}}>EXPÉRIENCES</div>{cvData.experiences?.map((exp,i)=><div key={i} style={{marginBottom:f.mb,paddingLeft:'14px',borderLeft:'1px solid #333'}}><div style={{display:'flex',justifyContent:'space-between',marginBottom:'2px'}}><div style={{fontWeight:'700',fontSize:f.base,color:'#e8e0cc'}}>{exp.poste}</div><div style={{fontSize:f.xsmall,color:'#c9a84c'}}>{exp.periode}</div></div><div style={{fontSize:f.small,color:'#888',marginBottom:'5px',fontStyle:'italic'}}>{exp.entreprise} · {exp.lieu}</div><ul style={{paddingLeft:'12px',margin:0}}>{exp.missions?.map((m,j)=><li key={j} style={{fontSize:f.small,color:'#aaa',marginBottom:'2px',lineHeight:f.lineH}}>{m}</li>)}</ul></div>)}</div>
-      <div style={{marginBottom:f.mb}}><div style={{fontSize:f.xsmall,fontWeight:'700',letterSpacing:'3px',textTransform:'uppercase',color:'#c9a84c',marginBottom:'12px',paddingBottom:'5px',borderBottom:'1px solid #333'}}>FORMATION</div>{cvData.formations?.map((f2,i)=><div key={i} style={{display:'flex',justifyContent:'space-between',marginBottom:f.mb,paddingLeft:'14px',borderLeft:'1px solid #333'}}><div><div style={{fontWeight:'700',fontSize:f.base,color:'#e8e0cc'}}>{f2.diplome}</div><div style={{fontSize:f.small,color:'#888'}}>{f2.etablissement}</div></div><div style={{fontSize:f.xsmall,color:'#c9a84c'}}>{f2.periode}</div></div>)}</div>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'20px',marginBottom:'12px'}}><div><div style={{fontSize:f.xsmall,fontWeight:'700',letterSpacing:'3px',textTransform:'uppercase',color:'#c9a84c',marginBottom:'8px',paddingBottom:'5px',borderBottom:'1px solid #333'}}>COMPÉTENCES</div><div style={{display:'flex',flexWrap:'wrap',gap:'5px'}}>{cvData.competences?.map((c,i)=><span key={i} style={{border:'1px solid #444',color:'#bbb',padding:'2px 8px',fontSize:f.xsmall,borderRadius:'2px'}}>{c}</span>)}</div></div><div><div style={{fontSize:f.xsmall,fontWeight:'700',letterSpacing:'3px',textTransform:'uppercase',color:'#c9a84c',marginBottom:'8px',paddingBottom:'5px',borderBottom:'1px solid #333'}}>LANGUES</div>{cvData.langues?.map((l,i)=><div key={i} style={{display:'flex',justifyContent:'space-between',fontSize:f.small,color:'#aaa',padding:'3px 0',borderBottom:'1px solid #222'}}><span>{l.langue}</span><span style={{color:'#c9a84c'}}>{l.niveau}</span></div>)}</div></div>
+      <div style={{marginBottom:f.mb}}><div style={{fontSize:f.xsmall,fontWeight:'700',letterSpacing:'3px',textTransform:'uppercase',color:C,marginBottom:'12px',paddingBottom:'5px',borderBottom:'1px solid #333'}}>EXPÉRIENCES</div>{cvData.experiences?.map((exp,i)=><div key={i} style={{marginBottom:f.mb,paddingLeft:'14px',borderLeft:'1px solid #333'}}><div style={{display:'flex',justifyContent:'space-between',marginBottom:'2px'}}><div style={{fontWeight:'700',fontSize:f.base,color:'#e8e0cc'}}>{exp.poste}</div><div style={{fontSize:f.xsmall,color:C}}>{exp.periode}</div></div><div style={{fontSize:f.small,color:'#888',marginBottom:'5px',fontStyle:'italic'}}>{exp.entreprise} · {exp.lieu}</div><ul style={{paddingLeft:'12px',margin:0}}>{exp.missions?.map((m,j)=><li key={j} style={{fontSize:f.small,color:'#aaa',marginBottom:'2px',lineHeight:f.lineH}}>{m}</li>)}</ul></div>)}</div>
+      <div style={{marginBottom:f.mb}}><div style={{fontSize:f.xsmall,fontWeight:'700',letterSpacing:'3px',textTransform:'uppercase',color:C,marginBottom:'12px',paddingBottom:'5px',borderBottom:'1px solid #333'}}>FORMATION</div>{cvData.formations?.map((f2,i)=><div key={i} style={{display:'flex',justifyContent:'space-between',marginBottom:f.mb,paddingLeft:'14px',borderLeft:'1px solid #333'}}><div><div style={{fontWeight:'700',fontSize:f.base,color:'#e8e0cc'}}>{f2.diplome}</div><div style={{fontSize:f.small,color:'#888'}}>{f2.etablissement}</div></div><div style={{fontSize:f.xsmall,color:C}}>{f2.periode}</div></div>)}</div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'20px',marginBottom:'12px'}}><div><div style={{fontSize:f.xsmall,fontWeight:'700',letterSpacing:'3px',textTransform:'uppercase',color:C,marginBottom:'8px',paddingBottom:'5px',borderBottom:'1px solid #333'}}>COMPÉTENCES</div><div style={{display:'flex',flexWrap:'wrap',gap:'5px'}}>{cvData.competences?.map((c,i)=><span key={i} style={{border:'1px solid #444',color:'#bbb',padding:'2px 8px',fontSize:f.xsmall,borderRadius:'2px'}}>{c}</span>)}</div></div><div><div style={{fontSize:f.xsmall,fontWeight:'700',letterSpacing:'3px',textTransform:'uppercase',color:C,marginBottom:'8px',paddingBottom:'5px',borderBottom:'1px solid #333'}}>LANGUES</div>{cvData.langues?.map((l,i)=><div key={i} style={{display:'flex',justifyContent:'space-between',fontSize:f.small,color:'#aaa',padding:'3px 0',borderBottom:'1px solid #222'}}><span>{l.langue}</span><span style={{color:C}}>{l.niveau}</span></div>)}</div></div>
     </div>
   )
 }
 
 // ─── 8. CREATIVE ─────────────────────────────────────────────
-export function TemplateCreative({ cvData }) {
+export function TemplateCreative({ cvData, color }) {
+  const C = color || '#667eea'
   const f = getFontConfig(cvData)
   return (
     <div id="cv-to-print" style={{fontFamily:'"Helvetica Neue",Arial,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',width:'794px',height:'1123px',overflow:'hidden',display:'grid',gridTemplateColumns:'230px 1fr'}}>
-      <div style={{background:'linear-gradient(160deg,#667eea,#764ba2)',color:'#fff',padding:'28px 18px',display:'flex',flexDirection:'column',gap:'16px'}}>
+      <div style={{background:`linear-gradient(160deg,${C},${C}bb)`,color:'#fff',padding:'28px 18px',display:'flex',flexDirection:'column',gap:'16px'}}>
         <div style={{textAlign:'center',paddingBottom:'16px',borderBottom:'1px solid rgba(255,255,255,0.2)'}}><div style={{display:'flex',justifyContent:'center',marginBottom:'10px'}}><Avatar cvData={cvData} size={70} shape="circle" /></div><div style={{fontSize:'7px',color:'rgba(255,255,255,0.6)',letterSpacing:'1.5px',textTransform:'uppercase',marginBottom:'3px'}}>{cvData.titre}</div><h1 style={{fontSize:'18px',fontWeight:'700',margin:'0',lineHeight:'1.15'}}>{cvData.prenom}<br/>{cvData.nom}</h1></div>
         <div><div style={{fontSize:'7px',fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',color:'rgba(255,255,255,0.6)',marginBottom:'6px'}}>CONTACT</div>{[cvData.email,cvData.telephone,cvData.ville].map((v,i)=><div key={i} style={{fontSize:f.xsmall,marginBottom:'4px',color:'rgba(255,255,255,0.9)'}}>{v}</div>)}</div>
         <div><div style={{fontSize:'7px',fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',color:'rgba(255,255,255,0.6)',marginBottom:'8px'}}>COMPÉTENCES</div>{cvData.competences?.map((c,i)=><div key={i} style={{marginBottom:'5px'}}><div style={{fontSize:f.xsmall,marginBottom:'2px'}}>{c}</div><div style={{height:'3px',background:'rgba(255,255,255,0.2)',borderRadius:'2px'}}><div style={{height:'100%',width:`${80-i*5}%`,background:'#fff',borderRadius:'2px',opacity:0.9}}></div></div></div>)}</div>
@@ -264,7 +269,8 @@ export function TemplateCreative({ cvData }) {
 }
 
 // ─── 9. MINIMAL ──────────────────────────────────────────────
-export function TemplateMinimal({ cvData }) {
+export function TemplateMinimal({ cvData, color }) {
+  const C = color || '#9ca3af'
   const f = getFontConfig(cvData)
   return (
     <div id="cv-to-print" style={{fontFamily:'"Helvetica Neue",Arial,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',color:'#222',width:'794px',height:'1123px',overflow:'hidden',padding:'48px 56px',boxSizing:'border-box'}}>
@@ -278,28 +284,30 @@ export function TemplateMinimal({ cvData }) {
 }
 
 // ─── 10. TECH ────────────────────────────────────────────────
-export function TemplateTech({ cvData }) {
+export function TemplateTech({ cvData, color }) {
+  const C = color || '#22d3ee'
   const f = getFontConfig(cvData)
   return (
     <div id="cv-to-print" style={{fontFamily:'"Courier New",monospace',fontSize:f.base,lineHeight:f.lineH,background:'#fff',width:'794px',height:'1123px',overflow:'hidden',display:'grid',gridTemplateColumns:'220px 1fr'}}>
-      <div style={{background:'#0f172a',color:'#94a3b8',padding:'24px 16px'}}>
-        <div style={{marginBottom:'18px',paddingBottom:'14px',borderBottom:'1px solid #1e293b',display:'flex',flexDirection:'column',alignItems:'center',gap:'8px'}}><Avatar cvData={cvData} size={64} shape="circle" /><div style={{textAlign:'center'}}><div style={{fontSize:f.xsmall,color:'#22d3ee',marginBottom:'3px',fontFamily:'monospace'}}>&gt; whoami</div><div style={{fontSize:'7px',color:'#22d3ee',letterSpacing:'1px',marginBottom:'2px'}}>{cvData.titre}</div><h1 style={{fontSize:'15px',fontWeight:'700',color:'#f1f5f9',margin:'0',fontFamily:'sans-serif'}}>{cvData.prenom} {cvData.nom}</h1></div></div>
+      <div style={{background:C==='#22d3ee'?'#0f172a':C,color:'#94a3b8',padding:'24px 16px'}}>
+        <div style={{marginBottom:'18px',paddingBottom:'14px',borderBottom:'1px solid #1e293b',display:'flex',flexDirection:'column',alignItems:'center',gap:'8px'}}><Avatar cvData={cvData} size={64} shape="circle" /><div style={{textAlign:'center'}}><div style={{fontSize:f.xsmall,color:C,marginBottom:'3px',fontFamily:'monospace'}}>&gt; whoami</div><div style={{fontSize:'7px',color:C,letterSpacing:'1px',marginBottom:'2px'}}>{cvData.titre}</div><h1 style={{fontSize:'15px',fontWeight:'700',color:'#f1f5f9',margin:'0',fontFamily:'sans-serif'}}>{cvData.prenom} {cvData.nom}</h1></div></div>
         <div style={{marginBottom:f.mb}}><div style={{fontSize:'7px',color:'#475569',textTransform:'uppercase',letterSpacing:'2px',marginBottom:'8px',fontFamily:'monospace'}}>{'//'} contact</div><div style={{fontSize:f.xsmall,marginBottom:'4px'}}>📧 {cvData.email}</div><div style={{fontSize:f.xsmall,marginBottom:'4px'}}>📱 {cvData.telephone}</div><div style={{fontSize:f.xsmall,marginBottom:'4px'}}>📍 {cvData.ville}</div></div>
         <div style={{marginBottom:f.mb}}><div style={{fontSize:'7px',color:'#475569',textTransform:'uppercase',letterSpacing:'2px',marginBottom:'8px',fontFamily:'monospace'}}>{'//'} skills</div>{cvData.competences?.map((c,i)=><div key={i} style={{marginBottom:'5px'}}><div style={{fontSize:f.xsmall,color:'#94a3b8',marginBottom:'2px'}}>{c}</div><div style={{height:'2px',background:'#1e293b',borderRadius:'1px'}}><div style={{height:'100%',width:`${85-i*5}%`,background:'linear-gradient(90deg,#22d3ee,#818cf8)',borderRadius:'1px'}}></div></div></div>)}</div>
-        <div style={{marginBottom:'12px'}}><div style={{fontSize:'7px',color:'#475569',textTransform:'uppercase',letterSpacing:'2px',marginBottom:'8px',fontFamily:'monospace'}}>{'//'} languages</div>{cvData.langues?.map((l,i)=><div key={i} style={{fontSize:f.xsmall,color:'#94a3b8',marginBottom:'4px'}}><span style={{color:'#22d3ee'}}>{l.langue}</span> · {l.niveau}</div>)}</div>
+        <div style={{marginBottom:'12px'}}><div style={{fontSize:'7px',color:'#475569',textTransform:'uppercase',letterSpacing:'2px',marginBottom:'8px',fontFamily:'monospace'}}>{'//'} languages</div>{cvData.langues?.map((l,i)=><div key={i} style={{fontSize:f.xsmall,color:'#94a3b8',marginBottom:'4px'}}><span style={{color:C}}>{l.langue}</span> · {l.niveau}</div>)}</div>
         {cvData.certifications?.length>0&&<div style={{marginBottom:'12px'}}><div style={{fontSize:'7px',color:'#475569',textTransform:'uppercase',letterSpacing:'2px',marginBottom:'8px',fontFamily:'monospace'}}>{'//'} certif.</div>{cvData.certifications.map((c,i)=><div key={i} style={{fontSize:f.xsmall,color:'#94a3b8',marginBottom:'2px'}}>✦ {c.titre}</div>)}</div>}
       </div>
       <div style={{padding:'24px 20px',background:'#fff'}}>
         {cvData.accroche&&<div style={{marginBottom:f.mb,padding:'10px 12px',background:'#f0fdf4',border:'1px solid #bbf7d0',borderRadius:'5px',fontFamily:'sans-serif'}}><p style={{fontSize:f.small,color:'#166534',margin:0,lineHeight:f.lineH}}>{cvData.accroche}</p></div>}
-        <div style={{marginBottom:f.mb}}><div style={{fontSize:f.xsmall,fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',color:'#0f172a',marginBottom:'10px',display:'flex',alignItems:'center',gap:'7px',fontFamily:'monospace'}}><span style={{color:'#22d3ee'}}>&gt;</span> expériences</div>{cvData.experiences?.map((exp,i)=><div key={i} style={{marginBottom:f.mb,paddingLeft:'12px',borderLeft:'2px solid #22d3ee'}}><div style={{display:'flex',justifyContent:'space-between',fontFamily:'sans-serif'}}><div style={{fontWeight:'700',fontSize:f.base,color:'#0f172a'}}>{exp.poste}</div><div style={{fontSize:f.xsmall,color:'#64748b',background:'#f1f5f9',padding:'1px 7px',borderRadius:'4px'}}>{exp.periode}</div></div><div style={{fontSize:f.small,color:'#22d3ee',marginBottom:'4px',fontFamily:'monospace'}}>{exp.entreprise} · {exp.lieu}</div><ul style={{paddingLeft:'12px',margin:0,fontFamily:'sans-serif'}}>{exp.missions?.map((m,j)=><li key={j} style={{fontSize:f.small,color:'#475569',marginBottom:'2px',lineHeight:f.lineH}}>{m}</li>)}</ul></div>)}</div>
-        <div><div style={{fontSize:f.xsmall,fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',color:'#0f172a',marginBottom:'10px',display:'flex',alignItems:'center',gap:'7px',fontFamily:'monospace'}}><span style={{color:'#22d3ee'}}>&gt;</span> formation</div>{cvData.formations?.map((f2,i)=><div key={i} style={{marginBottom:f.mb,paddingLeft:'12px',borderLeft:'2px solid #818cf8',fontFamily:'sans-serif'}}><div style={{fontWeight:'700',fontSize:f.base,color:'#0f172a'}}>{f2.diplome}</div><div style={{fontSize:f.small,color:'#64748b'}}>{f2.etablissement} · {f2.periode}</div></div>)}</div>
+        <div style={{marginBottom:f.mb}}><div style={{fontSize:f.xsmall,fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',color:'#0f172a',marginBottom:'10px',display:'flex',alignItems:'center',gap:'7px',fontFamily:'monospace'}}><span style={{color:C}}>&gt;</span> expériences</div>{cvData.experiences?.map((exp,i)=><div key={i} style={{marginBottom:f.mb,paddingLeft:'12px',borderLeft:'2px solid #22d3ee'}}><div style={{display:'flex',justifyContent:'space-between',fontFamily:'sans-serif'}}><div style={{fontWeight:'700',fontSize:f.base,color:'#0f172a'}}>{exp.poste}</div><div style={{fontSize:f.xsmall,color:'#64748b',background:'#f1f5f9',padding:'1px 7px',borderRadius:'4px'}}>{exp.periode}</div></div><div style={{fontSize:f.small,color:C,marginBottom:'4px',fontFamily:'monospace'}}>{exp.entreprise} · {exp.lieu}</div><ul style={{paddingLeft:'12px',margin:0,fontFamily:'sans-serif'}}>{exp.missions?.map((m,j)=><li key={j} style={{fontSize:f.small,color:'#475569',marginBottom:'2px',lineHeight:f.lineH}}>{m}</li>)}</ul></div>)}</div>
+        <div><div style={{fontSize:f.xsmall,fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',color:'#0f172a',marginBottom:'10px',display:'flex',alignItems:'center',gap:'7px',fontFamily:'monospace'}}><span style={{color:C}}>&gt;</span> formation</div>{cvData.formations?.map((f2,i)=><div key={i} style={{marginBottom:f.mb,paddingLeft:'12px',borderLeft:'2px solid #818cf8',fontFamily:'sans-serif'}}><div style={{fontWeight:'700',fontSize:f.base,color:'#0f172a'}}>{f2.diplome}</div><div style={{fontSize:f.small,color:'#64748b'}}>{f2.etablissement} · {f2.periode}</div></div>)}</div>
       </div>
     </div>
   )
 }
 
 // ─── 11. ELEGANT ─────────────────────────────────────────────
-export function TemplateElegant({ cvData }) {
+export function TemplateElegant({ cvData, color }) {
+  const C = color || '#c9a87a'
   const f = getFontConfig(cvData)
   return (
     <div id="cv-to-print" style={{fontFamily:'Georgia,serif',fontSize:f.base,lineHeight:f.lineH,background:'#faf7f2',color:'#2c2416',width:'794px',height:'1123px',overflow:'hidden',display:'grid',gridTemplateColumns:'220px 1fr'}}>
@@ -342,20 +350,21 @@ export function TemplateBold({ cvData, color }) {
 }
 
 // ─── 13. PASTEL ──────────────────────────────────────────────
-export function TemplatePastel({ cvData }) {
+export function TemplatePastel({ cvData, color }) {
+  const C = color || '#7c3aed'
   const f = getFontConfig(cvData)
   return (
     <div id="cv-to-print" style={{fontFamily:'"Helvetica Neue",Arial,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fef9ff',width:'794px',height:'1123px',overflow:'hidden',display:'grid',gridTemplateColumns:'230px 1fr'}}>
-      <div style={{background:'#e8d5f5',padding:'28px 18px'}}>
-        <div style={{textAlign:'center',marginBottom:'20px',paddingBottom:'16px',borderBottom:'1px solid #d4b8ec',display:'flex',flexDirection:'column',alignItems:'center',gap:'8px'}}><Avatar cvData={cvData} size={68} shape="circle" /><div><div style={{fontSize:'7px',color:'#7c3aed',letterSpacing:'1.5px',textTransform:'uppercase',marginBottom:'3px'}}>{cvData.titre}</div><h1 style={{fontSize:'17px',fontWeight:'700',color:'#5b21b6',margin:'0'}}>{cvData.prenom} {cvData.nom}</h1></div></div>
-        <div style={{marginBottom:f.mb}}><div style={{fontSize:'7px',fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',color:'#7c3aed',marginBottom:'8px'}}>Contact</div><div style={{fontSize:f.xsmall,color:'#5b21b6',marginBottom:'4px'}}>✉ {cvData.email}</div><div style={{fontSize:f.xsmall,color:'#5b21b6',marginBottom:'4px'}}>☎ {cvData.telephone}</div><div style={{fontSize:f.xsmall,color:'#5b21b6',marginBottom:'4px'}}>📍 {cvData.ville}</div></div>
-        <div style={{marginBottom:f.mb}}><div style={{fontSize:'7px',fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',color:'#7c3aed',marginBottom:'8px'}}>Compétences</div>{cvData.competences?.map((c,i)=><div key={i} style={{background:'rgba(124,58,237,0.1)',border:'1px solid #ddd6fe',color:'#5b21b6',padding:'3px 7px',borderRadius:'16px',fontSize:f.xsmall,marginBottom:'5px',textAlign:'center'}}>{c}</div>)}</div>
-        <div style={{marginBottom:'14px'}}><div style={{fontSize:'7px',fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',color:'#7c3aed',marginBottom:'8px'}}>Langues</div>{cvData.langues?.map((l,i)=><div key={i} style={{fontSize:f.xsmall,color:'#5b21b6',marginBottom:'4px'}}>{l.langue} · <span style={{color:'#7c3aed'}}>{l.niveau}</span></div>)}</div>
+      <div style={{background:`${C}33`,padding:'28px 18px'}}>
+        <div style={{textAlign:'center',marginBottom:'20px',paddingBottom:'16px',borderBottom:'1px solid #d4b8ec',display:'flex',flexDirection:'column',alignItems:'center',gap:'8px'}}><Avatar cvData={cvData} size={68} shape="circle" /><div><div style={{fontSize:'7px',color:C,letterSpacing:'1.5px',textTransform:'uppercase',marginBottom:'3px'}}>{cvData.titre}</div><h1 style={{fontSize:'17px',fontWeight:'700',color:C,margin:'0'}}>{cvData.prenom} {cvData.nom}</h1></div></div>
+        <div style={{marginBottom:f.mb}}><div style={{fontSize:'7px',fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',color:C,marginBottom:'8px'}}>Contact</div><div style={{fontSize:f.xsmall,color:C,marginBottom:'4px'}}>✉ {cvData.email}</div><div style={{fontSize:f.xsmall,color:C,marginBottom:'4px'}}>☎ {cvData.telephone}</div><div style={{fontSize:f.xsmall,color:C,marginBottom:'4px'}}>📍 {cvData.ville}</div></div>
+        <div style={{marginBottom:f.mb}}><div style={{fontSize:'7px',fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',color:C,marginBottom:'8px'}}>Compétences</div>{cvData.competences?.map((c,i)=><div key={i} style={{background:'rgba(124,58,237,0.1)',border:'1px solid #ddd6fe',color:C,padding:'3px 7px',borderRadius:'16px',fontSize:f.xsmall,marginBottom:'5px',textAlign:'center'}}>{c}</div>)}</div>
+        <div style={{marginBottom:'14px'}}><div style={{fontSize:'7px',fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',color:C,marginBottom:'8px'}}>Langues</div>{cvData.langues?.map((l,i)=><div key={i} style={{fontSize:f.xsmall,color:C,marginBottom:'4px'}}>{l.langue} · <span style={{color:C}}>{l.niveau}</span></div>)}</div>
       </div>
       <div style={{padding:'24px 20px'}}>
         {cvData.accroche&&<div style={{marginBottom:f.mb,padding:'12px',background:'#fdf4ff',borderRadius:'10px',border:'1px solid #e9d5ff'}}><p style={{fontSize:f.small,color:'#6d28d9',fontStyle:'italic',margin:0,lineHeight:f.lineH}}>{cvData.accroche}</p></div>}
-        <div style={{marginBottom:f.mb}}><div style={{fontSize:f.small,fontWeight:'700',color:'#7c3aed',marginBottom:'10px',display:'flex',alignItems:'center',gap:'7px'}}><div style={{width:'18px',height:'3px',background:'linear-gradient(90deg,#c084fc,#e879f9)',borderRadius:'2px'}}></div>EXPÉRIENCES</div>{cvData.experiences?.map((exp,i)=><div key={i} style={{marginBottom:f.mb,padding:'10px',background:'#fff',borderRadius:'8px',border:'1px solid #f3e8ff'}}><div style={{display:'flex',justifyContent:'space-between'}}><div style={{fontWeight:'700',fontSize:f.base,color:'#1f2937'}}>{exp.poste}</div><div style={{fontSize:f.xsmall,color:'#7c3aed',background:'#fdf4ff',padding:'1px 7px',borderRadius:'10px'}}>{exp.periode}</div></div><div style={{fontSize:f.small,color:'#a855f7',marginBottom:'5px'}}>{exp.entreprise} · {exp.lieu}</div><ul style={{paddingLeft:'12px',margin:0}}>{exp.missions?.map((m,j)=><li key={j} style={{fontSize:f.small,color:'#4b5563',marginBottom:'2px',lineHeight:f.lineH}}>{m}</li>)}</ul></div>)}</div>
-        <div><div style={{fontSize:f.small,fontWeight:'700',color:'#7c3aed',marginBottom:'10px',display:'flex',alignItems:'center',gap:'7px'}}><div style={{width:'18px',height:'3px',background:'linear-gradient(90deg,#c084fc,#e879f9)',borderRadius:'2px'}}></div>FORMATION</div>{cvData.formations?.map((f2,i)=><div key={i} style={{marginBottom:f.mb,padding:'8px 10px',background:'#fff',borderRadius:'8px',border:'1px solid #f3e8ff'}}><div style={{fontWeight:'700',fontSize:f.base,color:'#1f2937'}}>{f2.diplome}</div><div style={{fontSize:f.small,color:'#a855f7'}}>{f2.etablissement} · {f2.periode}</div></div>)}</div>
+        <div style={{marginBottom:f.mb}}><div style={{fontSize:f.small,fontWeight:'700',color:C,marginBottom:'10px',display:'flex',alignItems:'center',gap:'7px'}}><div style={{width:'18px',height:'3px',background:'linear-gradient(90deg,#c084fc,#e879f9)',borderRadius:'2px'}}></div>EXPÉRIENCES</div>{cvData.experiences?.map((exp,i)=><div key={i} style={{marginBottom:f.mb,padding:'10px',background:'#fff',borderRadius:'8px',border:'1px solid #f3e8ff'}}><div style={{display:'flex',justifyContent:'space-between'}}><div style={{fontWeight:'700',fontSize:f.base,color:'#1f2937'}}>{exp.poste}</div><div style={{fontSize:f.xsmall,color:C,background:'#fdf4ff',padding:'1px 7px',borderRadius:'10px'}}>{exp.periode}</div></div><div style={{fontSize:f.small,color:'#a855f7',marginBottom:'5px'}}>{exp.entreprise} · {exp.lieu}</div><ul style={{paddingLeft:'12px',margin:0}}>{exp.missions?.map((m,j)=><li key={j} style={{fontSize:f.small,color:'#4b5563',marginBottom:'2px',lineHeight:f.lineH}}>{m}</li>)}</ul></div>)}</div>
+        <div><div style={{fontSize:f.small,fontWeight:'700',color:C,marginBottom:'10px',display:'flex',alignItems:'center',gap:'7px'}}><div style={{width:'18px',height:'3px',background:'linear-gradient(90deg,#c084fc,#e879f9)',borderRadius:'2px'}}></div>FORMATION</div>{cvData.formations?.map((f2,i)=><div key={i} style={{marginBottom:f.mb,padding:'8px 10px',background:'#fff',borderRadius:'8px',border:'1px solid #f3e8ff'}}><div style={{fontWeight:'700',fontSize:f.base,color:'#1f2937'}}>{f2.diplome}</div><div style={{fontSize:f.small,color:'#a855f7'}}>{f2.etablissement} · {f2.periode}</div></div>)}</div>
       </div>
     </div>
   )
@@ -384,7 +393,8 @@ export function TemplateCorporate({ cvData, color }) {
 }
 
 // ─── 15. SWISS ───────────────────────────────────────────────
-export function TemplateSwiss({ cvData }) {
+export function TemplateSwiss({ cvData, color }) {
+  const C = color || '#111'
   const f = getFontConfig(cvData)
   return (
     <div id="cv-to-print" style={{fontFamily:'"Helvetica Neue",Helvetica,Arial,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',color:'#000',width:'794px',height:'1123px',overflow:'hidden',padding:'44px 48px',boxSizing:'border-box'}}>
