@@ -408,10 +408,9 @@ Retourne UNIQUEMENT ce JSON valide:
 
                 {/* Option 2 : PDF externe */}
                 <div style={{ padding: '20px', background: '#fafafa', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
-                  <div style={{ fontSize: '14px', fontWeight: '700', color: '#374151', marginBottom: '4px' }}>📄 Depuis un CV PDF externe</div>
+                  <div style={{ fontSize: '14px', fontWeight: '700', color: '#374151', marginBottom: '4px' }}>📄 Depuis un CV PDF</div>
                   <div style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '14px', lineHeight: '1.5' }}>
-                    Fonctionne avec les CVs Word exportés en PDF, les PDFs textuels.<br />
-                    <span style={{ color: '#f59e0b', fontWeight: '600' }}>⚠️ Ne fonctionne pas</span> avec les CVs générés par DidCV (image).
+                    Fonctionne avec tous les CVs PDF — y compris ceux générés par DidCV.
                   </div>
                   <label style={{ display: 'block', padding: '11px', background: '#fff', border: '1.5px dashed #d1d5db', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', textAlign: 'center', color: '#374151' }}>
                     <input type="file" accept=".pdf" onChange={handleImportCV} style={{ display: 'none' }} />
