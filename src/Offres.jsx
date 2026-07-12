@@ -2,41 +2,56 @@ import { useState } from 'react'
 import Navbar from './Navbar'
 
 const CATEGORIES = [
-  'Comptabilité', 'Finance', 'Ressources Humaines', 'Marketing', 'Commercial',
-  'Informatique', 'Ingénierie', 'Juridique', 'Logistique', 'Santé'
+  { label: 'Tous les secteurs', value: '' },
+  { label: 'Comptabilite & Finance', value: 'comptable finance audit' },
+  { label: 'Tech & Informatique', value: 'developpeur informatique data' },
+  { label: 'Marketing & Communication', value: 'marketing communication digital' },
+  { label: 'Commerce & Vente', value: 'commercial vente business' },
+  { label: 'Ressources Humaines', value: 'ressources humaines RH recrutement' },
+  { label: 'Sante & Medical', value: 'infirmier aide-soignant sante medical' },
+  { label: 'BTP & Chantier', value: 'electricien plombier batiment chantier' },
+  { label: 'Restauration', value: 'cuisinier serveur restauration' },
+  { label: 'Transport & Logistique', value: 'chauffeur logistique transport' },
+  { label: 'Etudiant & Stage', value: 'stage alternance etudiant junior' },
 ]
 
+const TYPES = ['Tous', 'CDI', 'CDD', 'Stage', 'Alternance', 'Freelance']
+
 export default function Offres() {
-  const [query, setQuery]       = useState('')
+  const [query, setQuery] = useState('')
   const [location, setLocation] = useState('')
-  const [offres, setOffres]     = useState([])
-  const [loading, setLoading]   = useState(false)
+  const [categorie, setCategorie] = useState('')
+  const [type, setType] = useState('Tous')
+  const [offres, setOffres] = useState([])
+  const [loading, setLoading] = useState(false)
   const [searched, setSearched] = useState(false)
-  const [error, setError]       = useState('')
+  const [error, setError] = useState('')
 
   const handleSearch = async (q = query, loc = location) => {
-    if (!q.trim()) return
+    const searchQ = q || categorie
+    if (!searchQ.trim()) return
     setLoading(true)
     setSearched(false)
     setError('')
     setOffres([])
+
     try {
-      const res = await fetch(`/api/offres?query=${encodeURIComponent(q)}&location=${encodeURIComponent(loc || 'France')}`)
+      const res = await fetch(`/api/offres?query=${encodeURIComponent(searchQ)}&location=${encodeURIComponent(loc || 'France')}`)
       const data = await res.json()
-      setOffres(data.offres || [])
+      let results = data.offres || []
+      if (type !== 'Tous') results = results.filter(o => o.type?.toLowerCase().includes(type.toLowerCase()))
+      setOffres(results)
       setSearched(true)
-      if ((data.offres || []).length === 0 && data.errors?.length > 0) {
-        setError('Aucune offre trouvée. Essaie des mots-clés différents.')
-      }
-    } catch (e) {
-      setError('Erreur de connexion. Réessaie.')
+      if (results.length === 0 && data.errors?.length) setError('Aucune offre trouvee. Essaie d\'autres mots-cles.')
+    } catch {
+      setError('Erreur de connexion. Reessaie.')
       setSearched(true)
     }
     setLoading(false)
   }
 
   const handleGenererCV = (offre) => {
-    const texte = `${offre.titre}\n${offre.entreprise} — ${offre.lieu}\n${offre.type ? `Type : ${offre.type}\n` : ''}\n${offre.description}\n\nSource : ${offre.url}`
+    const texte = [offre.titre, `${offre.entreprise} - ${offre.lieu}`, offre.type ? `Type: ${offre.type}` : '', '', offre.description, offre.url ? `Source: ${offre.url}` : ''].filter(Boolean).join('\n')
     sessionStorage.setItem('offre_prefill', texte)
     window.location.href = '/generate'
   }
@@ -47,120 +62,168 @@ export default function Offres() {
     catch { return '' }
   }
 
-  const sourceBadge = (s) => s === 'JSearch'
-    ? { background: '#e8f3ff', color: '#1a56db', border: '1px solid #b3d4f5' }
-    : { background: '#fff3e0', color: '#e65100', border: '1px solid #ffcc80' }
-
   return (
-    <div style={{ minHeight: '100vh', background: '#f8faff', fontFamily: 'inherit' }}>
-
+    <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
       <Navbar currentPage="offres" />
 
-      {/* HERO */}
-      <div style={{ background: 'linear-gradient(135deg, #1a56db, #3b82f6)', padding: '48px 32px', textAlign: 'center' }}>
-        <h1 style={{ color: '#fff', fontSize: '30px', fontWeight: '800', margin: '0 0 8px' }}>
-          Trouve ton prochain emploi
-        </h1>
-        <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '15px', margin: '0 0 28px' }}>
-          Offres LinkedIn, Indeed, Glassdoor et plus — en temps réel
-        </p>
-        <div style={{ maxWidth: '680px', margin: '0 auto', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-          <input type="text" placeholder="Poste, mots-clés..." value={query}
-            onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()}
-            style={{ flex: 2, minWidth: '180px', padding: '13px 16px', border: 'none', borderRadius: '10px', fontSize: '14px', outline: 'none' }} />
-          <input type="text" placeholder="Ville (ex: Paris)" value={location}
-            onChange={e => setLocation(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()}
-            style={{ flex: 1, minWidth: '130px', padding: '13px 16px', border: 'none', borderRadius: '10px', fontSize: '14px', outline: 'none' }} />
-          <button onClick={() => handleSearch()} disabled={loading || !query.trim()}
-            style={{ padding: '13px 24px', background: '#fff', color: '#1a56db', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: loading ? 'default' : 'pointer' }}>
-            {loading ? '⏳' : '🔍 Chercher'}
-          </button>
-        </div>
-        <div style={{ maxWidth: '680px', margin: '14px auto 0', display: 'flex', gap: '7px', flexWrap: 'wrap', justifyContent: 'center' }}>
-          {CATEGORIES.map(cat => (
-            <button key={cat} onClick={() => { setQuery(cat); handleSearch(cat, location) }}
-              style={{ padding: '4px 12px', background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '20px', fontSize: '12px', cursor: 'pointer', fontFamily: 'inherit' }}>
-              {cat}
+      {/* ─── HERO SEARCH ─── */}
+      <div style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', padding: '48px 40px 56px' }}>
+        <div style={{ maxWidth: '760px', margin: '0 auto', textAlign: 'center' }}>
+          <h1 style={{ fontSize: '36px', fontWeight: '800', color: '#fff', margin: '0 0 10px', letterSpacing: '-1px', lineHeight: '1.1' }}>
+            Trouve ton prochain emploi
+          </h1>
+          <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.75)', margin: '0 0 32px' }}>
+            Des milliers d'offres en temps reel - genere ton CV pour postuler en 1 clic
+          </p>
+
+          {/* Barre de recherche */}
+          <div style={{ background: '#fff', borderRadius: '14px', padding: '8px', display: 'flex', gap: '6px', boxShadow: '0 8px 32px rgba(0,0,0,0.15)', marginBottom: '16px' }}>
+            <input type="text" placeholder="Poste, metier, mots-cles..." value={query}
+              onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()}
+              style={{ flex: 2, padding: '12px 16px', border: 'none', outline: 'none', fontSize: '14px', fontFamily: 'inherit', color: '#111', background: 'transparent', minWidth: 0 }} />
+            <div style={{ width: '1px', background: '#f0f0f0', margin: '8px 0' }} />
+            <input type="text" placeholder="Ville (ex: Paris, Lyon...)" value={location}
+              onChange={e => setLocation(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()}
+              style={{ flex: 1, padding: '12px 16px', border: 'none', outline: 'none', fontSize: '14px', fontFamily: 'inherit', color: '#111', background: 'transparent', minWidth: 0 }} />
+            <button onClick={() => handleSearch()} disabled={loading || (!query && !categorie)}
+              style={{ padding: '12px 24px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0 }}>
+              {loading ? '⏳' : '🔍 Chercher'}
             </button>
-          ))}
+          </div>
+
+          {/* Raccourcis categories */}
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
+            {CATEGORIES.slice(1, 7).map(cat => (
+              <button key={cat.value} onClick={() => { setCategorie(cat.value); handleSearch(cat.value, location) }}
+                style={{ padding: '6px 14px', background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1px solid rgba(255,255,255,0.25)', borderRadius: '20px', fontSize: '12px', fontWeight: '500', cursor: 'pointer', fontFamily: 'inherit', backdropFilter: 'blur(4px)' }}>
+                {cat.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* RÉSULTATS */}
-      <div style={{ maxWidth: '860px', margin: '0 auto', padding: '28px 20px' }}>
+      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '28px 40px 60px', display: 'grid', gridTemplateColumns: '240px 1fr', gap: '28px', alignItems: 'start' }}>
 
-        {!searched && !loading && (
-          <div style={{ textAlign: 'center', padding: '48px 0', color: '#888' }}>
-            <div style={{ fontSize: '44px', marginBottom: '12px' }}>🔍</div>
-            <div style={{ fontSize: '17px', fontWeight: '600', color: '#333', marginBottom: '6px' }}>Lance une recherche</div>
-            <div style={{ fontSize: '13px' }}>Tape un poste et clique sur Chercher, ou sélectionne une catégorie</div>
+        {/* ─── SIDEBAR FILTRES ─── */}
+        <div style={{ position: 'sticky', top: '82px' }}>
+          <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '20px', marginBottom: '16px' }}>
+            <div style={{ fontSize: '12px', fontWeight: '700', color: '#374151', marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '1px' }}>Secteur</div>
+            {CATEGORIES.map(cat => (
+              <button key={cat.value} onClick={() => { setCategorie(cat.value); if (cat.value) handleSearch(cat.value, location) }}
+                style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 10px', border: 'none', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: categorie === cat.value ? '700' : '400', background: categorie === cat.value ? '#ede9fe' : 'transparent', color: categorie === cat.value ? '#4f46e5' : '#555', marginBottom: '2px', transition: 'all 0.1s' }}>
+                {cat.label}
+              </button>
+            ))}
           </div>
-        )}
 
-        {loading && (
-          <div style={{ textAlign: 'center', padding: '48px 0', color: '#888' }}>
-            <div style={{ fontSize: '28px', marginBottom: '12px' }}>⏳</div>
-            <div>Recherche sur LinkedIn, Indeed, Glassdoor...</div>
+          <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '20px' }}>
+            <div style={{ fontSize: '12px', fontWeight: '700', color: '#374151', marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '1px' }}>Type de contrat</div>
+            {TYPES.map(t => (
+              <button key={t} onClick={() => setType(t)}
+                style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 10px', border: 'none', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: type === t ? '700' : '400', background: type === t ? '#ede9fe' : 'transparent', color: type === t ? '#4f46e5' : '#555', marginBottom: '2px', transition: 'all 0.1s' }}>
+                {t}
+              </button>
+            ))}
           </div>
-        )}
+        </div>
 
-        {error && (
-          <div style={{ padding: '14px 18px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '10px', color: '#dc2626', fontSize: '14px', marginBottom: '20px' }}>
-            ⚠️ {error}
-          </div>
-        )}
+        {/* ─── RESULTATS ─── */}
+        <div>
+          {/* Etat initial */}
+          {!searched && !loading && (
+            <div style={{ textAlign: 'center', padding: '80px 40px', background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb' }}>
+              <div style={{ fontSize: '56px', marginBottom: '16px' }}>🔍</div>
+              <h3 style={{ fontSize: '20px', fontWeight: '700', color: '#111', margin: '0 0 8px' }}>Lance une recherche</h3>
+              <p style={{ fontSize: '14px', color: '#9ca3af', margin: 0 }}>
+                Tape un metier ou selectionne un secteur
+              </p>
+            </div>
+          )}
 
-        {searched && !loading && offres.length > 0 && (
-          <div style={{ fontSize: '14px', color: '#555', marginBottom: '18px' }}>
-            <span style={{ color: '#1a56db', fontWeight: '700' }}>{offres.length} offres</span> trouvées — clique sur une offre pour la voir ou générer ton CV
-          </div>
-        )}
+          {/* Chargement */}
+          {loading && (
+            <div style={{ textAlign: 'center', padding: '80px 40px', background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb' }}>
+              <div style={{ width: '40px', height: '40px', border: '4px solid #ede9fe', borderTop: '4px solid #4f46e5', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }} />
+              <div style={{ fontSize: '15px', color: '#555' }}>Recherche en cours...</div>
+              <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+            </div>
+          )}
 
-        {searched && !loading && offres.length === 0 && !error && (
-          <div style={{ textAlign: 'center', padding: '48px 0', color: '#888' }}>
-            <div style={{ fontSize: '36px', marginBottom: '12px' }}>😕</div>
-            <div style={{ fontSize: '17px', fontWeight: '600', color: '#333', marginBottom: '6px' }}>Aucune offre trouvée</div>
-            <div style={{ fontSize: '13px' }}>Essaie d'autres mots-clés ou une autre ville</div>
-          </div>
-        )}
+          {/* Erreur */}
+          {error && (
+            <div style={{ padding: '14px 18px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '10px', color: '#dc2626', fontSize: '14px', marginBottom: '16px' }}>
+              {error}
+            </div>
+          )}
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {offres.map(offre => (
-            <div key={offre.id} style={{ background: '#fff', borderRadius: '12px', padding: '18px 22px', border: '1px solid #e5e7ef', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '5px', flexWrap: 'wrap' }}>
-                    <div style={{ fontSize: '15px', fontWeight: '700', color: '#1f2937' }}>{offre.titre}</div>
-                    <span style={{ fontSize: '10px', padding: '1px 7px', borderRadius: '10px', ...sourceBadge(offre.source) }}>{offre.source}</span>
-                    {offre.remote && <span style={{ fontSize: '10px', padding: '1px 7px', borderRadius: '10px', background: '#f0fdf4', color: '#16a34a', border: '1px solid #86efac' }}>Télétravail</span>}
-                    {offre.type && <span style={{ fontSize: '10px', padding: '1px 7px', borderRadius: '10px', background: '#f3f4f6', color: '#555', border: '1px solid #e5e7eb' }}>{offre.type}</span>}
+          {/* Compteur */}
+          {searched && !loading && offres.length > 0 && (
+            <div style={{ fontSize: '14px', color: '#555', marginBottom: '16px', fontWeight: '500' }}>
+              <span style={{ color: '#4f46e5', fontWeight: '700' }}>{offres.length} offres</span> trouvees
+            </div>
+          )}
+
+          {/* Aucun resultat */}
+          {searched && !loading && offres.length === 0 && !error && (
+            <div style={{ textAlign: 'center', padding: '80px 40px', background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb' }}>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>😕</div>
+              <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#111', margin: '0 0 8px' }}>Aucune offre trouvee</h3>
+              <p style={{ fontSize: '14px', color: '#9ca3af', margin: 0 }}>Essaie d'autres mots-cles ou une autre ville</p>
+            </div>
+          )}
+
+          {/* Liste offres */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {offres.map(offre => (
+              <div key={offre.id} style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '20px 22px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)', transition: 'box-shadow 0.15s, transform 0.15s' }}
+                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.08)'; e.currentTarget.style.transform = 'translateY(-1px)' }}
+                onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)'; e.currentTarget.style.transform = 'translateY(0)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
+
+                  {/* Infos */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', flexWrap: 'wrap' }}>
+                      <div style={{ fontSize: '15px', fontWeight: '700', color: '#111' }}>{offre.titre}</div>
+                      {offre.source && (
+                        <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '10px', fontWeight: '600', background: offre.source === 'JSearch' ? '#e8f3ff' : '#fff3e0', color: offre.source === 'JSearch' ? '#1a56db' : '#e65100', border: `1px solid ${offre.source === 'JSearch' ? '#b3d4f5' : '#ffcc80'}` }}>
+                          {offre.source}
+                        </span>
+                      )}
+                      {offre.remote && <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '10px', background: '#f0fdf4', color: '#16a34a', border: '1px solid #86efac', fontWeight: '600' }}>Teletravail</span>}
+                      {offre.type && <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '10px', background: '#f3f4f6', color: '#555', border: '1px solid #e5e7eb' }}>{offre.type}</span>}
+                    </div>
+
+                    <div style={{ fontSize: '13px', color: '#374151', marginBottom: '3px' }}>
+                      {offre.entreprise && <span style={{ fontWeight: '600' }}>{offre.entreprise}</span>}
+                      {offre.lieu && <span style={{ color: '#9ca3af' }}> · 📍 {offre.lieu}</span>}
+                      {offre.date && <span style={{ color: '#c4c4c4' }}> · {formatDate(offre.date)}</span>}
+                    </div>
+
+                    {offre.description && (
+                      <p style={{ fontSize: '13px', color: '#6b7280', margin: '8px 0 0', lineHeight: '1.6', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {offre.description}
+                      </p>
+                    )}
                   </div>
-                  <div style={{ fontSize: '13px', color: '#374151', marginBottom: '3px' }}>
-                    {offre.entreprise && <span style={{ fontWeight: '600' }}>{offre.entreprise}</span>}
-                    {offre.lieu && <span style={{ color: '#6b7280' }}> · 📍 {offre.lieu}</span>}
-                    {offre.date && <span style={{ color: '#9ca3af' }}> · {formatDate(offre.date)}</span>}
+
+                  {/* Actions */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flexShrink: 0 }}>
+                    <button onClick={() => handleGenererCV(offre)}
+                      style={{ padding: '9px 18px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '9px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
+                      ⚡ Generer CV
+                    </button>
+                    {offre.url && (
+                      <a href={offre.url} target="_blank" rel="noopener noreferrer"
+                        style={{ padding: '9px 18px', background: '#f8f9ff', color: '#4f46e5', border: '1px solid #ede9fe', borderRadius: '9px', fontSize: '13px', fontWeight: '600', textDecoration: 'none', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                        Voir l'offre
+                      </a>
+                    )}
                   </div>
-                  {offre.description && (
-                    <p style={{ fontSize: '12px', color: '#6b7280', margin: '8px 0 0', lineHeight: '1.6', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                      {offre.description}
-                    </p>
-                  )}
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', flexShrink: 0 }}>
-                  {offre.url && (
-                    <a href={offre.url} target="_blank" rel="noopener noreferrer"
-                      style={{ padding: '7px 14px', background: '#f8faff', color: '#1a56db', border: '1px solid #c7d9ff', borderRadius: '8px', fontSize: '12px', fontWeight: '600', textDecoration: 'none', textAlign: 'center' }}>
-                      Voir →
-                    </a>
-                  )}
-                  <button onClick={() => handleGenererCV(offre)}
-                    style={{ padding: '7px 14px', background: '#1a56db', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
-                    ⚡ Générer CV
-                  </button>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>
