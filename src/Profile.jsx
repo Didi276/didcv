@@ -84,24 +84,29 @@ export default function Profile() {
     setImporting(true)
 
     try {
-      // Extraire le texte du PDF
-      const reader = new FileReader()
+      // 1. Extraire le texte du PDF
       const texte = await new Promise((resolve, reject) => {
+        const reader = new FileReader()
         reader.onload = async (ev) => {
-          const pdf = await pdfjsLib.getDocument(new Uint8Array(ev.target.result)).promise
-          let text = ''
-          for (let i = 1; i <= pdf.numPages; i++) {
-            const page = await pdf.getPage(i)
-            const content = await page.getTextContent()
-            text += content.items.map(item => item.str).join(' ') + '\n'
+          try {
+            const pdf = await pdfjsLib.getDocument(new Uint8Array(ev.target.result)).promise
+            let text = ''
+            for (let i = 1; i <= pdf.numPages; i++) {
+              const page = await pdf.getPage(i)
+              const content = await page.getTextContent()
+              text += content.items.map(item => item.str).join(' ') + '\n'
+            }
+            if (!text.trim()) reject(new Error('PDF vide ou non lisible'))
+            else resolve(text)
+          } catch (err) {
+            reject(err)
           }
-          resolve(text)
         }
-        reader.onerror = reject
+        reader.onerror = () => reject(new Error('Erreur lecture fichier'))
         reader.readAsArrayBuffer(file)
       })
 
-      // Envoyer a l'IA pour extraction
+      // 2. Envoyer à l'IA
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -111,12 +116,12 @@ export default function Profile() {
           system: 'Tu es un expert en extraction de donnees de CV. Tu retournes UNIQUEMENT un JSON valide, sans texte avant ou apres, sans balises markdown.',
           messages: [{
             role: 'user',
-            content: `Extrais toutes les informations de ce CV et retourne-les dans ce JSON exact. Si une information est absente, mets une chaine vide "".
+            content: `Extrais toutes les informations de ce CV. Si une information est absente, mets une chaine vide "".
 
-CV A ANALYSER:
-${texte}
+CV:
+${texte.substring(0, 8000)}
 
-Retourne UNIQUEMENT ce JSON:
+Retourne UNIQUEMENT ce JSON valide:
 {
   "prenom": "",
   "nom": "",
@@ -124,40 +129,41 @@ Retourne UNIQUEMENT ce JSON:
   "telephone": "",
   "ville": "",
   "linkedin": "",
-  "titre": "titre professionnel actuel ou recherche",
-  "accroche": "resume du profil en 3-4 phrases",
-  "experiences": [
-    {
-      "poste": "",
-      "entreprise": "",
-      "periode": "",
-      "lieu": "",
-      "missions": ["mission 1", "mission 2", "mission 3"]
-    }
-  ],
-  "formations": [
-    {
-      "diplome": "",
-      "etablissement": "",
-      "periode": "",
-      "mention": "",
-      "description": ""
-    }
-  ],
-  "competences": ["competence1", "competence2", "competence3"],
-  "langues": [{"langue": "", "niveau": ""}],
-  "certifications": [{"titre": "", "organisme": "", "annee": ""}],
-  "centres_interet": ["interet1", "interet2"]
+  "titre": "",
+  "accroche": "",
+  "experiences": [{"poste":"","entreprise":"","periode":"","lieu":"","missions":["","",""]}],
+  "formations": [{"diplome":"","etablissement":"","periode":"","mention":"","description":""}],
+  "competences": ["","",""],
+  "langues": [{"langue":"","niveau":""}],
+  "certifications": [{"titre":"","organisme":"","annee":""}],
+  "centres_interet": ["",""]
 }`
           }]
         })
       })
 
-      const data = await res.json()
-      const texteJSON = data.content[0].text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-      const json = JSON.parse(texteJSON)
+      if (!res.ok) throw new Error(`Erreur API: ${res.status}`)
 
-      // Remplir les champs
+      const data = await res.json()
+
+      if (!data.content || !data.content[0]) throw new Error('Reponse IA invalide')
+
+      const texteJSON = data.content[0].text
+        .replace(/```json\n?/g, '')
+        .replace(/```\n?/g, '')
+        .trim()
+
+      let json
+      try {
+        json = JSON.parse(texteJSON)
+      } catch {
+        // Essayer d'extraire le JSON si du texte parasite est présent
+        const match = texteJSON.match(/\{[\s\S]*\}/)
+        if (match) json = JSON.parse(match[0])
+        else throw new Error('JSON invalide dans la reponse IA')
+      }
+
+      // 3. Remplir les champs
       if (json.prenom) setPrenom(json.prenom)
       if (json.nom) setNom(json.nom)
       if (json.email) setEmail(json.email)
@@ -166,19 +172,24 @@ Retourne UNIQUEMENT ce JSON:
       if (json.linkedin) setLinkedin(json.linkedin)
       if (json.titre) setTitre(json.titre)
       if (json.accroche) setAccroche(json.accroche)
-      if (json.experiences?.length) setExperiences(json.experiences)
+      if (json.experiences?.length) setExperiences(json.experiences.map(exp => ({
+        ...exp,
+        missions: exp.missions?.filter(m => m) || ['']
+      })))
       if (json.formations?.length) setFormations(json.formations)
-      if (json.competences?.length) setCompetences(json.competences)
-      if (json.langues?.length) setLangues(json.langues)
+      if (json.competences?.filter(c => c).length) setCompetences(json.competences.filter(c => c))
+      if (json.langues?.filter(l => l.langue).length) setLangues(json.langues.filter(l => l.langue))
       if (json.certifications?.filter(c => c.titre).length) setCertifications(json.certifications.filter(c => c.titre))
-      if (json.centres_interet?.length) setCentresInteret(json.centres_interet)
+      if (json.centres_interet?.filter(c => c).length) setCentresInteret(json.centres_interet.filter(c => c))
 
       setImportDone(true)
       setActiveSection('infos')
+
     } catch (err) {
-      alert('Erreur lors de l\'import. Verifie que le PDF contient du texte.')
-      console.error(err)
+      console.error('Erreur import CV:', err)
+      alert(`Erreur lors de l'import : ${err.message}\n\nAssure-toi que le PDF contient du texte (pas un scan image).`)
     }
+
     setImporting(false)
   }
 
@@ -193,7 +204,8 @@ Retourne UNIQUEMENT ce JSON:
   const handleSave = async () => {
     if (!user) return
     setSaving(true)
-    await supabase.from('profiles').upsert({
+
+    const profileData = {
       user_id: user.id, prenom, nom, email, telephone, ville, linkedin,
       titre, accroche, photo,
       experiences: experiences.filter(e => e.poste || e.entreprise),
@@ -202,7 +214,35 @@ Retourne UNIQUEMENT ce JSON:
       langues: langues.filter(l => l.langue),
       certifications: certifications.filter(c => c.titre),
       centres_interet: centresInteret.filter(c => c.trim()),
-    }, { onConflict: 'user_id' })
+    }
+
+    // Vérifier si un profil existe déjà
+    const { data: existing } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    let error
+    if (existing) {
+      const { error: e } = await supabase
+        .from('profiles')
+        .update(profileData)
+        .eq('user_id', user.id)
+      error = e
+    } else {
+      const { error: e } = await supabase
+        .from('profiles')
+        .insert(profileData)
+      error = e
+    }
+
+    if (error) {
+      alert('Erreur de sauvegarde : ' + error.message)
+      setSaving(false)
+      return
+    }
+
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2500)
