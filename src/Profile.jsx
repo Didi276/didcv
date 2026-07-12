@@ -377,7 +377,7 @@ Retourne UNIQUEMENT ce JSON valide:
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
                       <div>
                         <div style={{ fontSize: '14px', fontWeight: '700', color: '#4f46e5', marginBottom: '2px' }}>⚡ Depuis un CV DidCV</div>
-                        <div style={{ fontSize: '12px', color: '#9ca3af' }}>Recommandé — import instantané sans IA</div>
+                        <div style={{ fontSize: '12px', color: '#9ca3af' }}>Recommandé - import instantané sans IA</div>
                       </div>
                     </div>
                     {!showSavedCvs ? (
@@ -406,15 +406,26 @@ Retourne UNIQUEMENT ce JSON valide:
                   </div>
                 )}
 
-                {/* Option 2 : PDF externe */}
+                {/* Option 2 : PDF */}
                 <div style={{ padding: '20px', background: '#fafafa', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
-                  <div style={{ fontSize: '14px', fontWeight: '700', color: '#374151', marginBottom: '4px' }}>📄 Depuis un CV PDF</div>
-                  <div style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '14px', lineHeight: '1.5' }}>
-                    Fonctionne avec tous les CVs PDF — y compris ceux générés par DidCV.
-                  </div>
-                  <label style={{ display: 'block', padding: '11px', background: '#fff', border: '1.5px dashed #d1d5db', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', textAlign: 'center', color: '#374151' }}>
+                  <div style={{ fontSize: '14px', fontWeight: '700', color: '#374151', marginBottom: '14px' }}>📄 Uploader ton CV PDF</div>
+                  <label
+                    onDragOver={e => { e.preventDefault(); e.currentTarget.style.borderColor = '#4f46e5'; e.currentTarget.style.background = '#faf9ff' }}
+                    onDragLeave={e => { e.currentTarget.style.borderColor = '#d1d5db'; e.currentTarget.style.background = '#fff' }}
+                    onDrop={e => {
+                      e.preventDefault()
+                      e.currentTarget.style.borderColor = '#d1d5db'
+                      e.currentTarget.style.background = '#fff'
+                      const file = e.dataTransfer.files[0]
+                      if (file) handleImportCV({ target: { files: [file] } })
+                    }}
+                    style={{ display: 'block', padding: '24px 16px', background: '#fff', border: '2px dashed #d1d5db', borderRadius: '10px', cursor: 'pointer', textAlign: 'center', transition: 'all 0.15s' }}>
                     <input type="file" accept=".pdf" onChange={handleImportCV} style={{ display: 'none' }} />
-                    📥 Choisir un fichier PDF
+                    <div style={{ fontSize: '28px', marginBottom: '8px' }}>📁</div>
+                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#374151', marginBottom: '4px' }}>
+                      Glisse ton CV ici ou clique pour choisir
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#9ca3af' }}>PDF uniquement</div>
                   </label>
                 </div>
 
@@ -471,7 +482,7 @@ Retourne UNIQUEMENT ce JSON valide:
               <span style={{ fontSize: '18px', flexShrink: 0 }}>⚠️</span>
               <div style={{ fontSize: '13px', color: '#92400e', lineHeight: '1.6' }}>
                 <strong>Vérifie bien tes informations avant de sauvegarder.</strong><br />
-                L'IA peut faire des erreurs — contrôle les dates, les intitulés de poste et les missions. Corrige ce qui ne va pas dans les onglets.
+                L'IA peut faire des erreurs - contrôle les dates, les intitulés de poste et les missions. Corrige ce qui ne va pas dans les onglets.
               </div>
             </div>
 
@@ -488,7 +499,7 @@ Retourne UNIQUEMENT ce JSON valide:
             </div>
             <button onClick={handleSave}
               style={{ width: '100%', marginTop: '10px', padding: '12px', background: '#16a34a', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
-              {saving ? '⏳ Sauvegarde...' : saved ? '✅ Sauvegardé !' : '💾 Tout semble bon — Sauvegarder'}
+              {saving ? '⏳ Sauvegarde...' : saved ? '✅ Sauvegardé !' : '💾 Tout semble bon - Sauvegarder'}
             </button>
           </div>
         )}
