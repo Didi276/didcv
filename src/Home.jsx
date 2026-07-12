@@ -274,7 +274,7 @@ export default function Home() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
             {[
               { icon: '🤖', title: 'CV généré par IA', desc: "L'IA analyse l'offre et génère un CV taillé pour passer tous les filtres ATS. Score 95%+." },
-              { icon: '✉️', title: 'Lettre de motivation', desc: 'Lettre personnalisée générée automatiquement, adaptée au poste et à l'entreprise.' },
+              { icon: '✉️', title: 'Lettre de motivation', desc: "Lettre personnalisée générée automatiquement, adaptée au poste et à l'entreprise." },
               { icon: '🎨', title: '27 templates', desc: 'Pour tous les profils : tertiaire, tech, santé, BTP, restauration, étudiant, international...' },
               { icon: '✏️', title: 'Éditeur intégré', desc: 'Modifie chaque section directement en ligne — missions, compétences, mise en forme.' },
               { icon: '🔍', title: 'Recherche d\'offres', desc: 'Parcours des milliers d\'offres en temps réel et génère ton CV pour postuler en 1 clic.' },
