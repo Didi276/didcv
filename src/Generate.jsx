@@ -13,6 +13,11 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.mi
 
 const ADMIN_EMAILS = ['fernandochokki@gmail.com', 'chokkifernando@gmail.com', 'carlinazon@gmail.com']
 
+const PRESET_COLORS = [
+  '#4f46e5', '#0a66c2', '#0f6e56', '#dc2626', '#0d9488',
+  '#7c3aed', '#ea580c', '#1e3a5f', '#374151', '#c9a84c',
+]
+
 const SECTEUR_LABELS = {
   tech: '💻 Tech', sante: '🏥 Sante', btp: '🏗 BTP',
   restauration: '🍽 Restauration', commerce: '🛒 Commerce',
@@ -65,6 +70,7 @@ export default function Generate() {
   const [lettre, setLettre] = useState('')
   const [activeTab, setActiveTab] = useState('cv')
   const [showEditor, setShowEditor] = useState(false)
+  const [customColor, setCustomColor] = useState(null)
 
   useEffect(() => {
     const init = async () => {
@@ -375,6 +381,28 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
             )}
           </div>
 
+          {/* Color picker */}
+          <div style={{ margin: '0 24px 16px', flexShrink: 0 }}>
+            <div style={{ fontSize: '12px', fontWeight: '600', color: '#374151', marginBottom: '10px' }}>
+              Couleur du template
+            </div>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+              {PRESET_COLORS.map(c => (
+                <button key={c} onClick={() => setCustomColor(customColor === c ? null : c)}
+                  style={{ width: '26px', height: '26px', borderRadius: '50%', background: c, border: customColor === c ? '3px solid #111' : '2px solid rgba(0,0,0,0.1)', cursor: 'pointer', flexShrink: 0, transition: 'transform 0.1s', transform: customColor === c ? 'scale(1.2)' : 'scale(1)' }} />
+              ))}
+              <label title="Couleur personnalisee" style={{ position: 'relative', cursor: 'pointer' }}>
+                <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: customColor && !PRESET_COLORS.includes(customColor) ? customColor : 'linear-gradient(135deg,#f093fb,#667eea,#22d3ee)', border: '2px solid rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px' }}>🎨</div>
+                <input type="color" onChange={e => setCustomColor(e.target.value)} style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }} />
+              </label>
+              {customColor && (
+                <button onClick={() => setCustomColor(null)} style={{ fontSize: '11px', color: '#9ca3af', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit' }}>
+                  Reset
+                </button>
+              )}
+            </div>
+          </div>
+
           {/* Bouton generer */}
           <div style={{ padding: '0 24px 24px', flexShrink: 0 }}>
             <button onClick={handleGenerate} disabled={loading}
@@ -431,7 +459,7 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
               <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '32px 24px' }}>
                 {activeTab === 'cv' ? (
                   <div style={{ boxShadow: '0 8px 40px rgba(0,0,0,0.15)', borderRadius: '4px', overflow: 'hidden' }}>
-                    <CVTemplate cvData={cvData} template={templateChoisi} />
+                    <CVTemplate cvData={cvData} template={templateChoisi} customColor={customColor} />
                   </div>
                 ) : (
                   <div style={{ background: '#fff', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', width: '100%', maxWidth: '680px', overflow: 'hidden' }}>

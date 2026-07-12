@@ -67,11 +67,12 @@ function SectionCentresInteret({ cvData, couleur = '#1a1a1a', style = {} }) {
 }
 
 // ─── 1. FINANCE ──────────────────────────────────────────────
-export function TemplateFinance({ cvData }) {
+export function TemplateFinance({ cvData, color }) {
+  const C = color || '#1a1a1a'
   const f = getFontConfig(cvData)
   return (
     <div id="cv-to-print" style={{fontFamily:'Georgia,serif',color:'#1a1a1a',fontSize:f.base,lineHeight:f.lineH,padding:'36px 40px',background:'#fff',width:'794px',height:'1123px',overflow:'hidden',boxSizing:'border-box'}}>
-      <div style={{borderBottom:'3px solid #1a1a1a',paddingBottom:'14px',marginBottom:'14px'}}>
+      <div style={{borderBottom:`3px solid ${C}`,paddingBottom:'14px',marginBottom:'14px'}}>
         <div style={{display:'flex',alignItems:'center',gap:'20px'}}>
           <Avatar cvData={cvData} size={88} shape="circle" />
           <div style={{flex:1,minWidth:0}}>
@@ -117,11 +118,12 @@ export function TemplateFinance({ cvData }) {
 }
 
 // ─── 2. LINKEDIN ─────────────────────────────────────────────
-export function TemplateLinkedIn({ cvData }) {
+export function TemplateLinkedIn({ cvData, color }) {
+  const C = color || '#0a66c2'
   const f = getFontConfig(cvData)
   return (
     <div id="cv-to-print" style={{fontFamily:'"Segoe UI",Arial,sans-serif',color:'#191919',fontSize:f.base,lineHeight:f.lineH,background:'#fff',width:'794px',height:'1123px',overflow:'hidden'}}>
-      <div style={{background:'#0a66c2',padding:'22px 28px'}}>
+      <div style={{background:C,padding:'22px 28px'}}>
         <div style={{display:'flex',alignItems:'flex-start',gap:'16px'}}>
           <Avatar cvData={cvData} size={62} shape="circle" />
           <div style={{flex:1}}><div style={{fontSize:f.xsmall,color:'rgba(255,255,255,0.75)',letterSpacing:'1px',textTransform:'uppercase',marginBottom:'3px'}}>{cvData.titre}</div><h1 style={{fontSize:'22px',fontWeight:'700',color:'#fff',margin:'0 0 6px',lineHeight:'1.1'}}>{cvData.prenom} {cvData.nom}</h1><div style={{display:'flex',gap:'14px',flexWrap:'wrap',fontSize:f.xsmall,color:'rgba(255,255,255,0.75)'}}><span>✉ {cvData.email}</span><span>☎ {cvData.telephone}</span><span>📍 {cvData.ville}</span></div></div>
@@ -204,11 +206,12 @@ export function TemplateSiliconValley({ cvData }) {
 }
 
 // ─── 6. MODERNE ──────────────────────────────────────────────
-export function TemplateModerne({ cvData }) {
+export function TemplateModerne({ cvData, color }) {
+  const C = color || '#0f6e56'
   const f = getFontConfig(cvData)
   return (
     <div id="cv-to-print" style={{display:'grid',gridTemplateColumns:'210px 1fr',fontFamily:'Helvetica,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',width:'794px',height:'1123px',overflow:'hidden'}}>
-      <div style={{background:'#0f6e56',color:'#fff',padding:'24px 18px'}}>
+      <div style={{background:C,color:'#fff',padding:'24px 18px'}}>
         <div style={{marginBottom:'18px',paddingBottom:'14px',borderBottom:'1px solid rgba(255,255,255,0.2)',display:'flex',flexDirection:'column',alignItems:'center',gap:'8px'}}><Avatar cvData={cvData} size={64} shape="circle" /><div style={{textAlign:'center'}}><div style={{fontSize:'7px',color:'rgba(255,255,255,0.6)',letterSpacing:'1.5px',textTransform:'uppercase',marginBottom:'3px'}}>{cvData.titre}</div><h1 style={{fontSize:'18px',fontWeight:'700',marginBottom:'0',color:'#fff',lineHeight:'1.15'}}>{cvData.prenom}<br/>{cvData.nom}</h1></div></div>
         <div style={{marginBottom:f.mb}}><div style={{fontSize:'7px',fontWeight:'700',letterSpacing:'1.5px',textTransform:'uppercase',color:'rgba(255,255,255,0.6)',marginBottom:'6px'}}>CONTACT</div><div style={{fontSize:f.xsmall,color:'rgba(255,255,255,0.9)',marginBottom:'4px'}}>✉ {cvData.email}</div><div style={{fontSize:f.xsmall,color:'rgba(255,255,255,0.9)',marginBottom:'4px'}}>☎ {cvData.telephone}</div><div style={{fontSize:f.xsmall,color:'rgba(255,255,255,0.9)',marginBottom:'4px'}}>📍 {cvData.ville}</div></div>
         <div style={{marginBottom:f.mb}}><div style={{fontSize:'7px',fontWeight:'700',letterSpacing:'1.5px',textTransform:'uppercase',color:'rgba(255,255,255,0.6)',marginBottom:'6px'}}>COMPÉTENCES</div>{cvData.competences?.map((c,i)=><div key={i} style={{background:'rgba(255,255,255,0.15)',padding:'3px 7px',borderRadius:'3px',fontSize:f.xsmall,color:'#fff',marginBottom:'4px'}}>{c}</div>)}</div>
@@ -317,11 +320,12 @@ export function TemplateElegant({ cvData }) {
 }
 
 // ─── 12. BOLD ────────────────────────────────────────────────
-export function TemplateBold({ cvData }) {
+export function TemplateBold({ cvData, color }) {
+  const C = color || '#c0392b'
   const f = getFontConfig(cvData)
   return (
     <div id="cv-to-print" style={{fontFamily:'Arial,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',width:'794px',height:'1123px',overflow:'hidden'}}>
-      <div style={{background:'#c0392b',padding:'24px 36px'}}><div style={{display:'flex',alignItems:'center',gap:'18px'}}><Avatar cvData={cvData} size={68} shape="circle" /><div><div style={{fontSize:f.xsmall,color:'rgba(255,255,255,0.7)',fontWeight:'300',letterSpacing:'2px',textTransform:'uppercase',marginBottom:'3px'}}>{cvData.titre}</div><h1 style={{fontSize:'26px',fontWeight:'900',color:'#fff',margin:'0 0 8px',letterSpacing:'-0.5px',textTransform:'uppercase'}}>{cvData.prenom} {cvData.nom}</h1><div style={{display:'flex',gap:'18px',flexWrap:'wrap',fontSize:f.xsmall,color:'rgba(255,255,255,0.75)'}}><span>✉ {cvData.email}</span><span>☎ {cvData.telephone}</span><span>📍 {cvData.ville}</span></div></div></div></div>
+      <div style={{background:C,padding:'24px 36px'}}><div style={{display:'flex',alignItems:'center',gap:'18px'}}><Avatar cvData={cvData} size={68} shape="circle" /><div><div style={{fontSize:f.xsmall,color:'rgba(255,255,255,0.7)',fontWeight:'300',letterSpacing:'2px',textTransform:'uppercase',marginBottom:'3px'}}>{cvData.titre}</div><h1 style={{fontSize:'26px',fontWeight:'900',color:'#fff',margin:'0 0 8px',letterSpacing:'-0.5px',textTransform:'uppercase'}}>{cvData.prenom} {cvData.nom}</h1><div style={{display:'flex',gap:'18px',flexWrap:'wrap',fontSize:f.xsmall,color:'rgba(255,255,255,0.75)'}}><span>✉ {cvData.email}</span><span>☎ {cvData.telephone}</span><span>📍 {cvData.ville}</span></div></div></div></div>
       {cvData.accroche&&<div style={{background:'#f9f9f9',padding:'12px 36px',borderBottom:'3px solid #c0392b'}}><p style={{fontSize:f.small,color:'#555',margin:0,fontStyle:'italic',lineHeight:f.lineH}}>{cvData.accroche}</p></div>}
       <div style={{padding:'20px 36px',display:'grid',gridTemplateColumns:'1fr 260px',gap:'28px'}}>
         <div>
@@ -358,11 +362,12 @@ export function TemplatePastel({ cvData }) {
 }
 
 // ─── 14. CORPORATE ───────────────────────────────────────────
-export function TemplateCorporate({ cvData }) {
+export function TemplateCorporate({ cvData, color }) {
+  const C = color || '#1e3a5f'
   const f = getFontConfig(cvData)
   return (
     <div id="cv-to-print" style={{fontFamily:'Arial,Helvetica,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#fff',width:'794px',height:'1123px',overflow:'hidden'}}>
-      <div style={{background:'#1e3a5f',borderBottom:'4px solid #f59e0b',padding:'20px 32px'}}><div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'18px'}}><div style={{display:'flex',alignItems:'center',gap:'14px'}}><Avatar cvData={cvData} size={62} shape="circle" /><div><div style={{fontSize:f.xsmall,color:'#f59e0b',letterSpacing:'1px',textTransform:'uppercase',fontWeight:'300',marginBottom:'3px'}}>{cvData.titre}</div><h1 style={{fontSize:'22px',fontWeight:'700',color:'#fff',margin:'0'}}>{cvData.prenom} {cvData.nom}</h1></div></div><div style={{textAlign:'right',fontSize:f.xsmall,color:'rgba(255,255,255,0.7)'}}><div style={{marginBottom:'2px'}}>{cvData.email}</div><div style={{marginBottom:'2px'}}>{cvData.telephone}</div><div>{cvData.ville}</div></div></div></div>
+      <div style={{background:C,borderBottom:'4px solid #f59e0b',padding:'20px 32px'}}><div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'18px'}}><div style={{display:'flex',alignItems:'center',gap:'14px'}}><Avatar cvData={cvData} size={62} shape="circle" /><div><div style={{fontSize:f.xsmall,color:'#f59e0b',letterSpacing:'1px',textTransform:'uppercase',fontWeight:'300',marginBottom:'3px'}}>{cvData.titre}</div><h1 style={{fontSize:'22px',fontWeight:'700',color:'#fff',margin:'0'}}>{cvData.prenom} {cvData.nom}</h1></div></div><div style={{textAlign:'right',fontSize:f.xsmall,color:'rgba(255,255,255,0.7)'}}><div style={{marginBottom:'2px'}}>{cvData.email}</div><div style={{marginBottom:'2px'}}>{cvData.telephone}</div><div>{cvData.ville}</div></div></div></div>
       {cvData.accroche&&<div style={{padding:'12px 32px',background:'#f0f4f8',borderBottom:'1px solid #e2e8f0'}}><p style={{fontSize:f.small,color:'#334155',margin:0,lineHeight:f.lineH}}>{cvData.accroche}</p></div>}
       <div style={{padding:'20px 32px',display:'grid',gridTemplateColumns:'1fr 240px',gap:'24px'}}>
         <div>
@@ -394,11 +399,12 @@ export function TemplateSwiss({ cvData }) {
 }
 
 // ─── 16. TIMELINE ────────────────────────────────────────────
-export function TemplateTimeline({ cvData }) {
+export function TemplateTimeline({ cvData, color }) {
+  const C = color || '#1e40af'
   const f = getFontConfig(cvData)
   return (
     <div id="cv-to-print" style={{fontFamily:'"Helvetica Neue",Arial,sans-serif',fontSize:f.base,lineHeight:f.lineH,background:'#f8faff',width:'794px',height:'1123px',overflow:'hidden'}}>
-      <div style={{background:'linear-gradient(135deg,#1e40af,#3b82f6)',padding:'20px 32px'}}><div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'14px'}}><div style={{display:'flex',alignItems:'center',gap:'14px'}}><Avatar cvData={cvData} size={60} shape="circle" /><div><div style={{fontSize:f.xsmall,color:'rgba(255,255,255,0.75)',letterSpacing:'1px',textTransform:'uppercase',marginBottom:'3px'}}>{cvData.titre}</div><h1 style={{fontSize:'22px',fontWeight:'700',color:'#fff',margin:'0'}}>{cvData.prenom} {cvData.nom}</h1></div></div><div style={{textAlign:'right',fontSize:f.xsmall,color:'rgba(255,255,255,0.8)'}}><div style={{marginBottom:'2px'}}>✉ {cvData.email}</div><div style={{marginBottom:'2px'}}>☎ {cvData.telephone}</div><div>📍 {cvData.ville}</div></div></div></div>
+      <div style={{background:`linear-gradient(135deg,${C},${C}99)`,padding:'20px 32px'}}><div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'14px'}}><div style={{display:'flex',alignItems:'center',gap:'14px'}}><Avatar cvData={cvData} size={60} shape="circle" /><div><div style={{fontSize:f.xsmall,color:'rgba(255,255,255,0.75)',letterSpacing:'1px',textTransform:'uppercase',marginBottom:'3px'}}>{cvData.titre}</div><h1 style={{fontSize:'22px',fontWeight:'700',color:'#fff',margin:'0'}}>{cvData.prenom} {cvData.nom}</h1></div></div><div style={{textAlign:'right',fontSize:f.xsmall,color:'rgba(255,255,255,0.8)'}}><div style={{marginBottom:'2px'}}>✉ {cvData.email}</div><div style={{marginBottom:'2px'}}>☎ {cvData.telephone}</div><div>📍 {cvData.ville}</div></div></div></div>
       {cvData.accroche&&<div style={{background:'#fff',padding:'12px 32px',borderBottom:'2px solid #e2e8f0'}}><p style={{fontSize:f.small,color:'#475569',margin:0,fontStyle:'italic',lineHeight:f.lineH}}>{cvData.accroche}</p></div>}
       <div style={{padding:'20px 32px',display:'grid',gridTemplateColumns:'1fr 240px',gap:'24px'}}>
         <div>
@@ -422,35 +428,38 @@ export function TemplateTimeline({ cvData }) {
 }
 
 // ─── ROUTER COMPLET ──────────────────────────────────────────
-export function CVTemplate({ cvData, template }) {
-  switch(template) {
-    case 'linkedin':       return <TemplateLinkedIn cvData={cvData} />
-    case 'canva':          return <TemplateCanva cvData={cvData} />
-    case 'harvard':        return <TemplateHarvard cvData={cvData} />
-    case 'siliconvalley':  return <TemplateSiliconValley cvData={cvData} />
-    case 'moderne':        return <TemplateModerne cvData={cvData} />
-    case 'executive':      return <TemplateExecutive cvData={cvData} />
-    case 'creative':       return <TemplateCreative cvData={cvData} />
-    case 'minimal':        return <TemplateMinimal cvData={cvData} />
-    case 'tech':           return <TemplateTech cvData={cvData} />
-    case 'elegant':        return <TemplateElegant cvData={cvData} />
-    case 'bold':           return <TemplateBold cvData={cvData} />
-    case 'pastel':         return <TemplatePastel cvData={cvData} />
-    case 'corporate':      return <TemplateCorporate cvData={cvData} />
-    case 'swiss':          return <TemplateSwiss cvData={cvData} />
-    case 'timeline':       return <TemplateTimeline cvData={cvData} />
-    case 'etudiant':       return <TemplateEtudiant cvData={cvData} />
-    case 'alternance':     return <TemplateAlternance cvData={cvData} />
-    case 'portfolio':      return <TemplatePortfolio cvData={cvData} />
-    case 'sante':          return <TemplateSante cvData={cvData} />
-    case 'commercial':     return <TemplateCommercial cvData={cvData} />
-    case 'startup':        return <TemplateStartup cvData={cvData} />
-    case 'classique':      return <TemplateClassique cvData={cvData} />
-    case 'international':  return <TemplateInternational cvData={cvData} />
-    case 'btp':            return <TemplateBTP cvData={cvData} />
-    case 'restauration':   return <TemplateRestauration cvData={cvData} />
-    case 'transport':      return <TemplateTransport cvData={cvData} />
-    case 'beaute':         return <TemplateBeaute cvData={cvData} />
-    default:               return <TemplateFinance cvData={cvData} />
+export function CVTemplate({ cvData, template, customColor }) {
+  const color = customColor || null
+
+  const templates = {
+    linkedin:      <TemplateLinkedIn cvData={cvData} color={color} />,
+    canva:         <TemplateCanva cvData={cvData} color={color} />,
+    harvard:       <TemplateHarvard cvData={cvData} color={color} />,
+    siliconvalley: <TemplateSiliconValley cvData={cvData} color={color} />,
+    moderne:       <TemplateModerne cvData={cvData} color={color} />,
+    executive:     <TemplateExecutive cvData={cvData} color={color} />,
+    creative:      <TemplateCreative cvData={cvData} color={color} />,
+    minimal:       <TemplateMinimal cvData={cvData} color={color} />,
+    tech:          <TemplateTech cvData={cvData} color={color} />,
+    elegant:       <TemplateElegant cvData={cvData} color={color} />,
+    bold:          <TemplateBold cvData={cvData} color={color} />,
+    pastel:        <TemplatePastel cvData={cvData} color={color} />,
+    corporate:     <TemplateCorporate cvData={cvData} color={color} />,
+    swiss:         <TemplateSwiss cvData={cvData} color={color} />,
+    timeline:      <TemplateTimeline cvData={cvData} color={color} />,
+    etudiant:      <TemplateEtudiant cvData={cvData} color={color} />,
+    alternance:    <TemplateAlternance cvData={cvData} color={color} />,
+    portfolio:     <TemplatePortfolio cvData={cvData} color={color} />,
+    sante:         <TemplateSante cvData={cvData} color={color} />,
+    commercial:    <TemplateCommercial cvData={cvData} color={color} />,
+    startup:       <TemplateStartup cvData={cvData} color={color} />,
+    classique:     <TemplateClassique cvData={cvData} color={color} />,
+    international: <TemplateInternational cvData={cvData} color={color} />,
+    btp:           <TemplateBTP cvData={cvData} color={color} />,
+    restauration:  <TemplateRestauration cvData={cvData} color={color} />,
+    transport:     <TemplateTransport cvData={cvData} color={color} />,
+    beaute:        <TemplateBeaute cvData={cvData} color={color} />,
   }
+
+  return templates[template] || <TemplateFinance cvData={cvData} color={color} />
 }

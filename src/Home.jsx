@@ -1,5 +1,41 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { supabase } from './supabase'
+
+// Hook pour détecter quand un élément entre dans le viewport
+function useInView(threshold = 0.15) {
+  const ref = useRef(null)
+  const [inView, setInView] = useState(false)
+  useEffect(() => {
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setInView(true); obs.disconnect() }
+    }, { threshold })
+    if (ref.current) obs.observe(ref.current)
+    return () => obs.disconnect()
+  }, [])
+  return [ref, inView]
+}
+
+// Styles d'animation globaux
+const ANIM_CSS = `
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(var(--r,0deg)); }
+    50%       { transform: translateY(-10px) rotate(var(--r,0deg)); }
+  }
+  @keyframes countUp {
+    from { opacity: 0; transform: scale(0.8); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  .anim-fade-up { animation: fadeUp 0.6s ease both; }
+  .anim-fade-in { animation: fadeIn 0.5s ease both; }
+`
 
 // Templates à afficher dans le hero
 const PREVIEW_TEMPLATES = [
@@ -40,6 +76,10 @@ function MiniCV({ color, accent, name, style }) {
 
 export default function Home() {
   const [scrolled, setScrolled] = useState(false)
+  const [templatesRef, templatesInView] = useInView()
+  const [howRef, howInView] = useInView()
+  const [featRef, featInView] = useInView()
+  const [pricingRef, pricingInView] = useInView()
 
   useEffect(() => {
     const checkUser = async () => {
@@ -55,6 +95,7 @@ export default function Home() {
 
   return (
     <div style={{ fontFamily: '"Inter",system-ui,sans-serif', color: '#111', background: '#fff', minHeight: '100vh' }}>
+      <style>{ANIM_CSS}</style>
 
       {/* ─── NAVIGATION ─────────────────────────────────────── */}
       <nav style={{
@@ -97,7 +138,7 @@ export default function Home() {
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '80px 48px 60px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '64px', alignItems: 'center' }}>
 
           {/* Texte gauche */}
-          <div>
+          <div style={{ animation: 'fadeUp 0.7s ease both' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#ede9fe', color: '#5b21b6', padding: '5px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '600', marginBottom: '24px', letterSpacing: '0.3px' }}>
               ✨ Propulsé par l'IA - Gratuit pour commencer
             </div>
@@ -139,13 +180,13 @@ export default function Home() {
           {/* Aperçus templates droite */}
           <div style={{ position: 'relative', height: '420px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {/* CV en arrière plan */}
-            <MiniCV color="#0a66c2" accent="#e8f3ff" name="LinkedIn" style={{ position: 'absolute', left: '0px', top: '20px', transform: 'rotate(-6deg)', opacity: 0.5 }} />
-            <MiniCV color="#0f6e56" accent="#f0fdf4" name="Modern" style={{ position: 'absolute', right: '10px', top: '30px', transform: 'rotate(5deg)', opacity: 0.5 }} />
+            <MiniCV color="#0a66c2" accent="#e8f3ff" name="LinkedIn" style={{ position: 'absolute', left: '0px', top: '20px', transform: 'rotate(-6deg)', opacity: 0.5, animation: 'float 4s ease-in-out infinite', '--r': '-6deg' }} />
+            <MiniCV color="#0f6e56" accent="#f0fdf4" name="Modern" style={{ position: 'absolute', right: '10px', top: '30px', transform: 'rotate(5deg)', opacity: 0.5, animation: 'float 5s ease-in-out infinite 0.5s', '--r': '5deg' }} />
             {/* CV principal au centre */}
-            <MiniCV color="#4f46e5" accent="#ede9fe" name="Main" style={{ position: 'relative', zIndex: 10, width: '160px', height: '226px', transform: 'rotate(0deg)' }} />
+            <MiniCV color="#4f46e5" accent="#ede9fe" name="Main" style={{ position: 'relative', zIndex: 10, width: '160px', height: '226px', animation: 'float 3.5s ease-in-out infinite 0.2s', '--r': '0deg' }} />
             {/* CV de droite */}
-            <MiniCV color="#1a1a1a" accent="#f0f0f0" name="Finance" style={{ position: 'absolute', right: '-10px', bottom: '20px', transform: 'rotate(4deg)', opacity: 0.7 }} />
-            <MiniCV color="#c9a84c" accent="#0d0d0d" name="Executive" style={{ position: 'absolute', left: '10px', bottom: '10px', transform: 'rotate(-4deg)', opacity: 0.7 }} />
+            <MiniCV color="#1a1a1a" accent="#f0f0f0" name="Finance" style={{ position: 'absolute', right: '-10px', bottom: '20px', transform: 'rotate(4deg)', opacity: 0.7, animation: 'float 4.5s ease-in-out infinite 0.8s', '--r': '4deg' }} />
+            <MiniCV color="#c9a84c" accent="#0d0d0d" name="Executive" style={{ position: 'absolute', left: '10px', bottom: '10px', transform: 'rotate(-4deg)', opacity: 0.7, animation: 'float 4s ease-in-out infinite 1s', '--r': '-4deg' }} />
 
             {/* Badge flottant */}
             <div style={{ position: 'absolute', top: '40px', right: '30px', background: '#fff', borderRadius: '12px', padding: '10px 14px', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', zIndex: 20, display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -177,7 +218,7 @@ export default function Home() {
       </div>
 
       {/* ─── TEMPLATES ───────────────────────────────────────── */}
-      <section id="templates" style={{ padding: '96px 48px', maxWidth: '1200px', margin: '0 auto' }}>
+      <section id="templates" ref={templatesRef} style={{ padding: '96px 48px', maxWidth: '1200px', margin: '0 auto', opacity: templatesInView ? 1 : 0, transform: templatesInView ? 'translateY(0)' : 'translateY(32px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
         <div style={{ textAlign: 'center', marginBottom: '56px' }}>
           <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#4f46e5', textTransform: 'uppercase', marginBottom: '12px' }}>TEMPLATES</div>
           <h2 style={{ fontSize: '40px', fontWeight: '800', letterSpacing: '-1.5px', margin: '0 0 16px', color: '#0f0f1a' }}>
@@ -237,7 +278,7 @@ export default function Home() {
       </section>
 
       {/* ─── COMMENT ÇA MARCHE ───────────────────────────────── */}
-      <section id="how" style={{ background: '#f8f9ff', padding: '96px 48px' }}>
+      <section id="how" ref={howRef} style={{ background: '#f8f9ff', padding: '96px 48px', opacity: howInView ? 1 : 0, transform: howInView ? 'translateY(0)' : 'translateY(32px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '64px' }}>
             <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#4f46e5', textTransform: 'uppercase', marginBottom: '12px' }}>COMMENT ÇA MARCHE</div>
@@ -263,7 +304,7 @@ export default function Home() {
       </section>
 
       {/* ─── FONCTIONNALITÉS ─────────────────────────────────── */}
-      <section style={{ padding: '96px 48px' }}>
+      <section ref={featRef} style={{ padding: '96px 48px', opacity: featInView ? 1 : 0, transform: featInView ? 'translateY(0)' : 'translateY(32px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '64px' }}>
             <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#4f46e5', textTransform: 'uppercase', marginBottom: '12px' }}>FONCTIONNALITÉS</div>
@@ -291,7 +332,7 @@ export default function Home() {
       </section>
 
       {/* ─── PRICING ─────────────────────────────────────────── */}
-      <section id="pricing" style={{ background: '#f8f9ff', padding: '96px 48px' }}>
+      <section id="pricing" ref={pricingRef} style={{ background: '#f8f9ff', padding: '96px 48px', opacity: pricingInView ? 1 : 0, transform: pricingInView ? 'translateY(0)' : 'translateY(32px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '56px' }}>
             <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#4f46e5', textTransform: 'uppercase', marginBottom: '12px' }}>TARIFS</div>
