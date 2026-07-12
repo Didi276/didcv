@@ -64,6 +64,11 @@ export default function Generate() {
   const [photoManuelle, setPhotoManuelle] = useState(null)
   const [offreEmploi, setOffreEmploi] = useState('')
   const [secteurDetecte, setSecteurDetecte] = useState(null)
+  const [showChat, setShowChat] = useState(false)
+  const [chatMessages, setChatMessages] = useState([])
+  const [chatInput, setChatInput] = useState('')
+  const [chatLoading, setChatLoading] = useState(false)
+  const [instructions, setInstructions] = useState('')
   const [loading, setLoading] = useState(false)
   const [progress, setProgress] = useState('')
   const [cvData, setCvData] = useState(null)
@@ -137,6 +142,58 @@ export default function Generate() {
     return t
   }
 
+  const openChat = () => {
+    setShowChat(true)
+    if (chatMessages.length === 0) {
+      setChatMessages([{
+        role: 'assistant',
+        content: `Bonjour ! Je suis là pour personnaliser ton CV selon tes souhaits.\n\nDis-moi ce que tu veux mettre en avant ou eviter. Par exemple :\n• "Je veux insister sur mon experience en management"\n• "Mettre ma formation en premier, j\'ai peu d\'experience"\n• "Ne pas mentionner mon stage chez X"\n• "Je veux un ton dynamique et ambitieux"\n\nQu\'est-ce qui est important pour toi dans ce CV ?`
+      }])
+    }
+  }
+
+  const sendChatMessage = async () => {
+    if (!chatInput.trim() || chatLoading) return
+    const userMsg = { role: 'user', content: chatInput }
+    const newMessages = [...chatMessages, userMsg]
+    setChatMessages(newMessages)
+    setChatInput('')
+    setChatLoading(true)
+
+    try {
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 400,
+          system: `Tu es un consultant RH qui aide un candidat a personaliser son CV. 
+Tu poses des questions courtes et pertinentes pour mieux comprendre ses souhaits.
+Apres 2-3 echanges, propose un resume des instructions sous la forme :
+"[INSTRUCTIONS CV]
+- Instruction 1
+- Instruction 2
+..."
+Sois concis, bienveillant et professionnel. Reponds en francais.
+Contexte offre : ${offreEmploi.substring(0, 200)}`,
+          messages: newMessages.map(m => ({ role: m.role, content: m.content }))
+        })
+      })
+      const data = await res.json()
+      const reply = data.content[0].text
+      setChatMessages(prev => [...prev, { role: 'assistant', content: reply }])
+
+      // Extraire les instructions si présentes
+      if (reply.includes('[INSTRUCTIONS CV]')) {
+        const idx = reply.indexOf('[INSTRUCTIONS CV]')
+        setInstructions(reply.slice(idx))
+      }
+    } catch (e) {
+      setChatMessages(prev => [...prev, { role: 'assistant', content: 'Desolé, une erreur est survenue. Reessaie.' }])
+    }
+    setChatLoading(false)
+  }
+
   const handleGenerate = async () => {
     if (!offreEmploi.trim()) { alert("Colle une offre d'emploi !"); return }
     if (!profile && !cvFile) { alert("Upload ton CV PDF ou remplis ton profil !"); return }
@@ -161,6 +218,11 @@ export default function Generate() {
     const promptCV = buildPromptCV(sourceCV, offreEmploi, secteur, config, nbExp,
       profile?.certifications?.filter(c=>c.titre).length > 0,
       profile?.centres_interet?.filter(c=>c).length > 0)
+
+    // Ajouter les instructions personnalisées si présentes
+    const promptFinal = instructions
+      ? `${promptCV}\n\nINSTRUCTIONS PERSONNALISEES DU CANDIDAT (a respecter absolument) :\n${instructions}`
+      : promptCV
     const dateJour = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 
     const fetchWithRetry = async (url, opts) => {
@@ -185,7 +247,7 @@ export default function Generate() {
           body: JSON.stringify({
             model: 'claude-haiku-4-5-20251001', max_tokens: 6000,
             system: `Tu es un expert RH senior specialise en ${config.label}. Tu retournes UNIQUEMENT un JSON valide, sans texte avant ou apres, sans balises markdown.`,
-            messages: [{ role: 'user', content: promptCV }]
+            messages: [{ role: 'user', content: promptFinal }]
           })
         }),
         fetchWithRetry('/api/generate', {
@@ -401,6 +463,82 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
                 </button>
               )}
             </div>
+          </div>
+
+          {/* ─── DISCUSSION IA ─── */}
+          <div style={{ margin: '0 24px 16px', flexShrink: 0 }}>
+            <button onClick={() => setShowChat(!showChat)}
+              style={{ width: '100%', padding: '11px 16px', background: showChat ? '#ede9fe' : '#f8f9ff', border: `1.5px solid ${showChat ? '#4f46e5' : '#e5e7eb'}`, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '16px' }}>💬</span>
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontSize: '13px', fontWeight: '700', color: showChat ? '#4f46e5' : '#374151' }}>Personnaliser avec l'IA</div>
+                  <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '1px' }}>
+                    {instructions ? '✅ Instructions enregistrees' : 'Dis a l\'IA ce que tu veux mettre en avant'}
+                  </div>
+                </div>
+              </div>
+              <span style={{ color: '#9ca3af', fontSize: '12px' }}>{showChat ? '▲' : '▼'}</span>
+            </button>
+
+            {showChat && (
+              <div style={{ marginTop: '10px', border: '1.5px solid #ede9fe', borderRadius: '12px', overflow: 'hidden', background: '#fff' }}>
+                {/* Messages */}
+                <div style={{ height: '260px', overflowY: 'auto', padding: '14px', display: 'flex', flexDirection: 'column', gap: '10px', background: '#faf9ff' }}>
+                  {chatMessages.map((msg, i) => (
+                    <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
+                      <div style={{
+                        maxWidth: '85%', padding: '9px 13px', borderRadius: msg.role === 'user' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
+                        background: msg.role === 'user' ? '#4f46e5' : '#fff',
+                        color: msg.role === 'user' ? '#fff' : '#374151',
+                        fontSize: '12px', lineHeight: '1.6',
+                        border: msg.role === 'assistant' ? '1px solid #ede9fe' : 'none',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                        whiteSpace: 'pre-wrap'
+                      }}>
+                        {msg.content}
+                      </div>
+                    </div>
+                  ))}
+                  {chatLoading && (
+                    <div style={{ display: 'flex', gap: '4px', padding: '8px 12px', background: '#fff', border: '1px solid #ede9fe', borderRadius: '12px', width: 'fit-content' }}>
+                      {[0,1,2].map(i => <div key={i} style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4f46e5', animation: `bounce 1s ease infinite ${i*0.2}s` }} />)}
+                      <style>{`@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }`}</style>
+                    </div>
+                  )}
+                </div>
+
+                {/* Input */}
+                <div style={{ padding: '10px', borderTop: '1px solid #ede9fe', display: 'flex', gap: '8px', background: '#fff' }}>
+                  <input
+                    value={chatInput}
+                    onChange={e => setChatInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && sendChatMessage()}
+                    placeholder="Dis-moi tes souhaits..."
+                    style={{ flex: 1, padding: '8px 12px', border: '1.5px solid #e5e7eb', borderRadius: '8px', fontSize: '12px', outline: 'none', fontFamily: 'inherit' }}
+                    onFocus={e => e.target.style.borderColor = '#4f46e5'}
+                    onBlur={e => e.target.style.borderColor = '#e5e7eb'}
+                  />
+                  <button onClick={chatMessages.length === 0 ? openChat : sendChatMessage}
+                    disabled={chatLoading && chatMessages.length > 0}
+                    style={{ padding: '8px 14px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0 }}>
+                    {chatMessages.length === 0 ? 'Commencer' : '→'}
+                  </button>
+                </div>
+
+                {/* Instructions extraites */}
+                {instructions && (
+                  <div style={{ padding: '10px 14px', background: '#f0fdf4', borderTop: '1px solid #86efac' }}>
+                    <div style={{ fontSize: '11px', fontWeight: '700', color: '#16a34a', marginBottom: '4px' }}>✅ Instructions prises en compte</div>
+                    <div style={{ fontSize: '11px', color: '#166534', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>{instructions}</div>
+                    <button onClick={() => { setInstructions(''); setChatMessages([]) }}
+                      style={{ marginTop: '6px', fontSize: '11px', color: '#9ca3af', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}>
+                      Reinitialiser la discussion
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Bouton generer */}
