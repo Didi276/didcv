@@ -7,6 +7,7 @@ import CVEditorBlocks from './CVEditorBlocks'
 import Navbar from './Navbar'
 import { detecterSecteur, getSecteurConfig, buildPromptCV } from './secteurConfig'
 import { downloadCVasPDF, downloadLettreasePDF } from './pdfUtils'
+import ATSScore from './ATSScore'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString()
 
@@ -577,6 +578,7 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
                 <a href="/dashboard" style={{ display: 'block', textAlign: 'center', padding: '11px', background: '#f0fdf4', color: '#16a34a', border: '1.5px solid #86efac', borderRadius: '10px', fontSize: '14px', fontWeight: '600', textDecoration: 'none' }}>
                   ✅ Aller au dashboard
                 </a>
+                <ATSScore cvData={cvData} offreEmploi={offreEmploi} />
               </div>
             )}
           </div>
