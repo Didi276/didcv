@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { supabase } from './supabase'
 import Navbar from './Navbar'
 import * as pdfjsLib from 'pdfjs-dist'
+import DateRangePicker from './DateRangePicker'
+import CityInput from './CityInput'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString()
 
@@ -532,7 +534,7 @@ Retourne UNIQUEMENT ce JSON valide:
               <Field label="Nom"><input value={nom} onChange={e => setNom(e.target.value)} placeholder="Dupont" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
               <Field label="Email"><input value={email} onChange={e => setEmail(e.target.value)} style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
               <Field label="Telephone"><input value={telephone} onChange={e => setTelephone(e.target.value)} placeholder="+33 6 12 34 56 78" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
-              <Field label="Ville"><input value={ville} onChange={e => setVille(e.target.value)} placeholder="Paris" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
+              <Field label="Ville"><CityInput value={ville} onChange={setVille} placeholder="Paris" /></Field>
               <Field label="LinkedIn" hint="optionnel"><input value={linkedin} onChange={e => setLinkedin(e.target.value)} placeholder="linkedin.com/in/..." style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
             </div>
             <Field label="Titre professionnel"><input value={titre} onChange={e => setTitre(e.target.value)} placeholder="Responsable Marketing Digital" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
@@ -554,8 +556,8 @@ Retourne UNIQUEMENT ce JSON valide:
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
                   <Field label="Poste"><input value={exp.poste} onChange={e => updateExp(i, 'poste', e.target.value)} placeholder="Responsable Marketing" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
                   <Field label="Entreprise"><input value={exp.entreprise} onChange={e => updateExp(i, 'entreprise', e.target.value)} placeholder="TechStartup" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
-                  <Field label="Periode"><input value={exp.periode} onChange={e => updateExp(i, 'periode', e.target.value)} placeholder="2022 - 2024" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
-                  <Field label="Lieu"><input value={exp.lieu} onChange={e => updateExp(i, 'lieu', e.target.value)} placeholder="Paris" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
+                  <Field label="Période"><DateRangePicker value={exp.periode} onChange={v => updateExp(i, 'periode', v)} /></Field>
+                  <Field label="Lieu"><CityInput value={exp.lieu} onChange={v => updateExp(i, 'lieu', v)} placeholder="Paris" /></Field>
                 </div>
                 <Field label="Missions">
                   {exp.missions?.map((m, j) => (
@@ -585,7 +587,7 @@ Retourne UNIQUEMENT ce JSON valide:
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
                   <Field label="Diplome"><input value={f.diplome} onChange={e => updateForm(i, 'diplome', e.target.value)} placeholder="Master Marketing Digital" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
                   <Field label="Etablissement"><input value={f.etablissement} onChange={e => updateForm(i, 'etablissement', e.target.value)} placeholder="ESCP Business School" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
-                  <Field label="Periode"><input value={f.periode} onChange={e => updateForm(i, 'periode', e.target.value)} placeholder="2018 - 2020" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
+                  <Field label="Période"><DateRangePicker value={f.periode} onChange={v => updateForm(i, 'periode', v)} /></Field>
                   <Field label="Mention" hint="optionnel"><input value={f.mention} onChange={e => updateForm(i, 'mention', e.target.value)} placeholder="Tres Bien" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
                 </div>
                 <Field label="Description"><input value={f.description} onChange={e => updateForm(i, 'description', e.target.value)} placeholder="Specialisation en..." style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
