@@ -66,6 +66,8 @@ function LettreRenderer({ lettre }) {
 export default function Generate() {
   const [searchParams] = useSearchParams()
   const templateChoisi = searchParams.get('template') || 'finance'
+  const [currentTemplate, setCurrentTemplate] = useState(templateChoisi)
+  const [showTemplatePicker, setShowTemplatePicker] = useState(false)
   const w = useWidth()
   const isMobile = w < 768
   const [mobileTab, setMobileTab] = useState('form')
@@ -318,7 +320,7 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
 
       if (user) {
         await supabase.from('cvs').insert({
-          user_id: user.id, template: templateChoisi,
+          user_id: user.id, template: currentTemplate,
           cv_data: json, lettre_motivation: dataLM.content[0].text,
           offre_titre: offreEmploi.substring(0, 60).trim()
         })
@@ -371,7 +373,7 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
                 Changer template
               </a>
             </div>
-            <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 20px' }}>Template : <strong style={{ color: '#374151' }}>{templateChoisi}</strong></p>
+            <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 20px' }}>Template : <strong style={{ color: '#374151' }}>{currentTemplate}</strong></p>
           </div>
 
           {/* Profil charge */}
@@ -585,7 +587,7 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
         </div>
 
         {/* ─── PANNEAU DROIT ──────────────────────────────── */}
-        <div style={{ overflowY: 'auto', display: isMobile && mobileTab !== 'preview' ? 'none' : 'flex', flexDirection: 'column', background: '#f0f0f5', minHeight: isMobile ? '80vh' : 'auto' }}>
+        <div style={{ overflowY: 'auto', display: isMobile && mobileTab !== 'preview' ? 'none' : 'flex', flexDirection: 'column', background: '#f0f0f5', minHeight: isMobile ? '80vh' : 'auto', position: 'relative' }}>
 
           {cvData ? (
             <>
@@ -598,6 +600,10 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
                       {label}
                     </button>
                   ))}
+                  <button onClick={() => setShowTemplatePicker(!showTemplatePicker)}
+                    style={{ padding: '7px 12px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', background: showTemplatePicker ? '#ede9fe' : '#f3f4f6', color: showTemplatePicker ? '#4f46e5' : '#374151' }}>
+                    🎨
+                  </button>
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
                   {activeTab === 'cv' && (
@@ -619,7 +625,7 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
               <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: isMobile ? '16px' : '32px 24px' }}>
                 {activeTab === 'cv' ? (
                   <div style={{ transform: isMobile ? `scale(${Math.min(0.45, (w-32)/794)})` : 'scale(1)', transformOrigin: 'top center', boxShadow: '0 8px 40px rgba(0,0,0,0.15)', borderRadius: '4px', overflow: 'hidden', marginBottom: isMobile ? `-${Math.round(1123*(1-Math.min(0.45,(w-32)/794)))}px` : 0 }}>
-                    <CVTemplate cvData={cvData} template={templateChoisi} customColor={customColor} />
+                    <CVTemplate cvData={cvData} template={currentTemplate} customColor={customColor} />
                   </div>
                 ) : (
                   <div style={{ background: '#fff', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', width: '100%', maxWidth: '680px', overflow: 'hidden' }}>
@@ -653,10 +659,27 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
       </div>
 
       {/* Editeur */}
+      {/* Template Picker */}
+      {showTemplatePicker && cvData && (
+        <div onClick={() => setShowTemplatePicker(false)} style={{ position: 'fixed', inset: 0, zIndex: 150, background: 'rgba(0,0,0,0.3)' }}>
+          <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: isMobile ? 'auto' : '70px', bottom: isMobile ? 0 : 'auto', right: 0, left: isMobile ? 0 : 'auto', width: isMobile ? '100%' : '320px', background: '#fff', borderRadius: isMobile ? '16px 16px 0 0' : '14px 0 0 14px', padding: '20px', boxShadow: '-8px 0 32px rgba(0,0,0,0.1)', maxHeight: '80vh', overflowY: 'auto' }}>
+            <div style={{ fontSize: '14px', fontWeight: '700', color: '#111', marginBottom: '16px' }}>Changer de template</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+              {['finance','linkedin','canva','harvard','siliconvalley','moderne','executive','creative','minimal','tech','elegant','bold','pastel','corporate','swiss','timeline','etudiant','alternance','portfolio','sante','commercial','startup','classique','international','btp','restauration','transport','beaute'].map(t => (
+                <button key={t} onClick={() => { setCurrentTemplate(t); setShowTemplatePicker(false) }}
+                  style={{ padding: '8px 4px', background: currentTemplate === t ? '#4f46e5' : '#f8f9ff', color: currentTemplate === t ? '#fff' : '#374151', border: `1.5px solid ${currentTemplate === t ? '#4f46e5' : '#e5e7eb'}`, borderRadius: '8px', fontSize: '10px', fontWeight: currentTemplate === t ? '700' : '500', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'center', textTransform: 'capitalize' }}>
+                  {currentTemplate === t ? '✓ ' : ''}{t}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {showEditor && cvData && (
         <CVEditorBlocks
           cvData={cvData}
-          template={templateChoisi}
+          template={currentTemplate}
           onSave={(d) => { setCvData(d); setShowEditor(false) }}
           onClose={() => setShowEditor(false)}
         />

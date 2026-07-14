@@ -13,6 +13,10 @@ import CGU from './CGU'
 import NotFound from './NotFound'
 
 import Candidatures from './Candidatures'
+import Blog from './Blog'
+import BlogArticle from './BlogArticle'
+import GuidesMetier from './GuidesMetier'
+import GuideDetail from './GuideDetail'
 
 function App() {
   return (
@@ -26,6 +30,10 @@ function App() {
         <Route path="/profile"        element={<Profile />} />
         <Route path="/offres"         element={<Offres />} />
         <Route path="/candidatures"   element={<Candidatures />} />
+        <Route path="/blog"           element={<Blog />} />
+        <Route path="/blog/:slug"     element={<BlogArticle />} />
+        <Route path="/guides"         element={<GuidesMetier />} />
+        <Route path="/guide/:slug"    element={<GuideDetail />} />
         <Route path="/about"          element={<About />} />
         <Route path="/contact"        element={<Contact />} />
         <Route path="/privacy"        element={<Privacy />} />
