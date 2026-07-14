@@ -27,9 +27,9 @@ export default function Navbar({ currentPage = '' }) {
     { page: 'offres',        label: 'Offres',        to: '/offres',       auth: true  },
     { page: 'candidatures',  label: 'Candidatures', to: '/candidatures', auth: true  },
     { page: 'generate',      label: 'Générer CV',   to: '/templates',    auth: true  },
+    { page: 'profile',       label: 'Profil',        to: '/profile',      auth: true  },
     { page: 'blog',          label: 'Blog',          to: '/blog',         auth: false },
     { page: 'guides',        label: 'Guides métier', to: '/guides',       auth: false },
-    { page: 'profile',       label: 'Profil',        to: '/profile',      auth: true  },
   ]
 
   const visibleLinks = user ? links : links.filter(l => !l.auth)
