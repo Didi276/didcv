@@ -1,0 +1,288 @@
+import { useState, useEffect, useRef } from 'react'
+import { supabase } from './supabase'
+import Navbar from './Navbar'
+
+const COLONNES = [
+  { id: 'a_postuler',  label: 'À postuler',    color: '#6b7280', bg: '#f9fafb', dot: '#9ca3af' },
+  { id: 'postule',     label: 'Postulé',        color: '#1d4ed8', bg: '#eff6ff', dot: '#3b82f6' },
+  { id: 'entretien',   label: 'Entretien',      color: '#7c3aed', bg: '#f5f3ff', dot: '#8b5cf6' },
+  { id: 'offre',       label: 'Offre reçue',    color: '#16a34a', bg: '#f0fdf4', dot: '#22c55e' },
+  { id: 'refuse',      label: 'Refusé',         color: '#dc2626', bg: '#fef2f2', dot: '#ef4444' },
+]
+
+const EMPTY = { titre: '', entreprise: '', lieu: '', url_offre: '', salaire: '', notes: '', statut: 'a_postuler' }
+
+function useWidth() {
+  const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
+  useEffect(() => {
+    const fn = () => setW(window.innerWidth)
+    window.addEventListener('resize', fn)
+    return () => window.removeEventListener('resize', fn)
+  }, [])
+  return w
+}
+
+export default function Candidatures() {
+  const [cards, setCards] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState(null)
+  const [showForm, setShowForm] = useState(false)
+  const [editCard, setEditCard] = useState(null)
+  const [form, setForm] = useState(EMPTY)
+  const [saving, setSaving] = useState(false)
+  const [dragId, setDragId] = useState(null)
+  const [dragOver, setDragOver] = useState(null)
+  const [activeCol, setActiveCol] = useState(null)
+  const w = useWidth()
+  const isMobile = w < 768
+
+  useEffect(() => {
+    const init = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { window.location.href = '/auth'; return }
+      setUser(user)
+      const { data } = await supabase.from('candidatures').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
+      setCards(data || [])
+      setLoading(false)
+    }
+    init()
+  }, [])
+
+  const openNew = (statut = 'a_postuler') => {
+    setEditCard(null)
+    setForm({ ...EMPTY, statut })
+    setShowForm(true)
+  }
+
+  const openEdit = (card) => {
+    setEditCard(card)
+    setForm({ titre: card.titre, entreprise: card.entreprise, lieu: card.lieu || '', url_offre: card.url_offre || '', salaire: card.salaire || '', notes: card.notes || '', statut: card.statut })
+    setShowForm(true)
+  }
+
+  const handleSave = async () => {
+    if (!form.titre.trim()) return
+    setSaving(true)
+    if (editCard) {
+      const { data } = await supabase.from('candidatures').update({ ...form, updated_at: new Date().toISOString() }).eq('id', editCard.id).select().single()
+      setCards(cards.map(c => c.id === editCard.id ? data : c))
+    } else {
+      const { data } = await supabase.from('candidatures').insert({ ...form, user_id: user.id }).select().single()
+      setCards([data, ...cards])
+    }
+    setSaving(false)
+    setShowForm(false)
+  }
+
+  const handleDelete = async (id) => {
+    if (!confirm('Supprimer cette candidature ?')) return
+    await supabase.from('candidatures').delete().eq('id', id)
+    setCards(cards.filter(c => c.id !== id))
+    setShowForm(false)
+  }
+
+  const moveCard = async (cardId, newStatut) => {
+    const card = cards.find(c => c.id === cardId)
+    if (!card || card.statut === newStatut) return
+    await supabase.from('candidatures').update({ statut: newStatut }).eq('id', cardId)
+    setCards(cards.map(c => c.id === cardId ? { ...c, statut: newStatut } : c))
+  }
+
+  const formatDate = (d) => d ? new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : ''
+
+  const stats = {
+    total: cards.length,
+    postule: cards.filter(c => c.statut === 'postule').length,
+    entretien: cards.filter(c => c.statut === 'entretien').length,
+    offre: cards.filter(c => c.statut === 'offre').length,
+  }
+
+  const INPUT = { width: '100%', padding: '9px 12px', border: '1.5px solid #e5e7eb', borderRadius: '8px', fontSize: '13px', fontFamily: 'inherit', color: '#111', outline: 'none', boxSizing: 'border-box', background: '#fff' }
+
+  if (loading) return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+      <div style={{ width: '36px', height: '36px', border: '3px solid #ede9fe', borderTop: '3px solid #4f46e5', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+    </div>
+  )
+
+  return (
+    <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
+      <Navbar currentPage="candidatures" />
+
+      {/* Header */}
+      <div style={{ background: '#fff', borderBottom: '1px solid #f0f0f0', padding: isMobile ? '16px' : '24px 40px' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+            <div>
+              <h1 style={{ fontSize: isMobile ? '20px' : '24px', fontWeight: '800', color: '#111', margin: '0 0 4px', letterSpacing: '-0.5px' }}>Suivi des candidatures</h1>
+              <p style={{ fontSize: '13px', color: '#9ca3af', margin: 0 }}>Gérez toutes vos candidatures en un seul endroit</p>
+            </div>
+            <button onClick={() => openNew()}
+              style={{ padding: '10px 20px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
+              + Nouvelle candidature
+            </button>
+          </div>
+
+          {/* Stats */}
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            {[
+              { label: 'Total', value: stats.total, color: '#374151', bg: '#f3f4f6' },
+              { label: 'Postulées', value: stats.postule, color: '#1d4ed8', bg: '#eff6ff' },
+              { label: 'Entretiens', value: stats.entretien, color: '#7c3aed', bg: '#f5f3ff' },
+              { label: 'Offres', value: stats.offre, color: '#16a34a', bg: '#f0fdf4' },
+            ].map(s => (
+              <div key={s.label} style={{ padding: '8px 16px', background: s.bg, borderRadius: '8px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <span style={{ fontSize: '18px', fontWeight: '800', color: s.color }}>{s.value}</span>
+                <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: '500' }}>{s.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Kanban */}
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: isMobile ? '16px 8px' : '24px 40px', overflowX: 'auto' }}>
+        <div style={{ display: 'flex', gap: '12px', minWidth: isMobile ? '900px' : 'auto' }}>
+          {COLONNES.map(col => {
+            const colCards = cards.filter(c => c.statut === col.id)
+            const isDragTarget = dragOver === col.id
+
+            return (
+              <div key={col.id}
+                style={{ flex: 1, minWidth: '200px', background: isDragTarget ? col.bg : '#f3f4f6', borderRadius: '14px', border: `2px solid ${isDragTarget ? col.dot : 'transparent'}`, transition: 'all 0.15s', padding: '12px' }}
+                onDragOver={e => { e.preventDefault(); setDragOver(col.id) }}
+                onDragLeave={() => setDragOver(null)}
+                onDrop={e => { e.preventDefault(); if (dragId) moveCard(dragId, col.id); setDragOver(null); setDragId(null) }}>
+
+                {/* En-tête colonne */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: col.dot }} />
+                    <span style={{ fontSize: '12px', fontWeight: '700', color: col.color }}>{col.label}</span>
+                  </div>
+                  <span style={{ fontSize: '11px', fontWeight: '700', color: '#9ca3af', background: '#fff', padding: '1px 7px', borderRadius: '10px' }}>{colCards.length}</span>
+                </div>
+
+                {/* Cartes */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minHeight: '100px' }}>
+                  {colCards.map(card => (
+                    <div key={card.id}
+                      draggable
+                      onDragStart={() => setDragId(card.id)}
+                      onDragEnd={() => setDragId(null)}
+                      onClick={() => openEdit(card)}
+                      style={{ background: '#fff', borderRadius: '10px', padding: '12px', cursor: 'pointer', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', border: '1px solid #f0f0f0', opacity: dragId === card.id ? 0.5 : 1, transition: 'all 0.1s', userSelect: 'none' }}
+                      onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'}
+                      onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)'}>
+                      <div style={{ fontSize: '13px', fontWeight: '700', color: '#111', marginBottom: '4px', lineHeight: '1.3' }}>{card.titre}</div>
+                      {card.entreprise && <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>🏢 {card.entreprise}</div>}
+                      {card.lieu && <div style={{ fontSize: '11px', color: '#9ca3af' }}>📍 {card.lieu}</div>}
+                      {card.salaire && <div style={{ fontSize: '11px', color: '#16a34a', marginTop: '4px', fontWeight: '600' }}>💰 {card.salaire}</div>}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+                        {card.url_offre && (
+                          <a href={card.url_offre} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
+                            style={{ fontSize: '10px', color: '#4f46e5', textDecoration: 'none', fontWeight: '600' }}>
+                            Voir l'offre →
+                          </a>
+                        )}
+                        <span style={{ fontSize: '10px', color: '#c4c4c4', marginLeft: 'auto' }}>{formatDate(card.created_at)}</span>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Bouton ajout rapide */}
+                  <button onClick={() => openNew(col.id)}
+                    style={{ width: '100%', padding: '8px', background: 'transparent', border: '1.5px dashed #d1d5db', borderRadius: '8px', color: '#9ca3af', fontSize: '12px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: '500', transition: 'all 0.15s', marginTop: colCards.length > 0 ? '4px' : '0' }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = col.dot; e.currentTarget.style.color = col.color }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = '#d1d5db'; e.currentTarget.style.color = '#9ca3af' }}>
+                    + Ajouter
+                  </button>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Modal formulaire */}
+      {showForm && (
+        <div onClick={() => setShowForm(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 200, display: 'flex', alignItems: isMobile ? 'flex-end' : 'center', justifyContent: 'center', padding: isMobile ? 0 : '24px', backdropFilter: 'blur(4px)' }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: isMobile ? '16px 16px 0 0' : '16px', width: '100%', maxWidth: '480px', maxHeight: '90vh', overflow: 'auto' }}>
+            <div style={{ padding: '20px 24px', borderBottom: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: 0 }}>
+                {editCard ? 'Modifier la candidature' : 'Nouvelle candidature'}
+              </h3>
+              <button onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#9ca3af', padding: '4px' }}>✕</button>
+            </div>
+
+            <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '5px' }}>Poste *</label>
+                <input value={form.titre} onChange={e => setForm({...form, titre: e.target.value})} placeholder="Développeur React" style={INPUT} />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '5px' }}>Entreprise</label>
+                  <input value={form.entreprise} onChange={e => setForm({...form, entreprise: e.target.value})} placeholder="Google" style={INPUT} />
+                </div>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '5px' }}>Ville</label>
+                  <input value={form.lieu} onChange={e => setForm({...form, lieu: e.target.value})} placeholder="Paris" style={INPUT} />
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '5px' }}>Salaire</label>
+                  <input value={form.salaire} onChange={e => setForm({...form, salaire: e.target.value})} placeholder="45 000€/an" style={INPUT} />
+                </div>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '5px' }}>Statut</label>
+                  <select value={form.statut} onChange={e => setForm({...form, statut: e.target.value})} style={{ ...INPUT, cursor: 'pointer' }}>
+                    {COLONNES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '5px' }}>Lien vers l'offre</label>
+                <input value={form.url_offre} onChange={e => setForm({...form, url_offre: e.target.value})} placeholder="https://..." style={INPUT} />
+              </div>
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '5px' }}>Notes</label>
+                <textarea value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} rows={3} placeholder="Contacts, remarques, prochaines étapes..." style={{ ...INPUT, resize: 'vertical', lineHeight: '1.5' }} />
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                <button onClick={handleSave} disabled={saving || !form.titre.trim()}
+                  style={{ flex: 1, padding: '11px', background: saving ? '#a5b4fc' : '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: saving ? 'default' : 'pointer', fontFamily: 'inherit' }}>
+                  {saving ? 'Sauvegarde...' : editCard ? 'Modifier' : 'Ajouter'}
+                </button>
+                {editCard && (
+                  <button onClick={() => handleDelete(editCard.id)}
+                    style={{ padding: '11px 16px', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: '10px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
+                    🗑
+                  </button>
+                )}
+              </div>
+
+              {/* Déplacer vers */}
+              {editCard && (
+                <div>
+                  <div style={{ fontSize: '11px', color: '#9ca3af', textAlign: 'center', marginBottom: '6px' }}>Déplacer vers</div>
+                  <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                    {COLONNES.filter(c => c.id !== form.statut).map(c => (
+                      <button key={c.id} onClick={async () => { await moveCard(editCard.id, c.id); setForm({...form, statut: c.id}); setShowForm(false) }}
+                        style={{ padding: '5px 12px', background: c.bg, color: c.color, border: 'none', borderRadius: '20px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+                        {c.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

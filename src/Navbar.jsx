@@ -23,10 +23,11 @@ export default function Navbar({ currentPage = '' }) {
   }
 
   const links = [
-    { page: 'dashboard', label: 'Dashboard', to: '/dashboard' },
-    { page: 'offres',    label: 'Offres',     to: '/offres'    },
-    { page: 'generate',  label: 'Générer CV', to: '/templates' },
-    { page: 'profile',   label: 'Profil',     to: '/profile'   },
+    { page: 'dashboard',     label: 'Dashboard',    to: '/dashboard'     },
+    { page: 'offres',        label: 'Offres',        to: '/offres'        },
+    { page: 'candidatures',  label: 'Candidatures', to: '/candidatures'  },
+    { page: 'generate',      label: 'Générer CV',   to: '/templates'     },
+    { page: 'profile',       label: 'Profil',        to: '/profile'       },
   ]
 
   const linkStyle = (page) => ({
