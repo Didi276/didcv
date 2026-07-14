@@ -61,7 +61,7 @@ export default async function handler(req, res) {
 
   // ─── Jooble (gratuit, sans inscription, HTTPS) ──────────
   const searchJooble = async () => {
-    const r = await fetch('https://jooble.org/api/3ae1d9b5-4b9d-494c-a3f2-77db8c4fa0c0', {
+    const r = await fetch(`https://jooble.org/api/${process.env.JOOBLE_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
