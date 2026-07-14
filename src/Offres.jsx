@@ -314,7 +314,8 @@ export default function Offres() {
             {/* Liste offres */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {offres.map(offre => {
-                const srcStyle = SOURCE_COLORS[offre.source] || { bg: '#f3f4f6', color: '#374151', dot: '#9ca3af' }                return (
+                const srcStyle = SOURCE_COLORS[offre.source] || { bg: '#f3f4f6', color: '#374151', dot: '#9ca3af' }
+                return (
                   <div key={offre.id} style={{ background: '#fff', borderRadius: '12px', border: '1px solid #e5e7eb', padding: isMobile ? '14px' : '18px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)', transition: 'box-shadow 0.15s' }}
                     onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)'}
                     onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)'}>
