@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from './supabase'
 
 export default function Navbar({ currentPage = '' }) {
   const [user, setUser] = useState(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
+  const navigate = useNavigate()
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => setUser(user))
@@ -17,14 +19,14 @@ export default function Navbar({ currentPage = '' }) {
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
-    window.location.href = '/'
+    navigate('/')
   }
 
   const links = [
-    { page: 'dashboard', label: 'Dashboard', href: '/dashboard' },
-    { page: 'offres',    label: 'Offres',     href: '/offres'    },
-    { page: 'generate',  label: 'Générer CV', href: '/templates' },
-    { page: 'profile',   label: 'Profil',     href: '/profile'   },
+    { page: 'dashboard', label: 'Dashboard', to: '/dashboard' },
+    { page: 'offres',    label: 'Offres',     to: '/offres'    },
+    { page: 'generate',  label: 'Générer CV', to: '/templates' },
+    { page: 'profile',   label: 'Profil',     to: '/profile'   },
   ]
 
   const linkStyle = (page) => ({
@@ -32,7 +34,7 @@ export default function Navbar({ currentPage = '' }) {
     color: currentPage === page ? '#4f46e5' : '#444',
     textDecoration: 'none', padding: '6px 14px',
     borderBottom: currentPage === page ? '2px solid #4f46e5' : '2px solid transparent',
-    transition: 'color 0.15s', marginBottom: currentPage === page ? '-2px' : '0',
+    transition: 'color 0.15s',
   })
 
   return (
@@ -44,13 +46,13 @@ export default function Navbar({ currentPage = '' }) {
         position: 'sticky', top: 0, zIndex: 100,
       }}>
         {/* Logo */}
-        <a href="/" style={{ fontWeight: '800', fontSize: '19px', textDecoration: 'none', color: '#1a1a1a', marginRight: isMobile ? 'auto' : '20px', letterSpacing: '-0.5px' }}>
+        <Link to="/" style={{ fontWeight: '800', fontSize: '19px', textDecoration: 'none', color: '#1a1a1a', marginRight: isMobile ? 'auto' : '20px', letterSpacing: '-0.5px' }}>
           <span style={{ color: '#4f46e5' }}>Did</span>CV
-        </a>
+        </Link>
 
         {/* Desktop links */}
-        {!isMobile && links.map(({ page, label, href }) => (
-          <a key={page} href={href} style={linkStyle(page)}>{label}</a>
+        {!isMobile && links.map(({ page, label, to }) => (
+          <Link key={page} to={to} style={linkStyle(page)}>{label}</Link>
         ))}
 
         <div style={{ flex: isMobile ? 0 : 1 }} />
@@ -73,18 +75,16 @@ export default function Navbar({ currentPage = '' }) {
         )}
       </nav>
 
-      {/* Menu mobile slide-in */}
+      {/* Menu mobile */}
       {isMobile && menuOpen && (
         <div style={{ position: 'fixed', top: '58px', left: 0, right: 0, bottom: 0, zIndex: 99 }}>
-          {/* Overlay */}
           <div onClick={() => setMenuOpen(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)' }} />
-          {/* Menu */}
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, background: '#fff', borderBottom: '1px solid #f0f0f0', boxShadow: '0 8px 24px rgba(0,0,0,0.12)', padding: '8px 0' }}>
-            {links.map(({ page, label, href }) => (
-              <a key={page} href={href} onClick={() => setMenuOpen(false)}
+            {links.map(({ page, label, to }) => (
+              <Link key={page} to={to} onClick={() => setMenuOpen(false)}
                 style={{ display: 'block', padding: '14px 24px', fontSize: '15px', fontWeight: currentPage === page ? '700' : '500', color: currentPage === page ? '#4f46e5' : '#374151', textDecoration: 'none', borderLeft: currentPage === page ? '3px solid #4f46e5' : '3px solid transparent', background: currentPage === page ? '#faf9ff' : 'transparent' }}>
                 {label}
-              </a>
+              </Link>
             ))}
             {user && (
               <button onClick={handleLogout}
