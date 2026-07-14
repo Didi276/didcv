@@ -23,12 +23,16 @@ export default function Navbar({ currentPage = '' }) {
   }
 
   const links = [
-    { page: 'dashboard',     label: 'Dashboard',    to: '/dashboard'     },
-    { page: 'offres',        label: 'Offres',        to: '/offres'        },
-    { page: 'candidatures',  label: 'Candidatures', to: '/candidatures'  },
-    { page: 'generate',      label: 'Générer CV',   to: '/templates'     },
-    { page: 'profile',       label: 'Profil',        to: '/profile'       },
+    { page: 'dashboard',     label: 'Dashboard',    to: '/dashboard',    auth: true  },
+    { page: 'offres',        label: 'Offres',        to: '/offres',       auth: true  },
+    { page: 'candidatures',  label: 'Candidatures', to: '/candidatures', auth: true  },
+    { page: 'generate',      label: 'Générer CV',   to: '/templates',    auth: true  },
+    { page: 'blog',          label: 'Blog',          to: '/blog',         auth: false },
+    { page: 'guides',        label: 'Guides métier', to: '/guides',       auth: false },
+    { page: 'profile',       label: 'Profil',        to: '/profile',      auth: true  },
   ]
+
+  const visibleLinks = user ? links : links.filter(l => !l.auth)
 
   const linkStyle = (page) => ({
     fontSize: '14px', fontWeight: '500',
@@ -52,7 +56,7 @@ export default function Navbar({ currentPage = '' }) {
         </Link>
 
         {/* Desktop links */}
-        {!isMobile && links.map(({ page, label, to }) => (
+        {!isMobile && visibleLinks.map(({ page, label, to }) => (
           <Link key={page} to={to} style={linkStyle(page)}>{label}</Link>
         ))}
 
@@ -81,7 +85,7 @@ export default function Navbar({ currentPage = '' }) {
         <div style={{ position: 'fixed', top: '58px', left: 0, right: 0, bottom: 0, zIndex: 99 }}>
           <div onClick={() => setMenuOpen(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)' }} />
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, background: '#fff', borderBottom: '1px solid #f0f0f0', boxShadow: '0 8px 24px rgba(0,0,0,0.12)', padding: '8px 0' }}>
-            {links.map(({ page, label, to }) => (
+            {visibleLinks.map(({ page, label, to }) => (
               <Link key={page} to={to} onClick={() => setMenuOpen(false)}
                 style={{ display: 'block', padding: '14px 24px', fontSize: '15px', fontWeight: currentPage === page ? '700' : '500', color: currentPage === page ? '#4f46e5' : '#374151', textDecoration: 'none', borderLeft: currentPage === page ? '3px solid #4f46e5' : '3px solid transparent', background: currentPage === page ? '#faf9ff' : 'transparent' }}>
                 {label}
