@@ -432,8 +432,8 @@ Retourne UNIQUEMENT ce JSON valide:
                 </div>
 
                 <button onClick={() => setActiveSection('infos')}
-                  style={{ display: 'block', margin: '16px auto 0', background: 'none', border: 'none', color: '#9ca3af', fontSize: '13px', cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit' }}>
-                  Remplir manuellement
+                  style={{ display: 'block', margin: '12px auto 0', background: 'none', border: '1px solid #e5e7eb', color: '#6b7280', fontSize: '13px', cursor: 'pointer', textDecoration: 'none', fontFamily: 'inherit', padding: '8px 20px', borderRadius: '8px', width: '100%' }}>
+                  ✏️ Remplir mon profil manuellement
                 </button>
               </div>
             )}
