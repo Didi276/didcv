@@ -47,6 +47,7 @@ const SOURCE_COLORS = {
   'France Travail': { bg: '#e8f5e9', color: '#2e7d32', dot: '#4caf50' },
   'JSearch':        { bg: '#e3f2fd', color: '#1565c0', dot: '#2196f3' },
   'Adzuna':         { bg: '#fce4ec', color: '#880e4f', dot: '#e91e63' },
+  'Jooble':         { bg: '#fff3e0', color: '#e65100', dot: '#ff9800' },
 }
 
 export default function Offres() {
@@ -59,9 +60,12 @@ export default function Offres() {
   const [secteur, setSecteur] = useState('')
   const [offres, setOffres] = useState([])
   const [loading, setLoading] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [searched, setSearched] = useState(false)
   const [sources, setSources] = useState(null)
   const [showFilters, setShowFilters] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [hasMore, setHasMore] = useState(false)
   const w = useWidth()
   const isMobile = w < 768
 
@@ -70,10 +74,12 @@ export default function Offres() {
     if (prefill) { setQuery(prefill); sessionStorage.removeItem('offre_prefill_query') }
   }, [])
 
-  const handleSearch = async (overrides = {}) => {
+  const handleSearch = async (overrides = {}, loadMore = false) => {
     const q = overrides.query ?? (secteur || query)
     if (!q.trim()) return
-    setLoading(true); setSearched(false); setOffres([]); setSources(null)
+    const page = loadMore ? currentPage + 1 : 1
+    if (loadMore) setLoadingMore(true)
+    else { setLoading(true); setSearched(false); setOffres([]); setSources(null); setCurrentPage(1) }
     setShowFilters(false)
     try {
       const params = new URLSearchParams({
@@ -83,14 +89,22 @@ export default function Offres() {
         experience: overrides.experience ?? experience,
         publieeDepuis: overrides.publieeDepuis ?? publieeDepuis,
         teletravail: overrides.teletravail ?? teletravail,
+        page,
       })
       const r = await fetch(`/api/offres?${params}`)
       const data = await r.json()
-      setOffres(data.offres || [])
+      if (loadMore) {
+        setOffres(prev => [...prev, ...(data.offres || [])])
+        setCurrentPage(page)
+      } else {
+        setOffres(data.offres || [])
+      }
       setSources(data.sources || null)
+      setHasMore(data.hasMore || false)
       setSearched(true)
     } catch { setSearched(true) }
     setLoading(false)
+    setLoadingMore(false)
   }
 
   const handleGenererCV = (offre) => {
@@ -244,14 +258,14 @@ export default function Offres() {
 
           {/* Résultats */}
           <div>
-            {/* Stats */}
+            {/* Stats sources */}
             {searched && sources && (
               <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
                 <span style={{ fontSize: '15px', fontWeight: '700', color: '#111' }}>{offres.length} offres</span>
                 {Object.entries(sources).map(([src, count]) => {
-                  const labels = { ft: 'France Travail', jsearch: 'JSearch', adzuna: 'Adzuna' }
-                  const colors = { ft: '#2e7d32', jsearch: '#1565c0', adzuna: '#880e4f' }
-                  const bgs = { ft: '#e8f5e9', jsearch: '#e3f2fd', adzuna: '#fce4ec' }
+                  const labels = { ft: 'France Travail', jsearch: 'JSearch', adzuna: 'Adzuna', jooble: 'Jooble' }
+                  const colors = { ft: '#2e7d32', jsearch: '#1565c0', adzuna: '#880e4f', jooble: '#e65100' }
+                  const bgs = { ft: '#e8f5e9', jsearch: '#e3f2fd', adzuna: '#fce4ec', jooble: '#fff3e0' }
                   return count > 0 ? (
                     <span key={src} style={{ fontSize: '12px', padding: '3px 10px', borderRadius: '12px', background: bgs[src], color: colors[src], fontWeight: '600' }}>
                       {labels[src]}: {count}
@@ -300,8 +314,7 @@ export default function Offres() {
             {/* Liste offres */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {offres.map(offre => {
-                const srcStyle = SOURCE_COLORS[offre.source] || { bg: '#f3f4f6', color: '#374151', dot: '#9ca3af' }
-                return (
+                const srcStyle = SOURCE_COLORS[offre.source] || { bg: '#f3f4f6', color: '#374151', dot: '#9ca3af' }                return (
                   <div key={offre.id} style={{ background: '#fff', borderRadius: '12px', border: '1px solid #e5e7eb', padding: isMobile ? '14px' : '18px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)', transition: 'box-shadow 0.15s' }}
                     onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)'}
                     onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)'}>
@@ -357,6 +370,16 @@ export default function Offres() {
                 )
               })}
             </div>
+
+            {/* Charger plus */}
+            {searched && !loading && offres.length > 0 && (
+              <div style={{ textAlign: 'center', marginTop: '24px', paddingBottom: '24px' }}>
+                <button onClick={() => handleSearch({}, true)} disabled={loadingMore}
+                  style={{ padding: '12px 32px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', opacity: loadingMore ? 0.7 : 1 }}>
+                  {loadingMore ? '⏳ Chargement...' : "⬇️ Charger plus d'offres"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

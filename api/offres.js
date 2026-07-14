@@ -59,13 +59,18 @@ export default async function handler(req, res) {
     return r.json()
   }
 
-  // ─── CareerJet (gratuit, sans inscription) ─────────────
-  const searchCareerJet = async () => {
-    const loc = location || 'France'
-    const r = await fetch(
-      `http://public.api.careerjet.net/search?locale_code=fr_FR&keywords=${encodeURIComponent(query)}&location=${encodeURIComponent(loc)}&pagesize=20&page=${pageNum}&affid=didcv`,
-      { headers: { 'User-Agent': 'DidCV/1.0' } }
-    )
+  // ─── Jooble (gratuit, sans inscription, HTTPS) ──────────
+  const searchJooble = async () => {
+    const r = await fetch('https://jooble.org/api/3ae1d9b5-4b9d-494c-a3f2-77db8c4fa0c0', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        keywords: query,
+        location: location || 'France',
+        page: pageNum,
+        resultonpage: 20
+      })
+    })
     return r.json()
   }
 
@@ -104,7 +109,7 @@ export default async function handler(req, res) {
   // ─── Appels parallèles ────────────────────────────────
   const [ftRes, cjRes, jRes, azRes] = await Promise.allSettled([
     withTimeout(searchFT(), 9000),
-    withTimeout(searchCareerJet(), 5000),
+    withTimeout(searchJooble(), 6000),
     withTimeout(searchJSearch(), 8000),
     withTimeout(searchAdzuna(), 8000),
   ])
@@ -131,19 +136,19 @@ export default async function handler(req, res) {
     })
   }
 
-  // ─── CareerJet ────────────────────────────────────────
+  // ─── Jooble ──────────────────────────────────────────
   if (cjRes.status === 'fulfilled' && cjRes.value?.jobs) {
     cjRes.value.jobs.forEach(job => {
       offres.push({
-        id: `cj-${job.id}`,
-        source: 'CareerJet',
+        id: `jooble-${job.id}`,
+        source: 'Jooble',
         titre: job.title || '',
         entreprise: job.company || '',
-        lieu: job.locations || location || 'France',
-        date: job.date || '',
-        description: (job.description || '').substring(0, 600),
-        url: job.url || '',
-        type: '',
+        lieu: job.location || location || 'France',
+        date: job.updated || '',
+        description: (job.snippet || '').substring(0, 600),
+        url: job.link || '',
+        type: job.type || '',
         salaire: job.salary || '',
         experience: '',
         remote: false,
@@ -216,7 +221,7 @@ export default async function handler(req, res) {
     hasMore: ftEnd < (parseInt(totalFT) || 0),
     sources: {
       ft: ftRes.status === 'fulfilled' ? (ftRes.value?.resultats?.length || 0) : 0,
-      careerjet: cjRes.status === 'fulfilled' ? (cjRes.value?.jobs?.length || 0) : 0,
+      jooble: cjRes.status === 'fulfilled' ? (cjRes.value?.jobs?.length || 0) : 0,
       jsearch: jRes.status === 'fulfilled' ? (jRes.value?.data?.length || 0) : 0,
       adzuna: azRes.status === 'fulfilled' ? (azRes.value?.results?.length || 0) : 0,
     }
