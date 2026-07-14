@@ -33,6 +33,7 @@ export default function Profile() {
   const [activeSection, setActiveSection] = useState('import')
   const [importing, setImporting] = useState(false)
   const [importDone, setImportDone] = useState(false)
+  const [showVerifModal, setShowVerifModal] = useState(false)
   const [savedCvs, setSavedCvs] = useState([])
   const [showSavedCvs, setShowSavedCvs] = useState(false)
 
@@ -110,6 +111,7 @@ export default function Profile() {
     // centres_interet est optionnel — pas d'erreur si absent
     if (d.centres_interet?.filter(c => c).length) setCentresInteret(d.centres_interet.filter(c => c))
     setImportDone(true)
+    setShowVerifModal(true)
     setShowSavedCvs(false)
     setActiveSection('verification')
   }
@@ -199,15 +201,15 @@ Retourne UNIQUEMENT ce JSON valide:
         else throw new Error('JSON invalide dans la reponse IA')
       }
 
-      // 3. Remplir les champs - toujours sans erreur même si section absente
-      setPrenom(json.prenom || '')
-      setNom(json.nom || '')
-      setEmail(json.email || email)
-      setTelephone(json.telephone || '')
-      setVille(json.ville || '')
-      setLinkedin(json.linkedin || '')
-      setTitre(json.titre || '')
-      setAccroche(json.accroche || '')
+      // 3. Remplir les champs - NE JAMAIS écraser prenom/nom si déjà définis
+      if (!prenom) setPrenom(json.prenom || '')
+      if (!nom) setNom(json.nom || '')
+      if (json.email && !email) setEmail(json.email)
+      if (json.telephone) setTelephone(json.telephone)
+      if (json.ville) setVille(json.ville)
+      if (json.linkedin) setLinkedin(json.linkedin)
+      if (json.titre) setTitre(json.titre)
+      if (json.accroche) setAccroche(json.accroche)
       if (json.experiences?.filter(e => e.poste || e.entreprise).length) {
         setExperiences(json.experiences.map(exp => ({
           ...exp,
@@ -222,7 +224,8 @@ Retourne UNIQUEMENT ce JSON valide:
       if (json.centres_interet?.filter(c => c).length) setCentresInteret(json.centres_interet.filter(c => c))
 
       setImportDone(true)
-      setActiveSection('verification') // Rediriger vers écran de vérification
+      setShowVerifModal(true) // Modale de vérification obligatoire
+      setActiveSection('verification')
 
     } catch (err) {
       console.error('Erreur import CV:', err)
@@ -362,7 +365,7 @@ Retourne UNIQUEMENT ce JSON valide:
                   </button>
                   <label style={{ padding: '11px 22px', background: '#f3f4f6', color: '#374151', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>
                     <input type="file" accept=".pdf" onChange={handleImportCV} style={{ display: 'none' }} />
-                    Importer un autre PDF
+                    Mettre à jour depuis un PDF
                   </label>
                 </div>
               </div>
@@ -511,6 +514,14 @@ Retourne UNIQUEMENT ce JSON valide:
           <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '28px' }}>
             <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: '0 0 24px' }}>Informations personnelles</h2>
 
+            {/* Avertissement 1 compte = 1 personne */}
+            <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '10px', padding: '12px 16px', marginBottom: '20px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+              <span style={{ fontSize: '16px', flexShrink: 0 }}>⚠️</span>
+              <div style={{ fontSize: '13px', color: '#92400e', lineHeight: '1.5' }}>
+                <strong>1 compte = 1 personne.</strong> Ton nom et prénom sont liés à ce compte et ne peuvent pas être changés une fois enregistrés. Si tu veux changer de profil, crée un nouveau compte.
+              </div>
+            </div>
+
             {/* Photo */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '28px', paddingBottom: '24px', borderBottom: '1px solid #f0f0f0' }}>
               {photo
@@ -530,9 +541,33 @@ Retourne UNIQUEMENT ce JSON valide:
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              <Field label="Prenom"><input value={prenom} onChange={e => setPrenom(e.target.value)} placeholder="Marie" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
-              <Field label="Nom"><input value={nom} onChange={e => setNom(e.target.value)} placeholder="Dupont" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
-              <Field label="Email"><input value={email} onChange={e => setEmail(e.target.value)} style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
+              <Field label="Prénom">
+                {importDone && prenom ? (
+                  <div style={{ padding: '9px 14px', border: '1.5px solid #f0f0f0', borderRadius: '9px', fontSize: '14px', color: '#374151', background: '#fafafa', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: '600' }}>{prenom}</span>
+                    <span style={{ fontSize: '11px', color: '#c4c4c4' }}>🔒</span>
+                  </div>
+                ) : (
+                  <input value={prenom} onChange={e => setPrenom(e.target.value)} placeholder="Marie" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} />
+                )}
+              </Field>
+              <Field label="Nom">
+                {importDone && nom ? (
+                  <div style={{ padding: '9px 14px', border: '1.5px solid #f0f0f0', borderRadius: '9px', fontSize: '14px', color: '#374151', background: '#fafafa', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: '600' }}>{nom}</span>
+                    <span style={{ fontSize: '11px', color: '#c4c4c4' }}>🔒</span>
+                  </div>
+                ) : (
+                  <input value={nom} onChange={e => setNom(e.target.value)} placeholder="Dupont" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} />
+                )}
+              </Field>
+            </div>
+              <Field label="Email">
+                <div style={{ padding: '9px 14px', border: '1.5px solid #f0f0f0', borderRadius: '9px', fontSize: '14px', color: '#9ca3af', background: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span>{email}</span>
+                  <span style={{ fontSize: '11px', color: '#c4c4c4' }}>🔒 Email du compte</span>
+                </div>
+              </Field>
               <Field label="Telephone"><input value={telephone} onChange={e => setTelephone(e.target.value)} placeholder="+33 6 12 34 56 78" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
               <Field label="Ville"><CityInput value={ville} onChange={setVille} placeholder="Paris" /></Field>
               <Field label="LinkedIn" hint="optionnel"><input value={linkedin} onChange={e => setLinkedin(e.target.value)} placeholder="linkedin.com/in/..." style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
@@ -668,6 +703,39 @@ Retourne UNIQUEMENT ce JSON valide:
           </div>
         )}
       </div>
+
+      {/* ─── MODALE VÉRIFICATION OBLIGATOIRE ─── */}
+      {showVerifModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', backdropFilter: 'blur(4px)' }}>
+          <div style={{ background: '#fff', borderRadius: '20px', padding: '36px', maxWidth: '480px', width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.2)', textAlign: 'center' }}>
+            <div style={{ fontSize: '52px', marginBottom: '16px' }}>⚠️</div>
+            <h2 style={{ fontSize: '22px', fontWeight: '800', color: '#111', margin: '0 0 12px', letterSpacing: '-0.5px' }}>
+              Vérifie bien tes informations !
+            </h2>
+            <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 20px', lineHeight: '1.7' }}>
+              La lecture automatique du PDF n'est <strong>pas parfaite à 100%</strong>. L'IA peut faire des erreurs sur :
+            </p>
+            <div style={{ background: '#fef3c7', border: '1px solid #fde68a', borderRadius: '10px', padding: '14px 16px', marginBottom: '24px', textAlign: 'left' }}>
+              {[
+                '🔤 Ton prénom et ton nom',
+                '📅 Les dates et périodes de poste',
+                '🏢 Les noms d\'entreprises',
+                '📍 Les villes et lieux',
+                '📋 Les intitulés de poste',
+              ].map(item => (
+                <div key={item} style={{ fontSize: '13px', color: '#92400e', marginBottom: '6px', fontWeight: '500' }}>{item}</div>
+              ))}
+            </div>
+            <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 24px' }}>
+              Prends 2 minutes pour vérifier chaque section avant de sauvegarder.
+            </p>
+            <button onClick={() => setShowVerifModal(false)}
+              style={{ width: '100%', padding: '14px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+              ✅ Compris, je vais vérifier mes infos
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Bouton save fixe */}
       <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 100 }}>
