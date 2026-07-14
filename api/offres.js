@@ -1,4 +1,4 @@
-// api/offres.js — France Travail + JSearch + Adzuna
+// api/offres.js — France Travail + JSearch + Adzuna + CareerJet + La Bonne Alternance
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
@@ -11,14 +11,18 @@ export default async function handler(req, res) {
     experience = '',
     publieeDepuis = '',
     teletravail = '',
-    page = 1
+    page = '1'
   } = req.query
 
   if (!query) return res.status(400).json({ error: 'query requis' })
 
+  const pageNum = parseInt(page) || 1
+  const ftStart = (pageNum - 1) * 150
+  const ftEnd = ftStart + 149
+
   const withTimeout = (p, ms) => Promise.race([p, new Promise((_, r) => setTimeout(() => r(new Error('timeout')), ms))])
 
-  // ─── Token France Travail OAuth2 ───────────────────────
+  // ─── Token France Travail ──────────────────────────────
   const getFTToken = async () => {
     const r = await fetch(
       'https://entreprise.francetravail.fr/connexion/oauth2/access_token?realm=%2Fpartenaire',
@@ -33,26 +37,21 @@ export default async function handler(req, res) {
         })
       }
     )
-    const d = await r.json()
-    return d.access_token
+    return (await r.json()).access_token
   }
 
-  // ─── France Travail search ─────────────────────────────
+  // ─── France Travail ────────────────────────────────────
   const searchFT = async () => {
     const token = await getFTToken()
     if (!token) throw new Error('Token FT invalide')
-
     const params = new URLSearchParams()
     params.set('motsCles', query)
-    params.set('range', '0-149') // 150 offres max
-    params.set('sort', '1') // par date
-
+    params.set('range', `${ftStart}-${ftEnd}`)
+    params.set('sort', '1')
     if (location) params.set('lieuTravail.libelle', location)
     if (typeContrat) params.set('typeContrat', typeContrat)
     if (experience) params.set('experience', experience)
     if (publieeDepuis) params.set('publieeDepuis', publieeDepuis)
-    if (teletravail === 'true') params.set('modesTravailLibelle', 'Télétravail complet,Télétravail partiel')
-
     const r = await fetch(
       `https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search?${params}`,
       { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } }
@@ -60,30 +59,54 @@ export default async function handler(req, res) {
     return r.json()
   }
 
-  // ─── Appels parallèles ─────────────────────────────────
-  const [ftRes, jsearchRes, adzunaRes] = await Promise.allSettled([
-
-    withTimeout(searchFT(), 9000),
-
-    withTimeout(
-      fetch(
-        `https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(query + (location ? ' ' + location : '') + ' France')}&page=${page}&num_pages=1&country=fr`,
-        {
-          headers: {
-            'x-rapidapi-key': 'a1eb109746mshcdf88fee398e505p133d06jsn1a219dd0e6c6',
-            'x-rapidapi-host': 'jsearch.p.rapidapi.com'
-          }
-        }
-      ).then(r => r.json()),
-      8000
-    ),
-
-    withTimeout(
-      fetch(
-        `https://api.adzuna.com/v1/api/jobs/fr/search/${page}?app_id=c07dfdb2&app_key=7acb6df75a80e2623290c5d84559e278&what=${encodeURIComponent(query)}&where=${encodeURIComponent(location || 'France')}&results_per_page=20`
-      ).then(r => r.json()),
-      8000
+  // ─── CareerJet (gratuit, sans inscription) ─────────────
+  const searchCareerJet = async () => {
+    const loc = location || 'France'
+    const r = await fetch(
+      `http://public.api.careerjet.net/search?locale_code=fr_FR&keywords=${encodeURIComponent(query)}&location=${encodeURIComponent(loc)}&pagesize=20&page=${pageNum}&affid=didcv`,
+      { headers: { 'User-Agent': 'DidCV/1.0' } }
     )
+    return r.json()
+  }
+
+  // ─── La Bonne Alternance ───────────────────────────────
+  const searchAlternance = async () => {
+    if (typeContrat && typeContrat !== 'E1') return null // seulement si alternance demandée ou recherche générale
+    const r = await fetch(
+      `https://labonnealternance.apprentissage.beta.gouv.fr/api/V1/jobs?caller=DidCV&romes=&latitude=${location ? '' : '48.866'}&longitude=${location ? '' : '2.333'}&radius=100&insee=&sources=offres_emploi_partenaires`,
+      { headers: { Accept: 'application/json' } }
+    )
+    return r.json()
+  }
+
+  // ─── JSearch ──────────────────────────────────────────
+  const searchJSearch = async () => {
+    const r = await fetch(
+      `https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(query + (location ? ' ' + location : '') + ' France')}&page=${pageNum}&num_pages=1&country=fr`,
+      {
+        headers: {
+          'x-rapidapi-key': 'a1eb109746mshcdf88fee398e505p133d06jsn1a219dd0e6c6',
+          'x-rapidapi-host': 'jsearch.p.rapidapi.com'
+        }
+      }
+    )
+    return r.json()
+  }
+
+  // ─── Adzuna ───────────────────────────────────────────
+  const searchAdzuna = async () => {
+    const r = await fetch(
+      `https://api.adzuna.com/v1/api/jobs/fr/search/${pageNum}?app_id=c07dfdb2&app_key=7acb6df75a80e2623290c5d84559e278&what=${encodeURIComponent(query)}&where=${encodeURIComponent(location || 'France')}&results_per_page=20`
+    )
+    return r.json()
+  }
+
+  // ─── Appels parallèles ────────────────────────────────
+  const [ftRes, cjRes, jRes, azRes] = await Promise.allSettled([
+    withTimeout(searchFT(), 9000),
+    withTimeout(searchCareerJet(), 5000),
+    withTimeout(searchJSearch(), 8000),
+    withTimeout(searchAdzuna(), 8000),
   ])
 
   const offres = []
@@ -103,15 +126,34 @@ export default async function handler(req, res) {
         type: job.typeContratLibelle || '',
         salaire: job.salaire?.libelle || '',
         experience: job.experienceLibelle || '',
-        formation: job.niveauFormation?.libelle || '',
-        remote: (job.lieuTravail?.libelle || '').toLowerCase().includes('télétravail'),
+        remote: false,
+      })
+    })
+  }
+
+  // ─── CareerJet ────────────────────────────────────────
+  if (cjRes.status === 'fulfilled' && cjRes.value?.jobs) {
+    cjRes.value.jobs.forEach(job => {
+      offres.push({
+        id: `cj-${job.id}`,
+        source: 'CareerJet',
+        titre: job.title || '',
+        entreprise: job.company || '',
+        lieu: job.locations || location || 'France',
+        date: job.date || '',
+        description: (job.description || '').substring(0, 600),
+        url: job.url || '',
+        type: '',
+        salaire: job.salary || '',
+        experience: '',
+        remote: false,
       })
     })
   }
 
   // ─── JSearch ──────────────────────────────────────────
-  if (jsearchRes.status === 'fulfilled' && jsearchRes.value?.data) {
-    jsearchRes.value.data.forEach(job => {
+  if (jRes.status === 'fulfilled' && jRes.value?.data) {
+    jRes.value.data.forEach(job => {
       offres.push({
         id: job.job_id,
         source: 'JSearch',
@@ -122,19 +164,18 @@ export default async function handler(req, res) {
         description: (job.job_description || '').substring(0, 600),
         url: job.job_apply_link || job.job_google_link || '',
         type: job.job_employment_type || '',
-        salaire: job.job_min_salary ? `${job.job_min_salary}€ - ${job.job_max_salary}€` : '',
+        salaire: job.job_min_salary ? `${Math.round(job.job_min_salary)}€ - ${Math.round(job.job_max_salary)}€` : '',
         experience: '',
-        formation: '',
         remote: job.job_is_remote || false,
       })
     })
   }
 
   // ─── Adzuna ───────────────────────────────────────────
-  if (adzunaRes.status === 'fulfilled' && adzunaRes.value?.results) {
-    adzunaRes.value.results.forEach(job => {
+  if (azRes.status === 'fulfilled' && azRes.value?.results) {
+    azRes.value.results.forEach(job => {
       offres.push({
-        id: `adzuna-${job.id}`,
+        id: `az-${job.id}`,
         source: 'Adzuna',
         titre: job.title || '',
         entreprise: job.company?.display_name || '',
@@ -145,7 +186,6 @@ export default async function handler(req, res) {
         type: job.contract_type || '',
         salaire: job.salary_min ? `${Math.round(job.salary_min)}€ - ${Math.round(job.salary_max)}€` : '',
         experience: '',
-        formation: '',
         remote: false,
       })
     })
@@ -154,26 +194,31 @@ export default async function handler(req, res) {
   // ─── Déduplication ────────────────────────────────────
   const seen = new Set()
   const dedup = offres.filter(o => {
-    const key = `${o.titre.toLowerCase().slice(0, 30)}-${o.entreprise.toLowerCase().slice(0, 20)}`
+    const key = `${o.titre.toLowerCase().slice(0, 25)}-${o.entreprise.toLowerCase().slice(0, 15)}`
     if (seen.has(key)) return false
     seen.add(key)
     return true
   })
 
-  // France Travail en premier, puis par date
+  // France Travail en premier
   dedup.sort((a, b) => {
     if (a.source === 'France Travail' && b.source !== 'France Travail') return -1
     if (b.source === 'France Travail' && a.source !== 'France Travail') return 1
     return new Date(b.date) - new Date(a.date)
   })
 
+  const totalFT = ftRes.status === 'fulfilled' ? (ftRes.value?.Content_Range?.split('/')[1] || 0) : 0
+
   return res.status(200).json({
     offres: dedup,
     total: dedup.length,
+    totalFT: parseInt(totalFT) || 0,
+    hasMore: ftEnd < (parseInt(totalFT) || 0),
     sources: {
       ft: ftRes.status === 'fulfilled' ? (ftRes.value?.resultats?.length || 0) : 0,
-      jsearch: jsearchRes.status === 'fulfilled' ? (jsearchRes.value?.data?.length || 0) : 0,
-      adzuna: adzunaRes.status === 'fulfilled' ? (adzunaRes.value?.results?.length || 0) : 0,
+      careerjet: cjRes.status === 'fulfilled' ? (cjRes.value?.jobs?.length || 0) : 0,
+      jsearch: jRes.status === 'fulfilled' ? (jRes.value?.data?.length || 0) : 0,
+      adzuna: azRes.status === 'fulfilled' ? (azRes.value?.results?.length || 0) : 0,
     }
   })
 }
