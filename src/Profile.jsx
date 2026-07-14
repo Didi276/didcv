@@ -561,16 +561,21 @@ Retourne UNIQUEMENT ce JSON valide:
                   <input value={nom} onChange={e => setNom(e.target.value)} placeholder="Dupont" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} />
                 )}
               </Field>
-            </div>
+              <Field label="Téléphone">
+                <input value={telephone} onChange={e => setTelephone(e.target.value)} placeholder="+33 6 12 34 56 78" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} />
+              </Field>
+              <Field label="Ville">
+                <CityInput value={ville} onChange={setVille} placeholder="Paris" />
+              </Field>
               <Field label="Email">
                 <div style={{ padding: '9px 14px', border: '1.5px solid #f0f0f0', borderRadius: '9px', fontSize: '14px', color: '#9ca3af', background: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span>{email}</span>
                   <span style={{ fontSize: '11px', color: '#c4c4c4' }}>🔒 Email du compte</span>
                 </div>
               </Field>
-              <Field label="Telephone"><input value={telephone} onChange={e => setTelephone(e.target.value)} placeholder="+33 6 12 34 56 78" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
-              <Field label="Ville"><CityInput value={ville} onChange={setVille} placeholder="Paris" /></Field>
-              <Field label="LinkedIn" hint="optionnel"><input value={linkedin} onChange={e => setLinkedin(e.target.value)} placeholder="linkedin.com/in/..." style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
+              <Field label="LinkedIn" hint="optionnel">
+                <input value={linkedin} onChange={e => setLinkedin(e.target.value)} placeholder="linkedin.com/in/..." style={INPUT} onFocus={focusStyle} onBlur={blurStyle} />
+              </Field>
             </div>
             <Field label="Titre professionnel"><input value={titre} onChange={e => setTitre(e.target.value)} placeholder="Responsable Marketing Digital" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
             <Field label="Accroche" hint="3-4 phrases"><textarea value={accroche} onChange={e => setAccroche(e.target.value)} rows={4} style={{ ...INPUT, resize: 'vertical', lineHeight: '1.6' }} onFocus={focusStyle} onBlur={blurStyle} /></Field>
