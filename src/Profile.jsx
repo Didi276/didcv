@@ -4,6 +4,7 @@ import Navbar from './Navbar'
 import * as pdfjsLib from 'pdfjs-dist'
 import DateRangePicker from './DateRangePicker'
 import CityInput from './CityInput'
+import SuggestionsIA from './SuggestionsIA'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString()
 
@@ -578,7 +579,14 @@ Retourne UNIQUEMENT ce JSON valide:
               </Field>
             </div>
             <Field label="Titre professionnel"><input value={titre} onChange={e => setTitre(e.target.value)} placeholder="Responsable Marketing Digital" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
-            <Field label="Accroche" hint="3-4 phrases"><textarea value={accroche} onChange={e => setAccroche(e.target.value)} rows={4} style={{ ...INPUT, resize: 'vertical', lineHeight: '1.6' }} onFocus={focusStyle} onBlur={blurStyle} /></Field>
+            <Field label="Accroche" hint="3-4 phrases">
+              <textarea value={accroche} onChange={e => setAccroche(e.target.value)} rows={4} style={{ ...INPUT, resize: 'vertical', lineHeight: '1.6' }} onFocus={focusStyle} onBlur={blurStyle} />
+              <SuggestionsIA
+                poste={titre}
+                type="accroche"
+                onSelect={s => setAccroche(s)}
+              />
+            </Field>
           </div>
         )}
 
@@ -604,6 +612,14 @@ Retourne UNIQUEMENT ce JSON valide:
                     <input key={j} value={m} onChange={e => updateMission(i, j, e.target.value)} placeholder={`Mission ${j+1}`} style={{ ...INPUT, marginBottom: '8px' }} onFocus={focusStyle} onBlur={blurStyle} />
                   ))}
                   <button onClick={() => addMission(i)} style={{ background: 'none', border: '1px dashed #d1d5db', color: '#6b7280', padding: '8px 14px', borderRadius: '8px', fontSize: '12px', cursor: 'pointer', fontFamily: 'inherit', width: '100%' }}>+ Ajouter une mission</button>
+                  <SuggestionsIA
+                    poste={exp.poste}
+                    type="missions"
+                    onSelect={s => {
+                      const missions = [...(exp.missions || []).filter(m => m), s]
+                      updateExp(i, 'missions', missions)
+                    }}
+                  />
                 </Field>
               </div>
             ))}
@@ -655,6 +671,13 @@ Retourne UNIQUEMENT ce JSON valide:
             <button onClick={() => setCompetences([...competences, ''])} style={{ background: 'none', border: '1px dashed #d1d5db', color: '#6b7280', padding: '8px 16px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit' }}>
               + Ajouter
             </button>
+            <SuggestionsIA
+              poste={titre || experiences[0]?.poste || ''}
+              type="competences"
+              onSelect={s => {
+                if (!competences.includes(s)) setCompetences([...competences.filter(c => c), s])
+              }}
+            />
           </div>
         )}
 

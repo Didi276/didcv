@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { CVTemplate } from './CVTemplates'
+import SuggestionsIA from './SuggestionsIA'
 
 const INPUT = {
   width: '100%', padding: '9px 12px', border: '1.5px solid #e5e7eb',
@@ -219,6 +220,14 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
                       <button onClick={() => addMission(i)} style={{ background: 'none', border: '1px dashed #d1d5db', color: '#9ca3af', padding: '5px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer', fontFamily: 'inherit', width: '100%' }}>
                         + Mission
                       </button>
+                      <SuggestionsIA
+                        poste={exp.poste}
+                        type="missions"
+                        onSelect={s => {
+                          const missions = [...(exp.missions || []).filter(m => m), s]
+                          setData(d => ({ ...d, experiences: d.experiences.map((e, k) => k === i ? { ...e, missions } : e) }))
+                        }}
+                      />
                     </Field>
                   </div>
                 ))}
