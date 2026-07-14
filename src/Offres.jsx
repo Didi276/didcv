@@ -11,205 +11,352 @@ function useWidth() {
   return w
 }
 
-const CATEGORIES = [
-  { label: 'Tous les secteurs', value: '' },
-  { label: 'Comptabilite & Finance', value: 'comptable finance audit' },
-  { label: 'Tech & Informatique', value: 'developpeur informatique data' },
-  { label: 'Marketing & Communication', value: 'marketing communication digital' },
-  { label: 'Commerce & Vente', value: 'commercial vente business' },
-  { label: 'Ressources Humaines', value: 'ressources humaines RH' },
-  { label: 'Sante & Medical', value: 'infirmier aide-soignant sante' },
-  { label: 'BTP & Chantier', value: 'electricien plombier batiment' },
-  { label: 'Restauration', value: 'cuisinier serveur restauration' },
-  { label: 'Transport & Logistique', value: 'chauffeur logistique transport' },
-  { label: 'Etudiant & Stage', value: 'stage alternance etudiant' },
+const CONTRATS = [
+  { label: 'Tous', value: '' },
+  { label: 'CDI', value: 'CDI' },
+  { label: 'CDD', value: 'CDD' },
+  { label: 'Alternance', value: 'E1' },
+  { label: 'Intérim', value: 'MIS' },
+  { label: 'Stage', value: 'NS' },
+  { label: 'Saisonnier', value: 'SAI' },
 ]
+
+const EXPERIENCE = [
+  { label: 'Tous niveaux', value: '' },
+  { label: 'Débutant', value: '1' },
+  { label: '1 à 3 ans', value: '2' },
+  { label: 'Plus de 3 ans', value: '3' },
+]
+
+const PUBLICATION = [
+  { label: 'Toutes dates', value: '' },
+  { label: 'Dernières 24h', value: '1' },
+  { label: '3 derniers jours', value: '3' },
+  { label: 'Dernière semaine', value: '7' },
+  { label: 'Dernier mois', value: '31' },
+]
+
+const SECTEURS = [
+  'Comptabilité & Finance', 'Tech & Informatique', 'Marketing & Communication',
+  'Commerce & Vente', 'Ressources Humaines', 'Santé & Médical',
+  'BTP & Chantier', 'Restauration & Hôtellerie', 'Transport & Logistique',
+  'Juridique', 'Éducation & Formation', 'Industrie & Production',
+]
+
+const SOURCE_COLORS = {
+  'France Travail': { bg: '#e8f5e9', color: '#2e7d32', dot: '#4caf50' },
+  'JSearch':        { bg: '#e3f2fd', color: '#1565c0', dot: '#2196f3' },
+  'Adzuna':         { bg: '#fce4ec', color: '#880e4f', dot: '#e91e63' },
+}
 
 export default function Offres() {
   const [query, setQuery] = useState('')
   const [location, setLocation] = useState('')
-  const [categorie, setCategorie] = useState('')
+  const [typeContrat, setTypeContrat] = useState('')
+  const [experience, setExperience] = useState('')
+  const [publieeDepuis, setPublieeDepuis] = useState('')
+  const [teletravail, setTeletravail] = useState(false)
+  const [secteur, setSecteur] = useState('')
   const [offres, setOffres] = useState([])
   const [loading, setLoading] = useState(false)
   const [searched, setSearched] = useState(false)
-  const [error, setError] = useState('')
+  const [sources, setSources] = useState(null)
   const [showFilters, setShowFilters] = useState(false)
   const w = useWidth()
   const isMobile = w < 768
 
-  const handleSearch = async (q = query, loc = location) => {
-    const searchQ = q || categorie
-    if (!searchQ.trim()) return
-    setLoading(true); setSearched(false); setError(''); setOffres([])
+  useEffect(() => {
+    const prefill = sessionStorage.getItem('offre_prefill_query')
+    if (prefill) { setQuery(prefill); sessionStorage.removeItem('offre_prefill_query') }
+  }, [])
+
+  const handleSearch = async (overrides = {}) => {
+    const q = overrides.query ?? (secteur || query)
+    if (!q.trim()) return
+    setLoading(true); setSearched(false); setOffres([]); setSources(null)
     setShowFilters(false)
     try {
-      const res = await fetch(`/api/offres?query=${encodeURIComponent(searchQ)}&location=${encodeURIComponent(loc || 'France')}`)
-      const data = await res.json()
+      const params = new URLSearchParams({
+        query: q,
+        location: overrides.location ?? location,
+        typeContrat: overrides.typeContrat ?? typeContrat,
+        experience: overrides.experience ?? experience,
+        publieeDepuis: overrides.publieeDepuis ?? publieeDepuis,
+        teletravail: overrides.teletravail ?? teletravail,
+      })
+      const r = await fetch(`/api/offres?${params}`)
+      const data = await r.json()
       setOffres(data.offres || [])
+      setSources(data.sources || null)
       setSearched(true)
-      if ((data.offres || []).length === 0 && data.errors?.length) setError('Aucune offre trouvee. Essaie d\'autres mots-cles.')
-    } catch {
-      setError('Erreur de connexion.'); setSearched(true)
-    }
+    } catch { setSearched(true) }
     setLoading(false)
   }
 
   const handleGenererCV = (offre) => {
-    const texte = [offre.titre, `${offre.entreprise} - ${offre.lieu}`, offre.type ? `Type: ${offre.type}` : '', '', offre.description, offre.url ? `Source: ${offre.url}` : ''].filter(Boolean).join('\n')
+    const texte = [offre.titre, offre.entreprise && `${offre.entreprise} - ${offre.lieu}`, offre.type, '', offre.description].filter(Boolean).join('\n')
     sessionStorage.setItem('offre_prefill', texte)
     window.location.href = '/generate'
   }
 
   const formatDate = (d) => {
     if (!d) return ''
-    try { return new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) } catch { return '' }
+    try {
+      const diff = Math.floor((Date.now() - new Date(d)) / 86400000)
+      if (diff === 0) return "Aujourd'hui"
+      if (diff === 1) return 'Hier'
+      if (diff < 7) return `Il y a ${diff} jours`
+      return new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+    } catch { return '' }
   }
+
+  const FilterSection = ({ title, children }) => (
+    <div style={{ marginBottom: '20px' }}>
+      <div style={{ fontSize: '11px', fontWeight: '700', color: '#374151', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>{title}</div>
+      {children}
+    </div>
+  )
+
+  const FilterChip = ({ label, active, onClick }) => (
+    <button onClick={onClick} style={{
+      padding: '5px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: active ? '700' : '500',
+      background: active ? '#4f46e5' : '#f3f4f6', color: active ? '#fff' : '#374151',
+      border: 'none', cursor: 'pointer', fontFamily: 'inherit', margin: '3px 3px 3px 0',
+      transition: 'all 0.1s'
+    }}>{label}</button>
+  )
+
+  const Sidebar = () => (
+    <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '20px' }}>
+      <FilterSection title="Secteur">
+        {SECTEURS.map(s => (
+          <FilterChip key={s} label={s} active={secteur === s}
+            onClick={() => { const val = secteur === s ? '' : s; setSecteur(val); handleSearch({ query: val || query }) }} />
+        ))}
+      </FilterSection>
+
+      <FilterSection title="Type de contrat">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {CONTRATS.map(c => (
+            <button key={c.value} onClick={() => { setTypeContrat(c.value); handleSearch({ typeContrat: c.value }) }}
+              style={{ padding: '7px 12px', border: 'none', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: typeContrat === c.value ? '700' : '400', background: typeContrat === c.value ? '#ede9fe' : 'transparent', color: typeContrat === c.value ? '#4f46e5' : '#555', textAlign: 'left', transition: 'all 0.1s' }}>
+              {c.label}
+            </button>
+          ))}
+        </div>
+      </FilterSection>
+
+      <FilterSection title="Expérience">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {EXPERIENCE.map(e => (
+            <button key={e.value} onClick={() => { setExperience(e.value); handleSearch({ experience: e.value }) }}
+              style={{ padding: '7px 12px', border: 'none', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: experience === e.value ? '700' : '400', background: experience === e.value ? '#ede9fe' : 'transparent', color: experience === e.value ? '#4f46e5' : '#555', textAlign: 'left' }}>
+              {e.label}
+            </button>
+          ))}
+        </div>
+      </FilterSection>
+
+      <FilterSection title="Date de publication">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {PUBLICATION.map(p => (
+            <button key={p.value} onClick={() => { setPublieeDepuis(p.value); handleSearch({ publieeDepuis: p.value }) }}
+              style={{ padding: '7px 12px', border: 'none', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: publieeDepuis === p.value ? '700' : '400', background: publieeDepuis === p.value ? '#ede9fe' : 'transparent', color: publieeDepuis === p.value ? '#4f46e5' : '#555', textAlign: 'left' }}>
+              {p.label}
+            </button>
+          ))}
+        </div>
+      </FilterSection>
+
+      <FilterSection title="Télétravail">
+        <button onClick={() => { const v = !teletravail; setTeletravail(v); handleSearch({ teletravail: v }) }}
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '7px 12px', border: 'none', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit', background: teletravail ? '#ede9fe' : 'transparent', color: teletravail ? '#4f46e5' : '#555', fontWeight: teletravail ? '700' : '400', width: '100%', textAlign: 'left' }}>
+          <span>{teletravail ? '✅' : '⬜'}</span> Télétravail possible
+        </button>
+      </FilterSection>
+
+      {(typeContrat || experience || publieeDepuis || teletravail || secteur) && (
+        <button onClick={() => { setTypeContrat(''); setExperience(''); setPublieeDepuis(''); setTeletravail(false); setSecteur(''); handleSearch({ typeContrat: '', experience: '', publieeDepuis: '', teletravail: false }) }}
+          style={{ width: '100%', padding: '8px', background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit', marginTop: '8px' }}>
+          Réinitialiser les filtres
+        </button>
+      )}
+    </div>
+  )
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
       <Navbar currentPage="offres" />
 
-      {/* Hero */}
-      <div style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', padding: isMobile ? '32px 16px 40px' : '48px 40px 56px' }}>
-        <div style={{ maxWidth: '760px', margin: '0 auto', textAlign: 'center' }}>
-          <h1 style={{ fontSize: isMobile ? '26px' : '36px', fontWeight: '800', color: '#fff', margin: '0 0 8px', letterSpacing: '-1px', lineHeight: '1.1' }}>
-            Trouve ton prochain emploi
+      {/* Hero recherche */}
+      <div style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', padding: isMobile ? '28px 16px 36px' : '40px 40px 48px' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+          <h1 style={{ fontSize: isMobile ? '24px' : '32px', fontWeight: '800', color: '#fff', margin: '0 0 6px', letterSpacing: '-0.5px' }}>
+            Trouve ton emploi idéal
           </h1>
-          <p style={{ fontSize: isMobile ? '13px' : '15px', color: 'rgba(255,255,255,0.75)', margin: '0 0 24px' }}>
-            Des milliers d'offres en temps reel
+          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)', margin: '0 0 20px' }}>
+            France Travail, LinkedIn, Indeed et plus — tout en un
           </p>
 
-          {/* Barre recherche */}
-          <div style={{ background: '#fff', borderRadius: '12px', padding: '6px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '6px', boxShadow: '0 8px 32px rgba(0,0,0,0.15)', marginBottom: '14px' }}>
-            <input type="text" placeholder="Poste, metier..." value={query}
-              onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()}
-              style={{ flex: 2, padding: '11px 14px', border: isMobile ? '1px solid #f0f0f0' : 'none', outline: 'none', fontSize: '14px', fontFamily: 'inherit', color: '#111', background: 'transparent', borderRadius: '8px', minWidth: 0 }} />
+          {/* Barre de recherche */}
+          <div style={{ background: '#fff', borderRadius: '12px', padding: '6px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '6px', boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
+            <input value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()}
+              placeholder="Poste, métier, compétence..." style={{ flex: 2, padding: '11px 14px', border: isMobile ? '1px solid #f0f0f0' : 'none', outline: 'none', fontSize: '14px', fontFamily: 'inherit', color: '#111', borderRadius: '8px', background: 'transparent' }} />
             {!isMobile && <div style={{ width: '1px', background: '#f0f0f0', margin: '6px 0' }} />}
-            <input type="text" placeholder="Ville..." value={location}
-              onChange={e => setLocation(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()}
-              style={{ flex: 1, padding: '11px 14px', border: isMobile ? '1px solid #f0f0f0' : 'none', outline: 'none', fontSize: '14px', fontFamily: 'inherit', color: '#111', background: 'transparent', borderRadius: '8px', minWidth: 0 }} />
-            <button onClick={() => handleSearch()} disabled={loading || (!query && !categorie)}
-              style={{ padding: '11px 22px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '9px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
-              {loading ? '⏳' : '🔍 Chercher'}
+            <input value={location} onChange={e => setLocation(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()}
+              placeholder="Ville, département..." style={{ flex: 1, padding: '11px 14px', border: isMobile ? '1px solid #f0f0f0' : 'none', outline: 'none', fontSize: '14px', fontFamily: 'inherit', color: '#111', borderRadius: '8px', background: 'transparent' }} />
+            <button onClick={() => handleSearch()} disabled={loading || !query.trim()}
+              style={{ padding: '11px 24px', background: loading ? '#a5b4fc' : '#4f46e5', color: '#fff', border: 'none', borderRadius: '9px', fontSize: '14px', fontWeight: '700', cursor: loading ? 'default' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
+              {loading ? '⏳' : '🔍 Rechercher'}
             </button>
           </div>
 
-          {/* Raccourcis */}
-          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'center' }}>
-            {CATEGORIES.slice(1, isMobile ? 5 : 7).map(cat => (
-              <button key={cat.value} onClick={() => { setCategorie(cat.value); handleSearch(cat.value, location) }}
-                style={{ padding: '5px 12px', background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1px solid rgba(255,255,255,0.25)', borderRadius: '20px', fontSize: '11px', fontWeight: '500', cursor: 'pointer', fontFamily: 'inherit' }}>
-                {cat.label}
+          {/* Raccourcis rapides */}
+          <div style={{ display: 'flex', gap: '6px', marginTop: '12px', flexWrap: 'wrap' }}>
+            {['Comptable', 'Développeur', 'Commercial', 'Infirmier', 'Alternance', 'Télétravail'].map(s => (
+              <button key={s} onClick={() => { setQuery(s); handleSearch({ query: s }) }}
+                style={{ padding: '4px 12px', background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '20px', fontSize: '12px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: '500' }}>
+                {s}
               </button>
             ))}
           </div>
         </div>
       </div>
 
-      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: isMobile ? '16px' : '24px 40px 60px', display: isMobile ? 'block' : 'grid', gridTemplateColumns: '220px 1fr', gap: '24px', alignItems: 'start' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: isMobile ? '16px' : '24px 40px 60px' }}>
 
-        {/* Filtres mobile - bouton toggle */}
+        {/* Filtres mobile */}
         {isMobile && (
           <div style={{ marginBottom: '12px' }}>
             <button onClick={() => setShowFilters(!showFilters)}
               style={{ width: '100%', padding: '11px 16px', background: '#fff', border: '1px solid #e5e7eb', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', fontFamily: 'inherit', fontSize: '14px', fontWeight: '600', color: '#374151' }}>
-              <span>🔧 Filtrer par secteur</span>
+              <span>🔧 Filtres {(typeContrat || experience || publieeDepuis || teletravail) && '(actifs)'}</span>
               <span>{showFilters ? '▲' : '▼'}</span>
             </button>
-            {showFilters && (
-              <div style={{ background: '#fff', borderRadius: '10px', border: '1px solid #e5e7eb', padding: '12px', marginTop: '8px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
-                {CATEGORIES.map(cat => (
-                  <button key={cat.value} onClick={() => { setCategorie(cat.value); if (cat.value) handleSearch(cat.value, location) }}
-                    style={{ padding: '8px 10px', border: 'none', borderRadius: '8px', fontSize: '12px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: categorie === cat.value ? '700' : '400', background: categorie === cat.value ? '#ede9fe' : '#f8f9ff', color: categorie === cat.value ? '#4f46e5' : '#555', textAlign: 'left' }}>
-                    {cat.label}
-                  </button>
-                ))}
+            {showFilters && <div style={{ marginTop: '8px' }}><Sidebar /></div>}
+          </div>
+        )}
+
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '240px 1fr', gap: '24px', alignItems: 'start' }}>
+
+          {/* Sidebar desktop */}
+          {!isMobile && <div style={{ position: 'sticky', top: '78px' }}><Sidebar /></div>}
+
+          {/* Résultats */}
+          <div>
+            {/* Stats */}
+            {searched && sources && (
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <span style={{ fontSize: '15px', fontWeight: '700', color: '#111' }}>{offres.length} offres</span>
+                {Object.entries(sources).map(([src, count]) => {
+                  const labels = { ft: 'France Travail', jsearch: 'JSearch', adzuna: 'Adzuna' }
+                  const colors = { ft: '#2e7d32', jsearch: '#1565c0', adzuna: '#880e4f' }
+                  const bgs = { ft: '#e8f5e9', jsearch: '#e3f2fd', adzuna: '#fce4ec' }
+                  return count > 0 ? (
+                    <span key={src} style={{ fontSize: '12px', padding: '3px 10px', borderRadius: '12px', background: bgs[src], color: colors[src], fontWeight: '600' }}>
+                      {labels[src]}: {count}
+                    </span>
+                  ) : null
+                })}
               </div>
             )}
-          </div>
-        )}
 
-        {/* Sidebar desktop */}
-        {!isMobile && (
-          <div style={{ position: 'sticky', top: '82px' }}>
-            <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '18px' }}>
-              <div style={{ fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>Secteur</div>
-              {CATEGORIES.map(cat => (
-                <button key={cat.value} onClick={() => { setCategorie(cat.value); if (cat.value) handleSearch(cat.value, location) }}
-                  style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 10px', border: 'none', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: categorie === cat.value ? '700' : '400', background: categorie === cat.value ? '#ede9fe' : 'transparent', color: categorie === cat.value ? '#4f46e5' : '#555', marginBottom: '2px', transition: 'all 0.1s' }}>
-                  {cat.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Résultats */}
-        <div>
-          {!searched && !loading && (
-            <div style={{ textAlign: 'center', padding: '60px 24px', background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb' }}>
-              <div style={{ fontSize: '48px', marginBottom: '14px' }}>🔍</div>
-              <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#111', margin: '0 0 8px' }}>Lance une recherche</h3>
-              <p style={{ fontSize: '13px', color: '#9ca3af', margin: 0 }}>Tape un metier ou selectionne un secteur</p>
-            </div>
-          )}
-
-          {loading && (
-            <div style={{ textAlign: 'center', padding: '60px', background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb' }}>
-              <div style={{ width: '36px', height: '36px', border: '4px solid #ede9fe', borderTop: '4px solid #4f46e5', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 14px' }} />
-              <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
-              <div style={{ fontSize: '14px', color: '#555' }}>Recherche en cours...</div>
-            </div>
-          )}
-
-          {error && <div style={{ padding: '12px 16px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '10px', color: '#dc2626', fontSize: '13px', marginBottom: '14px' }}>{error}</div>}
-
-          {searched && !loading && offres.length > 0 && (
-            <div style={{ fontSize: '13px', color: '#555', marginBottom: '14px', fontWeight: '500' }}>
-              <span style={{ color: '#4f46e5', fontWeight: '700' }}>{offres.length} offres</span> trouvees
-            </div>
-          )}
-
-          {searched && !loading && offres.length === 0 && !error && (
-            <div style={{ textAlign: 'center', padding: '60px', background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb' }}>
-              <div style={{ fontSize: '40px', marginBottom: '12px' }}>😕</div>
-              <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: '0 0 6px' }}>Aucune offre trouvee</h3>
-              <p style={{ fontSize: '13px', color: '#9ca3af', margin: 0 }}>Essaie d'autres mots-cles</p>
-            </div>
-          )}
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {offres.map(offre => (
-              <div key={offre.id} style={{ background: '#fff', borderRadius: '12px', border: '1px solid #e5e7eb', padding: isMobile ? '14px' : '18px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: isMobile ? '14px' : '15px', fontWeight: '700', color: '#111', marginBottom: '4px' }}>{offre.titre}</div>
-                    <div style={{ fontSize: '12px', color: '#374151', marginBottom: '2px' }}>
-                      {offre.entreprise && <span style={{ fontWeight: '600' }}>{offre.entreprise}</span>}
-                      {offre.lieu && <span style={{ color: '#9ca3af' }}> · 📍 {offre.lieu}</span>}
-                      {!isMobile && offre.date && <span style={{ color: '#c4c4c4' }}> · {formatDate(offre.date)}</span>}
-                    </div>
-                    {!isMobile && offre.description && (
-                      <p style={{ fontSize: '12px', color: '#6b7280', margin: '6px 0 0', lineHeight: '1.6', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                        {offre.description}
-                      </p>
-                    )}
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flexShrink: 0 }}>
-                    <button onClick={() => handleGenererCV(offre)}
-                      style={{ padding: isMobile ? '8px 12px' : '9px 16px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: isMobile ? '11px' : '13px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
-                      ⚡ {isMobile ? 'CV' : 'Générer CV'}
+            {/* État vide */}
+            {!searched && !loading && (
+              <div style={{ textAlign: 'center', padding: '60px 24px', background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb' }}>
+                <div style={{ fontSize: '48px', marginBottom: '14px' }}>🎯</div>
+                <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#111', margin: '0 0 8px' }}>Lance ta recherche</h3>
+                <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 20px' }}>Accès à des milliers d'offres en temps réel</p>
+                <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                  {['CDI Paris', 'Alternance Lyon', 'Développeur Remote', 'Comptable Bordeaux'].map(s => (
+                    <button key={s} onClick={() => { const [q, l] = s.split(' '); setQuery(s); handleSearch({ query: s }) }}
+                      style={{ padding: '8px 16px', background: '#ede9fe', color: '#4f46e5', border: 'none', borderRadius: '20px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
+                      {s}
                     </button>
-                    {!isMobile && offre.url && (
-                      <a href={offre.url} target="_blank" rel="noopener noreferrer"
-                        style={{ padding: '8px 16px', background: '#f8f9ff', color: '#4f46e5', border: '1px solid #ede9fe', borderRadius: '8px', fontSize: '12px', fontWeight: '600', textDecoration: 'none', textAlign: 'center' }}>
-                        Voir l'offre
-                      </a>
-                    )}
-                  </div>
+                  ))}
                 </div>
               </div>
-            ))}
+            )}
+
+            {/* Loading */}
+            {loading && (
+              <div style={{ textAlign: 'center', padding: '60px', background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb' }}>
+                <div style={{ width: '40px', height: '40px', border: '4px solid #ede9fe', borderTop: '4px solid #4f46e5', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }} />
+                <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+                <div style={{ fontSize: '15px', fontWeight: '600', color: '#374151', marginBottom: '6px' }}>Recherche en cours...</div>
+                <div style={{ fontSize: '12px', color: '#9ca3af' }}>France Travail + LinkedIn + Indeed + Glassdoor</div>
+              </div>
+            )}
+
+            {/* Pas de résultats */}
+            {searched && !loading && offres.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '60px', background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb' }}>
+                <div style={{ fontSize: '40px', marginBottom: '12px' }}>😕</div>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: '0 0 6px' }}>Aucune offre trouvée</h3>
+                <p style={{ fontSize: '13px', color: '#9ca3af', margin: 0 }}>Essaie d'autres mots-clés ou retire des filtres</p>
+              </div>
+            )}
+
+            {/* Liste offres */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {offres.map(offre => {
+                const srcStyle = SOURCE_COLORS[offre.source] || { bg: '#f3f4f6', color: '#374151', dot: '#9ca3af' }
+                return (
+                  <div key={offre.id} style={{ background: '#fff', borderRadius: '12px', border: '1px solid #e5e7eb', padding: isMobile ? '14px' : '18px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)', transition: 'box-shadow 0.15s' }}
+                    onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)'}
+                    onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)'}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', alignItems: 'flex-start' }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        {/* Badge source + date */}
+                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '6px', flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: '10px', fontWeight: '700', padding: '2px 8px', borderRadius: '10px', background: srcStyle.bg, color: srcStyle.color }}>
+                            ● {offre.source}
+                          </span>
+                          {offre.type && <span style={{ fontSize: '10px', fontWeight: '600', padding: '2px 8px', borderRadius: '10px', background: '#f3f4f6', color: '#6b7280' }}>{offre.type}</span>}
+                          {offre.remote && <span style={{ fontSize: '10px', fontWeight: '600', padding: '2px 8px', borderRadius: '10px', background: '#f0fdf4', color: '#16a34a' }}>🏠 Télétravail</span>}
+                          {offre.date && <span style={{ fontSize: '11px', color: '#c4c4c4', marginLeft: 'auto' }}>{formatDate(offre.date)}</span>}
+                        </div>
+
+                        <div style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '700', color: '#111', marginBottom: '4px', lineHeight: '1.3' }}>
+                          {offre.titre}
+                        </div>
+
+                        <div style={{ fontSize: '13px', color: '#374151', marginBottom: '4px' }}>
+                          {offre.entreprise && <span style={{ fontWeight: '600' }}>{offre.entreprise}</span>}
+                          {offre.lieu && <span style={{ color: '#9ca3af' }}> · 📍 {offre.lieu}</span>}
+                        </div>
+
+                        {offre.salaire && (
+                          <div style={{ fontSize: '12px', color: '#16a34a', fontWeight: '600', marginBottom: '4px' }}>
+                            💰 {offre.salaire}
+                          </div>
+                        )}
+
+                        {!isMobile && offre.description && (
+                          <p style={{ fontSize: '12px', color: '#6b7280', margin: '6px 0 0', lineHeight: '1.6', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                            {offre.description}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Actions */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flexShrink: 0 }}>
+                        <button onClick={() => handleGenererCV(offre)}
+                          style={{ padding: isMobile ? '8px 12px' : '9px 16px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: isMobile ? '11px' : '13px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
+                          ⚡ {isMobile ? 'CV' : 'Générer CV'}
+                        </button>
+                        {offre.url && (
+                          <a href={offre.url} target="_blank" rel="noopener noreferrer"
+                            style={{ padding: isMobile ? '6px 10px' : '8px 16px', background: '#f8f9ff', color: '#4f46e5', border: '1px solid #ede9fe', borderRadius: '8px', fontSize: isMobile ? '10px' : '12px', fontWeight: '600', textDecoration: 'none', textAlign: 'center', display: 'block' }}>
+                            Voir l'offre
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           </div>
         </div>
       </div>
