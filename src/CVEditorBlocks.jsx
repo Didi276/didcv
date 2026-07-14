@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { CVTemplate } from './CVTemplates'
 
 const INPUT = {
@@ -20,85 +20,134 @@ function Field({ label, children }) {
 export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
   const [data, setData] = useState({ ...cvData })
   const [section, setSection] = useState('infos')
+  const [hidden, setHidden] = useState({
+    certifications: false,
+    centres_interet: false,
+    linkedin: false,
+  })
+  const dragIdx = useRef(null)
 
   const update = (field, val) => setData(d => ({ ...d, [field]: val }))
 
+  // ─── Experiences ─────────────────────────────────────────
   const updateExp = (i, field, val) => setData(d => ({
     ...d, experiences: d.experiences.map((e, j) => j === i ? { ...e, [field]: val } : e)
   }))
   const updateMission = (i, j, val) => setData(d => ({
-    ...d, experiences: d.experiences.map((e, k) => k === i ? { ...e, missions: e.missions.map((m, l) => l === j ? val : m) } : e)
+    ...d, experiences: d.experiences.map((e, k) => k === i
+      ? { ...e, missions: e.missions.map((m, l) => l === j ? val : m) } : e)
   }))
   const addMission = (i) => setData(d => ({
-    ...d, experiences: d.experiences.map((e, k) => k === i ? { ...e, missions: [...(e.missions || []), ''] } : e)
+    ...d, experiences: d.experiences.map((e, k) => k === i
+      ? { ...e, missions: [...(e.missions || []), ''] } : e)
   }))
-  const addExp = () => setData(d => ({ ...d, experiences: [...d.experiences, { poste: '', entreprise: '', periode: '', lieu: '', missions: ['', ''] }] }))
+  const addExp = () => setData(d => ({ ...d, experiences: [...d.experiences, { poste: '', entreprise: '', periode: '', lieu: '', missions: [''] }] }))
   const removeExp = (i) => setData(d => ({ ...d, experiences: d.experiences.filter((_, j) => j !== i) }))
 
+  // Drag & drop experiences
+  const onDragStart = (i) => { dragIdx.current = i }
+  const onDrop = (i) => {
+    if (dragIdx.current === null || dragIdx.current === i) return
+    const arr = [...data.experiences]
+    const dragged = arr.splice(dragIdx.current, 1)[0]
+    arr.splice(i, 0, dragged)
+    setData(d => ({ ...d, experiences: arr }))
+    dragIdx.current = null
+  }
+
+  // ─── Formations ──────────────────────────────────────────
   const updateForm = (i, field, val) => setData(d => ({
     ...d, formations: d.formations.map((f, j) => j === i ? { ...f, [field]: val } : f)
   }))
   const addForm = () => setData(d => ({ ...d, formations: [...(d.formations || []), { diplome: '', etablissement: '', periode: '', mention: '', description: '' }] }))
   const removeForm = (i) => setData(d => ({ ...d, formations: d.formations.filter((_, j) => j !== i) }))
 
+  // Drag & drop formations
+  const dragFormIdx = useRef(null)
+  const onDragStartForm = (i) => { dragFormIdx.current = i }
+  const onDropForm = (i) => {
+    if (dragFormIdx.current === null || dragFormIdx.current === i) return
+    const arr = [...data.formations]
+    const dragged = arr.splice(dragFormIdx.current, 1)[0]
+    arr.splice(i, 0, dragged)
+    setData(d => ({ ...d, formations: arr }))
+    dragFormIdx.current = null
+  }
+
+  // ─── Competences ─────────────────────────────────────────
   const updateComp = (i, val) => setData(d => ({ ...d, competences: d.competences.map((c, j) => j === i ? val : c) }))
   const addComp = () => setData(d => ({ ...d, competences: [...(d.competences || []), ''] }))
   const removeComp = (i) => setData(d => ({ ...d, competences: d.competences.filter((_, j) => j !== i) }))
 
+  // ─── Langues ─────────────────────────────────────────────
   const updateLang = (i, field, val) => setData(d => ({
     ...d, langues: d.langues.map((l, j) => j === i ? { ...l, [field]: val } : l)
   }))
   const addLang = () => setData(d => ({ ...d, langues: [...(d.langues || []), { langue: '', niveau: '' }] }))
   const removeLang = (i) => setData(d => ({ ...d, langues: d.langues.filter((_, j) => j !== i) }))
 
+  const toggleHidden = (key) => setHidden(h => ({ ...h, [key]: !h[key] }))
+
+  // Applique les sections cachees au moment de sauvegarder
+  const handleSave = () => {
+    const saved = { ...data }
+    if (hidden.certifications) saved.certifications = []
+    if (hidden.centres_interet) saved.centres_interet = []
+    if (hidden.linkedin) saved.linkedin = ''
+    onSave(saved)
+  }
+
   const focus = (e) => { e.target.style.borderColor = '#4f46e5' }
   const blur = (e) => { e.target.style.borderColor = '#e5e7eb' }
 
   const SECTIONS = [
-    { id: 'infos',        label: 'Infos'         },
-    { id: 'accroche',     label: 'Accroche'      },
-    { id: 'experiences',  label: 'Experiences'   },
-    { id: 'formations',   label: 'Formations'    },
-    { id: 'competences',  label: 'Competences'   },
-    { id: 'langues',      label: 'Langues'       },
+    { id: 'infos',       label: '👤 Infos'        },
+    { id: 'accroche',    label: '📝 Accroche'     },
+    { id: 'experiences', label: '💼 Experiences'  },
+    { id: 'formations',  label: '🎓 Formations'   },
+    { id: 'competences', label: '⚡ Competences'  },
+    { id: 'langues',     label: '🌍 Langues'      },
+    { id: 'visibilite',  label: '👁 Visibilite'   },
   ]
+
+  const DRAG_STYLE = { cursor: 'grab', userSelect: 'none' }
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 300, display: 'flex', fontFamily: '"Inter",system-ui,sans-serif', backdropFilter: 'blur(4px)' }}>
       <div style={{ width: '100%', height: '100%', display: 'grid', gridTemplateColumns: '380px 1fr', background: '#f8f9ff' }}>
 
-        {/* ─── PANNEAU GAUCHE : Formulaire ─── */}
+        {/* ─── GAUCHE ─── */}
         <div style={{ background: '#fff', borderRight: '1px solid #f0f0f0', display: 'flex', flexDirection: 'column', height: '100vh' }}>
 
           {/* Header */}
-          <div style={{ padding: '18px 20px', borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+          <div style={{ padding: '16px 20px', borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
             <div>
-              <div style={{ fontSize: '15px', fontWeight: '800', color: '#111', letterSpacing: '-0.2px' }}>Modifier le CV</div>
-              <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '1px' }}>Les modifications s'appliquent en temps reel</div>
+              <div style={{ fontSize: '15px', fontWeight: '800', color: '#111' }}>Modifier le CV</div>
+              <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '1px' }}>Apercu en temps reel a droite</div>
             </div>
             <div style={{ display: 'flex', gap: '8px' }}>
-              <button onClick={() => onSave(data)}
+              <button onClick={handleSave}
                 style={{ padding: '8px 18px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
                 Sauvegarder
               </button>
               <button onClick={onClose}
-                style={{ width: '34px', height: '34px', border: '1px solid #e5e7eb', background: '#fff', borderRadius: '8px', cursor: 'pointer', fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                style={{ width: '34px', height: '34px', border: '1px solid #e5e7eb', background: '#fff', borderRadius: '8px', cursor: 'pointer', fontSize: '16px' }}>
                 ✕
               </button>
             </div>
           </div>
 
-          {/* Navigation sections */}
-          <div style={{ padding: '10px 12px', borderBottom: '1px solid #f0f0f0', display: 'flex', gap: '4px', flexWrap: 'wrap', flexShrink: 0 }}>
+          {/* Onglets */}
+          <div style={{ padding: '8px 12px', borderBottom: '1px solid #f0f0f0', display: 'flex', gap: '3px', flexWrap: 'wrap', flexShrink: 0 }}>
             {SECTIONS.map(s => (
               <button key={s.id} onClick={() => setSection(s.id)}
-                style={{ padding: '6px 12px', borderRadius: '7px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '12px', fontWeight: '600', background: section === s.id ? '#4f46e5' : '#f3f4f6', color: section === s.id ? '#fff' : '#6b7280', transition: 'all 0.1s' }}>
+                style={{ padding: '5px 10px', borderRadius: '7px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '11px', fontWeight: '600', background: section === s.id ? '#4f46e5' : '#f3f4f6', color: section === s.id ? '#fff' : '#6b7280', transition: 'all 0.1s' }}>
                 {s.label}
               </button>
             ))}
           </div>
 
-          {/* Contenu scrollable */}
+          {/* Contenu */}
           <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px' }}>
 
             {/* INFOS */}
@@ -112,8 +161,6 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                   <Field label="Email"><input value={data.email || ''} onChange={e => update('email', e.target.value)} style={INPUT} onFocus={focus} onBlur={blur} /></Field>
                   <Field label="Telephone"><input value={data.telephone || ''} onChange={e => update('telephone', e.target.value)} style={INPUT} onFocus={focus} onBlur={blur} /></Field>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                   <Field label="Ville"><input value={data.ville || ''} onChange={e => update('ville', e.target.value)} style={INPUT} onFocus={focus} onBlur={blur} /></Field>
                   <Field label="LinkedIn"><input value={data.linkedin || ''} onChange={e => update('linkedin', e.target.value)} style={INPUT} onFocus={focus} onBlur={blur} /></Field>
                 </div>
@@ -124,11 +171,11 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
             {section === 'accroche' && (
               <div>
                 <Field label="Accroche / Profil">
-                  <textarea value={data.accroche || ''} onChange={e => update('accroche', e.target.value)} rows={6}
+                  <textarea value={data.accroche || ''} onChange={e => update('accroche', e.target.value)} rows={7}
                     style={{ ...INPUT, resize: 'vertical', lineHeight: '1.6' }} onFocus={focus} onBlur={blur} />
                 </Field>
-                <div style={{ padding: '12px', background: '#f8f9ff', borderRadius: '8px', border: '1px solid #ede9fe', fontSize: '12px', color: '#6b7280', lineHeight: '1.6' }}>
-                  💡 3 a 5 phrases. Decris ton expertise, ta valeur ajoutee et ce que tu apportes au poste.
+                <div style={{ padding: '10px 12px', background: '#f8f9ff', borderRadius: '8px', border: '1px solid #ede9fe', fontSize: '12px', color: '#6b7280', lineHeight: '1.6' }}>
+                  💡 3 a 5 phrases percutantes. Expertise, valeur ajoutee, adequation avec le poste.
                 </div>
               </div>
             )}
@@ -136,11 +183,22 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
             {/* EXPERIENCES */}
             {section === 'experiences' && (
               <div>
+                <div style={{ fontSize: '11px', color: '#9ca3af', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span>⠿</span> Glisse-depose pour reordonner
+                </div>
                 {data.experiences?.map((exp, i) => (
-                  <div key={i} style={{ marginBottom: '16px', padding: '14px', background: '#f8f9ff', borderRadius: '10px', border: '1px solid #ede9fe' }}>
+                  <div key={i}
+                    draggable
+                    onDragStart={() => onDragStart(i)}
+                    onDragOver={e => e.preventDefault()}
+                    onDrop={() => onDrop(i)}
+                    style={{ marginBottom: '12px', padding: '14px', background: '#f8f9ff', borderRadius: '10px', border: '1px solid #ede9fe', ...DRAG_STYLE }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                      <div style={{ fontSize: '12px', fontWeight: '700', color: '#4f46e5' }}>
-                        {exp.poste || `Experience ${i + 1}`}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ color: '#c4c4c4', fontSize: '16px' }}>⠿</span>
+                        <div style={{ fontSize: '12px', fontWeight: '700', color: '#4f46e5' }}>
+                          {exp.poste || `Experience ${i + 1}`}
+                        </div>
                       </div>
                       {data.experiences.length > 1 && (
                         <button onClick={() => removeExp(i)} style={{ background: 'none', border: 'none', color: '#dc2626', fontSize: '12px', cursor: 'pointer', padding: '2px 6px' }}>🗑</button>
@@ -154,12 +212,11 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
                     </div>
                     <Field label="Missions">
                       {exp.missions?.map((m, j) => (
-                        <div key={j} style={{ display: 'flex', gap: '6px', marginBottom: '6px', alignItems: 'center' }}>
-                          <input value={m} onChange={e => updateMission(i, j, e.target.value)} placeholder={`Mission ${j+1}`}
-                            style={{ ...INPUT, flex: 1 }} onFocus={focus} onBlur={blur} />
-                        </div>
+                        <input key={j} value={m} onChange={e => updateMission(i, j, e.target.value)}
+                          placeholder={`Mission ${j+1}`} style={{ ...INPUT, marginBottom: '6px', cursor: 'text' }}
+                          onFocus={focus} onBlur={blur} />
                       ))}
-                      <button onClick={() => addMission(i)} style={{ background: 'none', border: '1px dashed #d1d5db', color: '#9ca3af', padding: '6px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer', fontFamily: 'inherit', width: '100%' }}>
+                      <button onClick={() => addMission(i)} style={{ background: 'none', border: '1px dashed #d1d5db', color: '#9ca3af', padding: '5px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer', fontFamily: 'inherit', width: '100%' }}>
                         + Mission
                       </button>
                     </Field>
@@ -176,12 +233,23 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
             {/* FORMATIONS */}
             {section === 'formations' && (
               <div>
+                <div style={{ fontSize: '11px', color: '#9ca3af', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span>⠿</span> Glisse-depose pour reordonner
+                </div>
                 {data.formations?.map((f, i) => (
-                  <div key={i} style={{ marginBottom: '16px', padding: '14px', background: '#f8f9ff', borderRadius: '10px', border: '1px solid #ede9fe' }}>
+                  <div key={i}
+                    draggable
+                    onDragStart={() => onDragStartForm(i)}
+                    onDragOver={e => e.preventDefault()}
+                    onDrop={() => onDropForm(i)}
+                    style={{ marginBottom: '12px', padding: '14px', background: '#f8f9ff', borderRadius: '10px', border: '1px solid #ede9fe', ...DRAG_STYLE }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                      <div style={{ fontSize: '12px', fontWeight: '700', color: '#4f46e5' }}>{f.diplome || `Formation ${i + 1}`}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ color: '#c4c4c4', fontSize: '16px' }}>⠿</span>
+                        <div style={{ fontSize: '12px', fontWeight: '700', color: '#4f46e5' }}>{f.diplome || `Formation ${i + 1}`}</div>
+                      </div>
                       {data.formations.length > 1 && (
-                        <button onClick={() => removeForm(i)} style={{ background: 'none', border: 'none', color: '#dc2626', fontSize: '12px', cursor: 'pointer', padding: '2px 6px' }}>🗑</button>
+                        <button onClick={() => removeForm(i)} style={{ background: 'none', border: 'none', color: '#dc2626', fontSize: '12px', cursor: 'pointer' }}>🗑</button>
                       )}
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
@@ -190,7 +258,9 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
                       <Field label="Periode"><input value={f.periode || ''} onChange={e => updateForm(i, 'periode', e.target.value)} style={INPUT} onFocus={focus} onBlur={blur} /></Field>
                       <Field label="Mention"><input value={f.mention || ''} onChange={e => updateForm(i, 'mention', e.target.value)} style={INPUT} onFocus={focus} onBlur={blur} /></Field>
                     </div>
-                    <Field label="Description"><input value={f.description || ''} onChange={e => updateForm(i, 'description', e.target.value)} style={INPUT} onFocus={focus} onBlur={blur} /></Field>
+                    <Field label="Description">
+                      <input value={f.description || ''} onChange={e => updateForm(i, 'description', e.target.value)} style={{ ...INPUT, cursor: 'text' }} onFocus={focus} onBlur={blur} />
+                    </Field>
                   </div>
                 ))}
                 <button onClick={addForm} style={{ padding: '10px', background: '#fff', border: '2px dashed #e5e7eb', borderRadius: '10px', color: '#6b7280', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit', width: '100%' }}
@@ -204,13 +274,13 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
             {/* COMPETENCES */}
             {section === 'competences' && (
               <div>
-                <div style={{ marginBottom: '12px', fontSize: '12px', color: '#9ca3af' }}>
-                  Competences courtes et precises — ex: Excel, Salesforce, Python
+                <div style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '12px' }}>
+                  Courtes et precises — ex: Excel, Python, Gestion de projet
                 </div>
                 {data.competences?.map((c, i) => (
                   <div key={i} style={{ display: 'flex', gap: '6px', marginBottom: '8px', alignItems: 'center' }}>
-                    <input value={c} onChange={e => updateComp(i, e.target.value)} placeholder={`Competence ${i+1}`}
-                      style={{ ...INPUT, flex: 1 }} onFocus={focus} onBlur={blur} />
+                    <input value={c} onChange={e => updateComp(i, e.target.value)}
+                      placeholder={`Competence ${i+1}`} style={{ ...INPUT, flex: 1 }} onFocus={focus} onBlur={blur} />
                     {data.competences.length > 1 && (
                       <button onClick={() => removeComp(i)} style={{ background: '#fef2f2', border: 'none', color: '#dc2626', width: '30px', height: '30px', borderRadius: '6px', cursor: 'pointer', flexShrink: 0, fontSize: '12px' }}>🗑</button>
                     )}
@@ -231,7 +301,7 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
                       <input value={l.langue || ''} onChange={e => updateLang(i, 'langue', e.target.value)} placeholder="Francais" style={INPUT} onFocus={focus} onBlur={blur} />
                     </Field>
                     <Field label={i === 0 ? 'Niveau' : ''}>
-                      <select value={l.niveau || ''} onChange={e => updateLang(i, 'niveau', e.target.value)} style={{ ...INPUT, cursor: 'pointer' }} onFocus={focus} onBlur={blur}>
+                      <select value={l.niveau || ''} onChange={e => updateLang(i, 'niveau', e.target.value)} style={{ ...INPUT, cursor: 'pointer' }}>
                         <option value="">Niveau</option>
                         {['Langue maternelle', 'Bilingue (C2)', 'Courant (C1)', 'Avance (B2)', 'Intermediaire (B1)', 'Notions (A2)'].map(n => <option key={n}>{n}</option>)}
                       </select>
@@ -246,23 +316,58 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
                 </button>
               </div>
             )}
+
+            {/* VISIBILITE */}
+            {section === 'visibilite' && (
+              <div>
+                <div style={{ fontSize: '13px', color: '#6b7280', marginBottom: '20px', lineHeight: '1.6' }}>
+                  Masque des sections de ton CV. Utile pour adapter ton CV selon les postes.
+                </div>
+
+                {[
+                  { key: 'certifications', label: 'Certifications', count: data.certifications?.filter(c => c.titre).length || 0 },
+                  { key: 'centres_interet', label: "Centres d'interet", count: data.centres_interet?.filter(c => c).length || 0 },
+                  { key: 'linkedin', label: 'LinkedIn', count: data.linkedin ? 1 : 0 },
+                ].map(({ key, label, count }) => (
+                  <div key={key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', background: '#f8f9ff', borderRadius: '10px', border: '1px solid #ede9fe', marginBottom: '10px' }}>
+                    <div>
+                      <div style={{ fontSize: '13px', fontWeight: '600', color: hidden[key] ? '#9ca3af' : '#111', textDecoration: hidden[key] ? 'line-through' : 'none' }}>{label}</div>
+                      <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '1px' }}>
+                        {count > 0 ? `${count} element${count > 1 ? 's' : ''}` : 'Vide'}
+                      </div>
+                    </div>
+                    <button onClick={() => toggleHidden(key)}
+                      style={{ padding: '6px 14px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontFamily: 'inherit', fontSize: '12px', fontWeight: '600', background: hidden[key] ? '#f3f4f6' : '#4f46e5', color: hidden[key] ? '#6b7280' : '#fff', transition: 'all 0.15s' }}>
+                      {hidden[key] ? '👁 Afficher' : '🙈 Masquer'}
+                    </button>
+                  </div>
+                ))}
+
+                <div style={{ marginTop: '20px', padding: '12px 14px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '10px', fontSize: '12px', color: '#92400e', lineHeight: '1.6' }}>
+                  💡 Les sections masquees ne seront pas incluses dans ton CV telecharge.
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* ─── PANNEAU DROIT : Apercu ─── */}
-        <div style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', background: '#e8e9ef' }}>
-          {/* Header apercu */}
-          <div style={{ padding: '14px 24px', background: '#fff', borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-            <div style={{ fontSize: '13px', fontWeight: '600', color: '#374151' }}>
-              Apercu en temps reel
-            </div>
+        {/* ─── DROITE : Apercu ─── */}
+        <div style={{ overflowY: 'auto', background: '#e8e9ef', display: 'flex', flexDirection: 'column', height: '100vh' }}>
+          <div style={{ padding: '12px 24px', background: '#fff', borderBottom: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0, position: 'sticky', top: 0, zIndex: 10 }}>
+            <div style={{ fontSize: '13px', fontWeight: '600', color: '#374151' }}>Apercu temps reel</div>
             <div style={{ fontSize: '12px', color: '#9ca3af' }}>Template : {template}</div>
           </div>
-
-          {/* CV preview */}
-          <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '32px 24px' }}>
-            <div style={{ boxShadow: '0 8px 40px rgba(0,0,0,0.2)', borderRadius: '4px', overflow: 'hidden' }}>
-              <CVTemplate cvData={data} template={template} />
+          <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '32px 24px', minHeight: 'fit-content' }}>
+            <div style={{ boxShadow: '0 8px 40px rgba(0,0,0,0.2)', borderRadius: '4px', overflow: 'hidden', flexShrink: 0 }}>
+              <CVTemplate
+                cvData={{
+                  ...data,
+                  certifications: hidden.certifications ? [] : data.certifications,
+                  centres_interet: hidden.centres_interet ? [] : data.centres_interet,
+                  linkedin: hidden.linkedin ? '' : data.linkedin,
+                }}
+                template={template}
+              />
             </div>
           </div>
         </div>
