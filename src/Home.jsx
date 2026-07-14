@@ -407,8 +407,8 @@ export default function Home() {
           <span style={{ color: '#4f46e5' }}>Did</span>CV
         </div>
         <div style={{ display: 'flex', gap: '24px' }}>
-          {['Confidentialité', 'CGU', 'Contact'].map(l => (
-            <a key={l} href="#" style={{ fontSize: '13px', color: '#9ca3af', textDecoration: 'none' }}>{l}</a>
+          {[['Confidentialité', '/privacy'], ['CGU', '/cgu'], ['Contact', '/contact'], ['A propos', '/about']].map(([label, href]) => (
+            <a key={label} href={href} style={{ fontSize: '13px', color: '#9ca3af', textDecoration: 'none' }}>{label}</a>
           ))}
         </div>
         <div style={{ fontSize: '13px', color: '#9ca3af' }}>© 2026 DidCV. Tous droits réservés.</div>
