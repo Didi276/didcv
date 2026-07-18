@@ -84,16 +84,20 @@ export default async function handler(req, res) {
     return r.json()
   }
 
-  // ─── JSearch ──────────────────────────────────────────
-  const searchJSearch = async () => {
+  // ─── Arbeitnow (gratuit, sans inscription, offres EU) ───
+  const searchArbeitnow = async () => {
     const r = await fetch(
-      `https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(query + (location ? ' ' + location : '') + ' France')}&page=${pageNum}&num_pages=1&country=fr`,
-      {
-        headers: {
-          'x-rapidapi-key': 'a1eb109746mshcdf88fee398e505p133d06jsn1a219dd0e6c6',
-          'x-rapidapi-host': 'jsearch.p.rapidapi.com'
-        }
-      }
+      `https://www.arbeitnow.com/api/job-board-api?search=${encodeURIComponent(query)}&page=${pageNum}`,
+      { headers: { Accept: 'application/json' } }
+    )
+    return r.json()
+  }
+
+  // ─── RemoteOK (gratuit, sans inscription, offres remote) ─
+  const searchRemoteOK = async () => {
+    const r = await fetch(
+      `https://remoteok.com/api?tag=${encodeURIComponent(query.split(' ')[0])}`,
+      { headers: { 'User-Agent': 'DidCV/1.0' } }
     )
     return r.json()
   }
@@ -107,10 +111,11 @@ export default async function handler(req, res) {
   }
 
   // ─── Appels parallèles ────────────────────────────────
-  const [ftRes, cjRes, jRes, azRes] = await Promise.allSettled([
+  const [ftRes, cjRes, aRes, rkRes, azRes] = await Promise.allSettled([
     withTimeout(searchFT(), 9000),
     withTimeout(searchJooble(), 6000),
-    withTimeout(searchJSearch(), 8000),
+    withTimeout(searchArbeitnow(), 6000),
+    withTimeout(searchRemoteOK(), 5000),
     withTimeout(searchAdzuna(), 8000),
   ])
 
@@ -156,22 +161,42 @@ export default async function handler(req, res) {
     })
   }
 
-  // ─── JSearch ──────────────────────────────────────────
-  if (jRes.status === 'fulfilled' && jRes.value?.data) {
-    jRes.value.data.forEach(job => {
+  // ─── Arbeitnow ────────────────────────────────────────
+  if (aRes.status === 'fulfilled' && aRes.value?.data) {
+    aRes.value.data.forEach(job => {
       offres.push({
-        id: job.job_id,
-        source: 'JSearch',
-        titre: job.job_title || '',
-        entreprise: job.employer_name || '',
-        lieu: job.job_city || 'France',
-        date: job.job_posted_at_datetime_utc || '',
-        description: (job.job_description || '').substring(0, 600),
-        url: job.job_apply_link || job.job_google_link || '',
-        type: job.job_employment_type || '',
-        salaire: job.job_min_salary ? `${Math.round(job.job_min_salary)}€ - ${Math.round(job.job_max_salary)}€` : '',
+        id: `arb-${job.slug}`,
+        source: 'Arbeitnow',
+        titre: job.title || '',
+        entreprise: job.company_name || '',
+        lieu: job.location || 'Remote',
+        date: job.created_at ? new Date(job.created_at * 1000).toISOString() : '',
+        description: (job.description || '').replace(/<[^>]*>/g, '').substring(0, 600),
+        url: job.url || '',
+        type: job.job_types?.join(', ') || '',
+        salaire: '',
         experience: '',
-        remote: job.job_is_remote || false,
+        remote: job.remote || false,
+      })
+    })
+  }
+
+  // ─── RemoteOK ─────────────────────────────────────────
+  if (rkRes.status === 'fulfilled' && Array.isArray(rkRes.value)) {
+    rkRes.value.filter(j => j.id).slice(0, 15).forEach(job => {
+      offres.push({
+        id: `rok-${job.id}`,
+        source: 'RemoteOK',
+        titre: job.position || '',
+        entreprise: job.company || '',
+        lieu: 'Remote',
+        date: job.date || '',
+        description: (job.description || '').replace(/<[^>]*>/g, '').substring(0, 600),
+        url: job.url || '',
+        type: 'Remote',
+        salaire: job.salary_min ? `${job.salary_min}$ - ${job.salary_max}$` : '',
+        experience: '',
+        remote: true,
       })
     })
   }
@@ -222,7 +247,8 @@ export default async function handler(req, res) {
     sources: {
       ft: ftRes.status === 'fulfilled' ? (ftRes.value?.resultats?.length || 0) : 0,
       jooble: cjRes.status === 'fulfilled' ? (cjRes.value?.jobs?.length || 0) : 0,
-      jsearch: jRes.status === 'fulfilled' ? (jRes.value?.data?.length || 0) : 0,
+      arbeitnow: aRes.status === 'fulfilled' ? (aRes.value?.data?.length || 0) : 0,
+      remoteok: rkRes.status === 'fulfilled' ? (Array.isArray(rkRes.value) ? rkRes.value.filter(j => j.id).length : 0) : 0,
       adzuna: azRes.status === 'fulfilled' ? (azRes.value?.results?.length || 0) : 0,
     }
   })
