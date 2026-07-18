@@ -227,7 +227,6 @@ export default function Profile() {
 
     setImporting(false)
   }
-  }
 
   const handlePhoto = (e) => {
     const file = e.target.files[0]
