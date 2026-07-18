@@ -123,7 +123,8 @@ export default function Profile() {
     setImporting(true)
 
     try {
-      // 1. Extraire le texte du PDF
+      // 1. Extraire le texte ET la photo du PDF
+      let photoExtraite = null
       const texte = await new Promise((resolve, reject) => {
         const reader = new FileReader()
         reader.onload = async (ev) => {
@@ -134,6 +135,49 @@ export default function Profile() {
               const page = await pdf.getPage(i)
               const content = await page.getTextContent()
               text += content.items.map(item => item.str).join(' ') + '\n'
+
+              // Tenter d'extraire la photo de la première page
+              if (i === 1 && !photoExtraite) {
+                try {
+                  const opList = await page.getOperatorList()
+                  const imgNames = []
+                  for (let j = 0; j < opList.fnArray.length; j++) {
+                    if (opList.fnArray[j] === pdfjsLib.OPS.paintImageXObject) {
+                      imgNames.push(opList.argsArray[j][0])
+                    }
+                  }
+                  for (const name of imgNames) {
+                    const img = await new Promise(res => {
+                      try { page.commonObjs.get(name, res) } catch { res(null) }
+                    })
+                    if (!img || !img.data) continue
+                    const ratio = img.width / img.height
+                    // Une photo de profil est généralement carrée ou portrait (ratio 0.5 à 1.5)
+                    if (ratio > 0.5 && ratio < 1.5 && img.width > 60 && img.height > 60) {
+                      const canvas = document.createElement('canvas')
+                      canvas.width = img.width
+                      canvas.height = img.height
+                      const ctx = canvas.getContext('2d')
+                      const imageData = ctx.createImageData(img.width, img.height)
+                      imageData.data.set(new Uint8ClampedArray(img.data))
+                      ctx.putImageData(imageData, 0, 0)
+                      // Compresser et redimensionner à 200x200
+                      const finalCanvas = document.createElement('canvas')
+                      const MAX = 200
+                      let w = img.width, h = img.height
+                      if (w > MAX || h > MAX) {
+                        if (w > h) { h = Math.round(h * MAX / w); w = MAX }
+                        else { w = Math.round(w * MAX / h); h = MAX }
+                      }
+                      finalCanvas.width = w
+                      finalCanvas.height = h
+                      finalCanvas.getContext('2d').drawImage(canvas, 0, 0, w, h)
+                      photoExtraite = finalCanvas.toDataURL('image/jpeg', 0.8)
+                      break
+                    }
+                  }
+                } catch {}
+              }
             }
             if (!text.trim()) reject(new Error('PDF vide ou non lisible'))
             else resolve(text)
@@ -223,6 +267,9 @@ Retourne UNIQUEMENT ce JSON valide:
       // Sections optionnelles — ne plante pas si absentes du CV
       if (json.certifications?.filter(c => c.titre).length) setCertifications(json.certifications.filter(c => c.titre))
       if (json.centres_interet?.filter(c => c).length) setCentresInteret(json.centres_interet.filter(c => c))
+
+      // Appliquer la photo extraite si trouvée
+      if (photoExtraite) setPhoto(photoExtraite)
 
       setImportDone(true)
       setShowVerifModal(true) // Modale de vérification obligatoire
@@ -508,11 +555,21 @@ Retourne UNIQUEMENT ce JSON valide:
             </div>
 
             {/* Avertissement */}
-            <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '10px', padding: '14px 16px', marginBottom: '24px', display: 'flex', gap: '10px' }}>
+            <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '10px', padding: '14px 16px', marginBottom: '12px', display: 'flex', gap: '10px' }}>
               <span style={{ fontSize: '18px', flexShrink: 0 }}>⚠️</span>
               <div style={{ fontSize: '13px', color: '#92400e', lineHeight: '1.6' }}>
                 <strong>Vérifie bien tes informations avant de sauvegarder.</strong><br />
                 L'IA peut faire des erreurs - contrôle les dates, les intitulés de poste et les missions. Corrige ce qui ne va pas dans les onglets.
+              </div>
+            </div>
+
+            <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '10px', padding: '14px 16px', marginBottom: '24px', display: 'flex', gap: '10px' }}>
+              <span style={{ fontSize: '18px', flexShrink: 0 }}>{photo ? '✅' : '📸'}</span>
+              <div style={{ fontSize: '13px', color: '#1e40af', lineHeight: '1.6' }}>
+                {photo
+                  ? <><strong>Photo détectée et importée !</strong><br />Vérifie dans l'onglet "Infos" que c'est bien la bonne.</>
+                  : <><strong>Ta photo n'a pas été importée.</strong><br />Les photos dans les PDFs ne sont pas toujours extractibles. Ajoute-la manuellement dans l'onglet "Infos".</>
+                }
               </div>
             </div>
 
