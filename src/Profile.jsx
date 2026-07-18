@@ -123,73 +123,65 @@ export default function Profile() {
     setImporting(true)
 
     try {
-      // 1. Extraire le texte ET la photo du PDF
+      const TIMEOUT = 20000
       let photoExtraite = null
-      const texte = await new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onload = async (ev) => {
-          try {
-            const pdf = await pdfjsLib.getDocument(new Uint8Array(ev.target.result)).promise
-            let text = ''
-            for (let i = 1; i <= pdf.numPages; i++) {
-              const page = await pdf.getPage(i)
-              const content = await page.getTextContent()
-              text += content.items.map(item => item.str).join(' ') + '\n'
 
-              // Tenter d'extraire la photo de la première page
-              if (i === 1 && !photoExtraite) {
-                try {
-                  const opList = await page.getOperatorList()
-                  const imgNames = []
-                  for (let j = 0; j < opList.fnArray.length; j++) {
-                    if (opList.fnArray[j] === pdfjsLib.OPS.paintImageXObject) {
-                      imgNames.push(opList.argsArray[j][0])
-                    }
-                  }
-                  for (const name of imgNames) {
-                    const img = await new Promise(res => {
-                      try { page.commonObjs.get(name, res) } catch { res(null) }
-                    })
-                    if (!img || !img.data) continue
-                    const ratio = img.width / img.height
-                    // Une photo de profil est généralement carrée ou portrait (ratio 0.5 à 1.5)
-                    if (ratio > 0.5 && ratio < 1.5 && img.width > 60 && img.height > 60) {
-                      const canvas = document.createElement('canvas')
-                      canvas.width = img.width
-                      canvas.height = img.height
-                      const ctx = canvas.getContext('2d')
-                      const imageData = ctx.createImageData(img.width, img.height)
-                      imageData.data.set(new Uint8ClampedArray(img.data))
-                      ctx.putImageData(imageData, 0, 0)
-                      // Compresser et redimensionner à 200x200
-                      const finalCanvas = document.createElement('canvas')
-                      const MAX = 200
-                      let w = img.width, h = img.height
-                      if (w > MAX || h > MAX) {
-                        if (w > h) { h = Math.round(h * MAX / w); w = MAX }
-                        else { w = Math.round(w * MAX / h); h = MAX }
+      const result = await Promise.race([
+        new Promise((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = async (ev) => {
+            try {
+              const pdf = await pdfjsLib.getDocument(new Uint8Array(ev.target.result)).promise
+              let text = ''
+              const maxPages = Math.min(pdf.numPages, 3)
+              for (let i = 1; i <= maxPages; i++) {
+                const page = await pdf.getPage(i)
+                const content = await page.getTextContent()
+                text += content.items.map(item => item.str).join(' ') + '\n'
+                if (i === 1 && !photoExtraite) {
+                  try {
+                    const photoP = new Promise(async (resP) => {
+                      const opList = await page.getOperatorList()
+                      for (let j = 0; j < opList.fnArray.length; j++) {
+                        if (opList.fnArray[j] === pdfjsLib.OPS.paintImageXObject) {
+                          const name = opList.argsArray[j][0]
+                          const img = await new Promise(r => { try { page.commonObjs.get(name, r) } catch { r(null) } })
+                          if (!img?.data) continue
+                          const ratio = img.width / img.height
+                          if (ratio > 0.5 && ratio < 1.5 && img.width > 60 && img.height > 60) {
+                            const tmp = document.createElement('canvas')
+                            tmp.width = img.width; tmp.height = img.height
+                            const d = tmp.getContext('2d').createImageData(img.width, img.height)
+                            d.data.set(new Uint8ClampedArray(img.data))
+                            tmp.getContext('2d').putImageData(d, 0, 0)
+                            const MAX = 200
+                            let w = img.width, h = img.height
+                            if (w > MAX || h > MAX) { if (w > h) { h = Math.round(h*MAX/w); w=MAX } else { w=Math.round(w*MAX/h); h=MAX } }
+                            const c = document.createElement('canvas')
+                            c.width = w; c.height = h
+                            c.getContext('2d').drawImage(tmp, 0, 0, w, h)
+                            resP(c.toDataURL('image/jpeg', 0.8)); return
+                          }
+                        }
                       }
-                      finalCanvas.width = w
-                      finalCanvas.height = h
-                      finalCanvas.getContext('2d').drawImage(canvas, 0, 0, w, h)
-                      photoExtraite = finalCanvas.toDataURL('image/jpeg', 0.8)
-                      break
-                    }
-                  }
-                } catch {}
+                      resP(null)
+                    })
+                    photoExtraite = await Promise.race([photoP, new Promise(r => setTimeout(() => r(null), 3000))])
+                  } catch {}
+                }
               }
-            }
-            if (!text.trim()) reject(new Error('PDF vide ou non lisible'))
-            else resolve(text)
-          } catch (err) {
-            reject(err)
+              if (!text.trim()) reject(new Error('Ce PDF est un scan ou une image. Utilise un PDF avec du texte sélectionnable.'))
+              else resolve({ texte: text, photo: photoExtraite })
+            } catch (err) { reject(err) }
           }
-        }
-        reader.onerror = () => reject(new Error('Erreur lecture fichier'))
-        reader.readAsArrayBuffer(file)
-      })
+          reader.onerror = () => reject(new Error('Erreur lecture fichier'))
+          reader.readAsArrayBuffer(file)
+        }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Délai dépassé (20s). Le PDF est peut-être trop lourd ou c\'est un scan.')), TIMEOUT))
+      ])
 
-      // 2. Envoyer à l'IA
+      const { texte: textContent, photo: photoFound } = result
+
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -197,56 +189,17 @@ export default function Profile() {
           model: 'claude-haiku-4-5-20251001',
           max_tokens: 4000,
           system: 'Tu es un expert en extraction de donnees de CV. Tu retournes UNIQUEMENT un JSON valide, sans texte avant ou apres, sans balises markdown.',
-          messages: [{
-            role: 'user',
-            content: `Extrais toutes les informations de ce CV. Si une information est absente, mets une chaine vide "".
-
-CV:
-${texte.substring(0, 8000)}
-
-Retourne UNIQUEMENT ce JSON valide:
-{
-  "prenom": "",
-  "nom": "",
-  "email": "",
-  "telephone": "",
-  "ville": "",
-  "linkedin": "",
-  "titre": "",
-  "accroche": "",
-  "experiences": [{"poste":"","entreprise":"","periode":"","lieu":"","missions":["","",""]}],
-  "formations": [{"diplome":"","etablissement":"","periode":"","mention":"","description":""}],
-  "competences": ["","",""],
-  "langues": [{"langue":"","niveau":""}],
-  "certifications": [{"titre":"","organisme":"","annee":""}],
-  "centres_interet": ["",""]
-}`
-          }]
+          messages: [{ role: 'user', content: `Extrais toutes les informations de ce CV. Si une information est absente, mets une chaine vide "".\n\nCV:\n${textContent.substring(0, 8000)}\n\nRetourne UNIQUEMENT ce JSON valide:\n{\n  "prenom": "",\n  "nom": "",\n  "email": "",\n  "telephone": "",\n  "ville": "",\n  "linkedin": "",\n  "titre": "",\n  "accroche": "",\n  "experiences": [{"poste":"","entreprise":"","periode":"","lieu":"","missions":["",""]}],\n  "formations": [{"diplome":"","etablissement":"","periode":"","mention":"","description":""}],\n  "competences": ["",""],\n  "langues": [{"langue":"","niveau":""}],\n  "certifications": [{"titre":"","organisme":"","annee":""}],\n  "centres_interet": ["",""]\n}` }]
         })
       })
 
       if (!res.ok) throw new Error(`Erreur API: ${res.status}`)
-
       const data = await res.json()
-
-      if (!data.content || !data.content[0]) throw new Error('Reponse IA invalide')
-
-      const texteJSON = data.content[0].text
-        .replace(/```json\n?/g, '')
-        .replace(/```\n?/g, '')
-        .trim()
-
+      if (!data.content?.[0]) throw new Error('Reponse IA invalide')
+      const texteJSON = data.content[0].text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
       let json
-      try {
-        json = JSON.parse(texteJSON)
-      } catch {
-        // Essayer d'extraire le JSON si du texte parasite est présent
-        const match = texteJSON.match(/\{[\s\S]*\}/)
-        if (match) json = JSON.parse(match[0])
-        else throw new Error('JSON invalide dans la reponse IA')
-      }
+      try { json = JSON.parse(texteJSON) } catch { const m = texteJSON.match(/\{[\s\S]*\}/); if (m) json = JSON.parse(m[0]); else throw new Error('JSON invalide') }
 
-      // 3. Remplir les champs - NE JAMAIS écraser prenom/nom si déjà définis
       if (!prenom) setPrenom(json.prenom || '')
       if (!nom) setNom(json.nom || '')
       if (json.email && !email) setEmail(json.email)
@@ -255,32 +208,25 @@ Retourne UNIQUEMENT ce JSON valide:
       if (json.linkedin) setLinkedin(json.linkedin)
       if (json.titre) setTitre(json.titre)
       if (json.accroche) setAccroche(json.accroche)
-      if (json.experiences?.filter(e => e.poste || e.entreprise).length) {
-        setExperiences(json.experiences.map(exp => ({
-          ...exp,
-          missions: exp.missions?.filter(m => m) || ['']
-        })))
-      }
+      if (json.experiences?.filter(e => e.poste || e.entreprise).length) setExperiences(json.experiences.map(exp => ({ ...exp, missions: exp.missions?.filter(m => m) || [''] })))
       if (json.formations?.filter(f => f.diplome || f.etablissement).length) setFormations(json.formations)
       if (json.competences?.filter(c => c).length) setCompetences(json.competences.filter(c => c))
       if (json.langues?.filter(l => l.langue).length) setLangues(json.langues.filter(l => l.langue))
-      // Sections optionnelles — ne plante pas si absentes du CV
       if (json.certifications?.filter(c => c.titre).length) setCertifications(json.certifications.filter(c => c.titre))
       if (json.centres_interet?.filter(c => c).length) setCentresInteret(json.centres_interet.filter(c => c))
-
-      // Appliquer la photo extraite si trouvée
-      if (photoExtraite) setPhoto(photoExtraite)
+      if (photoFound) setPhoto(photoFound)
 
       setImportDone(true)
-      setShowVerifModal(true) // Modale de vérification obligatoire
+      setShowVerifModal(true)
       setActiveSection('verification')
 
     } catch (err) {
       console.error('Erreur import CV:', err)
-      alert(`Erreur lors de l'import : ${err.message}\n\nAssure-toi que le PDF contient du texte (pas un scan image).`)
+      alert(`Erreur lors de l'import : ${err.message}`)
     }
 
     setImporting(false)
+  }
   }
 
   const handlePhoto = (e) => {
