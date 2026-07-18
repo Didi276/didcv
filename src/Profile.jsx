@@ -239,8 +239,32 @@ Retourne UNIQUEMENT ce JSON valide:
   const handlePhoto = (e) => {
     const file = e.target.files[0]
     if (!file) return
+
+    // Vérifier la taille (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Image trop lourde. Utilise une image de moins de 10MB.')
+      return
+    }
+
     const reader = new FileReader()
-    reader.onload = (ev) => setPhoto(ev.target.result)
+    reader.onload = (ev) => {
+      const img = new Image()
+      img.onload = () => {
+        // Redimensionner à 200x200px max et compresser
+        const canvas = document.createElement('canvas')
+        const MAX = 200
+        let w = img.width, h = img.height
+        if (w > h) { if (w > MAX) { h = Math.round(h * MAX / w); w = MAX } }
+        else { if (h > MAX) { w = Math.round(w * MAX / h); h = MAX } }
+        canvas.width = w
+        canvas.height = h
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0, w, h)
+        // JPEG 80% — réduit à ~5-15KB au lieu de 3-5MB
+        setPhoto(canvas.toDataURL('image/jpeg', 0.8))
+      }
+      img.src = ev.target.result
+    }
     reader.readAsDataURL(file)
   }
 
@@ -526,18 +550,19 @@ Retourne UNIQUEMENT ce JSON valide:
             {/* Photo */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '28px', paddingBottom: '24px', borderBottom: '1px solid #f0f0f0' }}>
               {photo
-                ? <img src={photo} alt="Photo" style={{ width: '72px', height: '72px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #ede9fe' }} />
-                : <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px' }}>👤</div>
+                ? <img src={photo} alt="Photo" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #4f46e5', flexShrink: 0 }} />
+                : <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px', flexShrink: 0 }}>👤</div>
               }
               <div>
-                <div style={{ fontSize: '14px', fontWeight: '600', color: '#111', marginBottom: '8px' }}>Photo de profil</div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <label style={{ padding: '7px 14px', background: '#ede9fe', color: '#4f46e5', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>
-                    <input type="file" accept="image/*" onChange={handlePhoto} style={{ display: 'none' }} />
-                    {photo ? 'Changer' : 'Ajouter une photo'}
+                <div style={{ fontSize: '14px', fontWeight: '700', color: '#111', marginBottom: '6px' }}>Photo de profil</div>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <label style={{ padding: '8px 16px', background: '#4f46e5', color: '#fff', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', display: 'inline-block' }}>
+                    <input type="file" accept="image/*" capture="user" onChange={handlePhoto} style={{ display: 'none' }} />
+                    {photo ? '🔄 Changer' : '📸 Ajouter'}
                   </label>
-                  {photo && <button onClick={() => setPhoto(null)} style={{ padding: '7px 14px', background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>Supprimer</button>}
+                  {photo && <button onClick={() => setPhoto(null)} style={{ padding: '8px 14px', background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>Supprimer</button>}
                 </div>
+                <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '5px' }}>JPG, PNG — compressée automatiquement</div>
               </div>
             </div>
 
