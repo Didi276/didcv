@@ -73,10 +73,197 @@ function FormationCard({ f }) {
         <span style={{ fontSize: '11px', fontWeight: '600', color: '#6b7280', background: '#f3f4f6', padding: '4px 10px', borderRadius: '6px' }}>⏱ {f.duree}</span>
       </div>
       <a href={f.lien} target="_blank" rel="noopener noreferrer"
-        style={{ marginTop: '4px', textAlign: 'center', fontSize: '13px', fontWeight: '700', textDecoration: 'none', color: '#fff', background: '#4f46e5', padding: '10px', borderRadius: '8px' }}>
+        style={{ textAlign: 'center', fontSize: '13px', fontWeight: '700', textDecoration: 'none', color: '#fff', background: '#4f46e5', padding: '10px', borderRadius: '8px' }}>
         Accéder →
       </a>
+      <TestCompetence formation={f} />
     </div>
+  )
+}
+
+function TestCompetence({ formation }) {
+  const [open, setOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
+  const [quiz, setQuiz] = useState(null)
+  const [step, setStep] = useState(0)
+  const [selected, setSelected] = useState(null)
+  const [revealed, setRevealed] = useState(false)
+  const [score, setScore] = useState(0)
+  const [finished, setFinished] = useState(false)
+  const [adding, setAdding] = useState(false)
+  const [added, setAdded] = useState(false)
+
+  const demarrer = async () => {
+    setOpen(true)
+    setLoading(true)
+    setErrorMsg('')
+    setQuiz(null)
+    setStep(0)
+    setSelected(null)
+    setRevealed(false)
+    setScore(0)
+    setFinished(false)
+    setAdded(false)
+
+    const prompt = `Génère 5 questions QCM pour tester le niveau ${formation.titre} niveau ${formation.niveau}. Retourne UNIQUEMENT ce JSON : { questions: [{ question: '', options: ['','','',''], reponse_correcte: 0, explication: '' }] }`
+
+    try {
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 1800,
+          system: 'Tu retournes UNIQUEMENT du JSON valide, sans texte avant ou après, sans markdown.',
+          messages: [{ role: 'user', content: prompt }],
+        }),
+      })
+      const data = await res.json()
+      const text = data.content[0].text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+      const json = JSON.parse(text)
+      if (!json.questions?.length) throw new Error('reponse vide')
+      setQuiz(json.questions.slice(0, 5))
+    } catch {
+      setErrorMsg('Impossible de générer le quiz pour le moment. Réessaie dans un instant.')
+    }
+    setLoading(false)
+  }
+
+  const choisir = (i) => {
+    if (revealed) return
+    setSelected(i)
+    setRevealed(true)
+    if (i === quiz[step].reponse_correcte) setScore(s => s + 1)
+  }
+
+  const suivant = () => {
+    if (step + 1 >= quiz.length) { setFinished(true); return }
+    setStep(s => s + 1)
+    setSelected(null)
+    setRevealed(false)
+  }
+
+  const ajouterAuProfil = async () => {
+    setAdding(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { setAdding(false); return }
+    const { data: profil } = await supabase.from('profiles').select('competences').eq('user_id', user.id).maybeSingle()
+    if (!profil) {
+      setAdding(false)
+      alert("Complète d'abord ton profil (page Profil) pour pouvoir y ajouter des compétences.")
+      return
+    }
+    const label = `${formation.titre} — Certifié DidCV`
+    const competences = profil.competences || []
+    if (!competences.includes(label)) {
+      await supabase.from('profiles').update({ competences: [...competences, label] }).eq('user_id', user.id)
+    }
+    setAdding(false)
+    setAdded(true)
+  }
+
+  const fermer = () => setOpen(false)
+
+  const messageFinal = score >= 4
+    ? 'Excellent niveau ! Cette compétence est acquise.'
+    : score >= 2
+      ? 'Pas mal, mais il reste des choses à consolider - la formation ci-dessus t\'aidera.'
+      : "C'est le moment idéal pour suivre cette formation."
+
+  return (
+    <>
+      <button onClick={demarrer}
+        style={{ textAlign: 'center', fontSize: '12px', fontWeight: '700', color: '#4f46e5', background: '#eef2ff', border: '1px solid #e0e7ff', borderRadius: '8px', padding: '9px', cursor: 'pointer', fontFamily: 'inherit' }}>
+        🎯 Tester mon niveau
+      </button>
+
+      {open && (
+        <div onClick={fermer} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', backdropFilter: 'blur(4px)' }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: '20px', padding: '32px', maxWidth: '480px', width: '100%', maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px', gap: '12px' }}>
+              <div>
+                <div style={{ fontSize: '11px', fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>Test de niveau</div>
+                <div style={{ fontSize: '16px', fontWeight: '800', color: '#111' }}>{formation.titre}</div>
+              </div>
+              <button onClick={fermer} style={{ background: '#f3f4f6', border: 'none', width: '30px', height: '30px', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', color: '#6b7280', flexShrink: 0 }}>✕</button>
+            </div>
+
+            {loading && (
+              <div style={{ textAlign: 'center', padding: '40px 0' }}>
+                <div style={{ width: '36px', height: '36px', border: '3px solid #ede9fe', borderTop: '3px solid #4f46e5', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }} />
+                <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+                <div style={{ fontSize: '13px', color: '#6b7280' }}>Génération du quiz...</div>
+              </div>
+            )}
+
+            {!loading && errorMsg && (
+              <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                <div style={{ fontSize: '13px', color: '#dc2626', marginBottom: '16px' }}>{errorMsg}</div>
+                <button onClick={demarrer} style={{ padding: '10px 20px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+                  Réessayer
+                </button>
+              </div>
+            )}
+
+            {!loading && !errorMsg && quiz && !finished && (
+              <div>
+                <div style={{ fontSize: '11px', fontWeight: '700', color: '#4f46e5', marginBottom: '12px' }}>Question {step + 1} / {quiz.length}</div>
+                <div style={{ fontSize: '15px', fontWeight: '700', color: '#111', marginBottom: '16px', lineHeight: '1.5' }}>{quiz[step].question}</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+                  {quiz[step].options.map((opt, i) => {
+                    const estCorrecte = i === quiz[step].reponse_correcte
+                    const estChoisie = i === selected
+                    let bg = '#fff', border = '#e5e7eb', color = '#374151'
+                    if (revealed && estCorrecte) { bg = '#f0fdf4'; border = '#86efac'; color = '#16a34a' }
+                    else if (revealed && estChoisie && !estCorrecte) { bg = '#fef2f2'; border = '#fecaca'; color = '#dc2626' }
+                    return (
+                      <button key={i} onClick={() => choisir(i)} disabled={revealed}
+                        style={{ textAlign: 'left', padding: '11px 14px', background: bg, border: `1.5px solid ${border}`, borderRadius: '10px', fontSize: '13px', color, cursor: revealed ? 'default' : 'pointer', fontFamily: 'inherit', fontWeight: revealed && (estCorrecte || estChoisie) ? '700' : '500' }}>
+                        {opt}
+                      </button>
+                    )
+                  })}
+                </div>
+                {revealed && (
+                  <div style={{ padding: '12px 14px', background: '#f8f9ff', border: '1px solid #ede9fe', borderRadius: '10px', fontSize: '12px', color: '#6b7280', lineHeight: '1.6', marginBottom: '16px' }}>
+                    💡 {quiz[step].explication}
+                  </div>
+                )}
+                <button onClick={suivant} disabled={!revealed}
+                  style={{ width: '100%', padding: '12px', background: revealed ? '#4f46e5' : '#e5e7eb', color: revealed ? '#fff' : '#9ca3af', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: revealed ? 'pointer' : 'default', fontFamily: 'inherit' }}>
+                  {step + 1 >= quiz.length ? 'Voir mon résultat' : 'Question suivante'}
+                </button>
+              </div>
+            )}
+
+            {finished && quiz && (
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '44px', marginBottom: '8px' }}>{score >= 4 ? '🏆' : score >= 2 ? '👍' : '📘'}</div>
+                <div style={{ fontSize: '24px', fontWeight: '800', color: '#111', marginBottom: '8px' }}>{score} / {quiz.length}</div>
+                <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '24px', lineHeight: '1.6' }}>{messageFinal}</div>
+
+                {score >= 4 && !added && (
+                  <button onClick={ajouterAuProfil} disabled={adding}
+                    style={{ width: '100%', padding: '13px', background: '#0f6e56', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: adding ? 'default' : 'pointer', fontFamily: 'inherit', marginBottom: '10px' }}>
+                    {adding ? 'Ajout...' : '+ Ajouter à mon profil'}
+                  </button>
+                )}
+                {added && (
+                  <div style={{ padding: '12px', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '10px', fontSize: '13px', color: '#16a34a', fontWeight: '600', marginBottom: '10px' }}>
+                    ✓ Ajouté à ton profil — "{formation.titre} — Certifié DidCV"
+                  </div>
+                )}
+                <button onClick={fermer} style={{ width: '100%', padding: '11px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
+                  Fermer
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 
