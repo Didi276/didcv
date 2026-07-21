@@ -5,6 +5,15 @@ import CVEditorBlocks from './CVEditorBlocks'
 import Navbar from './Navbar'
 import { downloadCVasPDF, downloadLettreasePDF } from './pdfUtils'
 
+const REGEX_ACCENTS = new RegExp('[' + String.fromCharCode(0x0300) + '-' + String.fromCharCode(0x036f) + ']', 'g')
+
+function slugify(str) {
+  return str.toString().toLowerCase()
+    .normalize('NFD').replace(REGEX_ACCENTS, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
 function useWidth() {
   const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
   useEffect(() => {
@@ -25,6 +34,10 @@ export default function Dashboard() {
   const [showEditor, setShowEditor] = useState(false)
   const [cvToEdit, setCvToEdit] = useState(null)
   const [downloading, setDownloading] = useState(null)
+  const [partages, setPartages] = useState({})
+  const [partageLoading, setPartageLoading] = useState(null)
+  const [partageOuvert, setPartageOuvert] = useState(null)
+  const [copie, setCopie] = useState(false)
   const w = useWidth()
   const isMobile = w < 768
 
@@ -37,6 +50,12 @@ export default function Dashboard() {
       setCvs(cvData || [])
       const { data: profileData } = await supabase.from('profiles').select('*').eq('user_id', user.id).maybeSingle()
       if (profileData?.prenom) setProfile(profileData)
+      const { data: partagesData } = await supabase.from('cv_partages').select('*').eq('user_id', user.id)
+      if (partagesData) {
+        const map = {}
+        partagesData.forEach(p => { map[p.cv_id] = p })
+        setPartages(map)
+      }
       setLoading(false)
     }
     fetchData()
@@ -68,6 +87,39 @@ export default function Dashboard() {
     setCvToEdit(cv)
     setShowEditor(true)
     setSelectedCv(null)
+  }
+
+  const handlePartager = async (cv, e) => {
+    e.stopPropagation()
+    const existant = partages[cv.id]
+    if (existant) { setPartageOuvert(existant); return }
+
+    setPartageLoading(cv.id)
+    const base = slugify(`${cv.cv_data.prenom}-${cv.cv_data.nom}`) || 'cv'
+    let cree = null
+    for (let tentative = 0; tentative < 5 && !cree; tentative++) {
+      const suffixe = Math.floor(1000 + Math.random() * 9000)
+      const slug = `${base}-${suffixe}`
+      const { data, error } = await supabase.from('cv_partages')
+        .insert({ cv_id: cv.id, user_id: user.id, slug })
+        .select()
+        .single()
+      if (!error) cree = data
+    }
+    setPartageLoading(null)
+    if (cree) {
+      setPartages(p => ({ ...p, [cv.id]: cree }))
+      setPartageOuvert(cree)
+    } else {
+      alert('Impossible de créer le lien de partage pour le moment.')
+    }
+  }
+
+  const copierLien = () => {
+    if (!partageOuvert) return
+    navigator.clipboard.writeText(`${window.location.origin}/cv/${partageOuvert.slug}`)
+    setCopie(true)
+    setTimeout(() => setCopie(false), 2000)
   }
 
   const handleSaveEdit = async (cvDataModifie) => {
@@ -175,6 +227,11 @@ export default function Dashboard() {
                     <CVTemplate cvData={cv.cv_data} template={cv.template} />
                   </div>
                   <div style={{ position: 'absolute', top: '6px', right: '6px', background: 'rgba(0,0,0,0.5)', color: '#fff', padding: '1px 6px', borderRadius: '5px', fontSize: '9px', fontWeight: '600' }}>{cv.template}</div>
+                  {partages[cv.id]?.actif && (
+                    <div style={{ position: 'absolute', top: '6px', left: '6px', background: 'rgba(79,70,229,0.9)', color: '#fff', padding: '1px 7px', borderRadius: '5px', fontSize: '9px', fontWeight: '600' }}>
+                      👁 {partages[cv.id].vues} vue{partages[cv.id].vues !== 1 ? 's' : ''}
+                    </div>
+                  )}
                 </div>
 
                 {/* Infos */}
@@ -199,6 +256,10 @@ export default function Dashboard() {
                       🗑
                     </button>
                   </div>
+                  <button onClick={(e) => handlePartager(cv, e)} disabled={partageLoading === cv.id}
+                    style={{ width: '100%', marginTop: '5px', padding: isMobile ? '6px 4px' : '7px', background: partages[cv.id] ? '#f0fdf4' : '#eef2ff', color: partages[cv.id] ? '#16a34a' : '#4f46e5', border: 'none', borderRadius: '7px', fontSize: isMobile ? '10px' : '11px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
+                    {partageLoading === cv.id ? '...' : partages[cv.id] ? '🔗 Voir le lien' : '🔗 Partager'}
+                  </button>
                 </div>
               </div>
             ))}
@@ -250,6 +311,31 @@ export default function Dashboard() {
 
       {showEditor && cvToEdit && (
         <CVEditorBlocks cvData={cvToEdit.cv_data} template={cvToEdit.template} onSave={handleSaveEdit} onClose={() => { setShowEditor(false); setCvToEdit(null) }} />
+      )}
+
+      {/* Modal lien de partage */}
+      {partageOuvert && (
+        <div onClick={() => setPartageOuvert(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', backdropFilter: 'blur(4px)' }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: '16px', padding: '28px', maxWidth: '420px', width: '100%' }}>
+            <div style={{ fontSize: '15px', fontWeight: '800', color: '#111', marginBottom: '6px' }}>🔗 Lien de partage</div>
+            <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 16px', lineHeight: '1.6' }}>
+              Toute personne avec ce lien peut voir ce CV. Chaque visite est comptabilisée
+              {partageOuvert.vues > 0 && <> — <strong>{partageOuvert.vues} vue{partageOuvert.vues !== 1 ? 's' : ''}</strong> pour l'instant</>}.
+            </p>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+              <input readOnly value={`${window.location.origin}/cv/${partageOuvert.slug}`} onFocus={e => e.target.select()}
+                style={{ flex: 1, padding: '10px 12px', border: '1.5px solid #e5e7eb', borderRadius: '8px', fontSize: '13px', color: '#374151', fontFamily: 'inherit', minWidth: 0 }} />
+              <button onClick={copierLien}
+                style={{ padding: '10px 16px', background: copie ? '#16a34a' : '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0 }}>
+                {copie ? '✓ Copié' : 'Copier'}
+              </button>
+            </div>
+            <button onClick={() => setPartageOuvert(null)}
+              style={{ width: '100%', padding: '11px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
+              Fermer
+            </button>
+          </div>
+        </div>
       )}
     </div>
   )
