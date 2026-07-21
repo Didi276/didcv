@@ -5,6 +5,7 @@ import Templates from './Templates'
 import Auth from './Auth'
 import Dashboard from './Dashboard'
 import Profile from './Profile'
+import Formations from './Formations'
 import Offres from './Offres'
 import About from './About'
 import Contact from './Contact'
@@ -30,6 +31,7 @@ function App() {
         <Route path="/profile"        element={<Profile />} />
         <Route path="/offres"         element={<Offres />} />
         <Route path="/candidatures"   element={<Candidatures />} />
+        <Route path="/formations"     element={<Formations />} />
         <Route path="/blog"           element={<Blog />} />
         <Route path="/blog/:slug"     element={<BlogArticle />} />
         <Route path="/guides"         element={<GuidesMetier />} />
