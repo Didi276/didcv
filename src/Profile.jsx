@@ -86,6 +86,9 @@ export default function Profile() {
   const [titre, setTitre] = useState('')
   const [accroche, setAccroche] = useState('')
   const [photo, setPhoto] = useState(null)
+  const [visibleRecruteurs, setVisibleRecruteurs] = useState(false)
+  const [rechercheEmploi, setRechercheEmploi] = useState('')
+  const [disponibilite, setDisponibilite] = useState('')
 
   const [experiences, setExperiences] = useState([{ poste: '', entreprise: '', periode: '', lieu: '', missions: ['', '', ''] }])
   const [formations, setFormations] = useState([{ diplome: '', etablissement: '', periode: '', mention: '', description: '' }])
@@ -110,6 +113,9 @@ export default function Profile() {
         setTitre(data.titre || '')
         setAccroche(data.accroche || '')
         setPhoto(data.photo || null)
+        setVisibleRecruteurs(data.visible_recruteurs || false)
+        setRechercheEmploi(data.recherche_emploi || '')
+        setDisponibilite(data.disponibilite || '')
         if (data.experiences?.length) setExperiences(data.experiences)
         if (data.formations?.length) setFormations(data.formations)
         if (data.competences?.length) setCompetences(data.competences)
@@ -306,6 +312,9 @@ export default function Profile() {
     const profileData = {
       user_id: user.id, prenom, nom, email, telephone, ville, linkedin,
       titre, accroche, photo,
+      visible_recruteurs: visibleRecruteurs,
+      recherche_emploi: visibleRecruteurs ? rechercheEmploi : '',
+      disponibilite: visibleRecruteurs ? disponibilite : '',
       experiences: experiences.filter(e => e.poste || e.entreprise),
       formations: formations.filter(f => f.diplome || f.etablissement),
       competences: competences.filter(c => c.trim()),
@@ -655,6 +664,42 @@ export default function Profile() {
                 onSelect={s => setAccroche(s)}
               />
             </Field>
+
+            {/* Visibilité recruteurs */}
+            <div style={{ marginTop: '28px', paddingTop: '24px', borderTop: '1px solid #f0f0f0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
+                <div>
+                  <div style={{ fontSize: '14px', fontWeight: '700', color: '#111', marginBottom: '2px' }}>Être visible par les recruteurs</div>
+                  <div style={{ fontSize: '12px', color: '#9ca3af' }}>Apparaît dans la banque de CV publique</div>
+                </div>
+                <button type="button" onClick={() => setVisibleRecruteurs(v => !v)}
+                  style={{ width: '46px', height: '26px', borderRadius: '20px', border: 'none', cursor: 'pointer', background: visibleRecruteurs ? '#4f46e5' : '#e5e7eb', position: 'relative', flexShrink: 0, transition: 'background 0.2s' }}>
+                  <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#fff', position: 'absolute', top: '3px', left: visibleRecruteurs ? '23px' : '3px', transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
+                </button>
+              </div>
+
+              {visibleRecruteurs && (
+                <div style={{ marginTop: '18px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '16px' }}>
+                    <Field label="Je recherche">
+                      <select value={rechercheEmploi} onChange={e => setRechercheEmploi(e.target.value)} style={{ ...INPUT, cursor: 'pointer' }}>
+                        <option value="">— Sélectionner —</option>
+                        {['CDI', 'CDD', 'Alternance', 'Stage', 'Freelance'].map(c => <option key={c}>{c}</option>)}
+                      </select>
+                    </Field>
+                    <Field label="Disponibilité">
+                      <select value={disponibilite} onChange={e => setDisponibilite(e.target.value)} style={{ ...INPUT, cursor: 'pointer' }}>
+                        <option value="">— Sélectionner —</option>
+                        {['Immédiatement', 'Dans 1 mois', 'Dans 3 mois'].map(d => <option key={d}>{d}</option>)}
+                      </select>
+                    </Field>
+                  </div>
+                  <div style={{ background: '#f8f9ff', border: '1px solid #ede9fe', borderRadius: '10px', padding: '12px 14px', fontSize: '13px', color: '#4f46e5', lineHeight: '1.6' }}>
+                    ✨ Ton profil sera visible par des recruteurs qui cherchent des profils comme le tien.
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
