@@ -15,6 +15,16 @@ const INPUT = {
   transition: 'border-color 0.15s',
 }
 
+function useWidth() {
+  const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
+  useEffect(() => {
+    const fn = () => setW(window.innerWidth)
+    window.addEventListener('resize', fn)
+    return () => window.removeEventListener('resize', fn)
+  }, [])
+  return w
+}
+
 function Field({ label, hint, children }) {
   return (
     <div style={{ marginBottom: '18px' }}>
@@ -28,6 +38,8 @@ function Field({ label, hint, children }) {
 }
 
 export default function Profile() {
+  const w = useWidth()
+  const isMobile = w < 768
   const [user, setUser] = useState(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -478,7 +490,7 @@ export default function Profile() {
               <div style={{ fontSize: '13px', fontWeight: '700', color: '#4f46e5', marginBottom: '14px' }}>
                 📋 Informations importées
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', fontSize: '13px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '10px', fontSize: '13px' }}>
                 {[
                   ['Prénom', prenom], ['Nom', nom], ['Email', email],
                   ['Téléphone', telephone], ['Ville', ville], ['Titre', titre],
@@ -568,7 +580,7 @@ export default function Profile() {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '16px' }}>
               <Field label="Prénom">
                 {importDone && prenom ? (
                   <div style={{ padding: '9px 14px', border: '1.5px solid #f0f0f0', borderRadius: '9px', fontSize: '14px', color: '#374151', background: '#fafafa', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -628,7 +640,7 @@ export default function Profile() {
                   </h3>
                   {experiences.length > 1 && <button onClick={() => removeExp(i)} style={{ padding: '5px 12px', background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '7px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>Supprimer</button>}
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
                   <Field label="Poste"><input value={exp.poste} onChange={e => updateExp(i, 'poste', e.target.value)} placeholder="Responsable Marketing" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
                   <Field label="Entreprise"><input value={exp.entreprise} onChange={e => updateExp(i, 'entreprise', e.target.value)} placeholder="TechStartup" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
                   <Field label="Période"><DateRangePicker value={exp.periode} onChange={v => updateExp(i, 'periode', v)} /></Field>
@@ -667,7 +679,7 @@ export default function Profile() {
                   <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#111', margin: 0 }}>Formation {i + 1} {f.diplome && <span style={{ color: '#4f46e5' }}>- {f.diplome}</span>}</h3>
                   {formations.length > 1 && <button onClick={() => removeForm(i)} style={{ padding: '5px 12px', background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '7px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>Supprimer</button>}
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '14px' }}>
                   <Field label="Diplome"><input value={f.diplome} onChange={e => updateForm(i, 'diplome', e.target.value)} placeholder="Master Marketing Digital" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
                   <Field label="Etablissement"><input value={f.etablissement} onChange={e => updateForm(i, 'etablissement', e.target.value)} placeholder="ESCP Business School" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
                   <Field label="Période"><DateRangePicker value={f.periode} onChange={v => updateForm(i, 'periode', v)} /></Field>
@@ -689,7 +701,7 @@ export default function Profile() {
           <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '28px' }}>
             <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: '0 0 6px' }}>Competences</h2>
             <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 24px' }}>Outils, logiciels, methodes - ex: Excel, Salesforce, Gestion de projet</p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '10px', marginBottom: '12px' }}>
               {competences.map((c, i) => (
                 <input key={i} value={c} onChange={e => setCompetences(competences.map((v, j) => j === i ? e.target.value : v))}
                   placeholder={`Competence ${i+1}`} style={INPUT} onFocus={focusStyle} onBlur={blurStyle} />
@@ -715,7 +727,7 @@ export default function Profile() {
             <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '24px' }}>
               <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: '0 0 20px' }}>Langues</h2>
               {langues.map((l, i) => (
-                <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '10px', marginBottom: '10px', alignItems: 'end' }}>
+                <div key={i} style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr auto', gap: '10px', marginBottom: '10px', alignItems: 'end' }}>
                   <Field label={i === 0 ? 'Langue' : ''}><input value={l.langue} onChange={e => setLangues(langues.map((v, j) => j === i ? { ...v, langue: e.target.value } : v))} placeholder="Francais" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
                   <Field label={i === 0 ? 'Niveau' : ''}>
                     <select value={l.niveau} onChange={e => setLangues(langues.map((v, j) => j === i ? { ...v, niveau: e.target.value } : v))} style={{ ...INPUT, cursor: 'pointer' }} onFocus={focusStyle} onBlur={blurStyle}>
@@ -733,7 +745,7 @@ export default function Profile() {
             <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '24px' }}>
               <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: '0 0 20px' }}>Certifications</h2>
               {certifications.map((c, i) => (
-                <div key={i} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 80px auto', gap: '10px', marginBottom: '10px', alignItems: 'end' }}>
+                <div key={i} style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr 80px auto', gap: '10px', marginBottom: '10px', alignItems: 'end' }}>
                   <Field label={i === 0 ? 'Titre' : ''}><input value={c.titre} onChange={e => setCertifications(certifications.map((v, j) => j === i ? { ...v, titre: e.target.value } : v))} placeholder="Google Analytics" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
                   <Field label={i === 0 ? 'Organisme' : ''}><input value={c.organisme} onChange={e => setCertifications(certifications.map((v, j) => j === i ? { ...v, organisme: e.target.value } : v))} placeholder="Google" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
                   <Field label={i === 0 ? 'Annee' : ''}><input value={c.annee} onChange={e => setCertifications(certifications.map((v, j) => j === i ? { ...v, annee: e.target.value } : v))} placeholder="2024" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
@@ -747,7 +759,7 @@ export default function Profile() {
             <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '24px' }}>
               <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: '0 0 6px' }}>Centres d'interet</h2>
               <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 16px' }}>Optionnel</p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginBottom: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: '10px', marginBottom: '10px' }}>
                 {centresInteret.map((ci, i) => (
                   <input key={i} value={ci} onChange={e => setCentresInteret(centresInteret.map((v, j) => j === i ? e.target.value : v))}
                     placeholder={['Voyage', 'Photographie', 'Sport'][i] || `Interet ${i+1}`} style={INPUT} onFocus={focusStyle} onBlur={blurStyle} />

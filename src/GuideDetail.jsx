@@ -1,8 +1,20 @@
+import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import Navbar from './Navbar'
 import { GUIDES } from './guidesData'
 
+function useWidth() {
+  const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
+  useEffect(() => {
+    const fn = () => setW(window.innerWidth)
+    window.addEventListener('resize', fn)
+    return () => window.removeEventListener('resize', fn)
+  }, [])
+  return w
+}
+
 export default function GuideDetail() {
+  const isMobile = useWidth() < 768
   const { slug } = useParams()
   const guide = GUIDES.find(g => g.slug === slug)
 
@@ -35,7 +47,7 @@ export default function GuideDetail() {
         </div>
         <p style={{ fontSize: '17px', color: '#6b7280', margin: '0 0 40px', lineHeight: '1.7', borderBottom: '1px solid #f0f0f0', paddingBottom: '32px' }}>{guide.description}</p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '32px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '20px', marginBottom: '32px' }}>
           <div style={{ background: '#f8f9ff', borderRadius: '14px', border: '1px solid #ede9fe', padding: '22px' }}>
             <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#4f46e5', margin: '0 0 14px' }}>Compétences clés à mentionner</h2>
             {guide.competences.map((c, i) => (

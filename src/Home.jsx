@@ -1,6 +1,16 @@
 import { useEffect, useState, useRef } from 'react'
 import { supabase } from './supabase'
 
+function useWidth() {
+  const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
+  useEffect(() => {
+    const fn = () => setW(window.innerWidth)
+    window.addEventListener('resize', fn)
+    return () => window.removeEventListener('resize', fn)
+  }, [])
+  return w
+}
+
 // Hook pour détecter quand un élément entre dans le viewport
 function useInView(threshold = 0.15) {
   const ref = useRef(null)
@@ -76,6 +86,9 @@ function MiniCV({ color, accent, name, style }) {
 
 export default function Home() {
   const [scrolled, setScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const w = useWidth()
+  const isMobile = w < 768
   const [templatesRef, templatesInView] = useInView()
   const [howRef, howInView] = useInView()
   const [featRef, featInView] = useInView()
@@ -104,52 +117,88 @@ export default function Home() {
         backdropFilter: scrolled ? 'blur(12px)' : 'none',
         borderBottom: scrolled ? '1px solid #f0f0f0' : '1px solid transparent',
         transition: 'all 0.2s',
-        padding: '0 48px', height: '64px',
+        padding: isMobile ? '0 20px' : '0 48px', height: '64px',
         display: 'flex', alignItems: 'center', gap: '32px'
       }}>
-        <a href="/" style={{ fontWeight: '800', fontSize: '20px', textDecoration: 'none', color: '#111', letterSpacing: '-0.5px', marginRight: '16px' }}>
+        <a href="/" style={{ fontWeight: '800', fontSize: '20px', textDecoration: 'none', color: '#111', letterSpacing: '-0.5px', marginRight: isMobile ? 'auto' : '16px' }}>
           <span style={{ color: '#9c7a3f' }}>Did</span>CV
         </a>
-        <div style={{ display: 'flex', gap: '28px', flex: 1 }}>
+        {!isMobile && (
+          <div style={{ display: 'flex', gap: '28px', flex: 1 }}>
+            {[['#templates', 'Templates'], ['#how', 'Comment ça marche'], ['#pricing', 'Tarifs']].map(([href, label]) => (
+              <a key={href} href={href} style={{ fontSize: '14px', color: '#555', textDecoration: 'none', fontWeight: '500' }}
+                onMouseEnter={e => e.target.style.color = '#111'}
+                onMouseLeave={e => e.target.style.color = '#555'}>
+                {label}
+              </a>
+            ))}
+          </div>
+        )}
+        {!isMobile && (
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <a href="/auth" style={{ fontSize: '14px', color: '#555', textDecoration: 'none', fontWeight: '500', padding: '8px 16px' }}>
+              Se connecter
+            </a>
+            <a href="/auth" style={{
+              fontSize: '14px', fontWeight: '600', textDecoration: 'none',
+              background: '#171412', color: '#fff', padding: '9px 20px',
+              borderRadius: '8px', letterSpacing: '-0.2px'
+            }}>
+              Créer mon CV gratuit
+            </a>
+          </div>
+        )}
+        {isMobile && (
+          <button onClick={() => setMenuOpen(!menuOpen)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+            <div style={{ width: '22px', height: '2px', background: '#171412', borderRadius: '2px', transition: 'transform 0.2s', transform: menuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }} />
+            <div style={{ width: '22px', height: '2px', background: '#171412', borderRadius: '2px', opacity: menuOpen ? 0 : 1, transition: 'opacity 0.2s' }} />
+            <div style={{ width: '22px', height: '2px', background: '#171412', borderRadius: '2px', transition: 'transform 0.2s', transform: menuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }} />
+          </button>
+        )}
+      </nav>
+
+      {/* Menu mobile */}
+      {isMobile && menuOpen && (
+        <div style={{ position: 'fixed', top: '64px', left: 0, right: 0, zIndex: 99, background: '#fff', borderBottom: '1px solid #f0f0f0', boxShadow: '0 8px 24px rgba(0,0,0,0.12)', padding: '8px 0' }}>
           {[['#templates', 'Templates'], ['#how', 'Comment ça marche'], ['#pricing', 'Tarifs']].map(([href, label]) => (
-            <a key={href} href={href} style={{ fontSize: '14px', color: '#555', textDecoration: 'none', fontWeight: '500' }}
-              onMouseEnter={e => e.target.style.color = '#111'}
-              onMouseLeave={e => e.target.style.color = '#555'}>
+            <a key={href} href={href} onClick={() => setMenuOpen(false)}
+              style={{ display: 'block', padding: '14px 20px', fontSize: '15px', fontWeight: '500', color: '#374151', textDecoration: 'none' }}>
               {label}
             </a>
           ))}
+          <div style={{ padding: '12px 20px', display: 'flex', flexDirection: 'column', gap: '10px', borderTop: '1px solid #f0f0f0', marginTop: '4px', paddingTop: '16px' }}>
+            <a href="/auth" style={{ fontSize: '14px', color: '#555', textDecoration: 'none', fontWeight: '500', textAlign: 'center', padding: '10px' }}>
+              Se connecter
+            </a>
+            <a href="/auth" style={{
+              fontSize: '14px', fontWeight: '600', textDecoration: 'none', textAlign: 'center',
+              background: '#171412', color: '#fff', padding: '12px',
+              borderRadius: '8px', letterSpacing: '-0.2px'
+            }}>
+              Créer mon CV gratuit
+            </a>
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <a href="/auth" style={{ fontSize: '14px', color: '#555', textDecoration: 'none', fontWeight: '500', padding: '8px 16px' }}>
-            Se connecter
-          </a>
-          <a href="/auth" style={{
-            fontSize: '14px', fontWeight: '600', textDecoration: 'none',
-            background: '#171412', color: '#fff', padding: '9px 20px',
-            borderRadius: '8px', letterSpacing: '-0.2px'
-          }}>
-            Créer mon CV gratuit
-          </a>
-        </div>
-      </nav>
+      )}
 
       {/* ─── HERO ───────────────────────────────────────────── */}
       <div style={{ paddingTop: '64px', background: 'linear-gradient(180deg, #faf7f2 0%, #fff 100%)' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '80px 48px 60px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '64px', alignItems: 'center' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: isMobile ? '40px 20px 40px' : '80px 48px 60px', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '40px' : '64px', alignItems: 'center' }}>
 
           {/* Texte gauche */}
           <div style={{ animation: 'fadeUp 0.7s ease both' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#f3ead9', color: '#7a5c2e', padding: '5px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '600', marginBottom: '24px', letterSpacing: '0.3px' }}>
               Fini les CV qui se ressemblent tous
             </div>
-            <h1 style={{ fontSize: '52px', fontWeight: '800', lineHeight: '1.1', letterSpacing: '-2px', margin: '0 0 20px', color: '#0f0f1a' }}>
+            <h1 style={{ fontSize: isMobile ? '34px' : '52px', fontWeight: '800', lineHeight: '1.15', letterSpacing: isMobile ? '-1px' : '-2px', margin: '0 0 20px', color: '#0f0f1a' }}>
               Un CV soigné.<br />
               Sans y passer <span style={{ color: '#9c7a3f' }}>ta soirée</span>.
             </h1>
-            <p style={{ fontSize: '17px', color: '#6b7280', lineHeight: '1.7', margin: '0 0 36px', maxWidth: '440px' }}>
+            <p style={{ fontSize: isMobile ? '15px' : '17px', color: '#6b7280', lineHeight: '1.7', margin: '0 0 36px', maxWidth: '440px' }}>
               Choisis un template, colle l'offre qui t'intéresse. On s'occupe de la mise en page, des bons mots-clés pour passer les filtres de tri, et d'une lettre de motivation qui tient debout. Il ne te reste qu'à postuler.
             </p>
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap' }}>
               <a href="/auth" style={{
                 fontWeight: '700', textDecoration: 'none', fontSize: '15px',
                 background: '#171412', color: '#fff', padding: '14px 28px',
@@ -166,7 +215,7 @@ export default function Home() {
             </p>
 
             {/* Stats compactes */}
-            <div style={{ display: 'flex', gap: '28px', marginTop: '36px', paddingTop: '28px', borderTop: '1px solid #f0f0f0' }}>
+            <div style={{ display: 'flex', gap: isMobile ? '20px' : '28px', flexWrap: 'wrap', marginTop: '36px', paddingTop: '28px', borderTop: '1px solid #f0f0f0' }}>
               {[['27+', 'Templates'], ['95%', 'Score ATS'], ['<30s', 'Génération'], ['Incluse', 'Lettre de motiv.']].map(([val, label]) => (
                 <div key={label}>
                   <div style={{ fontSize: '20px', fontWeight: '800', color: '#111', letterSpacing: '-0.5px' }}>{val}</div>
@@ -177,7 +226,7 @@ export default function Home() {
           </div>
 
           {/* Aperçus templates droite */}
-          <div style={{ position: 'relative', height: '420px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ position: 'relative', height: isMobile ? '300px' : '420px', display: 'flex', alignItems: 'center', justifyContent: 'center', transform: isMobile ? 'scale(0.75)' : 'none' }}>
             {/* CV en arrière plan */}
             <MiniCV color="#0a66c2" accent="#e8f3ff" name="LinkedIn" style={{ position: 'absolute', left: '0px', top: '20px', transform: 'rotate(-6deg)', opacity: 0.5, animation: 'float 4s ease-in-out infinite', '--r': '-6deg' }} />
             <MiniCV color="#0f6e56" accent="#f0fdf4" name="Modern" style={{ position: 'absolute', right: '10px', top: '30px', transform: 'rotate(5deg)', opacity: 0.5, animation: 'float 5s ease-in-out infinite 0.5s', '--r': '5deg' }} />
@@ -206,8 +255,8 @@ export default function Home() {
       </div>
 
       {/* ─── BANDE SOCIAL PROOF ──────────────────────────────── */}
-      <div style={{ background: '#faf8f3', borderTop: '1px solid #efe6d2', borderBottom: '1px solid #efe6d2', padding: '20px 48px' }}>
-        <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '48px', flexWrap: 'wrap' }}>
+      <div style={{ background: '#faf8f3', borderTop: '1px solid #efe6d2', borderBottom: '1px solid #efe6d2', padding: isMobile ? '16px 20px' : '20px 48px' }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: isMobile ? '20px' : '48px', flexWrap: 'wrap' }}>
           {['Finance & Comptabilité', 'Tech & Informatique', 'BTP & Chantier', 'Santé & Médical', 'Commerce & Vente', 'Restauration', 'Étudiant & Junior', 'Transport & Logistique'].map(s => (
             <span key={s} style={{ fontSize: '13px', color: '#6b7280', fontWeight: '500', whiteSpace: 'nowrap' }}>
               {s}
@@ -217,19 +266,19 @@ export default function Home() {
       </div>
 
       {/* ─── TEMPLATES ───────────────────────────────────────── */}
-      <section id="templates" ref={templatesRef} style={{ padding: '96px 48px', maxWidth: '1200px', margin: '0 auto', opacity: templatesInView ? 1 : 0, transform: templatesInView ? 'translateY(0)' : 'translateY(32px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
-        <div style={{ textAlign: 'center', marginBottom: '56px' }}>
+      <section id="templates" ref={templatesRef} style={{ padding: isMobile ? '56px 20px' : '96px 48px', maxWidth: '1200px', margin: '0 auto', opacity: templatesInView ? 1 : 0, transform: templatesInView ? 'translateY(0)' : 'translateY(32px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
+        <div style={{ textAlign: 'center', marginBottom: isMobile ? '36px' : '56px' }}>
           <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#9c7a3f', textTransform: 'uppercase', marginBottom: '12px' }}>TEMPLATES</div>
-          <h2 style={{ fontSize: '40px', fontWeight: '800', letterSpacing: '-1.5px', margin: '0 0 16px', color: '#0f0f1a' }}>
+          <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', letterSpacing: '-1.5px', margin: '0 0 16px', color: '#0f0f1a' }}>
             27 modèles, pas un de trop
           </h2>
-          <p style={{ fontSize: '16px', color: '#6b7280', margin: 0 }}>
+          <p style={{ fontSize: isMobile ? '14px' : '16px', color: '#6b7280', margin: 0 }}>
             Bureau, terrain, santé, création, premier job - un modèle qui te ressemble, pas un gabarit générique.
           </p>
         </div>
 
         {/* Grille de mini aperçus */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '16px', marginBottom: '40px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : w < 1024 ? 'repeat(4, 1fr)' : 'repeat(6, 1fr)', gap: isMobile ? '10px' : '16px', marginBottom: isMobile ? '28px' : '40px' }}>
           {[
             { color: '#1a1a1a', name: 'Finance' },
             { color: '#0a66c2', name: 'LinkedIn' },
@@ -277,15 +326,15 @@ export default function Home() {
       </section>
 
       {/* ─── COMMENT ÇA MARCHE ───────────────────────────────── */}
-      <section id="how" ref={howRef} style={{ background: '#faf8f3', padding: '96px 48px', opacity: howInView ? 1 : 0, transform: howInView ? 'translateY(0)' : 'translateY(32px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
+      <section id="how" ref={howRef} style={{ background: '#faf8f3', padding: isMobile ? '56px 20px' : '96px 48px', opacity: howInView ? 1 : 0, transform: howInView ? 'translateY(0)' : 'translateY(32px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+          <div style={{ textAlign: 'center', marginBottom: isMobile ? '36px' : '64px' }}>
             <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#9c7a3f', textTransform: 'uppercase', marginBottom: '12px' }}>COMMENT ÇA MARCHE</div>
-            <h2 style={{ fontSize: '40px', fontWeight: '800', letterSpacing: '-1.5px', margin: '0 0 16px', color: '#0f0f1a' }}>
+            <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', letterSpacing: '-1.5px', margin: '0 0 16px', color: '#0f0f1a' }}>
               Trois étapes, pas plus.
             </h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? '16px' : '32px' }}>
             {[
               { num: '01', title: 'Choisis ton template', desc: '27 modèles pensés pour des métiers réels. Finance, tech, santé, BTP, premier emploi...' },
               { num: '02', title: "Colle l'offre d'emploi", desc: "On repère les mots-clés qui comptent, on adapte ton profil au poste, et on rédige une lettre de motivation qui a du sens." },
@@ -302,15 +351,15 @@ export default function Home() {
       </section>
 
       {/* ─── FONCTIONNALITÉS ─────────────────────────────────── */}
-      <section ref={featRef} style={{ padding: '96px 48px', opacity: featInView ? 1 : 0, transform: featInView ? 'translateY(0)' : 'translateY(32px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
+      <section ref={featRef} style={{ padding: isMobile ? '56px 20px' : '96px 48px', opacity: featInView ? 1 : 0, transform: featInView ? 'translateY(0)' : 'translateY(32px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+          <div style={{ textAlign: 'center', marginBottom: isMobile ? '36px' : '64px' }}>
             <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#9c7a3f', textTransform: 'uppercase', marginBottom: '12px' }}>FONCTIONNALITÉS</div>
-            <h2 style={{ fontSize: '40px', fontWeight: '800', letterSpacing: '-1.5px', margin: '0', color: '#0f0f1a' }}>
+            <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', letterSpacing: '-1.5px', margin: '0', color: '#0f0f1a' }}>
               Tout pour décrocher l'entretien.
             </h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? '14px' : '24px' }}>
             {[
               { title: 'Un CV qui passe les filtres', desc: "L'offre est analysée, le CV s'adapte aux mots-clés qui comptent vraiment. Score ATS 95%+." },
               { title: 'Lettre de motivation', desc: "Rédigée pour le poste et l'entreprise visés - pas un modèle générique recopié partout." },
@@ -330,15 +379,15 @@ export default function Home() {
       </section>
 
       {/* ─── PRICING ─────────────────────────────────────────── */}
-      <section id="pricing" ref={pricingRef} style={{ background: '#faf8f3', padding: '96px 48px', opacity: pricingInView ? 1 : 0, transform: pricingInView ? 'translateY(0)' : 'translateY(32px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
+      <section id="pricing" ref={pricingRef} style={{ background: '#faf8f3', padding: isMobile ? '56px 20px' : '96px 48px', opacity: pricingInView ? 1 : 0, transform: pricingInView ? 'translateY(0)' : 'translateY(32px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '56px' }}>
+          <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '56px' }}>
             <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#9c7a3f', textTransform: 'uppercase', marginBottom: '12px' }}>TARIFS</div>
-            <h2 style={{ fontSize: '40px', fontWeight: '800', letterSpacing: '-1.5px', margin: '0', color: '#0f0f1a' }}>
+            <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', letterSpacing: '-1.5px', margin: '0', color: '#0f0f1a' }}>
               Simple et transparent.
             </h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '16px' : '24px' }}>
             {/* Gratuit */}
             <div style={{ background: '#fff', borderRadius: '16px', padding: '36px', border: '1px solid #e5e7eb' }}>
               <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '1px', color: '#6b7280', textTransform: 'uppercase', marginBottom: '20px' }}>GRATUIT</div>
@@ -383,9 +432,9 @@ export default function Home() {
       </section>
 
       {/* ─── CTA FINAL ───────────────────────────────────────── */}
-      <section style={{ padding: '96px 48px', textAlign: 'center' }}>
+      <section style={{ padding: isMobile ? '56px 20px' : '96px 48px', textAlign: 'center' }}>
         <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: '44px', fontWeight: '800', letterSpacing: '-1.5px', margin: '0 0 16px', color: '#0f0f1a', lineHeight: '1.1' }}>
+          <h2 style={{ fontSize: isMobile ? '30px' : '44px', fontWeight: '800', letterSpacing: '-1.5px', margin: '0 0 16px', color: '#0f0f1a', lineHeight: '1.15' }}>
             Prêt à décrocher<br />
             <span style={{ color: '#9c7a3f' }}>ton prochain entretien ?</span>
           </h2>
@@ -400,7 +449,7 @@ export default function Home() {
       </section>
 
       {/* ─── FOOTER ──────────────────────────────────────────── */}
-      <footer style={{ borderTop: '1px solid #f0f0f0', padding: '40px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+      <footer style={{ borderTop: '1px solid #f0f0f0', padding: isMobile ? '28px 20px' : '40px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
         <div style={{ fontWeight: '800', fontSize: '18px', color: '#111', letterSpacing: '-0.5px' }}>
           <span style={{ color: '#9c7a3f' }}>Did</span>CV
         </div>

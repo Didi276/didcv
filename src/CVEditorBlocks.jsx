@@ -1,6 +1,16 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { CVTemplate } from './CVTemplates'
 import SuggestionsIA from './SuggestionsIA'
+
+function useWidth() {
+  const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
+  useEffect(() => {
+    const fn = () => setW(window.innerWidth)
+    window.addEventListener('resize', fn)
+    return () => window.removeEventListener('resize', fn)
+  }, [])
+  return w
+}
 
 const INPUT = {
   width: '100%', padding: '9px 12px', border: '1.5px solid #e5e7eb',
@@ -27,6 +37,9 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
     linkedin: false,
   })
   const dragIdx = useRef(null)
+  const w = useWidth()
+  const isMobile = w < 768
+  const previewScale = isMobile ? Math.min(1, (w - 24) / 794) : 1
 
   const update = (field, val) => setData(d => ({ ...d, [field]: val }))
 
@@ -114,14 +127,14 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
   const DRAG_STYLE = { cursor: 'grab', userSelect: 'none' }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 300, display: 'flex', fontFamily: '"Inter",system-ui,sans-serif', backdropFilter: 'blur(4px)' }}>
-      <div style={{ width: '100%', height: '100%', display: 'grid', gridTemplateColumns: '380px 1fr', background: '#f8f9ff' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 300, display: 'flex', fontFamily: '"Inter",system-ui,sans-serif', backdropFilter: 'blur(4px)', overflowY: isMobile ? 'auto' : 'hidden' }}>
+      <div style={{ width: '100%', height: isMobile ? 'auto' : '100%', minHeight: '100%', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '380px 1fr', background: '#f8f9ff' }}>
 
         {/* ─── GAUCHE ─── */}
-        <div style={{ background: '#fff', borderRight: '1px solid #f0f0f0', display: 'flex', flexDirection: 'column', height: '100vh' }}>
+        <div style={{ background: '#fff', borderRight: isMobile ? 'none' : '1px solid #f0f0f0', borderBottom: isMobile ? '1px solid #f0f0f0' : 'none', display: 'flex', flexDirection: 'column', height: isMobile ? 'auto' : '100vh' }}>
 
           {/* Header */}
-          <div style={{ padding: '16px 20px', borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+          <div style={{ padding: '16px 20px', borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, flexWrap: 'wrap', gap: '10px' }}>
             <div>
               <div style={{ fontSize: '15px', fontWeight: '800', color: '#111' }}>Modifier le CV</div>
               <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '1px' }}>Apercu en temps reel a droite</div>
@@ -154,12 +167,12 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
             {/* INFOS */}
             {section === 'infos' && (
               <div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '10px' }}>
                   <Field label="Prenom"><input value={data.prenom || ''} onChange={e => update('prenom', e.target.value)} style={INPUT} onFocus={focus} onBlur={blur} /></Field>
                   <Field label="Nom"><input value={data.nom || ''} onChange={e => update('nom', e.target.value)} style={INPUT} onFocus={focus} onBlur={blur} /></Field>
                 </div>
                 <Field label="Titre"><input value={data.titre || ''} onChange={e => update('titre', e.target.value)} style={INPUT} onFocus={focus} onBlur={blur} /></Field>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '10px' }}>
                   <Field label="Email"><input value={data.email || ''} onChange={e => update('email', e.target.value)} style={INPUT} onFocus={focus} onBlur={blur} /></Field>
                   <Field label="Telephone"><input value={data.telephone || ''} onChange={e => update('telephone', e.target.value)} style={INPUT} onFocus={focus} onBlur={blur} /></Field>
                   <Field label="Ville"><input value={data.ville || ''} onChange={e => update('ville', e.target.value)} style={INPUT} onFocus={focus} onBlur={blur} /></Field>
@@ -205,7 +218,7 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
                         <button onClick={() => removeExp(i)} style={{ background: 'none', border: 'none', color: '#dc2626', fontSize: '12px', cursor: 'pointer', padding: '2px 6px' }}>🗑</button>
                       )}
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
                       <Field label="Poste"><input value={exp.poste || ''} onChange={e => updateExp(i, 'poste', e.target.value)} style={INPUT} onFocus={focus} onBlur={blur} /></Field>
                       <Field label="Entreprise"><input value={exp.entreprise || ''} onChange={e => updateExp(i, 'entreprise', e.target.value)} style={INPUT} onFocus={focus} onBlur={blur} /></Field>
                       <Field label="Periode"><input value={exp.periode || ''} onChange={e => updateExp(i, 'periode', e.target.value)} style={INPUT} onFocus={focus} onBlur={blur} /></Field>
@@ -261,7 +274,7 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
                         <button onClick={() => removeForm(i)} style={{ background: 'none', border: 'none', color: '#dc2626', fontSize: '12px', cursor: 'pointer' }}>🗑</button>
                       )}
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '8px' }}>
                       <Field label="Diplome"><input value={f.diplome || ''} onChange={e => updateForm(i, 'diplome', e.target.value)} style={INPUT} onFocus={focus} onBlur={blur} /></Field>
                       <Field label="Etablissement"><input value={f.etablissement || ''} onChange={e => updateForm(i, 'etablissement', e.target.value)} style={INPUT} onFocus={focus} onBlur={blur} /></Field>
                       <Field label="Periode"><input value={f.periode || ''} onChange={e => updateForm(i, 'periode', e.target.value)} style={INPUT} onFocus={focus} onBlur={blur} /></Field>
@@ -305,7 +318,7 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
             {section === 'langues' && (
               <div>
                 {data.langues?.map((l, i) => (
-                  <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '8px', marginBottom: '8px', alignItems: 'end' }}>
+                  <div key={i} style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr auto', gap: '8px', marginBottom: '8px', alignItems: 'end' }}>
                     <Field label={i === 0 ? 'Langue' : ''}>
                       <input value={l.langue || ''} onChange={e => updateLang(i, 'langue', e.target.value)} placeholder="Francais" style={INPUT} onFocus={focus} onBlur={blur} />
                     </Field>
@@ -361,22 +374,24 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
         </div>
 
         {/* ─── DROITE : Apercu ─── */}
-        <div style={{ overflowY: 'auto', background: '#e8e9ef', display: 'flex', flexDirection: 'column', height: '100vh' }}>
-          <div style={{ padding: '12px 24px', background: '#fff', borderBottom: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0, position: 'sticky', top: 0, zIndex: 10 }}>
+        <div style={{ overflowY: 'auto', background: '#e8e9ef', display: 'flex', flexDirection: 'column', height: isMobile ? 'auto' : '100vh' }}>
+          <div style={{ padding: '12px 24px', background: '#fff', borderBottom: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0, position: isMobile ? 'static' : 'sticky', top: 0, zIndex: 10 }}>
             <div style={{ fontSize: '13px', fontWeight: '600', color: '#374151' }}>Apercu temps reel</div>
             <div style={{ fontSize: '12px', color: '#9ca3af' }}>Template : {template}</div>
           </div>
-          <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '32px 24px', minHeight: 'fit-content' }}>
-            <div style={{ boxShadow: '0 8px 40px rgba(0,0,0,0.2)', borderRadius: '4px', overflow: 'hidden', flexShrink: 0 }}>
-              <CVTemplate
-                cvData={{
-                  ...data,
-                  certifications: hidden.certifications ? [] : data.certifications,
-                  centres_interet: hidden.centres_interet ? [] : data.centres_interet,
-                  linkedin: hidden.linkedin ? '' : data.linkedin,
-                }}
-                template={template}
-              />
+          <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: isMobile ? '16px 12px' : '32px 24px', minHeight: 'fit-content' }}>
+            <div style={{ width: `${794 * previewScale}px`, height: `${1123 * previewScale}px`, boxShadow: '0 8px 40px rgba(0,0,0,0.2)', borderRadius: '4px', overflow: 'hidden', flexShrink: 0, position: 'relative' }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, width: '794px', height: '1123px', transform: `scale(${previewScale})`, transformOrigin: 'top left' }}>
+                <CVTemplate
+                  cvData={{
+                    ...data,
+                    certifications: hidden.certifications ? [] : data.certifications,
+                    centres_interet: hidden.centres_interet ? [] : data.centres_interet,
+                    linkedin: hidden.linkedin ? '' : data.linkedin,
+                  }}
+                  template={template}
+                />
+              </div>
             </div>
           </div>
         </div>
