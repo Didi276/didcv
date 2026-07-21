@@ -1,4 +1,20 @@
 import { useState } from 'react'
+import { FORMATIONS } from './formationsData'
+
+// Cherche les formations dont les competences[] correspondent aux mots-cles ATS manquants
+function suggererFormations(motsClesManquants) {
+  if (!motsClesManquants?.length) return []
+  const mots = motsClesManquants.map(m => m.toLowerCase())
+  const scored = FORMATIONS.map(f => {
+    const score = f.competences.filter(c => {
+      const cLower = c.toLowerCase()
+      return mots.some(m => cLower.includes(m) || m.includes(cLower))
+    }).length
+    return { f, score }
+  }).filter(x => x.score > 0)
+  scored.sort((a, b) => b.score - a.score)
+  return scored.slice(0, 3).map(x => x.f)
+}
 
 export default function ATSScore({ cvData, offreEmploi }) {
   const [loading, setLoading] = useState(false)
@@ -202,6 +218,30 @@ Retourne UNIQUEMENT ce JSON:
                 </div>
               </div>
             )}
+
+            {/* Formations recommandées */}
+            {(() => {
+              const formationsSuggerees = suggererFormations(result.mots_cles_manquants)
+              return formationsSuggerees.length > 0 && (
+                <div>
+                  <div style={{ fontSize: '12px', fontWeight: '700', color: '#374151', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>📚 Formations pour améliorer ton score</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {formationsSuggerees.map(f => (
+                      <div key={f.id} style={{ padding: '10px 12px', background: '#f8f9ff', border: '1px solid #ede9fe', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontSize: '12px', fontWeight: '700', color: '#111', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.titre}</div>
+                          <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '2px' }}>⏱ {f.duree}</div>
+                        </div>
+                        <a href={f.lien} target="_blank" rel="noopener noreferrer"
+                          style={{ flexShrink: 0, fontSize: '11px', fontWeight: '700', color: '#fff', background: '#4f46e5', padding: '7px 12px', borderRadius: '7px', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                          Voir la formation
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })()}
 
           </div>
         </div>
