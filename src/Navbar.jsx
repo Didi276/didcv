@@ -26,9 +26,9 @@ export default function Navbar({ currentPage = '' }) {
   const mainLinks = [
     { page: 'dashboard', label: 'Dashboard',  to: '/dashboard',  auth: true },
     { page: 'offres',    label: 'Offres',     to: '/offres',     auth: true },
+    { page: 'entretien', label: 'Entretien',  to: '/entretien',  auth: true },
     { page: 'generate',  label: 'Générer CV', to: '/templates',  auth: true },
     { page: 'formations', label: 'Formations', to: '/formations', auth: true },
-    { page: 'entretien', label: 'Entretien',  to: '/entretien',  auth: true },
     { page: 'profile',   label: 'Profil',     to: '/profile',    auth: true },
   ]
 
