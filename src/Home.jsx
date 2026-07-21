@@ -108,7 +108,7 @@ export default function Home() {
         display: 'flex', alignItems: 'center', gap: '32px'
       }}>
         <a href="/" style={{ fontWeight: '800', fontSize: '20px', textDecoration: 'none', color: '#111', letterSpacing: '-0.5px', marginRight: '16px' }}>
-          <span style={{ color: '#4f46e5' }}>Did</span>CV
+          <span style={{ color: '#9c7a3f' }}>Did</span>CV
         </a>
         <div style={{ display: 'flex', gap: '28px', flex: 1 }}>
           {[['#templates', 'Templates'], ['#how', 'Comment ça marche'], ['#pricing', 'Tarifs']].map(([href, label]) => (
@@ -125,7 +125,7 @@ export default function Home() {
           </a>
           <a href="/auth" style={{
             fontSize: '14px', fontWeight: '600', textDecoration: 'none',
-            background: '#4f46e5', color: '#fff', padding: '9px 20px',
+            background: '#171412', color: '#fff', padding: '9px 20px',
             borderRadius: '8px', letterSpacing: '-0.2px'
           }}>
             Créer mon CV gratuit
@@ -134,26 +134,25 @@ export default function Home() {
       </nav>
 
       {/* ─── HERO ───────────────────────────────────────────── */}
-      <div style={{ paddingTop: '64px', background: 'linear-gradient(180deg, #fafaff 0%, #fff 100%)' }}>
+      <div style={{ paddingTop: '64px', background: 'linear-gradient(180deg, #faf7f2 0%, #fff 100%)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '80px 48px 60px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '64px', alignItems: 'center' }}>
 
           {/* Texte gauche */}
           <div style={{ animation: 'fadeUp 0.7s ease both' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#ede9fe', color: '#5b21b6', padding: '5px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '600', marginBottom: '24px', letterSpacing: '0.3px' }}>
-              ✨ Propulsé par l'IA - Gratuit pour commencer
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#f3ead9', color: '#7a5c2e', padding: '5px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '600', marginBottom: '24px', letterSpacing: '0.3px' }}>
+              Fini les CV qui se ressemblent tous
             </div>
             <h1 style={{ fontSize: '52px', fontWeight: '800', lineHeight: '1.1', letterSpacing: '-2px', margin: '0 0 20px', color: '#0f0f1a' }}>
-              Crée ton CV<br />
-              <span style={{ color: '#4f46e5' }}>parfait</span> en<br />
-              30 secondes.
+              Un CV soigné.<br />
+              Sans y passer <span style={{ color: '#9c7a3f' }}>ta soirée</span>.
             </h1>
             <p style={{ fontSize: '17px', color: '#6b7280', lineHeight: '1.7', margin: '0 0 36px', maxWidth: '440px' }}>
-              Choisis un template, colle ton offre d'emploi - l'IA génère un CV optimisé ATS et une lettre de motivation personnalisée. Télécharge, postule.
+              Choisis un template, colle l'offre qui t'intéresse. On s'occupe de la mise en page, des bons mots-clés pour passer les filtres de tri, et d'une lettre de motivation qui tient debout. Il ne te reste qu'à postuler.
             </p>
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '20px' }}>
               <a href="/auth" style={{
                 fontWeight: '700', textDecoration: 'none', fontSize: '15px',
-                background: '#4f46e5', color: '#fff', padding: '14px 28px',
+                background: '#171412', color: '#fff', padding: '14px 28px',
                 borderRadius: '10px', letterSpacing: '-0.2px', display: 'inline-block'
               }}>
                 Créer mon CV gratuitement →
@@ -168,7 +167,7 @@ export default function Home() {
 
             {/* Stats compactes */}
             <div style={{ display: 'flex', gap: '28px', marginTop: '36px', paddingTop: '28px', borderTop: '1px solid #f0f0f0' }}>
-              {[['27+', 'Templates'], ['95%', 'Score ATS'], ['<30s', 'Génération'], ['IA', 'Intégrée']].map(([val, label]) => (
+              {[['27+', 'Templates'], ['95%', 'Score ATS'], ['<30s', 'Génération'], ['Incluse', 'Lettre de motiv.']].map(([val, label]) => (
                 <div key={label}>
                   <div style={{ fontSize: '20px', fontWeight: '800', color: '#111', letterSpacing: '-0.5px' }}>{val}</div>
                   <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '1px' }}>{label}</div>
@@ -183,7 +182,7 @@ export default function Home() {
             <MiniCV color="#0a66c2" accent="#e8f3ff" name="LinkedIn" style={{ position: 'absolute', left: '0px', top: '20px', transform: 'rotate(-6deg)', opacity: 0.5, animation: 'float 4s ease-in-out infinite', '--r': '-6deg' }} />
             <MiniCV color="#0f6e56" accent="#f0fdf4" name="Modern" style={{ position: 'absolute', right: '10px', top: '30px', transform: 'rotate(5deg)', opacity: 0.5, animation: 'float 5s ease-in-out infinite 0.5s', '--r': '5deg' }} />
             {/* CV principal au centre */}
-            <MiniCV color="#4f46e5" accent="#ede9fe" name="Main" style={{ position: 'relative', zIndex: 10, width: '160px', height: '226px', animation: 'float 3.5s ease-in-out infinite 0.2s', '--r': '0deg' }} />
+            <MiniCV color="#171412" accent="#f3ead9" name="Main" style={{ position: 'relative', zIndex: 10, width: '160px', height: '226px', animation: 'float 3.5s ease-in-out infinite 0.2s', '--r': '0deg' }} />
             {/* CV de droite */}
             <MiniCV color="#1a1a1a" accent="#f0f0f0" name="Finance" style={{ position: 'absolute', right: '-10px', bottom: '20px', transform: 'rotate(4deg)', opacity: 0.7, animation: 'float 4.5s ease-in-out infinite 0.8s', '--r': '4deg' }} />
             <MiniCV color="#c9a84c" accent="#0d0d0d" name="Executive" style={{ position: 'absolute', left: '10px', bottom: '10px', transform: 'rotate(-4deg)', opacity: 0.7, animation: 'float 4s ease-in-out infinite 1s', '--r': '-4deg' }} />
@@ -197,17 +196,17 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Badge IA */}
-            <div style={{ position: 'absolute', bottom: '30px', left: '20px', background: '#4f46e5', borderRadius: '12px', padding: '10px 14px', boxShadow: '0 4px 20px rgba(79,70,229,0.3)', zIndex: 20 }}>
-              <div style={{ fontSize: '11px', fontWeight: '700', color: '#fff' }}>⚡ Généré par IA</div>
-              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.7)' }}>CV + Lettre en 30 sec</div>
+            {/* Badge génération */}
+            <div style={{ position: 'absolute', bottom: '30px', left: '20px', background: '#171412', borderRadius: '12px', padding: '10px 14px', boxShadow: '0 4px 20px rgba(0,0,0,0.25)', zIndex: 20 }}>
+              <div style={{ fontSize: '11px', fontWeight: '700', color: '#fff' }}>CV + lettre</div>
+              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.7)' }}>Prêts en 30 secondes</div>
             </div>
           </div>
         </div>
       </div>
 
       {/* ─── BANDE SOCIAL PROOF ──────────────────────────────── */}
-      <div style={{ background: '#f8f9ff', borderTop: '1px solid #ede9fe', borderBottom: '1px solid #ede9fe', padding: '20px 48px' }}>
+      <div style={{ background: '#faf8f3', borderTop: '1px solid #efe6d2', borderBottom: '1px solid #efe6d2', padding: '20px 48px' }}>
         <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '48px', flexWrap: 'wrap' }}>
           {['Finance & Comptabilité', 'Tech & Informatique', 'BTP & Chantier', 'Santé & Médical', 'Commerce & Vente', 'Restauration', 'Étudiant & Junior', 'Transport & Logistique'].map(s => (
             <span key={s} style={{ fontSize: '13px', color: '#6b7280', fontWeight: '500', whiteSpace: 'nowrap' }}>
@@ -220,12 +219,12 @@ export default function Home() {
       {/* ─── TEMPLATES ───────────────────────────────────────── */}
       <section id="templates" ref={templatesRef} style={{ padding: '96px 48px', maxWidth: '1200px', margin: '0 auto', opacity: templatesInView ? 1 : 0, transform: templatesInView ? 'translateY(0)' : 'translateY(32px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
         <div style={{ textAlign: 'center', marginBottom: '56px' }}>
-          <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#4f46e5', textTransform: 'uppercase', marginBottom: '12px' }}>TEMPLATES</div>
+          <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#9c7a3f', textTransform: 'uppercase', marginBottom: '12px' }}>TEMPLATES</div>
           <h2 style={{ fontSize: '40px', fontWeight: '800', letterSpacing: '-1.5px', margin: '0 0 16px', color: '#0f0f1a' }}>
-            27 templates professionnels
+            27 modèles, pas un de trop
           </h2>
           <p style={{ fontSize: '16px', color: '#6b7280', margin: 0 }}>
-            Pour tous les profils - bureau, terrain, santé, création, junior...
+            Bureau, terrain, santé, création, premier job - un modèle qui te ressemble, pas un gabarit générique.
           </p>
         </div>
 
@@ -271,30 +270,29 @@ export default function Home() {
         </div>
 
         <div style={{ textAlign: 'center' }}>
-          <a href="/auth" style={{ fontSize: '14px', color: '#4f46e5', textDecoration: 'none', fontWeight: '600', border: '1px solid #ede9fe', padding: '10px 24px', borderRadius: '8px', background: '#faf9ff' }}>
+          <a href="/auth" style={{ fontSize: '14px', color: '#9c7a3f', textDecoration: 'none', fontWeight: '600', border: '1px solid #e8dfc9', padding: '10px 24px', borderRadius: '8px', background: '#faf7ee' }}>
             Voir tous les templates →
           </a>
         </div>
       </section>
 
       {/* ─── COMMENT ÇA MARCHE ───────────────────────────────── */}
-      <section id="how" ref={howRef} style={{ background: '#f8f9ff', padding: '96px 48px', opacity: howInView ? 1 : 0, transform: howInView ? 'translateY(0)' : 'translateY(32px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
+      <section id="how" ref={howRef} style={{ background: '#faf8f3', padding: '96px 48px', opacity: howInView ? 1 : 0, transform: howInView ? 'translateY(0)' : 'translateY(32px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '64px' }}>
-            <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#4f46e5', textTransform: 'uppercase', marginBottom: '12px' }}>COMMENT ÇA MARCHE</div>
+            <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#9c7a3f', textTransform: 'uppercase', marginBottom: '12px' }}>COMMENT ÇA MARCHE</div>
             <h2 style={{ fontSize: '40px', fontWeight: '800', letterSpacing: '-1.5px', margin: '0 0 16px', color: '#0f0f1a' }}>
-              3 étapes. Un CV parfait.
+              Trois étapes, pas plus.
             </h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px' }}>
             {[
-              { num: '01', icon: '🎨', title: 'Choisis ton template', desc: '27 designs professionnels pour tous les secteurs et profils. Finance, tech, santé, BTP, étudiant...' },
-              { num: '02', icon: '⚡', title: "L'IA génère ton CV", desc: "Colle l'offre d'emploi. L'IA analyse les mots-clés, adapte ton profil et génère CV + lettre de motivation en 30 secondes." },
-              { num: '03', icon: '📥', title: 'Télécharge et postule', desc: 'CV optimisé ATS en PDF propre, prêt à envoyer. Modifie à tout moment depuis ton dashboard.' },
+              { num: '01', title: 'Choisis ton template', desc: '27 modèles pensés pour des métiers réels. Finance, tech, santé, BTP, premier emploi...' },
+              { num: '02', title: "Colle l'offre d'emploi", desc: "On repère les mots-clés qui comptent, on adapte ton profil au poste, et on rédige une lettre de motivation qui a du sens." },
+              { num: '03', title: 'Télécharge et postule', desc: 'Un PDF propre, lisible par les logiciels de recrutement. Tu peux le retoucher à tout moment depuis ton dashboard.' },
             ].map(s => (
-              <div key={s.num} style={{ background: '#fff', borderRadius: '16px', padding: '32px', border: '1px solid #ede9fe' }}>
-                <div style={{ fontSize: '11px', fontWeight: '700', color: '#a5b4fc', letterSpacing: '2px', marginBottom: '16px' }}>ÉTAPE {s.num}</div>
-                <div style={{ fontSize: '32px', marginBottom: '14px' }}>{s.icon}</div>
+              <div key={s.num} style={{ background: '#fff', borderRadius: '16px', padding: '32px', border: '1px solid #efe6d2' }}>
+                <div style={{ fontSize: '11px', fontWeight: '700', color: '#c9ad74', letterSpacing: '2px', marginBottom: '16px' }}>ÉTAPE {s.num}</div>
                 <h3 style={{ fontSize: '18px', fontWeight: '700', margin: '0 0 10px', color: '#111', letterSpacing: '-0.3px' }}>{s.title}</h3>
                 <p style={{ fontSize: '14px', color: '#6b7280', margin: 0, lineHeight: '1.6' }}>{s.desc}</p>
               </div>
@@ -307,22 +305,22 @@ export default function Home() {
       <section ref={featRef} style={{ padding: '96px 48px', opacity: featInView ? 1 : 0, transform: featInView ? 'translateY(0)' : 'translateY(32px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '64px' }}>
-            <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#4f46e5', textTransform: 'uppercase', marginBottom: '12px' }}>FONCTIONNALITÉS</div>
+            <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#9c7a3f', textTransform: 'uppercase', marginBottom: '12px' }}>FONCTIONNALITÉS</div>
             <h2 style={{ fontSize: '40px', fontWeight: '800', letterSpacing: '-1.5px', margin: '0', color: '#0f0f1a' }}>
               Tout pour décrocher l'entretien.
             </h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
             {[
-              { icon: '🤖', title: 'CV généré par IA', desc: "L'IA analyse l'offre et génère un CV taillé pour passer tous les filtres ATS. Score 95%+." },
-              { icon: '✉️', title: 'Lettre de motivation', desc: "Lettre personnalisée générée automatiquement, adaptée au poste et à l'entreprise." },
-              { icon: '🎨', title: '27 templates', desc: 'Pour tous les profils : tertiaire, tech, santé, BTP, restauration, étudiant, international...' },
-              { icon: '✏️', title: 'Éditeur intégré', desc: 'Modifie chaque section directement en ligne - missions, compétences, mise en forme.' },
-              { icon: '🔍', title: 'Recherche d\'offres', desc: 'Parcours des milliers d\'offres en temps réel et génère ton CV pour postuler en 1 clic.' },
-              { icon: '📊', title: 'Dashboard personnel', desc: 'Tous tes CV classés par offre. Modifie, télécharge, duplique à tout moment.' },
+              { title: 'Un CV qui passe les filtres', desc: "L'offre est analysée, le CV s'adapte aux mots-clés qui comptent vraiment. Score ATS 95%+." },
+              { title: 'Lettre de motivation', desc: "Rédigée pour le poste et l'entreprise visés - pas un modèle générique recopié partout." },
+              { title: '27 templates', desc: 'Pour tous les profils : tertiaire, tech, santé, BTP, restauration, étudiant, international...' },
+              { title: 'Éditeur intégré', desc: 'Modifie chaque section directement en ligne - missions, compétences, mise en forme.' },
+              { title: 'Recherche d\'offres', desc: 'Parcours des offres en temps réel et génère ton CV pour postuler en un clic.' },
+              { title: 'Dashboard personnel', desc: 'Tous tes CV classés par offre. Modifie, télécharge, duplique à tout moment.' },
             ].map(f => (
               <div key={f.title} style={{ padding: '28px', borderRadius: '14px', border: '1px solid #f0f0f0', background: '#fff' }}>
-                <div style={{ fontSize: '28px', marginBottom: '14px' }}>{f.icon}</div>
+                <div style={{ width: '32px', height: '3px', background: '#9c7a3f', borderRadius: '2px', marginBottom: '18px' }} />
                 <h3 style={{ fontSize: '16px', fontWeight: '700', margin: '0 0 8px', color: '#111' }}>{f.title}</h3>
                 <p style={{ fontSize: '13px', color: '#6b7280', margin: 0, lineHeight: '1.6' }}>{f.desc}</p>
               </div>
@@ -332,10 +330,10 @@ export default function Home() {
       </section>
 
       {/* ─── PRICING ─────────────────────────────────────────── */}
-      <section id="pricing" ref={pricingRef} style={{ background: '#f8f9ff', padding: '96px 48px', opacity: pricingInView ? 1 : 0, transform: pricingInView ? 'translateY(0)' : 'translateY(32px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
+      <section id="pricing" ref={pricingRef} style={{ background: '#faf8f3', padding: '96px 48px', opacity: pricingInView ? 1 : 0, transform: pricingInView ? 'translateY(0)' : 'translateY(32px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '56px' }}>
-            <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#4f46e5', textTransform: 'uppercase', marginBottom: '12px' }}>TARIFS</div>
+            <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#9c7a3f', textTransform: 'uppercase', marginBottom: '12px' }}>TARIFS</div>
             <h2 style={{ fontSize: '40px', fontWeight: '800', letterSpacing: '-1.5px', margin: '0', color: '#0f0f1a' }}>
               Simple et transparent.
             </h2>
@@ -349,21 +347,21 @@ export default function Home() {
               <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: '24px', marginBottom: '28px' }}>
                 {['1 CV optimisé ATS', '1 lettre de motivation', '27 templates', 'Éditeur intégré', 'Export PDF'].map(f => (
                   <div key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px', fontSize: '14px', color: '#374151' }}>
-                    <span style={{ color: '#22c55e', fontWeight: '700' }}>✓</span>{f}
+                    <span style={{ color: '#9c7a3f', fontWeight: '700' }}>✓</span>{f}
                   </div>
                 ))}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px', fontSize: '14px', color: '#9ca3af' }}>
                   <span style={{ color: '#e5e7eb', fontWeight: '700' }}>✗</span>CV illimités
                 </div>
               </div>
-              <a href="/auth" style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: '10px', border: '1.5px solid #4f46e5', color: '#4f46e5', textDecoration: 'none', fontWeight: '600', fontSize: '14px' }}>
+              <a href="/auth" style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: '10px', border: '1.5px solid #171412', color: '#171412', textDecoration: 'none', fontWeight: '600', fontSize: '14px' }}>
                 Commencer gratuitement
               </a>
             </div>
 
             {/* Pro */}
-            <div style={{ background: '#4f46e5', borderRadius: '16px', padding: '36px', position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: '16px', right: '16px', background: '#fff', color: '#4f46e5', fontSize: '10px', fontWeight: '800', padding: '3px 10px', borderRadius: '20px', letterSpacing: '0.5px' }}>
+            <div style={{ background: '#171412', borderRadius: '16px', padding: '36px', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: '16px', right: '16px', background: '#9c7a3f', color: '#fff', fontSize: '10px', fontWeight: '800', padding: '3px 10px', borderRadius: '20px', letterSpacing: '0.5px' }}>
                 POPULAIRE
               </div>
               <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '1px', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', marginBottom: '20px' }}>PRO</div>
@@ -372,11 +370,11 @@ export default function Home() {
               <div style={{ borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '24px', marginBottom: '28px' }}>
                 {['CV illimités', 'Lettres illimitées', '27 templates', 'Éditeur avancé', 'Export PDF illimité', 'Profil centralisé'].map(f => (
                   <div key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px', fontSize: '14px', color: 'rgba(255,255,255,0.9)' }}>
-                    <span style={{ color: '#a5f3fc', fontWeight: '700' }}>✓</span>{f}
+                    <span style={{ color: '#d9c08a', fontWeight: '700' }}>✓</span>{f}
                   </div>
                 ))}
               </div>
-              <a href="#" style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: '10px', background: '#fff', color: '#4f46e5', textDecoration: 'none', fontWeight: '700', fontSize: '14px' }}>
+              <a href="#" style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: '10px', background: '#fff', color: '#171412', textDecoration: 'none', fontWeight: '700', fontSize: '14px' }}>
                 Passer au Pro
               </a>
             </div>
@@ -389,12 +387,12 @@ export default function Home() {
         <div style={{ maxWidth: '600px', margin: '0 auto' }}>
           <h2 style={{ fontSize: '44px', fontWeight: '800', letterSpacing: '-1.5px', margin: '0 0 16px', color: '#0f0f1a', lineHeight: '1.1' }}>
             Prêt à décrocher<br />
-            <span style={{ color: '#4f46e5' }}>ton prochain entretien ?</span>
+            <span style={{ color: '#9c7a3f' }}>ton prochain entretien ?</span>
           </h2>
           <p style={{ fontSize: '16px', color: '#6b7280', margin: '0 0 36px', lineHeight: '1.6' }}>
-            Crée ton CV optimisé en moins de 30 secondes.<br />Gratuit pour commencer.
+            Ton CV peut être prêt avant la fin de cette page.<br />Gratuit pour commencer.
           </p>
-          <a href="/auth" style={{ fontSize: '16px', fontWeight: '700', textDecoration: 'none', background: '#4f46e5', color: '#fff', padding: '16px 36px', borderRadius: '12px', display: 'inline-block', letterSpacing: '-0.3px' }}>
+          <a href="/auth" style={{ fontSize: '16px', fontWeight: '700', textDecoration: 'none', background: '#171412', color: '#fff', padding: '16px 36px', borderRadius: '12px', display: 'inline-block', letterSpacing: '-0.3px' }}>
             Créer mon CV gratuitement →
           </a>
           <p style={{ fontSize: '12px', color: '#9ca3af', marginTop: '16px' }}>Aucune carte bancaire requise</p>
@@ -404,7 +402,7 @@ export default function Home() {
       {/* ─── FOOTER ──────────────────────────────────────────── */}
       <footer style={{ borderTop: '1px solid #f0f0f0', padding: '40px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
         <div style={{ fontWeight: '800', fontSize: '18px', color: '#111', letterSpacing: '-0.5px' }}>
-          <span style={{ color: '#4f46e5' }}>Did</span>CV
+          <span style={{ color: '#9c7a3f' }}>Did</span>CV
         </div>
         <div style={{ display: 'flex', gap: '24px' }}>
           {[['Confidentialité', '/privacy'], ['CGU', '/cgu'], ['Contact', '/contact'], ['A propos', '/about'], ['Blog', '/blog'], ['Guides métier', '/guides']].map(([label, href]) => (
