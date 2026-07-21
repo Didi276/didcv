@@ -4,6 +4,12 @@ import Navbar from './Navbar'
 
 const TYPES = ['RH', 'Technique', 'Manager', 'Commercial']
 const NB_QUESTIONS = 5
+const CLE_ENTRETIENS_COMPLETES = 'didcv-entretiens-completes'
+
+function comptabiliserEntretienComplete() {
+  const total = parseInt(localStorage.getItem(CLE_ENTRETIENS_COMPLETES) || '0', 10) + 1
+  localStorage.setItem(CLE_ENTRETIENS_COMPLETES, String(total))
+}
 
 function useWidth() {
   const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
@@ -205,6 +211,7 @@ export default function Entretien() {
       if (json.bilan_final) {
         setBilan(json.bilan_final)
         setStep('bilan')
+        comptabiliserEntretienComplete()
       } else if (json.question_suivante) {
         suite.push({ type: 'question', text: json.question_suivante })
         setHistorique(suite)

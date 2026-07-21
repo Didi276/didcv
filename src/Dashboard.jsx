@@ -38,6 +38,8 @@ export default function Dashboard() {
   const [partageLoading, setPartageLoading] = useState(null)
   const [partageOuvert, setPartageOuvert] = useState(null)
   const [copie, setCopie] = useState(false)
+  const [candidaturesCount, setCandidaturesCount] = useState(0)
+  const [entretiensCompletes] = useState(() => parseInt(localStorage.getItem('didcv-entretiens-completes') || '0', 10))
   const w = useWidth()
   const isMobile = w < 768
 
@@ -56,6 +58,8 @@ export default function Dashboard() {
         partagesData.forEach(p => { map[p.cv_id] = p })
         setPartages(map)
       }
+      const { count: nbCandidatures } = await supabase.from('candidatures').select('*', { count: 'exact', head: true }).eq('user_id', user.id)
+      setCandidaturesCount(nbCandidatures || 0)
       setLoading(false)
     }
     fetchData()
@@ -173,17 +177,20 @@ export default function Dashboard() {
           </div>
 
           {/* Stats */}
-          <div style={{ display: 'flex', gap: isMobile ? '10px' : '20px', marginTop: '20px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : w < 1024 ? 'repeat(3, 1fr)' : 'repeat(6, 1fr)', gap: isMobile ? '10px' : '16px', marginTop: '20px' }}>
             {[
               { label: 'CV générés', value: cvs.length, icon: '📄', color: '#4f46e5' },
               { label: 'Lettres', value: cvs.filter(c => c.lettre_motivation).length, icon: '✉️', color: '#0d9488' },
-              { label: 'Profil', value: profile?.prenom ? 'OK' : 'Incomplet', icon: '👤', color: profile?.prenom ? '#16a34a' : '#f59e0b' },
+              { label: 'CV partagés', value: Object.values(partages).filter(p => p.actif).length, icon: '🔗', color: '#7c3aed' },
+              { label: 'Vues totales', value: Object.values(partages).reduce((somme, p) => somme + (p.vues || 0), 0), icon: '👁', color: '#0891b2' },
+              { label: 'Candidatures', value: candidaturesCount, icon: '📋', color: '#c2410c' },
+              { label: 'Entretiens', value: entretiensCompletes, icon: '🎙', color: '#16a34a' },
             ].map(s => (
-              <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: isMobile ? '10px 14px' : '14px 20px', background: '#f8f9ff', borderRadius: '10px', border: '1px solid #ede9fe', flex: isMobile ? 1 : 'none' }}>
+              <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: isMobile ? '10px 14px' : '14px 16px', background: '#f8f9ff', borderRadius: '10px', border: '1px solid #ede9fe' }}>
                 <span style={{ fontSize: '18px' }}>{s.icon}</span>
-                <div>
+                <div style={{ minWidth: 0 }}>
                   <div style={{ fontSize: isMobile ? '16px' : '20px', fontWeight: '800', color: s.color, lineHeight: 1 }}>{s.value}</div>
-                  <div style={{ fontSize: '10px', color: '#9ca3af', marginTop: '1px' }}>{s.label}</div>
+                  <div style={{ fontSize: '10px', color: '#9ca3af', marginTop: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.label}</div>
                 </div>
               </div>
             ))}
