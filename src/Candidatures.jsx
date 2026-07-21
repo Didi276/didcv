@@ -1,6 +1,37 @@
+/*
+  ─── SQL à exécuter dans Supabase ────────────────────────────────────────
+
+  -- Nécessaire pour relier une candidature au CV généré pour ce poste (boutons
+  -- "📋 Voir mon CV" et "🎯 Préparer l'entretien" ci-dessous, et le bouton
+  -- "Ajouter au suivi des candidatures" dans Generate.jsx). Sans cette colonne,
+  -- on ne pourrait retrouver le CV correspondant qu'en comparant des titres de
+  -- façon approximative, ce qui n'est pas fiable.
+  ALTER TABLE candidatures ADD COLUMN IF NOT EXISTS cv_id UUID REFERENCES cvs(id) ON DELETE SET NULL;
+
+  ──────────────────────────────────────────────────────────────────────────
+*/
+
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from './supabase'
 import Navbar from './Navbar'
+import { CVTemplate } from './CVTemplates'
+import { downloadCVasPDF } from './pdfUtils'
+
+function resumerCV(cvData) {
+  if (!cvData) return ''
+  const lignes = [
+    `${cvData.prenom || ''} ${cvData.nom || ''}`.trim(),
+    cvData.titre,
+    cvData.accroche,
+  ].filter(Boolean)
+  if (cvData.experiences?.length) {
+    lignes.push('Expériences : ' + cvData.experiences.map(e => `${e.poste} chez ${e.entreprise}`).filter(Boolean).join(', '))
+  }
+  if (cvData.competences?.filter(c => c).length) {
+    lignes.push('Compétences : ' + cvData.competences.filter(c => c).join(', '))
+  }
+  return lignes.join('\n')
+}
 
 const COLONNES = [
   { id: 'a_postuler',  label: 'À postuler',    color: '#6b7280', bg: '#f9fafb', dot: '#9ca3af' },
@@ -33,6 +64,8 @@ export default function Candidatures() {
   const [dragId, setDragId] = useState(null)
   const [dragOver, setDragOver] = useState(null)
   const [activeCol, setActiveCol] = useState(null)
+  const [cvApercu, setCvApercu] = useState(null)
+  const [felicitationsCard, setFelicitationsCard] = useState(null)
   const w = useWidth()
   const isMobile = w < 768
 
@@ -86,6 +119,39 @@ export default function Candidatures() {
     if (!card || card.statut === newStatut) return
     await supabase.from('candidatures').update({ statut: newStatut }).eq('id', cardId)
     setCards(cards.map(c => c.id === cardId ? { ...c, statut: newStatut } : c))
+  }
+
+  const construireTexteOffre = (card) =>
+    [card.titre, card.entreprise && `${card.entreprise}${card.lieu ? ' - ' + card.lieu : ''}`, card.salaire, '', card.notes].filter(Boolean).join('\n')
+
+  const genererCV = (card, e) => {
+    e.stopPropagation()
+    sessionStorage.setItem('offre_prefill', JSON.stringify({
+      titre: card.titre || '', entreprise: card.entreprise || '', url: card.url_offre || '',
+      texte: construireTexteOffre(card),
+    }))
+    window.location.href = '/generate?template=auto'
+  }
+
+  const voirCV = async (card, e) => {
+    e.stopPropagation()
+    if (!card.cv_id) { alert("Aucun CV n'est encore associé à cette candidature."); return }
+    setCvApercu({ loading: true })
+    const { data } = await supabase.from('cvs').select('*').eq('id', card.cv_id).maybeSingle()
+    if (data) setCvApercu({ loading: false, cv: data })
+    else { setCvApercu(null); alert("Ce CV n'existe plus.") }
+  }
+
+  const preparerEntretien = async (card, e) => {
+    e.stopPropagation()
+    sessionStorage.setItem('entretien_offre', construireTexteOffre(card))
+    if (card.cv_id) {
+      const { data } = await supabase.from('cvs').select('cv_data').eq('id', card.cv_id).maybeSingle()
+      if (data?.cv_data) {
+        sessionStorage.setItem('entretien_cv', JSON.stringify({ titre: card.titre, resume: resumerCV(data.cv_data) }))
+      }
+    }
+    window.location.href = '/entretien'
   }
 
   const formatDate = (d) => d ? new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : ''
@@ -188,6 +254,38 @@ export default function Candidatures() {
                         )}
                         <span style={{ fontSize: '10px', color: '#c4c4c4', marginLeft: 'auto' }}>{formatDate(card.created_at)}</span>
                       </div>
+
+                      {/* Action selon le statut */}
+                      {card.statut === 'a_postuler' && (
+                        <button onClick={e => genererCV(card, e)}
+                          style={{ width: '100%', marginTop: '8px', padding: '7px', background: '#eef2ff', color: '#4f46e5', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+                          ⚡ Générer mon CV
+                        </button>
+                      )}
+                      {card.statut === 'postule' && (
+                        <button onClick={e => voirCV(card, e)}
+                          style={{ width: '100%', marginTop: '8px', padding: '7px', background: '#eff6ff', color: '#1d4ed8', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+                          📋 Voir mon CV
+                        </button>
+                      )}
+                      {card.statut === 'entretien' && (
+                        <button onClick={e => preparerEntretien(card, e)}
+                          style={{ width: '100%', marginTop: '8px', padding: '7px', background: '#f5f3ff', color: '#7c3aed', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+                          🎯 Préparer l'entretien
+                        </button>
+                      )}
+                      {card.statut === 'offre' && (
+                        <button onClick={e => { e.stopPropagation(); setFelicitationsCard(card) }}
+                          style={{ width: '100%', marginTop: '8px', padding: '7px', background: '#f0fdf4', color: '#16a34a', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+                          🎉 Félicitations
+                        </button>
+                      )}
+                      {card.statut === 'refuse' && (
+                        <a href="/formations" onClick={e => e.stopPropagation()}
+                          style={{ display: 'block', width: '100%', marginTop: '8px', padding: '7px', background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none', textAlign: 'center', boxSizing: 'border-box' }}>
+                          📚 Formations recommandées
+                        </a>
+                      )}
                     </div>
                   ))}
 
@@ -280,6 +378,53 @@ export default function Candidatures() {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal apercu CV */}
+      {cvApercu && (
+        <div onClick={() => setCvApercu(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 250, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: isMobile ? '0' : '24px', backdropFilter: 'blur(4px)' }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: isMobile ? '0' : '16px', width: '100%', maxWidth: isMobile ? '100%' : '860px', height: isMobile ? '100%' : 'auto', maxHeight: '90vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '14px 16px', borderBottom: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+              <div style={{ fontSize: '13px', fontWeight: '700', color: '#111' }}>Mon CV pour ce poste</div>
+              <div style={{ display: 'flex', gap: '6px' }}>
+                {cvApercu.cv && (
+                  <button onClick={() => downloadCVasPDF(document.getElementById('cv-to-print'), cvApercu.cv.cv_data.prenom, cvApercu.cv.cv_data.nom)}
+                    style={{ padding: '6px 14px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
+                    📥
+                  </button>
+                )}
+                <button onClick={() => setCvApercu(null)} style={{ width: '30px', height: '30px', borderRadius: '8px', border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+              </div>
+            </div>
+            <div style={{ overflow: 'auto', flex: 1, display: 'flex', justifyContent: 'center', padding: '20px 16px', background: '#f8f9ff' }}>
+              {cvApercu.loading ? (
+                <div style={{ padding: '60px', color: '#9ca3af', fontSize: '13px' }}>Chargement...</div>
+              ) : (
+                <div style={{ transform: isMobile ? `scale(${Math.min(0.45, (w - 32) / 794)})` : 'scale(1)', transformOrigin: 'top center', boxShadow: '0 4px 24px rgba(0,0,0,0.12)', borderRadius: '4px', overflow: 'hidden' }}>
+                  <CVTemplate cvData={cvApercu.cv.cv_data} template={cvApercu.cv.template} />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal félicitations */}
+      {felicitationsCard && (
+        <div onClick={() => setFelicitationsCard(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 250, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', backdropFilter: 'blur(4px)' }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: '20px', padding: '36px', maxWidth: '440px', width: '100%', textAlign: 'center' }}>
+            <div style={{ fontSize: '52px', marginBottom: '16px' }}>🎉</div>
+            <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#111', margin: '0 0 10px' }}>Félicitations !</h2>
+            <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 24px', lineHeight: '1.7' }}>
+              Tu as décroché le poste de <strong>{felicitationsCard.titre}</strong>
+              {felicitationsCard.entreprise && <> chez <strong>{felicitationsCard.entreprise}</strong></>} ! Tout le travail mis dans ta candidature a payé.
+            </p>
+            <button onClick={() => setFelicitationsCard(null)}
+              style={{ width: '100%', padding: '12px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+              Merci !
+            </button>
           </div>
         </div>
       )}

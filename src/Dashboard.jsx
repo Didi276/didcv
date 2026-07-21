@@ -14,6 +14,35 @@ function slugify(str) {
     .replace(/^-+|-+$/g, '')
 }
 
+function resumerCV(cvData) {
+  if (!cvData) return ''
+  const lignes = [
+    `${cvData.prenom || ''} ${cvData.nom || ''}`.trim(),
+    cvData.titre,
+    cvData.accroche,
+  ].filter(Boolean)
+  if (cvData.experiences?.length) {
+    lignes.push('Expériences : ' + cvData.experiences.map(e => `${e.poste} chez ${e.entreprise}`).filter(Boolean).join(', '))
+  }
+  if (cvData.competences?.filter(c => c).length) {
+    lignes.push('Compétences : ' + cvData.competences.filter(c => c).join(', '))
+  }
+  return lignes.join('\n')
+}
+
+function construireTexteOffre(card) {
+  return [card.titre, card.entreprise && `${card.entreprise}${card.lieu ? ' - ' + card.lieu : ''}`, card.salaire, '', card.notes].filter(Boolean).join('\n')
+}
+
+function etapesCandidature(card) {
+  return [
+    { label: 'CV généré', done: !!card.cv_id || card.statut !== 'a_postuler' },
+    { label: 'Postulé', done: ['postule', 'entretien', 'offre', 'refuse'].includes(card.statut) },
+    { label: 'Entretien', done: ['entretien', 'offre', 'refuse'].includes(card.statut) },
+    { label: 'Décision', done: ['offre', 'refuse'].includes(card.statut) },
+  ]
+}
+
 function useWidth() {
   const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
   useEffect(() => {
@@ -39,6 +68,7 @@ export default function Dashboard() {
   const [partageOuvert, setPartageOuvert] = useState(null)
   const [copie, setCopie] = useState(false)
   const [candidaturesCount, setCandidaturesCount] = useState(0)
+  const [candidaturesRecentes, setCandidaturesRecentes] = useState([])
   const [entretiensCompletes] = useState(() => parseInt(localStorage.getItem('didcv-entretiens-completes') || '0', 10))
   const w = useWidth()
   const isMobile = w < 768
@@ -60,6 +90,8 @@ export default function Dashboard() {
       }
       const { count: nbCandidatures } = await supabase.from('candidatures').select('*', { count: 'exact', head: true }).eq('user_id', user.id)
       setCandidaturesCount(nbCandidatures || 0)
+      const { data: recentes } = await supabase.from('candidatures').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(3)
+      setCandidaturesRecentes(recentes || [])
       setLoading(false)
     }
     fetchData()
@@ -124,6 +156,29 @@ export default function Dashboard() {
     navigator.clipboard.writeText(`${window.location.origin}/cv/${partageOuvert.slug}`)
     setCopie(true)
     setTimeout(() => setCopie(false), 2000)
+  }
+
+  const allerVersCV = (card) => {
+    if (card.cv_id) {
+      const cv = cvs.find(c => c.id === card.cv_id)
+      if (cv) { setSelectedCv(cv); setShowLettre(false); return }
+    }
+    sessionStorage.setItem('offre_prefill', JSON.stringify({
+      titre: card.titre || '', entreprise: card.entreprise || '', url: card.url_offre || '',
+      texte: construireTexteOffre(card),
+    }))
+    window.location.href = '/generate?template=auto'
+  }
+
+  const allerVersCandidatures = () => { window.location.href = '/candidatures' }
+
+  const allerVersEntretien = (card) => {
+    sessionStorage.setItem('entretien_offre', construireTexteOffre(card))
+    if (card.cv_id) {
+      const cv = cvs.find(c => c.id === card.cv_id)
+      if (cv) sessionStorage.setItem('entretien_cv', JSON.stringify({ titre: card.titre, resume: resumerCV(cv.cv_data) }))
+    }
+    window.location.href = '/entretien'
   }
 
   const handleSaveEdit = async (cvDataModifie) => {
@@ -197,6 +252,54 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Mes candidatures en cours */}
+      {candidaturesRecentes.length > 0 && (
+        <div style={{ maxWidth: '1200px', margin: '16px auto 0', padding: `0 ${isMobile ? '16px' : '40px'}` }}>
+          <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: isMobile ? '16px' : '20px 24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div style={{ fontSize: '14px', fontWeight: '700', color: '#111' }}>Mes candidatures en cours</div>
+              <a href="/candidatures" style={{ fontSize: '12px', color: '#4f46e5', textDecoration: 'none', fontWeight: '600' }}>Voir tout →</a>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+              {candidaturesRecentes.map(card => {
+                const etapes = etapesCandidature(card)
+                const actions = [() => allerVersCV(card), allerVersCandidatures, () => allerVersEntretien(card), allerVersCandidatures]
+                return (
+                  <div key={card.id}>
+                    <div style={{ fontSize: '13px', fontWeight: '600', color: '#111', marginBottom: '10px' }}>
+                      {card.titre}{card.entreprise && <span style={{ color: '#9ca3af', fontWeight: '400' }}> · {card.entreprise}</span>}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+                      {etapes.map((etape, i) => (
+                        <div key={etape.label} style={{ display: 'flex', alignItems: 'center', flex: i < etapes.length - 1 ? 1 : 'none' }}>
+                          <button onClick={actions[i]}
+                            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', padding: 0 }}>
+                            <div style={{
+                              width: '22px', height: '22px', borderRadius: '50%', flexShrink: 0,
+                              background: etape.done ? '#4f46e5' : '#f3f4f6', color: etape.done ? '#fff' : '#9ca3af',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: '700',
+                              border: etape.done ? 'none' : '1.5px solid #e5e7eb',
+                            }}>
+                              {etape.done ? '✓' : i + 1}
+                            </div>
+                            <div style={{ fontSize: isMobile ? '9px' : '10px', color: etape.done ? '#4f46e5' : '#9ca3af', fontWeight: etape.done ? '700' : '500', whiteSpace: 'nowrap' }}>
+                              {etape.label}
+                            </div>
+                          </button>
+                          {i < etapes.length - 1 && (
+                            <div style={{ flex: 1, height: '2px', background: etapes[i + 1].done ? '#4f46e5' : '#e5e7eb', margin: '0 4px', marginBottom: '17px' }} />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Bandeau profil */}
       {!profile?.prenom && (

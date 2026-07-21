@@ -36,6 +36,14 @@ const SECTEUR_LABELS = {
   junior: '🎓 Junior', cadre: '👔 Cadre', tertiaire: '📊 Tertiaire'
 }
 
+// Utilisé quand on arrive avec ?template=auto (depuis Offres.jsx ou une candidature)
+const SECTEUR_TO_TEMPLATE = {
+  tech: 'tech', sante: 'sante', btp: 'btp', restauration: 'restauration',
+  commerce: 'commercial', transport: 'transport', creatif: 'creative',
+  securite: 'corporate', beaute: 'beaute', junior: 'etudiant',
+  cadre: 'executive', tertiaire: 'finance',
+}
+
 function LettreRenderer({ lettre }) {
   if (!lettre.includes('||EXP||')) {
     return <div style={{ fontFamily: 'Georgia,serif', fontSize: '13px', lineHeight: '1.9', color: '#222', whiteSpace: 'pre-wrap', padding: '32px' }}>{lettre}</div>
@@ -66,7 +74,8 @@ function LettreRenderer({ lettre }) {
 export default function Generate() {
   const [searchParams] = useSearchParams()
   const templateChoisi = searchParams.get('template') || 'finance'
-  const [currentTemplate, setCurrentTemplate] = useState(templateChoisi)
+  const [currentTemplate, setCurrentTemplate] = useState(templateChoisi === 'auto' ? 'finance' : templateChoisi)
+  const [templateAuto, setTemplateAuto] = useState(templateChoisi === 'auto')
   const [showTemplatePicker, setShowTemplatePicker] = useState(false)
   const w = useWidth()
   const isMobile = w < 768
@@ -78,6 +87,7 @@ export default function Generate() {
   const [cvTexte, setCvTexte] = useState('')
   const [photoManuelle, setPhotoManuelle] = useState(null)
   const [offreEmploi, setOffreEmploi] = useState('')
+  const [offreMeta, setOffreMeta] = useState(null)
   const [secteurDetecte, setSecteurDetecte] = useState(null)
   const [showChat, setShowChat] = useState(false)
   const [chatMessages, setChatMessages] = useState([])
@@ -91,6 +101,9 @@ export default function Generate() {
   const [activeTab, setActiveTab] = useState('cv')
   const [showEditor, setShowEditor] = useState(false)
   const [customColor, setCustomColor] = useState(null)
+  const [cvSauvegardeId, setCvSauvegardeId] = useState(null)
+  const [candidatureAjoutee, setCandidatureAjoutee] = useState(false)
+  const [ajoutCandidatureEnCours, setAjoutCandidatureEnCours] = useState(false)
 
   useEffect(() => {
     const init = async () => {
@@ -101,7 +114,17 @@ export default function Generate() {
         if (data?.prenom) setProfile(data)
       }
       const prefill = sessionStorage.getItem('offre_prefill')
-      if (prefill) { setOffreEmploi(prefill); sessionStorage.removeItem('offre_prefill') }
+      if (prefill) {
+        sessionStorage.removeItem('offre_prefill')
+        try {
+          const parsed = JSON.parse(prefill)
+          setOffreEmploi(parsed.texte || '')
+          setOffreMeta({ titre: parsed.titre || '', entreprise: parsed.entreprise || '', url: parsed.url || '' })
+        } catch {
+          // Ancien format (texte brut) — conservé par compatibilité
+          setOffreEmploi(prefill)
+        }
+      }
     }
     init()
   }, [])
@@ -110,6 +133,11 @@ export default function Generate() {
     if (offreEmploi.length > 50) setSecteurDetecte(detecterSecteur(offreEmploi, ''))
     else setSecteurDetecte(null)
   }, [offreEmploi])
+
+  // ?template=auto : bascule automatiquement sur un template adapté au secteur détecté
+  useEffect(() => {
+    if (templateAuto && secteurDetecte) setCurrentTemplate(SECTEUR_TO_TEMPLATE[secteurDetecte] || 'finance')
+  }, [secteurDetecte, templateAuto])
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0]
@@ -215,6 +243,8 @@ Contexte offre : ${offreEmploi.substring(0, 200)}`,
     setLoading(true)
     setCvData(null)
     setLettre('')
+    setCvSauvegardeId(null)
+    setCandidatureAjoutee(false)
     setProgress("Analyse de l'offre...")
 
     if (user) {
@@ -319,11 +349,12 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
       setActiveTab('cv')
 
       if (user) {
-        await supabase.from('cvs').insert({
+        const { data: cvInsere } = await supabase.from('cvs').insert({
           user_id: user.id, template: currentTemplate,
           cv_data: json, lettre_motivation: dataLM.content[0].text,
           offre_titre: offreEmploi.substring(0, 60).trim()
-        })
+        }).select().single()
+        if (cvInsere) setCvSauvegardeId(cvInsere.id)
       }
     } catch (err) {
       alert(err.message?.includes('incomplet') || err.message?.includes('invalide') ? err.message : 'Erreur de generation. Reessaie.')
@@ -340,6 +371,22 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
 
   const handleDownloadLettre = () => {
     downloadLettreasePDF(lettre, cvData?.prenom, cvData?.nom)
+  }
+
+  // Nécessite la colonne candidatures.cv_id (voir commentaire SQL en haut de Candidatures.jsx)
+  const handleAjouterCandidature = async () => {
+    if (!user || !cvSauvegardeId || ajoutCandidatureEnCours) return
+    setAjoutCandidatureEnCours(true)
+    await supabase.from('candidatures').insert({
+      user_id: user.id,
+      titre: offreMeta?.titre || cvData?.titre || offreEmploi.split('\n')[0].slice(0, 80) || 'Candidature',
+      entreprise: offreMeta?.entreprise || '',
+      url_offre: offreMeta?.url || '',
+      statut: 'postule',
+      cv_id: cvSauvegardeId,
+    })
+    setAjoutCandidatureEnCours(false)
+    setCandidatureAjoutee(true)
   }
 
   return (
@@ -580,6 +627,18 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
                 <a href="/dashboard" style={{ display: 'block', textAlign: 'center', padding: '11px', background: '#f0fdf4', color: '#16a34a', border: '1.5px solid #86efac', borderRadius: '10px', fontSize: '14px', fontWeight: '600', textDecoration: 'none' }}>
                   ✅ Aller au dashboard
                 </a>
+                {user && cvSauvegardeId && (
+                  candidatureAjoutee ? (
+                    <div style={{ padding: '11px', textAlign: 'center', background: '#f5f3ff', color: '#7c3aed', border: '1.5px solid #ddd6fe', borderRadius: '10px', fontSize: '13px', fontWeight: '700' }}>
+                      ✓ Ajoutée au suivi des candidatures
+                    </div>
+                  ) : (
+                    <button onClick={handleAjouterCandidature} disabled={ajoutCandidatureEnCours}
+                      style={{ padding: '11px', background: '#fff', color: '#7c3aed', border: '1.5px solid #ddd6fe', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: ajoutCandidatureEnCours ? 'default' : 'pointer', fontFamily: 'inherit' }}>
+                      {ajoutCandidatureEnCours ? 'Ajout...' : '📋 Ajouter au suivi des candidatures'}
+                    </button>
+                  )
+                )}
                 <ATSScore cvData={cvData} offreEmploi={offreEmploi} />
               </div>
             )}
@@ -666,7 +725,7 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
             <div style={{ fontSize: '14px', fontWeight: '700', color: '#111', marginBottom: '16px' }}>Changer de template</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
               {['finance','linkedin','canva','harvard','siliconvalley','moderne','executive','creative','minimal','tech','elegant','bold','pastel','corporate','swiss','timeline','etudiant','alternance','portfolio','sante','commercial','startup','classique','international','btp','restauration','transport','beaute'].map(t => (
-                <button key={t} onClick={() => { setCurrentTemplate(t); setShowTemplatePicker(false) }}
+                <button key={t} onClick={() => { setCurrentTemplate(t); setTemplateAuto(false); setShowTemplatePicker(false) }}
                   style={{ padding: '8px 4px', background: currentTemplate === t ? '#4f46e5' : '#f8f9ff', color: currentTemplate === t ? '#fff' : '#374151', border: `1.5px solid ${currentTemplate === t ? '#4f46e5' : '#e5e7eb'}`, borderRadius: '8px', fontSize: '10px', fontWeight: currentTemplate === t ? '700' : '500', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'center', textTransform: 'capitalize' }}>
                   {currentTemplate === t ? '✓ ' : ''}{t}
                 </button>

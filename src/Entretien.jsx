@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from './Navbar'
+import { supabase } from './supabase'
 
 const TYPES = ['RH', 'Technique', 'Manager', 'Commercial']
 const NB_QUESTIONS = 5
@@ -21,11 +22,28 @@ function useWidth() {
   return w
 }
 
-function buildSystemPrompt(poste, type, offre) {
+function resumerCV(cvData) {
+  if (!cvData) return ''
+  const lignes = [
+    `${cvData.prenom || ''} ${cvData.nom || ''}`.trim(),
+    cvData.titre,
+    cvData.accroche,
+  ].filter(Boolean)
+  if (cvData.experiences?.length) {
+    lignes.push('Expériences : ' + cvData.experiences.map(e => `${e.poste} chez ${e.entreprise}`).filter(Boolean).join(', '))
+  }
+  if (cvData.competences?.filter(c => c).length) {
+    lignes.push('Compétences : ' + cvData.competences.filter(c => c).join(', '))
+  }
+  return lignes.join('\n')
+}
+
+function buildSystemPrompt(poste, type, offre, cvResume) {
   return `Tu es [prénom] [nom], recruteur(euse) chez [entreprise extraite de l'offre ou 'une grande entreprise française'] qui fait passer un entretien ${type} pour le poste de ${poste}.
 Si une offre d'emploi a été fournie, adapte tes questions exactement aux compétences et missions mentionnées dans cette offre.
 
 ${offre ? `OFFRE D'EMPLOI FOURNIE PAR LE CANDIDAT :\n${offre.slice(0, 2000)}\n` : "Aucune offre d'emploi fournie — utilise \"une grande entreprise française\" comme entreprise."}
+${cvResume ? `\nCV DU CANDIDAT (utilise-le pour poser des questions adaptées à son parcours réel) :\n${cvResume.slice(0, 1500)}\n` : ''}
 
 Choisis toi-même un prénom et un nom de recruteur(euse) français crédibles, ainsi qu'un intitulé de poste RH cohérent (ex: DRH, Chargé de recrutement, Talent Manager). Communique cette identité UNE SEULE FOIS, dans ta toute première réponse (avant la première question), via le champ "recruteur".
 
@@ -92,6 +110,9 @@ export default function Entretien() {
   const [poste, setPoste] = useState('')
   const [type, setType] = useState('RH')
   const [offre, setOffre] = useState('')
+  const [cvUtilise, setCvUtilise] = useState(null) // { titre, resume }
+  const [mesCandidatures, setMesCandidatures] = useState([])
+  const [candidatureSelectionnee, setCandidatureSelectionnee] = useState('')
 
   const [recruteur, setRecruteur] = useState(null)
   const [historique, setHistorique] = useState([]) // items affichés dans le chat
@@ -114,6 +135,51 @@ export default function Entretien() {
   useEffect(() => {
     finRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [historique, loading])
+
+  // Préremplissage depuis une candidature (Candidatures.jsx -> "🎯 Préparer l'entretien")
+  useEffect(() => {
+    const appliquerPrefill = async () => {
+      const offrePrefill = sessionStorage.getItem('entretien_offre')
+      const cvPrefillRaw = sessionStorage.getItem('entretien_cv')
+      sessionStorage.removeItem('entretien_offre')
+      sessionStorage.removeItem('entretien_cv')
+
+      let cvPrefill = null
+      try { cvPrefill = cvPrefillRaw ? JSON.parse(cvPrefillRaw) : null } catch { cvPrefill = null }
+
+      const posteInitial = cvPrefill?.titre || (offrePrefill ? offrePrefill.split('\n')[0] : '')
+
+      if (offrePrefill) setOffre(offrePrefill)
+      if (cvPrefill) setCvUtilise(cvPrefill)
+      if (posteInitial) setPoste(posteInitial)
+    }
+    appliquerPrefill()
+  }, [])
+
+  // Candidatures "en entretien" pour le sélecteur
+  useEffect(() => {
+    const charger = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const { data } = await supabase.from('candidatures').select('*').eq('user_id', user.id).eq('statut', 'entretien').order('created_at', { ascending: false })
+      setMesCandidatures(data || [])
+    }
+    charger()
+  }, [])
+
+  const choisirCandidature = async (id) => {
+    setCandidatureSelectionnee(id)
+    if (!id) return
+    const candidature = mesCandidatures.find(c => c.id === id)
+    if (!candidature) return
+    setPoste(candidature.titre)
+    setOffre([candidature.titre, candidature.entreprise && `${candidature.entreprise}${candidature.lieu ? ' - ' + candidature.lieu : ''}`, candidature.salaire, '', candidature.notes].filter(Boolean).join('\n'))
+    setCvUtilise(null)
+    if (candidature.cv_id) {
+      const { data: cv } = await supabase.from('cvs').select('cv_data').eq('id', candidature.cv_id).maybeSingle()
+      if (cv?.cv_data) setCvUtilise({ titre: candidature.titre, resume: resumerCV(cv.cv_data) })
+    }
+  }
 
   useEffect(() => () => {
     recognitionRef.current?.stop()
@@ -168,7 +234,7 @@ export default function Entretien() {
     setRecruteur(null)
     setBilan(null)
 
-    const system = buildSystemPrompt(poste.trim(), type, offre.trim())
+    const system = buildSystemPrompt(poste.trim(), type, offre.trim(), cvUtilise?.resume)
     const premierMessage = [{ role: 'user', content: "Commence l'entretien : donne ton identité de recruteur, puis pose la première question." }]
 
     try {
@@ -202,7 +268,7 @@ export default function Entretien() {
     const nouvelApiHistory = [...apiHistory, { role: 'user', content: contenuUser }]
 
     try {
-      const system = buildSystemPrompt(poste.trim(), type, offre.trim())
+      const system = buildSystemPrompt(poste.trim(), type, offre.trim(), cvUtilise?.resume)
       const json = await appelerClaude(system, nouvelApiHistory)
       const suite = [...nouvelHistorique]
       if (json.feedback) suite.push({ type: 'feedback', data: json.feedback })
@@ -235,6 +301,8 @@ export default function Entretien() {
     setPoste('')
     setType('RH')
     setOffre('')
+    setCvUtilise(null)
+    setCandidatureSelectionnee('')
     setRecruteur(null)
     setHistorique([])
     setApiHistory([])
@@ -268,6 +336,25 @@ export default function Entretien() {
         {step === 'setup' && (
           <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb', padding: '32px' }}>
             <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: '0 0 20px' }}>Configure ton entretien</h2>
+
+            {mesCandidatures.length > 0 && (
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>Choisir parmi mes candidatures</label>
+                <select value={candidatureSelectionnee} onChange={e => choisirCandidature(e.target.value)}
+                  style={{ width: '100%', padding: '11px 14px', border: '1.5px solid #e5e7eb', borderRadius: '9px', fontSize: '14px', fontFamily: 'inherit', color: '#111', outline: 'none', boxSizing: 'border-box', cursor: 'pointer', background: '#fff' }}>
+                  <option value="">— Configurer manuellement —</option>
+                  {mesCandidatures.map(c => (
+                    <option key={c.id} value={c.id}>{c.titre}{c.entreprise ? ` — ${c.entreprise}` : ''}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {cvUtilise && (
+              <div style={{ marginBottom: '20px', padding: '10px 14px', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '9px', fontSize: '13px', color: '#16a34a', fontWeight: '600' }}>
+                📄 CV utilisé : {cvUtilise.titre}
+              </div>
+            )}
 
             <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>Poste visé</label>
             <input value={poste} onChange={e => setPoste(e.target.value)} placeholder="Ex : Responsable Marketing Digital"

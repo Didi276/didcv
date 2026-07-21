@@ -110,8 +110,13 @@ export default function Offres() {
 
   const handleGenererCV = (offre) => {
     const texte = [offre.titre, offre.entreprise && `${offre.entreprise} - ${offre.lieu}`, offre.type, '', offre.description].filter(Boolean).join('\n')
-    sessionStorage.setItem('offre_prefill', texte)
-    window.location.href = '/generate'
+    sessionStorage.setItem('offre_prefill', JSON.stringify({
+      titre: offre.titre || '',
+      entreprise: offre.entreprise || '',
+      url: offre.url || '',
+      texte,
+    }))
+    window.location.href = '/generate?template=auto'
   }
 
   const formatDate = (d) => {
