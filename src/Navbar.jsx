@@ -5,6 +5,7 @@ import { supabase } from './supabase'
 export default function Navbar({ currentPage = '' }) {
   const [user, setUser] = useState(null)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [resourcesOpen, setResourcesOpen] = useState(false)
   const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
   const navigate = useNavigate()
 
@@ -22,18 +23,25 @@ export default function Navbar({ currentPage = '' }) {
     navigate('/')
   }
 
-  const links = [
-    { page: 'dashboard',     label: 'Dashboard',    to: '/dashboard',    auth: true  },
-    { page: 'offres',        label: 'Offres',        to: '/offres',       auth: true  },
-    { page: 'candidatures',  label: 'Candidatures', to: '/candidatures', auth: true  },
-    { page: 'generate',      label: 'Générer CV',   to: '/templates',    auth: true  },
-    { page: 'formations',    label: 'Formations',    to: '/formations',   auth: true  },
-    { page: 'profile',       label: 'Profil',        to: '/profile',      auth: true  },
-    { page: 'blog',          label: 'Blog',          to: '/blog',         auth: false },
-    { page: 'guides',        label: 'Guides métier', to: '/guides',       auth: false },
+  const mainLinks = [
+    { page: 'dashboard', label: 'Dashboard',  to: '/dashboard',  auth: true },
+    { page: 'offres',    label: 'Offres',     to: '/offres',     auth: true },
+    { page: 'generate',  label: 'Générer CV', to: '/templates',  auth: true },
+    { page: 'formations', label: 'Formations', to: '/formations', auth: true },
+    { page: 'profile',   label: 'Profil',     to: '/profile',    auth: true },
   ]
 
+  const resourceLinks = [
+    { page: 'blog',         label: 'Blog',          to: '/blog',         auth: false },
+    { page: 'guides',       label: 'Guides métier', to: '/guides',       auth: false },
+    { page: 'candidatures', label: 'Candidatures',  to: '/candidatures', auth: true  },
+  ]
+
+  const links = [...mainLinks, ...resourceLinks]
   const visibleLinks = user ? links : links.filter(l => !l.auth)
+  const visibleMainLinks = user ? mainLinks : mainLinks.filter(l => !l.auth)
+  const visibleResourceLinks = user ? resourceLinks : resourceLinks.filter(l => !l.auth)
+  const isResourcePage = visibleResourceLinks.some(l => l.page === currentPage)
 
   const linkStyle = (page) => ({
     fontSize: '14px', fontWeight: '500',
@@ -57,9 +65,28 @@ export default function Navbar({ currentPage = '' }) {
         </Link>
 
         {/* Desktop links */}
-        {!isMobile && visibleLinks.map(({ page, label, to }) => (
+        {!isMobile && visibleMainLinks.map(({ page, label, to }) => (
           <Link key={page} to={to} style={linkStyle(page)}>{label}</Link>
         ))}
+
+        {/* Desktop menu Ressources (survol) */}
+        {!isMobile && visibleResourceLinks.length > 0 && (
+          <div onMouseEnter={() => setResourcesOpen(true)} onMouseLeave={() => setResourcesOpen(false)} style={{ position: 'relative' }}>
+            <span style={{ ...linkStyle(isResourcePage ? currentPage : ''), cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              Ressources <span style={{ fontSize: '10px', transform: resourcesOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s', display: 'inline-block' }}>▼</span>
+            </span>
+            {resourcesOpen && (
+              <div style={{ position: 'absolute', top: '100%', left: 0, minWidth: '180px', background: '#fff', border: '1px solid #ebebeb', borderRadius: '10px', boxShadow: '0 8px 24px rgba(0,0,0,0.1)', padding: '6px', zIndex: 110 }}>
+                {visibleResourceLinks.map(({ page, label, to }) => (
+                  <Link key={page} to={to}
+                    style={{ display: 'block', padding: '9px 12px', borderRadius: '7px', fontSize: '14px', fontWeight: currentPage === page ? '700' : '500', color: currentPage === page ? '#4f46e5' : '#374151', textDecoration: 'none', background: currentPage === page ? '#f5f5ff' : 'transparent' }}>
+                    {label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         <div style={{ flex: isMobile ? 0 : 1 }} />
 
