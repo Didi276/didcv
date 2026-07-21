@@ -5,6 +5,33 @@ import * as pdfjsLib from 'pdfjs-dist'
 import DateRangePicker from './DateRangePicker'
 import CityInput from './CityInput'
 import SuggestionsIA from './SuggestionsIA'
+import { FORMATIONS } from './formationsData'
+
+// Mots-clés d'un titre de poste -> tags "metiers" utilisés dans formationsData.js
+const METIER_KEYWORDS = [
+  [/compt/i, 'comptable'],
+  [/assistant/i, 'assistant'],
+  [/commercial|vente|business developer/i, 'commercial'],
+  [/marketing/i, 'marketing'],
+  [/communication/i, 'communication'],
+  [/d[ée]veloppeur|informatique|logiciel|ingénieur.*(logiciel|informatique)/i, 'developpeur'],
+  [/data|données/i, 'data'],
+  [/chef de projet|project manager/i, 'chef de projet'],
+  [/manager|responsable|directeur/i, 'manager'],
+  [/rh|ressources humaines|recrut/i, 'rh'],
+  [/designer|graphiste|ux|ui/i, 'designer'],
+  [/cr[ée]atif|cr[ée]ation/i, 'creatif'],
+  [/finance/i, 'finance'],
+  [/international|export/i, 'international'],
+]
+
+function formationsPourMetier(titrePoste) {
+  const tags = new Set()
+  if (titrePoste) METIER_KEYWORDS.forEach(([regex, tag]) => { if (regex.test(titrePoste)) tags.add(tag) })
+  let matches = tags.size ? FORMATIONS.filter(f => f.metiers.some(m => tags.has(m))) : []
+  if (!matches.length) matches = FORMATIONS.filter(f => f.metiers.includes('tous'))
+  return matches.slice(0, 3)
+}
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString()
 
@@ -330,6 +357,8 @@ export default function Profile() {
 
   const focusStyle = (e) => { e.target.style.borderColor = '#4f46e5' }
   const blurStyle = (e) => { e.target.style.borderColor = '#e5e7eb' }
+
+  const formationsRecommandees = formationsPourMetier(titre)
 
   const SECTIONS = [
     { id: 'import',       label: '📥 Import PDF' },
@@ -717,6 +746,24 @@ export default function Profile() {
                 if (!competences.includes(s)) setCompetences([...competences.filter(c => c), s])
               }}
             />
+
+            {formationsRecommandees.length > 0 && (
+              <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px solid #f0f0f0' }}>
+                <h3 style={{ fontSize: '14px', fontWeight: '700', color: '#111', margin: '0 0 12px' }}>📚 Formations recommandées pour toi</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '10px' }}>
+                  {formationsRecommandees.map(f => (
+                    <a key={f.id} href={f.lien} target="_blank" rel="noopener noreferrer"
+                      style={{ display: 'block', padding: '14px', background: '#f8f9ff', border: '1px solid #ede9fe', borderRadius: '10px', textDecoration: 'none', transition: 'all 0.15s' }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = '#4f46e5'; e.currentTarget.style.background = '#faf9ff' }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = '#ede9fe'; e.currentTarget.style.background = '#f8f9ff' }}>
+                      <div style={{ fontSize: '10px', fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{f.categorie}</div>
+                      <div style={{ fontSize: '13px', fontWeight: '700', color: '#111', marginBottom: '4px', lineHeight: '1.3' }}>{f.titre}</div>
+                      <div style={{ fontSize: '11px', color: '#9ca3af' }}>⏱ {f.duree} · {f.niveau}</div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
