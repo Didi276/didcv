@@ -17,22 +17,6 @@ import Navbar from './Navbar'
 import { CVTemplate } from './CVTemplates'
 import { downloadCVasPDF } from './pdfUtils'
 
-function resumerCV(cvData) {
-  if (!cvData) return ''
-  const lignes = [
-    `${cvData.prenom || ''} ${cvData.nom || ''}`.trim(),
-    cvData.titre,
-    cvData.accroche,
-  ].filter(Boolean)
-  if (cvData.experiences?.length) {
-    lignes.push('Expériences : ' + cvData.experiences.map(e => `${e.poste} chez ${e.entreprise}`).filter(Boolean).join(', '))
-  }
-  if (cvData.competences?.filter(c => c).length) {
-    lignes.push('Compétences : ' + cvData.competences.filter(c => c).join(', '))
-  }
-  return lignes.join('\n')
-}
-
 const COLONNES = [
   { id: 'a_postuler',  label: 'À postuler',    color: '#6b7280', bg: '#f9fafb', dot: '#9ca3af' },
   { id: 'postule',     label: 'Postulé',        color: '#1d4ed8', bg: '#eff6ff', dot: '#3b82f6' },
@@ -142,15 +126,13 @@ export default function Candidatures() {
     else { setCvApercu(null); alert("Ce CV n'existe plus.") }
   }
 
-  const preparerEntretien = async (card, e) => {
+  const allerVersEntretien = (card, mode) => (e) => {
     e.stopPropagation()
-    sessionStorage.setItem('entretien_offre', construireTexteOffre(card))
-    if (card.cv_id) {
-      const { data } = await supabase.from('cvs').select('cv_data').eq('id', card.cv_id).maybeSingle()
-      if (data?.cv_data) {
-        sessionStorage.setItem('entretien_cv', JSON.stringify({ titre: card.titre, resume: resumerCV(data.cv_data) }))
-      }
-    }
+    sessionStorage.setItem('entretien_candidature_id', card.id)
+    sessionStorage.setItem('entretien_poste', card.titre || '')
+    sessionStorage.setItem('entretien_entreprise', card.entreprise || '')
+    if (card.url_offre) sessionStorage.setItem('entretien_url', card.url_offre)
+    sessionStorage.setItem('entretien_mode', mode)
     window.location.href = '/entretien'
   }
 
@@ -263,13 +245,19 @@ export default function Candidatures() {
                         </button>
                       )}
                       {card.statut === 'postule' && (
-                        <button onClick={e => voirCV(card, e)}
-                          style={{ width: '100%', marginTop: '8px', padding: '7px', background: '#eff6ff', color: '#1d4ed8', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
-                          📋 Voir mon CV
-                        </button>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '8px' }}>
+                          <button onClick={e => voirCV(card, e)}
+                            style={{ width: '100%', padding: '7px', background: '#eff6ff', color: '#1d4ed8', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+                            📋 Voir mon CV
+                          </button>
+                          <button onClick={allerVersEntretien(card, 'entrainement')} title="Tu n'as pas encore eu de réponse mais tu peux t'entraîner en avance"
+                            style={{ width: '100%', padding: '7px', background: '#f5f3ff', color: '#7c3aed', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+                            🎯 S'entraîner
+                          </button>
+                        </div>
                       )}
                       {card.statut === 'entretien' && (
-                        <button onClick={e => preparerEntretien(card, e)}
+                        <button onClick={allerVersEntretien(card, 'preparation')}
                           style={{ width: '100%', marginTop: '8px', padding: '7px', background: '#f5f3ff', color: '#7c3aed', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
                           🎯 Préparer l'entretien
                         </button>

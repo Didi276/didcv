@@ -14,22 +14,6 @@ function slugify(str) {
     .replace(/^-+|-+$/g, '')
 }
 
-function resumerCV(cvData) {
-  if (!cvData) return ''
-  const lignes = [
-    `${cvData.prenom || ''} ${cvData.nom || ''}`.trim(),
-    cvData.titre,
-    cvData.accroche,
-  ].filter(Boolean)
-  if (cvData.experiences?.length) {
-    lignes.push('Expériences : ' + cvData.experiences.map(e => `${e.poste} chez ${e.entreprise}`).filter(Boolean).join(', '))
-  }
-  if (cvData.competences?.filter(c => c).length) {
-    lignes.push('Compétences : ' + cvData.competences.filter(c => c).join(', '))
-  }
-  return lignes.join('\n')
-}
-
 function construireTexteOffre(card) {
   return [card.titre, card.entreprise && `${card.entreprise}${card.lieu ? ' - ' + card.lieu : ''}`, card.salaire, '', card.notes].filter(Boolean).join('\n')
 }
@@ -173,11 +157,11 @@ export default function Dashboard() {
   const allerVersCandidatures = () => { window.location.href = '/candidatures' }
 
   const allerVersEntretien = (card) => {
-    sessionStorage.setItem('entretien_offre', construireTexteOffre(card))
-    if (card.cv_id) {
-      const cv = cvs.find(c => c.id === card.cv_id)
-      if (cv) sessionStorage.setItem('entretien_cv', JSON.stringify({ titre: card.titre, resume: resumerCV(cv.cv_data) }))
-    }
+    sessionStorage.setItem('entretien_candidature_id', card.id)
+    sessionStorage.setItem('entretien_poste', card.titre || '')
+    sessionStorage.setItem('entretien_entreprise', card.entreprise || '')
+    if (card.url_offre) sessionStorage.setItem('entretien_url', card.url_offre)
+    sessionStorage.setItem('entretien_mode', card.statut === 'entretien' ? 'preparation' : 'entrainement')
     window.location.href = '/entretien'
   }
 

@@ -27,7 +27,7 @@ export default function Navbar({ currentPage = '' }) {
     { page: 'dashboard',    label: 'Dashboard',     to: '/dashboard',    auth: true },
     { page: 'offres',       label: 'Offres',        to: '/offres',       auth: true },
     { page: 'generate',     label: 'Générer CV',    to: '/templates',    auth: true },
-    { page: 'entretien',    label: 'Entretien',     to: '/entretien',    auth: true },
+    { page: 'entretien',    label: '🎯 Entretien',  to: '/entretien',    auth: true },
     { page: 'candidatures', label: 'Candidatures',  to: '/candidatures', auth: true },
     { page: 'formations',   label: 'Formations',    to: '/formations',   auth: true },
     { page: 'profile',      label: 'Profil',        to: '/profile',      auth: true },

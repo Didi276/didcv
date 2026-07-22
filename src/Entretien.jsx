@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom'
 import Navbar from './Navbar'
 import { supabase } from './supabase'
 
-const TYPES = ['RH', 'Technique', 'Manager', 'Commercial']
-const NB_QUESTIONS = 5
+const TYPES = ['RH', 'Technique', 'Manager', 'Commercial', 'Complet']
+const DUREES = [{ label: 'Court', n: 10 }, { label: 'Standard', n: 20 }, { label: 'Approfondi', n: 30 }]
+const NIVEAUX = ['Junior', 'Intermédiaire', 'Senior']
+const LANGUES = ['Français', 'Anglais']
 const CLE_ENTRETIENS_COMPLETES = 'didcv-entretiens-completes'
 
 function comptabiliserEntretienComplete() {
@@ -38,23 +40,43 @@ function resumerCV(cvData) {
   return lignes.join('\n')
 }
 
-function buildSystemPrompt(poste, type, offre, cvResume) {
-  return `Tu es [prénom] [nom], recruteur(euse) chez [entreprise extraite de l'offre ou 'une grande entreprise française'] qui fait passer un entretien ${type} pour le poste de ${poste}.
-Si une offre d'emploi a été fournie, adapte tes questions exactement aux compétences et missions mentionnées dans cette offre.
+function formatTemps(s) {
+  const m = Math.floor(s / 60).toString().padStart(2, '0')
+  const sec = (s % 60).toString().padStart(2, '0')
+  return `${m}:${sec}`
+}
 
-${offre ? `OFFRE D'EMPLOI FOURNIE PAR LE CANDIDAT :\n${offre.slice(0, 2000)}\n` : "Aucune offre d'emploi fournie — utilise \"une grande entreprise française\" comme entreprise."}
-${cvResume ? `\nCV DU CANDIDAT (utilise-le pour poser des questions adaptées à son parcours réel) :\n${cvResume.slice(0, 1500)}\n` : ''}
+function buildSystemPrompt({ poste, entreprise, description, cvResume, type, niveau, langue, nbQuestions }) {
+  const enAnglais = langue === 'Anglais'
+  return `Tu es un recruteur professionnel${entreprise ? ` chez ${entreprise}` : ''} qui fait passer un entretien pour le poste de ${poste}.
+Choisis toi-même un prénom, un nom et un intitulé de poste RH crédibles pour ton personnage (ex: DRH, Talent Acquisition Manager, Chargé de recrutement).
 
-Choisis toi-même un prénom et un nom de recruteur(euse) français crédibles, ainsi qu'un intitulé de poste RH cohérent (ex: DRH, Chargé de recrutement, Talent Manager). Communique cette identité UNE SEULE FOIS, dans ta toute première réponse (avant la première question), via le champ "recruteur".
+${description ? `CONTEXTE DE L'OFFRE :\n${description.slice(0, 3000)}\n` : "Aucune offre détaillée fournie — base-toi sur l'intitulé du poste."}
+${cvResume ? `\nCV DU CANDIDAT (réfère-toi à ses éléments réels pour personnaliser tes questions) :\n${cvResume.slice(0, 1500)}\n` : ''}
 
-Pose UNE question à la fois. Après chaque réponse du candidat, donne un feedback structuré en JSON :
-{ "recruteur": null, "question_suivante": "", "feedback": { "points_forts": "", "a_ameliorer": "", "note": 8, "conseil": "" }, "bilan_final": null }
+Type d'entretien : ${type}. Niveau attendu : ${niveau}. Nombre total de questions notées : ${nbQuestions}.
 
-Sur ta toute première réponse (avant toute réponse du candidat), remplis le champ "recruteur": { "prenom": "", "nom": "", "role": "", "entreprise": "" }, laisse "feedback" à null, et pose la première question dans "question_suivante".
+Mène un vrai entretien professionnel${enAnglais ? ', entièrement en anglais (questions, feedback, conseils)' : ', en français'}. Adapte tes questions exactement aux compétences et missions de l'offre.
+Structure l'entretien proportionnellement aux ${nbQuestions} questions selon le type choisi :
+- Phase RH en début (motivation, parcours, soft skills)
+- Phase Technique ensuite (compétences métier liées à l'offre), sauf si le type porte uniquement sur RH
+- Phase Comportementale vers la fin (mises en situation selon la méthode STAR)
+- Dernière question : demande si le candidat a des questions
+Si le type est "Complet", couvre les quatre phases. Si le type est ciblé (RH, Technique, Manager, Commercial), concentre l'essentiel des questions sur cette dimension.
 
-Après la 5ème question, mets "question_suivante" à null et remplis "bilan_final": { "score_moyen": 7, "forces": "", "axes_amelioration": "", "conseil_final": "" }
+Ta TOUTE PREMIÈRE réponse est un message d'ouverture, avant toute question notée :
+"Bonjour, je suis [prénom] [nom], [poste recruteur] chez ${entreprise || "l'entreprise"}. Merci de vous être déplacé. Avant de commencer, avez-vous des questions sur le déroulement de cet entretien ?"
+Pour cette réponse : "question_suivante" = ce message, "numero_question": 0, "feedback": null, "bilan_final": null.
 
-Sois bienveillant mais honnête. Réponds UNIQUEMENT en JSON valide, sans texte avant ni après, sans markdown.`
+Après la réponse du candidat à ce message d'ouverture, enchaîne directement sur la question 1 (numero_question: 1) avec "feedback": null pour cette transition (la réponse à l'ouverture n'est pas notée).
+
+Ensuite, pose UNE question notée à la fois. Après chaque réponse du candidat à une question notée, retourne un feedback structuré (méthode STAR pour les questions comportementales), dans ce format JSON exact :
+{ "question_suivante": "...", "feedback": { "points_forts": "...", "a_ameliorer": "...", "note": 7, "conseil": "..." }, "numero_question": 3, "bilan_final": null }
+
+Quand le candidat vient de répondre à la ${nbQuestions}ème question notée, mets "question_suivante" à null et remplis "bilan_final" :
+{ "question_suivante": null, "feedback": { "points_forts": "...", "a_ameliorer": "...", "note": 7, "conseil": "..." }, "numero_question": ${nbQuestions}, "bilan_final": { "score_moyen": 7, "forces": "...", "axes_amelioration": "...", "conseil_final": "..." } }
+
+Sois professionnel, bienveillant mais exigeant comme un vrai recruteur. Réponds UNIQUEMENT en JSON valide, sans texte avant ni après, sans balises markdown.`
 }
 
 async function appelerClaude(system, messages) {
@@ -73,11 +95,12 @@ async function appelerClaude(system, messages) {
   return JSON.parse(text)
 }
 
-function choisirVoixFrancaise() {
+function choisirVoix(langue) {
   const voix = window.speechSynthesis?.getVoices() || []
-  const fr = voix.filter(v => v.lang?.toLowerCase().startsWith('fr'))
-  const feminines = fr.filter(v => /amelie|amélie|audrey|marie|female|femme|google français/i.test(v.name))
-  return feminines[0] || fr[0] || null
+  const prefix = langue === 'Anglais' ? 'en' : 'fr'
+  const filtres = voix.filter(v => v.lang?.toLowerCase().startsWith(prefix))
+  const feminines = filtres.filter(v => /amelie|amélie|audrey|marie|female|femme|samantha|zira|google (français|us english)/i.test(v.name))
+  return feminines[0] || filtres[0] || null
 }
 
 function CircleScore({ score }) {
@@ -102,26 +125,57 @@ function CircleScore({ score }) {
   )
 }
 
+const CHAMP = {
+  width: '100%', padding: '11px 14px', border: '1.5px solid #e5e7eb', borderRadius: '9px',
+  fontSize: '14px', fontFamily: 'inherit', color: '#111', outline: 'none', boxSizing: 'border-box',
+}
+
+const STATUT_LABELS = { a_postuler: 'À postuler', postule: 'Postulé', entretien: 'Entretien', offre: 'Offre reçue', refuse: 'Refusé' }
+
 export default function Entretien() {
   const w = useWidth()
   const isMobile = w < 768
 
   const [step, setStep] = useState('setup') // setup | chat | bilan
-  const [poste, setPoste] = useState('')
-  const [type, setType] = useState('RH')
-  const [offre, setOffre] = useState('')
-  const [cvUtilise, setCvUtilise] = useState(null) // { titre, resume }
-  const [mesCandidatures, setMesCandidatures] = useState([])
-  const [candidatureSelectionnee, setCandidatureSelectionnee] = useState('')
 
-  const [recruteur, setRecruteur] = useState(null)
-  const [historique, setHistorique] = useState([]) // items affichés dans le chat
-  const [apiHistory, setApiHistory] = useState([]) // messages envoyés a Claude
+  // Source de l'offre
+  const [source, setSource] = useState('manuel') // candidature | url | manuel
+  const [mesCandidatures, setMesCandidatures] = useState([])
+  const [candidaturesChargees, setCandidaturesChargees] = useState(false)
+  const [candidatureId, setCandidatureId] = useState(null)
+  const [urlOffre, setUrlOffre] = useState('')
+  const [analyseEnCours, setAnalyseEnCours] = useState(false)
+  const [offreAnalysee, setOffreAnalysee] = useState(null)
+  const [erreurAnalyse, setErreurAnalyse] = useState('')
+  const [banniere, setBanniere] = useState(null)
+
+  const [poste, setPoste] = useState('')
+  const [entreprise, setEntreprise] = useState('')
+  const [description, setDescription] = useState('')
+  const [cvResume, setCvResume] = useState('')
+
+  // Paramètres
+  const [type, setType] = useState('RH')
+  const [dureeQuestions, setDureeQuestions] = useState(20)
+  const [niveau, setNiveau] = useState('Intermédiaire')
+  const [langue, setLangue] = useState('Français')
+  const [modeVocal, setModeVocal] = useState(true)
+
+  // Entretien
+  const [historique, setHistorique] = useState([])
+  const [apiHistory, setApiHistory] = useState([])
   const [questionIndex, setQuestionIndex] = useState(0)
+  const [questionCourante, setQuestionCourante] = useState('')
+  const [recapitulatif, setRecapitulatif] = useState([])
   const [reponse, setReponse] = useState('')
   const [loading, setLoading] = useState(false)
   const [erreur, setErreur] = useState('')
   const [bilan, setBilan] = useState(null)
+  const [tempsEcoule, setTempsEcoule] = useState(0)
+  const [dureeFinale, setDureeFinale] = useState(0)
+  const [pause, setPause] = useState(false)
+  const [feedbackOuverts, setFeedbackOuverts] = useState({})
+  const [noteAjoutee, setNoteAjoutee] = useState(false)
 
   const [vocalActif, setVocalActif] = useState(true)
   const [ecoute, setEcoute] = useState(false)
@@ -136,72 +190,129 @@ export default function Entretien() {
     finRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [historique, loading])
 
-  // Préremplissage depuis une candidature (Candidatures.jsx -> "🎯 Préparer l'entretien")
-  useEffect(() => {
-    const appliquerPrefill = async () => {
-      const offrePrefill = sessionStorage.getItem('entretien_offre')
-      const cvPrefillRaw = sessionStorage.getItem('entretien_cv')
-      sessionStorage.removeItem('entretien_offre')
-      sessionStorage.removeItem('entretien_cv')
-
-      let cvPrefill = null
-      try { cvPrefill = cvPrefillRaw ? JSON.parse(cvPrefillRaw) : null } catch { cvPrefill = null }
-
-      const posteInitial = cvPrefill?.titre || (offrePrefill ? offrePrefill.split('\n')[0] : '')
-
-      if (offrePrefill) setOffre(offrePrefill)
-      if (cvPrefill) setCvUtilise(cvPrefill)
-      if (posteInitial) setPoste(posteInitial)
-    }
-    appliquerPrefill()
-  }, [])
-
-  // Candidatures "en entretien" pour le sélecteur
-  useEffect(() => {
-    const charger = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-      const { data } = await supabase.from('candidatures').select('*').eq('user_id', user.id).eq('statut', 'entretien').order('created_at', { ascending: false })
-      setMesCandidatures(data || [])
-    }
-    charger()
-  }, [])
-
-  const choisirCandidature = async (id) => {
-    setCandidatureSelectionnee(id)
-    if (!id) return
-    const candidature = mesCandidatures.find(c => c.id === id)
-    if (!candidature) return
-    setPoste(candidature.titre)
-    setOffre([candidature.titre, candidature.entreprise && `${candidature.entreprise}${candidature.lieu ? ' - ' + candidature.lieu : ''}`, candidature.salaire, '', candidature.notes].filter(Boolean).join('\n'))
-    setCvUtilise(null)
-    if (candidature.cv_id) {
-      const { data: cv } = await supabase.from('cvs').select('cv_data').eq('id', candidature.cv_id).maybeSingle()
-      if (cv?.cv_data) setCvUtilise({ titre: candidature.titre, resume: resumerCV(cv.cv_data) })
-    }
-  }
-
   useEffect(() => () => {
     recognitionRef.current?.stop()
     window.speechSynthesis?.cancel()
   }, [])
 
+  // Timer de l'entretien
+  useEffect(() => {
+    if (step !== 'chat' || pause) return
+    const interval = setInterval(() => setTempsEcoule(t => t + 1), 1000)
+    return () => clearInterval(interval)
+  }, [step, pause])
+
+  const analyserOffre = async (urlACharger) => {
+    const cible = (urlACharger || urlOffre).trim()
+    if (!cible) return
+    setAnalyseEnCours(true)
+    setErreurAnalyse('')
+    setOffreAnalysee(null)
+    try {
+      const r = await fetch(`/api/fetch-offer?url=${encodeURIComponent(cible)}`)
+      const data = await r.json()
+      if (!data.contenu) throw new Error('vide')
+      setDescription(data.contenu)
+      try {
+        const extraction = await appelerClaude(
+          "Tu extrais des informations depuis le contenu brut d'une page web. Retourne UNIQUEMENT du JSON valide.",
+          [{ role: 'user', content: `Voici le contenu brut d'une offre d'emploi. Extrais le titre du poste et le nom de l'entreprise. Retourne UNIQUEMENT ce JSON : { "titre": "...", "entreprise": "..." }\n\nCONTENU:\n${data.contenu.slice(0, 3000)}` }]
+        )
+        setOffreAnalysee({ titre: extraction.titre || '', entreprise: extraction.entreprise || '' })
+        if (extraction.titre) setPoste(extraction.titre)
+        if (extraction.entreprise) setEntreprise(extraction.entreprise)
+      } catch {
+        setOffreAnalysee({ titre: '', entreprise: '' })
+      }
+    } catch {
+      setErreurAnalyse("Impossible de récupérer cette offre. Vérifie le lien ou remplis manuellement.")
+    }
+    setAnalyseEnCours(false)
+  }
+
+  // Option A : candidatures éligibles
+  useEffect(() => {
+    const charger = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { setCandidaturesChargees(true); return }
+      const { data } = await supabase.from('candidatures').select('*').eq('user_id', user.id).in('statut', ['entretien', 'postule']).order('created_at', { ascending: false })
+      setMesCandidatures(data || [])
+      setCandidaturesChargees(true)
+    }
+    charger()
+  }, [])
+
+  const choisirCandidature = async (c) => {
+    setCandidatureId(c.id)
+    setPoste(c.titre || '')
+    setEntreprise(c.entreprise || '')
+    setDescription([c.salaire, c.notes].filter(Boolean).join('\n'))
+    setCvResume('')
+    if (c.cv_id) {
+      const { data: cv } = await supabase.from('cvs').select('cv_data').eq('id', c.cv_id).maybeSingle()
+      if (cv?.cv_data) setCvResume(resumerCV(cv.cv_data))
+    }
+    if (c.url_offre) analyserOffre(c.url_offre)
+  }
+
+  // Préremplissage depuis Candidatures.jsx
+  useEffect(() => {
+    const appliquerPrefill = async () => {
+      const id = sessionStorage.getItem('entretien_candidature_id')
+      const posteSS = sessionStorage.getItem('entretien_poste')
+      const entrepriseSS = sessionStorage.getItem('entretien_entreprise')
+      const urlSS = sessionStorage.getItem('entretien_url')
+      const modeSS = sessionStorage.getItem('entretien_mode')
+      sessionStorage.removeItem('entretien_candidature_id')
+      sessionStorage.removeItem('entretien_poste')
+      sessionStorage.removeItem('entretien_entreprise')
+      sessionStorage.removeItem('entretien_url')
+      sessionStorage.removeItem('entretien_mode')
+
+      if (!id && !posteSS) return
+
+      if (posteSS) setPoste(posteSS)
+      if (entrepriseSS) setEntreprise(entrepriseSS)
+      setSource('candidature')
+      setBanniere({
+        poste: posteSS || '',
+        entreprise: entrepriseSS || '',
+        entrainement: modeSS === 'entrainement',
+      })
+
+      if (id) {
+        setCandidatureId(id)
+        const { data: c } = await supabase.from('candidatures').select('*').eq('id', id).maybeSingle()
+        if (c) {
+          setDescription([c.salaire, c.notes].filter(Boolean).join('\n'))
+          if (c.cv_id) {
+            const { data: cv } = await supabase.from('cvs').select('cv_data').eq('id', c.cv_id).maybeSingle()
+            if (cv?.cv_data) setCvResume(resumerCV(cv.cv_data))
+          }
+        }
+      }
+      if (urlSS) analyserOffre(urlSS)
+    }
+    appliquerPrefill()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const lire = (texte) => {
-    if (!vocalActif || !synthSupported || !texte) return
+    if (!modeVocal || !vocalActif || !synthSupported || !texte) return
     window.speechSynthesis.cancel()
     const utterance = new SpeechSynthesisUtterance(texte)
-    utterance.lang = 'fr-FR'
+    utterance.lang = langue === 'Anglais' ? 'en-US' : 'fr-FR'
     utterance.rate = 1.0
-    const voix = choisirVoixFrancaise()
+    const voix = choisirVoix(langue)
     if (voix) utterance.voice = voix
     window.speechSynthesis.speak(utterance)
   }
 
   const demarrerEcoute = () => {
-    if (!recognitionSupported) return
+    if (!recognitionSupported || !modeVocal) return
     const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition
     const recognition = new SpeechRecognitionAPI()
-    recognition.lang = 'fr-FR'
+    recognition.lang = langue === 'Anglais' ? 'en-US' : 'fr-FR'
     recognition.continuous = true
     recognition.interimResults = true
 
@@ -224,25 +335,39 @@ export default function Entretien() {
     setTimeout(() => envoyer(), 150)
   }
 
+  const togglePause = () => {
+    if (!pause) {
+      recognitionRef.current?.stop()
+      window.speechSynthesis?.cancel()
+      setEcoute(false)
+    }
+    setPause(p => !p)
+  }
+
   const demarrer = async () => {
     if (!poste.trim()) return
     setStep('chat')
     setLoading(true)
     setErreur('')
     setHistorique([])
+    setApiHistory([])
     setQuestionIndex(0)
-    setRecruteur(null)
+    setQuestionCourante('')
+    setRecapitulatif([])
     setBilan(null)
+    setTempsEcoule(0)
+    setPause(false)
+    setFeedbackOuverts({})
+    setNoteAjoutee(false)
 
-    const system = buildSystemPrompt(poste.trim(), type, offre.trim(), cvUtilise?.resume)
-    const premierMessage = [{ role: 'user', content: "Commence l'entretien : donne ton identité de recruteur, puis pose la première question." }]
+    const system = buildSystemPrompt({ poste: poste.trim(), entreprise: entreprise.trim(), description: description.trim(), cvResume, type, niveau, langue, nbQuestions: dureeQuestions })
+    const premierMessage = [{ role: 'user', content: "Commence l'entretien avec ton message d'ouverture." }]
 
     try {
       const json = await appelerClaude(system, premierMessage)
-      if (json.recruteur) setRecruteur(json.recruteur)
       setHistorique([{ type: 'question', text: json.question_suivante }])
-      setApiHistory([...premierMessage, { role: 'assistant', content: `Question 1 : "${json.question_suivante}"` }])
-      setQuestionIndex(1)
+      setQuestionCourante(json.question_suivante)
+      setApiHistory([...premierMessage, { role: 'assistant', content: `Message d'ouverture : "${json.question_suivante}"` }])
       lire(json.question_suivante)
     } catch {
       setErreur("Impossible de démarrer l'entretien pour le moment. Réessaie.")
@@ -251,9 +376,9 @@ export default function Entretien() {
   }
 
   const envoyer = async () => {
-    if (!reponse.trim() || loading) return
+    if (!reponse.trim() || loading || pause) return
     const texteReponse = reponse.trim()
-    const derniereQuestion = questionIndex === NB_QUESTIONS
+    const derniereQuestion = questionIndex === dureeQuestions
 
     const nouvelHistorique = [...historique, { type: 'reponse', text: texteReponse }]
     setHistorique(nouvelHistorique)
@@ -262,28 +387,33 @@ export default function Entretien() {
     setErreur('')
 
     const contenuUser = derniereQuestion
-      ? `${texteReponse}\n\n(Ceci était la réponse à la 5ème et dernière question. Donne le feedback de cette réponse puis remplis bilan_final, sans poser de nouvelle question.)`
+      ? `${texteReponse}\n\n(Ceci était la réponse à la dernière question notée. Donne le feedback de cette réponse puis remplis bilan_final, sans poser de nouvelle question.)`
       : texteReponse
 
     const nouvelApiHistory = [...apiHistory, { role: 'user', content: contenuUser }]
 
     try {
-      const system = buildSystemPrompt(poste.trim(), type, offre.trim(), cvUtilise?.resume)
+      const system = buildSystemPrompt({ poste: poste.trim(), entreprise: entreprise.trim(), description: description.trim(), cvResume, type, niveau, langue, nbQuestions: dureeQuestions })
       const json = await appelerClaude(system, nouvelApiHistory)
       const suite = [...nouvelHistorique]
-      if (json.feedback) suite.push({ type: 'feedback', data: json.feedback })
+      if (json.feedback) {
+        suite.push({ type: 'feedback', data: json.feedback })
+        setRecapitulatif(r => [...r, { question: questionCourante, note: json.feedback.note }])
+      }
       setHistorique(suite)
 
       if (json.bilan_final) {
         setBilan(json.bilan_final)
         setStep('bilan')
+        setDureeFinale(tempsEcoule)
         comptabiliserEntretienComplete()
       } else if (json.question_suivante) {
         suite.push({ type: 'question', text: json.question_suivante })
         setHistorique(suite)
+        setQuestionCourante(json.question_suivante)
         setApiHistory([...nouvelApiHistory, {
           role: 'assistant',
-          content: `Feedback donné (note ${json.feedback?.note ?? '?'}/10). Question ${questionIndex + 1} : "${json.question_suivante}"`,
+          content: `Feedback donné (note ${json.feedback?.note ?? '?'}/10). Question ${json.numero_question ?? questionIndex + 1} : "${json.question_suivante}"`,
         }])
         setQuestionIndex(i => i + 1)
         lire(json.question_suivante)
@@ -296,21 +426,30 @@ export default function Entretien() {
     setLoading(false)
   }
 
-  const nouvelEntretien = () => {
+  const recommencer = () => {
     setStep('setup')
-    setPoste('')
-    setType('RH')
-    setOffre('')
-    setCvUtilise(null)
-    setCandidatureSelectionnee('')
-    setRecruteur(null)
     setHistorique([])
     setApiHistory([])
     setQuestionIndex(0)
-    setReponse('')
-    setErreur('')
+    setQuestionCourante('')
+    setRecapitulatif([])
     setBilan(null)
+    setTempsEcoule(0)
+    setPause(false)
+    setFeedbackOuverts({})
+    setErreur('')
+    setNoteAjoutee(false)
     setModeEcrit(!isMobile)
+  }
+
+  const ajouterNoteCandidature = async () => {
+    if (!candidatureId || !bilan) return
+    const { data: candidature } = await supabase.from('candidatures').select('notes').eq('id', candidatureId).maybeSingle()
+    const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+    const ligne = `[Entraînement entretien du ${dateStr}] Score : ${bilan.score_moyen}/10`
+    const nouvellesNotes = candidature?.notes ? `${candidature.notes}\n\n${ligne}` : ligne
+    const { error } = await supabase.from('candidatures').update({ notes: nouvellesNotes }).eq('id', candidatureId)
+    if (!error) setNoteAjoutee(true)
   }
 
   const telechargerBilan = () => window.print()
@@ -323,7 +462,7 @@ export default function Entretien() {
       <div className="no-print" style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', padding: '48px 24px' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
           <h1 style={{ fontSize: '36px', fontWeight: '800', color: '#fff', margin: '0 0 12px', letterSpacing: '-1px' }}>
-            Entraîne-toi aux entretiens
+            {step === 'setup' ? 'Prépare ton entretien' : 'Entraîne-toi aux entretiens'}
           </h1>
           <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.8)', margin: 0 }}>
             Un recruteur IA disponible 24h/24, adapté à chaque offre
@@ -335,44 +474,153 @@ export default function Entretien() {
 
         {step === 'setup' && (
           <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb', padding: '32px' }}>
-            <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: '0 0 20px' }}>Configure ton entretien</h2>
 
-            {mesCandidatures.length > 0 && (
+            {banniere && (
+              <div style={{ marginBottom: '20px', padding: '12px 16px', background: banniere.entrainement ? '#fffbeb' : '#f0fdf4', border: `1px solid ${banniere.entrainement ? '#fde68a' : '#86efac'}`, borderRadius: '10px', fontSize: '13px', color: banniere.entrainement ? '#92400e' : '#16a34a' }}>
+                {banniere.entrainement ? (
+                  <><strong>Entraînement anticipé</strong> — Tu n'as pas encore eu de réponse mais tu peux t'entraîner en avance{banniere.poste && <> pour <strong>{banniere.poste}</strong>{banniere.entreprise && ` chez ${banniere.entreprise}`}</>}.</>
+                ) : (
+                  <>Préparation pour : <strong>{banniere.poste}</strong>{banniere.entreprise && ` chez ${banniere.entreprise}`}</>
+                )}
+              </div>
+            )}
+
+            {/* Source de l'offre */}
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '20px' }}>
+              {[['candidature', '📋 Mes candidatures'], ['url', '🔗 Lien d\'offre'], ['manuel', '✍️ Manuel']].map(([id, label]) => (
+                <button key={id} type="button" onClick={() => setSource(id)}
+                  style={{ padding: '8px 14px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', background: source === id ? '#4f46e5' : '#f3f4f6', color: source === id ? '#fff' : '#374151' }}>
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {source === 'candidature' && (
+              <div style={{ marginBottom: '24px' }}>
+                {!candidaturesChargees ? (
+                  <div style={{ fontSize: '13px', color: '#9ca3af', padding: '12px 0' }}>Chargement...</div>
+                ) : mesCandidatures.length === 0 ? (
+                  <div style={{ fontSize: '13px', color: '#9ca3af', padding: '12px 0' }}>
+                    Aucune candidature "postulé" ou "entretien" pour l'instant. <Link to="/candidatures" style={{ color: '#4f46e5', fontWeight: '600' }}>Va sur Candidatures →</Link>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    {mesCandidatures.map(c => (
+                      <button key={c.id} type="button" onClick={() => choisirCandidature(c)}
+                        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', padding: '12px 14px', borderRadius: '10px', border: `1.5px solid ${candidatureId === c.id ? '#4f46e5' : '#e5e7eb'}`, background: candidatureId === c.id ? '#f8f9ff' : '#fff', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
+                        <span style={{ fontSize: '13px', color: '#111' }}>
+                          <strong>{c.entreprise || 'Entreprise ?'}</strong> — {c.titre}
+                        </span>
+                        <span style={{ fontSize: '10px', fontWeight: '700', padding: '2px 8px', borderRadius: '10px', background: '#f3f4f6', color: '#6b7280', flexShrink: 0 }}>{STATUT_LABELS[c.statut] || c.statut}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {source === 'url' && (
+              <div style={{ marginBottom: '24px' }}>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input value={urlOffre} onChange={e => setUrlOffre(e.target.value)} placeholder="https://..." style={CHAMP}
+                    onKeyDown={e => e.key === 'Enter' && analyserOffre()} />
+                  <button type="button" onClick={() => analyserOffre()} disabled={!urlOffre.trim() || analyseEnCours}
+                    style={{ padding: '11px 18px', background: !urlOffre.trim() || analyseEnCours ? '#e5e7eb' : '#4f46e5', color: !urlOffre.trim() || analyseEnCours ? '#9ca3af' : '#fff', border: 'none', borderRadius: '9px', fontSize: '13px', fontWeight: '700', cursor: !urlOffre.trim() || analyseEnCours ? 'default' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
+                    {analyseEnCours ? 'Analyse...' : 'Analyser l\'offre'}
+                  </button>
+                </div>
+                {offreAnalysee && (
+                  <div style={{ marginTop: '10px', padding: '10px 14px', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '9px', fontSize: '13px', color: '#16a34a', fontWeight: '600' }}>
+                    ✓ Offre analysée{offreAnalysee.titre && ` : ${offreAnalysee.titre}`}{offreAnalysee.entreprise && ` chez ${offreAnalysee.entreprise}`}
+                  </div>
+                )}
+                {erreurAnalyse && (
+                  <div style={{ marginTop: '10px', padding: '10px 14px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '9px', fontSize: '13px', color: '#dc2626' }}>
+                    {erreurAnalyse}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Champs communs (toujours visibles, pré-remplis selon la source) */}
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>Poste visé *</label>
+                <input value={poste} onChange={e => setPoste(e.target.value)} placeholder="Ex : Responsable Marketing Digital" style={CHAMP} />
+              </div>
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>Entreprise</label>
+                <input value={entreprise} onChange={e => setEntreprise(e.target.value)} placeholder="Optionnel" style={CHAMP} />
+              </div>
+            </div>
+
+            {(source === 'manuel' || description) && (
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>Choisir parmi mes candidatures</label>
-                <select value={candidatureSelectionnee} onChange={e => choisirCandidature(e.target.value)}
-                  style={{ width: '100%', padding: '11px 14px', border: '1.5px solid #e5e7eb', borderRadius: '9px', fontSize: '14px', fontFamily: 'inherit', color: '#111', outline: 'none', boxSizing: 'border-box', cursor: 'pointer', background: '#fff' }}>
-                  <option value="">— Configurer manuellement —</option>
-                  {mesCandidatures.map(c => (
-                    <option key={c.id} value={c.id}>{c.titre}{c.entreprise ? ` — ${c.entreprise}` : ''}</option>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>
+                  Description du poste <span style={{ fontWeight: '400', color: '#9ca3af' }}>(optionnel)</span>
+                </label>
+                <textarea value={description} onChange={e => setDescription(e.target.value)} rows={5} placeholder="Colle ici le descriptif du poste pour un entretien encore plus précis..."
+                  style={{ ...CHAMP, resize: 'vertical', lineHeight: '1.6', fontSize: '13px' }} />
+              </div>
+            )}
+
+            {cvResume && (
+              <div style={{ marginBottom: '20px', padding: '10px 14px', background: '#f8f9ff', border: '1px solid #ede9fe', borderRadius: '9px', fontSize: '13px', color: '#4f46e5', fontWeight: '600' }}>
+                📄 CV pris en compte pour personnaliser les questions
+              </div>
+            )}
+
+            {/* Paramètres communs */}
+            <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: '20px', marginBottom: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>Type d'entretien</label>
+                  <select value={type} onChange={e => setType(e.target.value)} style={{ ...CHAMP, cursor: 'pointer', background: '#fff' }}>
+                    {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>Niveau</label>
+                  <select value={niveau} onChange={e => setNiveau(e.target.value)} style={{ ...CHAMP, cursor: 'pointer', background: '#fff' }}>
+                    {NIVEAUX.map(n => <option key={n} value={n}>{n}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '8px' }}>Durée</label>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {DUREES.map(d => (
+                    <button key={d.n} type="button" onClick={() => setDureeQuestions(d.n)}
+                      style={{ padding: '8px 14px', borderRadius: '9px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', background: dureeQuestions === d.n ? '#4f46e5' : '#f3f4f6', color: dureeQuestions === d.n ? '#fff' : '#374151' }}>
+                      {d.label} ({d.n} questions)
+                    </button>
                   ))}
-                </select>
+                </div>
               </div>
-            )}
 
-            {cvUtilise && (
-              <div style={{ marginBottom: '20px', padding: '10px 14px', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '9px', fontSize: '13px', color: '#16a34a', fontWeight: '600' }}>
-                📄 CV utilisé : {cvUtilise.titre}
+              <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '8px' }}>Langue</label>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    {LANGUES.map(l => (
+                      <button key={l} type="button" onClick={() => setLangue(l)}
+                        style={{ padding: '8px 14px', borderRadius: '9px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', background: langue === l ? '#4f46e5' : '#f3f4f6', color: langue === l ? '#fff' : '#374151' }}>
+                        {l}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '8px' }}>Mode vocal</label>
+                  <button type="button" onClick={() => setModeVocal(v => !v)}
+                    style={{ width: '46px', height: '26px', borderRadius: '20px', border: 'none', cursor: 'pointer', background: modeVocal ? '#4f46e5' : '#e5e7eb', position: 'relative' }}>
+                    <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#fff', position: 'absolute', top: '3px', left: modeVocal ? '23px' : '3px', transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
+                  </button>
+                </div>
               </div>
-            )}
-
-            <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>Poste visé</label>
-            <input value={poste} onChange={e => setPoste(e.target.value)} placeholder="Ex : Responsable Marketing Digital"
-              style={{ width: '100%', padding: '11px 14px', border: '1.5px solid #e5e7eb', borderRadius: '9px', fontSize: '14px', fontFamily: 'inherit', color: '#111', outline: 'none', boxSizing: 'border-box', marginBottom: '20px' }}
-              onFocus={e => e.target.style.borderColor = '#4f46e5'} onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
-
-            <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '8px' }}>Type d'entretien</label>
-            <select value={type} onChange={e => setType(e.target.value)}
-              style={{ width: '100%', padding: '11px 14px', border: '1.5px solid #e5e7eb', borderRadius: '9px', fontSize: '14px', fontFamily: 'inherit', color: '#111', outline: 'none', boxSizing: 'border-box', marginBottom: '20px', cursor: 'pointer', background: '#fff' }}>
-              {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
-
-            <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>
-              Coller l'offre d'emploi <span style={{ fontWeight: '400', color: '#9ca3af' }}>(optionnel)</span>
-            </label>
-            <textarea value={offre} onChange={e => setOffre(e.target.value)} rows={6} placeholder="Colle ici le texte de l'offre pour un entretien adapté à l'entreprise et au poste exact..."
-              style={{ width: '100%', padding: '11px 14px', border: '1.5px solid #e5e7eb', borderRadius: '9px', fontSize: '13px', fontFamily: 'inherit', color: '#111', outline: 'none', boxSizing: 'border-box', resize: 'vertical', marginBottom: '28px', lineHeight: '1.6' }}
-              onFocus={e => e.target.style.borderColor = '#4f46e5'} onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
+            </div>
 
             <button onClick={demarrer} disabled={!poste.trim()}
               style={{ width: '100%', padding: '13px', background: poste.trim() ? '#4f46e5' : '#e5e7eb', color: poste.trim() ? '#fff' : '#9ca3af', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '700', cursor: poste.trim() ? 'pointer' : 'default', fontFamily: 'inherit' }}>
@@ -384,20 +632,19 @@ export default function Entretien() {
         {step === 'chat' && (
           <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
 
-            {/* Barre de progression + recruteur */}
+            {/* Barre de progression */}
             <div style={{ padding: '16px 20px', borderBottom: '1px solid #f0f0f0' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', gap: '10px' }}>
-                <div style={{ fontSize: '13px', fontWeight: '700', color: '#111', minWidth: 0 }}>
-                  {recruteur ? (
-                    <>
-                      {recruteur.prenom} {recruteur.nom} <span style={{ color: '#9ca3af', fontWeight: '500' }}>— {recruteur.role} chez {recruteur.entreprise}</span>
-                    </>
-                  ) : (
-                    <>{poste} <span style={{ color: '#9ca3af', fontWeight: '500' }}>· {type}</span></>
-                  )}
+                <div style={{ fontSize: '13px', fontWeight: '700', color: '#111', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {poste} <span style={{ color: '#9ca3af', fontWeight: '500' }}>{entreprise && `· ${entreprise} `}· {type}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-                  {synthSupported && (
+                  <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: '600', whiteSpace: 'nowrap' }}>⏱ {formatTemps(tempsEcoule)}</div>
+                  <button onClick={togglePause} title={pause ? 'Reprendre' : 'Mettre en pause'}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '15px', padding: '2px' }}>
+                    {pause ? '▶️' : '⏸'}
+                  </button>
+                  {modeVocal && synthSupported && (
                     <button onClick={() => { setVocalActif(v => !v); window.speechSynthesis.cancel() }}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', padding: '2px' }}
                       title={vocalActif ? 'Désactiver la lecture vocale' : 'Activer la lecture vocale'}>
@@ -405,12 +652,12 @@ export default function Entretien() {
                     </button>
                   )}
                   <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: '600', whiteSpace: 'nowrap' }}>
-                    Question {Math.min(questionIndex, NB_QUESTIONS)}/{NB_QUESTIONS}
+                    {questionIndex === 0 ? 'Introduction' : `Question ${Math.min(questionIndex, dureeQuestions)}/${dureeQuestions}`}
                   </div>
                 </div>
               </div>
               <div style={{ height: '6px', background: '#f0f0f0', borderRadius: '3px', overflow: 'hidden' }}>
-                <div style={{ width: `${(Math.min(questionIndex, NB_QUESTIONS) / NB_QUESTIONS) * 100}%`, height: '100%', background: '#4f46e5', borderRadius: '3px', transition: 'width 0.4s ease' }} />
+                <div style={{ width: `${(Math.min(questionIndex, dureeQuestions) / dureeQuestions) * 100}%`, height: '100%', background: '#4f46e5', borderRadius: '3px', transition: 'width 0.4s ease' }} />
               </div>
             </div>
 
@@ -428,15 +675,23 @@ export default function Entretien() {
                   )
                 }
                 if (item.type === 'reponse') {
+                  const feedbackSuivant = historique[i + 1]?.type === 'feedback' ? historique[i + 1] : null
                   return (
-                    <div key={i} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
                       <div style={{ background: '#4f46e5', color: '#fff', borderRadius: '14px', borderTopRightRadius: '4px', padding: '12px 16px', maxWidth: '80%', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
                         {item.text}
                       </div>
+                      {feedbackSuivant && (
+                        <button onClick={() => setFeedbackOuverts(f => ({ ...f, [i]: !f[i] }))}
+                          style={{ background: 'none', border: 'none', color: '#4f46e5', fontSize: '11px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit', padding: '2px 4px' }}>
+                          {feedbackOuverts[i] ? '▲ Masquer le feedback' : '▼ Voir le feedback'}
+                        </button>
+                      )}
                     </div>
                   )
                 }
                 if (item.type === 'feedback') {
+                  if (!feedbackOuverts[i - 1]) return null
                   const { points_forts, a_ameliorer, note, conseil } = item.data
                   return (
                     <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -495,7 +750,15 @@ export default function Entretien() {
 
             {/* Zone de saisie */}
             <div style={{ borderTop: '1px solid #f0f0f0', padding: '14px 20px' }}>
-              {isMobile && !modeEcrit ? (
+              {pause ? (
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '13px', color: '#9ca3af', marginBottom: '10px' }}>Entretien en pause</div>
+                  <button onClick={togglePause}
+                    style={{ padding: '11px 24px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+                    ▶️ Reprendre l'entretien
+                  </button>
+                </div>
+              ) : modeVocal && isMobile && !modeEcrit ? (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
                   {reponse && <div style={{ fontSize: '13px', color: '#374151', textAlign: 'center', fontStyle: 'italic', padding: '0 8px' }}>« {reponse} »</div>}
                   {recognitionSupported ? (
@@ -524,7 +787,7 @@ export default function Entretien() {
                     onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); envoyer() } }}
                     style={{ flex: 1, padding: '10px 14px', border: '1.5px solid #e5e7eb', borderRadius: '10px', fontSize: '14px', fontFamily: 'inherit', color: '#111', outline: 'none', resize: 'none', boxSizing: 'border-box' }}
                     onFocus={e => e.target.style.borderColor = '#4f46e5'} onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
-                  {recognitionSupported && (
+                  {modeVocal && recognitionSupported && (
                     <button onClick={ecoute ? arreterEtEnvoyer : demarrerEcoute} disabled={loading}
                       style={{
                         width: '44px', height: '44px', borderRadius: '10px', border: 'none', cursor: loading ? 'default' : 'pointer',
@@ -540,7 +803,7 @@ export default function Entretien() {
                     style={{ padding: '12px 20px', background: reponse.trim() && !loading ? '#4f46e5' : '#e5e7eb', color: reponse.trim() && !loading ? '#fff' : '#9ca3af', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: reponse.trim() && !loading ? 'pointer' : 'default', fontFamily: 'inherit', flexShrink: 0 }}>
                     Envoyer
                   </button>
-                  {isMobile && (
+                  {modeVocal && isMobile && (
                     <button onClick={() => setModeEcrit(false)} style={{ background: 'none', border: 'none', color: '#9ca3af', fontSize: '18px', cursor: 'pointer', flexShrink: 0 }} title="Revenir au micro">
                       🎤
                     </button>
@@ -557,9 +820,26 @@ export default function Entretien() {
               Bilan de l'entretien
             </div>
             <CircleScore score={bilan.score_moyen} />
-            <div style={{ textAlign: 'center', fontSize: '13px', color: '#9ca3af', marginTop: '10px', marginBottom: '28px' }}>
-              {poste} · {type}
+            <div style={{ textAlign: 'center', fontSize: '13px', color: '#9ca3af', marginTop: '10px' }}>
+              {poste}{entreprise && ` · ${entreprise}`}
             </div>
+            <div style={{ textAlign: 'center', fontSize: '12px', color: '#9ca3af', marginBottom: '28px' }}>
+              ⏱ Durée : {formatTemps(dureeFinale)}
+            </div>
+
+            {recapitulatif.length > 0 && (
+              <div style={{ marginBottom: '24px' }}>
+                <div style={{ fontSize: '12px', fontWeight: '700', color: '#374151', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '10px' }}>Récapitulatif</div>
+                <div style={{ border: '1px solid #f0f0f0', borderRadius: '10px', overflow: 'hidden' }}>
+                  {recapitulatif.map((r, i) => (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', padding: '10px 14px', borderBottom: i < recapitulatif.length - 1 ? '1px solid #f0f0f0' : 'none', background: i % 2 ? '#fafafa' : '#fff' }}>
+                      <div style={{ fontSize: '13px', color: '#374151', flex: 1, lineHeight: '1.5' }}>{r.question}</div>
+                      <div style={{ fontSize: '12px', fontWeight: '800', color: '#fff', background: r.note >= 7 ? '#16a34a' : r.note >= 5 ? '#f59e0b' : '#dc2626', padding: '3px 10px', borderRadius: '20px', flexShrink: 0 }}>{r.note}/10</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {bilan.forces && (
               <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '12px', padding: '16px', marginBottom: '14px' }}>
@@ -585,15 +865,27 @@ export default function Entretien() {
             <div className="no-print" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button onClick={telechargerBilan}
                 style={{ width: '100%', padding: '13px', background: '#171412', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
-                Télécharger mon bilan
+                📥 Télécharger mon bilan
               </button>
-              <button onClick={nouvelEntretien}
+              <button onClick={recommencer}
                 style={{ width: '100%', padding: '13px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
-                Nouvel entretien
+                🔄 Recommencer avec les mêmes paramètres
               </button>
-              <Link to="/offres"
+              {candidatureId && (
+                noteAjoutee ? (
+                  <div style={{ width: '100%', padding: '13px', textAlign: 'center', background: '#f5f3ff', color: '#7c3aed', border: '1.5px solid #ddd6fe', borderRadius: '10px', fontSize: '13px', fontWeight: '700', boxSizing: 'border-box' }}>
+                    ✓ Note ajoutée à ta candidature
+                  </div>
+                ) : (
+                  <button onClick={ajouterNoteCandidature}
+                    style={{ width: '100%', padding: '13px', background: '#fff', color: '#7c3aed', border: '1.5px solid #ddd6fe', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
+                    📋 Ajouter une note dans mes candidatures
+                  </button>
+                )
+              )}
+              <Link to="/formations"
                 style={{ display: 'block', textAlign: 'center', width: '100%', padding: '13px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none', boxSizing: 'border-box' }}>
-                Voir les offres d'emploi
+                📚 Formations recommandées
               </Link>
             </div>
           </div>
