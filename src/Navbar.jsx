@@ -34,9 +34,8 @@ export default function Navbar({ currentPage = '' }) {
   ]
 
   const resourceLinks = [
-    { page: 'blog',       label: 'Blog',          to: '/blog',       auth: false },
-    { page: 'guides',     label: 'Guides métier', to: '/guides',     auth: false },
-    { page: 'banque-cvs', label: 'Banque CVs',    to: '/banque-cvs', auth: false },
+    { page: 'blog',   label: 'Blog',          to: '/blog',   auth: false },
+    { page: 'guides', label: 'Guides métier', to: '/guides', auth: false },
   ]
 
   const links = [...mainLinks, ...resourceLinks]

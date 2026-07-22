@@ -466,7 +466,7 @@ export default function Home() {
           <span style={{ color: '#9c7a3f' }}>Did</span>CV
         </div>
         <div style={{ display: 'flex', gap: '24px' }}>
-          {[['Confidentialité', '/privacy'], ['CGU', '/cgu'], ['Contact', '/contact'], ['A propos', '/about'], ['Blog', '/blog'], ['Guides métier', '/guides'], ['Formations', '/formations']].map(([label, href]) => (
+          {[['Confidentialité', '/privacy'], ['CGU', '/cgu'], ['Contact', '/contact'], ['A propos', '/about'], ['Blog', '/blog'], ['Guides métier', '/guides'], ['Formations', '/formations'], ['Espace Recruteurs', '/recruteurs/inscription']].map(([label, href]) => (
             <a key={label} href={href} style={{ fontSize: '13px', color: '#9ca3af', textDecoration: 'none' }}>{label}</a>
           ))}
         </div>

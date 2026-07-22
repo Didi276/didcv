@@ -8,8 +8,11 @@ import Profile from './Profile'
 import Formations from './Formations'
 import Entretien from './Entretien'
 import CVPublic from './CVPublic'
-import BanqueCVs from './BanqueCVs'
 import Offres from './Offres'
+import RecruteurInscription from './RecruteurInscription'
+import RecruteurConnexion from './RecruteurConnexion'
+import RecruteurBanque from './RecruteurBanque'
+import AdminRecruteurs from './AdminRecruteurs'
 import About from './About'
 import Contact from './Contact'
 import Privacy from './Privacy'
@@ -37,7 +40,10 @@ function App() {
         <Route path="/formations"     element={<Formations />} />
         <Route path="/entretien"      element={<Entretien />} />
         <Route path="/cv/:slug"       element={<CVPublic />} />
-        <Route path="/banque-cvs"     element={<BanqueCVs />} />
+        <Route path="/recruteurs/inscription" element={<RecruteurInscription />} />
+        <Route path="/recruteurs/connexion"   element={<RecruteurConnexion />} />
+        <Route path="/recruteurs/banque"      element={<RecruteurBanque />} />
+        <Route path="/admin/recruteurs"       element={<AdminRecruteurs />} />
         <Route path="/blog"           element={<Blog />} />
         <Route path="/blog/:slug"     element={<BlogArticle />} />
         <Route path="/guides"         element={<GuidesMetier />} />

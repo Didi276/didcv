@@ -87,7 +87,7 @@ export default function Profile() {
   const [accroche, setAccroche] = useState('')
   const [photo, setPhoto] = useState(null)
   const [visibleRecruteurs, setVisibleRecruteurs] = useState(false)
-  const [rechercheEmploi, setRechercheEmploi] = useState('')
+  const [rechercheContrat, setRechercheContrat] = useState([])
   const [disponibilite, setDisponibilite] = useState('')
 
   const [experiences, setExperiences] = useState([{ poste: '', entreprise: '', periode: '', lieu: '', missions: ['', '', ''] }])
@@ -114,7 +114,7 @@ export default function Profile() {
         setAccroche(data.accroche || '')
         setPhoto(data.photo || null)
         setVisibleRecruteurs(data.visible_recruteurs || false)
-        setRechercheEmploi(data.recherche_emploi || '')
+        setRechercheContrat(data.recherche_contrat ? data.recherche_contrat.split(',').map(s => s.trim()).filter(Boolean) : [])
         setDisponibilite(data.disponibilite || '')
         if (data.experiences?.length) setExperiences(data.experiences)
         if (data.formations?.length) setFormations(data.formations)
@@ -313,7 +313,7 @@ export default function Profile() {
       user_id: user.id, prenom, nom, email, telephone, ville, linkedin,
       titre, accroche, photo,
       visible_recruteurs: visibleRecruteurs,
-      recherche_emploi: visibleRecruteurs ? rechercheEmploi : '',
+      recherche_contrat: visibleRecruteurs ? rechercheContrat.join(', ') : '',
       disponibilite: visibleRecruteurs ? disponibilite : '',
       experiences: experiences.filter(e => e.poste || e.entreprise),
       formations: formations.filter(f => f.diplome || f.etablissement),
@@ -667,10 +667,11 @@ export default function Profile() {
 
             {/* Visibilité recruteurs */}
             <div style={{ marginTop: '28px', paddingTop: '24px', borderTop: '1px solid #f0f0f0' }}>
+              <div style={{ fontSize: '15px', fontWeight: '700', color: '#111', marginBottom: '16px' }}>Visibilité recruteurs</div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
                 <div>
                   <div style={{ fontSize: '14px', fontWeight: '700', color: '#111', marginBottom: '2px' }}>Être visible par les recruteurs</div>
-                  <div style={{ fontSize: '12px', color: '#9ca3af' }}>Apparaît dans la banque de CV publique</div>
+                  <div style={{ fontSize: '12px', color: '#9ca3af' }}>Apparaît dans la banque de talents recruteurs</div>
                 </div>
                 <button type="button" onClick={() => setVisibleRecruteurs(v => !v)}
                   style={{ width: '46px', height: '26px', borderRadius: '20px', border: 'none', cursor: 'pointer', background: visibleRecruteurs ? '#4f46e5' : '#e5e7eb', position: 'relative', flexShrink: 0, transition: 'background 0.2s' }}>
@@ -680,22 +681,28 @@ export default function Profile() {
 
               {visibleRecruteurs && (
                 <div style={{ marginTop: '18px' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '16px' }}>
-                    <Field label="Je recherche">
-                      <select value={rechercheEmploi} onChange={e => setRechercheEmploi(e.target.value)} style={{ ...INPUT, cursor: 'pointer' }}>
-                        <option value="">— Sélectionner —</option>
-                        {['CDI', 'CDD', 'Alternance', 'Stage', 'Freelance'].map(c => <option key={c}>{c}</option>)}
-                      </select>
-                    </Field>
-                    <Field label="Disponibilité">
-                      <select value={disponibilite} onChange={e => setDisponibilite(e.target.value)} style={{ ...INPUT, cursor: 'pointer' }}>
-                        <option value="">— Sélectionner —</option>
-                        {['Immédiatement', 'Dans 1 mois', 'Dans 3 mois'].map(d => <option key={d}>{d}</option>)}
-                      </select>
-                    </Field>
-                  </div>
+                  <Field label="Je recherche" hint="plusieurs choix possibles">
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      {['CDI', 'CDD', 'Alternance', 'Stage', 'Freelance'].map(c => {
+                        const actif = rechercheContrat.includes(c)
+                        return (
+                          <button key={c} type="button"
+                            onClick={() => setRechercheContrat(actif ? rechercheContrat.filter(v => v !== c) : [...rechercheContrat, c])}
+                            style={{ padding: '7px 14px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', background: actif ? '#4f46e5' : '#f3f4f6', color: actif ? '#fff' : '#374151' }}>
+                            {actif ? '✓ ' : ''}{c}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </Field>
+                  <Field label="Disponibilité">
+                    <select value={disponibilite} onChange={e => setDisponibilite(e.target.value)} style={{ ...INPUT, cursor: 'pointer' }}>
+                      <option value="">— Sélectionner —</option>
+                      {['Immédiatement', 'Dans 1 mois', 'Dans 3 mois'].map(d => <option key={d}>{d}</option>)}
+                    </select>
+                  </Field>
                   <div style={{ background: '#f8f9ff', border: '1px solid #ede9fe', borderRadius: '10px', padding: '12px 14px', fontSize: '13px', color: '#4f46e5', lineHeight: '1.6' }}>
-                    ✨ Ton profil sera visible par des recruteurs qui cherchent des profils comme le tien.
+                    ✨ Seuls ton prénom, initiale du nom, titre professionnel et ville sont visibles. Ton email reste masqué. Seuls les recruteurs certifiés par DidCV peuvent accéder à la banque.
                   </div>
                 </div>
               )}
