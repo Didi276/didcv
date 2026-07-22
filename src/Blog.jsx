@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from './Navbar'
+import SEO from './SEO'
 import { ARTICLES, CATEGORIES } from './blogData'
 
 export default function Blog() {
@@ -9,6 +10,11 @@ export default function Blog() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
+      <SEO
+        titre="Blog conseils carrière"
+        description="Blog conseils carrière — CV, entretien, lettre de motivation, recherche d'emploi. Des guides pratiques pour réussir votre candidature."
+        url="https://didcv.vercel.app/blog"
+      />
       <Navbar />
       <div style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', padding: '48px 24px' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>

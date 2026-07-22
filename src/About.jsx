@@ -1,8 +1,14 @@
 import Navbar from './Navbar'
+import SEO from './SEO'
 
 export default function About() {
   return (
     <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
+      <SEO
+        titre="À propos"
+        description="À propos de DidCV — le générateur de CV IA made in France. Notre mission : aider chacun à décrocher son prochain emploi avec un CV optimisé ATS en 30 secondes."
+        url="https://didcv.vercel.app/about"
+      />
       <Navbar />
       <div style={{ maxWidth: '760px', margin: '0 auto', padding: '60px 24px' }}>
         <div style={{ marginBottom: '48px' }}>

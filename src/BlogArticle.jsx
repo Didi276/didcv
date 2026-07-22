@@ -1,5 +1,6 @@
 import { useParams, Link } from 'react-router-dom'
 import Navbar from './Navbar'
+import SEO from './SEO'
 import { ARTICLES } from './blogData'
 
 function renderMarkdown(text) {
@@ -33,6 +34,11 @@ export default function BlogArticle() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#fff', fontFamily: '"Inter",system-ui,sans-serif' }}>
+      <SEO
+        titre={article.titre}
+        description={article.description}
+        url={`https://didcv.vercel.app/blog/${article.slug}`}
+      />
       <Navbar />
 
       <div style={{ maxWidth: '760px', margin: '0 auto', padding: '48px 24px' }}>

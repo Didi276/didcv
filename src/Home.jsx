@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { supabase } from './supabase'
+import SEO from './SEO'
 
 function useWidth() {
   const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
@@ -108,6 +109,11 @@ export default function Home() {
 
   return (
     <div style={{ fontFamily: '"Inter",system-ui,sans-serif', color: '#111', background: '#fff', minHeight: '100vh' }}>
+      <SEO
+        titre="Créez votre CV optimisé ATS en 30 secondes"
+        description="DidCV génère votre CV professionnel et votre lettre de motivation en 30 secondes grâce à l'IA. 27 templates, score ATS, offres d'emploi intégrées. Gratuit."
+        url="https://didcv.vercel.app"
+      />
       <style>{ANIM_CSS}</style>
 
       {/* ─── NAVIGATION ─────────────────────────────────────── */}

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from './Navbar'
+import SEO from './SEO'
 import { GUIDES, SECTEURS } from './guidesData'
 
 export default function GuidesMetier() {
@@ -9,6 +10,11 @@ export default function GuidesMetier() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
+      <SEO
+        titre="Exemples de CV par métier"
+        description="Exemples de CV par métier — 24 guides professionnels gratuits avec compétences, missions types et conseils pour réussir votre candidature."
+        url="https://didcv.vercel.app/guides"
+      />
       <Navbar />
       <div style={{ background: 'linear-gradient(135deg, #0f6e56, #059669)', padding: '48px 24px' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>

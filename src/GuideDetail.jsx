@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import Navbar from './Navbar'
+import SEO from './SEO'
 import { GUIDES } from './guidesData'
 
 function useWidth() {
@@ -32,6 +33,11 @@ export default function GuideDetail() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#fff', fontFamily: '"Inter",system-ui,sans-serif' }}>
+      <SEO
+        titre={guide.titre}
+        description={guide.description}
+        url={`https://didcv.vercel.app/guide/${guide.slug}`}
+      />
       <Navbar />
       <div style={{ maxWidth: '860px', margin: '0 auto', padding: '48px 24px' }}>
         <Link to="/guides" style={{ fontSize: '13px', color: '#4f46e5', textDecoration: 'none', fontWeight: '600', display: 'inline-block', marginBottom: '32px' }}>

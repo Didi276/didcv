@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /generate
+Disallow: /admin
+Sitemap: https://didcv.vercel.app/sitemap.xml

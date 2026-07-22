@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import Navbar from './Navbar'
+import SEO from './SEO'
 import { supabase } from './supabase'
 import { FORMATIONS, CATEGORIES } from './formationsData'
 
@@ -293,6 +294,11 @@ export default function Formations() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
+      <SEO
+        titre="Centre de formations professionnelles gratuites"
+        description="Centre de formations professionnelles gratuites — Excel, IA, Communication, Data et plus. Formations sélectionnées et recommandées selon ton métier."
+        url="https://didcv.vercel.app/formations"
+      />
       <Navbar currentPage="formations" />
 
       <div style={{ background: '#0f6e56', padding: '56px 24px' }}>

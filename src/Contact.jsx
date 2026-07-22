@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Navbar from './Navbar'
+import SEO from './SEO'
 
 function useWidth() {
   const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
@@ -35,6 +36,11 @@ export default function Contact() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
+      <SEO
+        titre="Contact"
+        description="Contactez l'équipe DidCV pour toute question sur votre CV, votre compte ou nos services. Réponse sous 24h."
+        url="https://didcv.vercel.app/contact"
+      />
       <Navbar />
       <div style={{ maxWidth: '600px', margin: '0 auto', padding: '60px 24px' }}>
         <div style={{ marginBottom: '40px', textAlign: 'center' }}>
