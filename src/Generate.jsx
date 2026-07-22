@@ -377,7 +377,7 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
   const handleAjouterCandidature = async () => {
     if (!user || !cvSauvegardeId || ajoutCandidatureEnCours) return
     setAjoutCandidatureEnCours(true)
-    await supabase.from('candidatures').insert({
+    const { error } = await supabase.from('candidatures').insert({
       user_id: user.id,
       titre: offreMeta?.titre || cvData?.titre || offreEmploi.split('\n')[0].slice(0, 80) || 'Candidature',
       entreprise: offreMeta?.entreprise || '',
@@ -386,7 +386,8 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
       cv_id: cvSauvegardeId,
     })
     setAjoutCandidatureEnCours(false)
-    setCandidatureAjoutee(true)
+    if (error) alert("Impossible d'ajouter cette candidature au suivi pour le moment.")
+    else setCandidatureAjoutee(true)
   }
 
   return (
