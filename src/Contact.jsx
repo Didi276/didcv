@@ -43,25 +43,25 @@ export default function Contact() {
         url="https://didcv.vercel.app/contact"
       />
       <Navbar />
-      <div style={{ maxWidth: '600px', margin: '0 auto', padding: '60px 24px' }}>
-        <div style={{ marginBottom: '40px', textAlign: 'center' }}>
-          <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#4f46e5', textTransform: 'uppercase', marginBottom: '12px' }}>CONTACT</div>
-          <h1 style={{ fontSize: '32px', fontWeight: '800', color: '#0f0f1a', margin: '0 0 12px', letterSpacing: '-1px' }}>Une question ? On t'écoute.</h1>
+      <div style={{ maxWidth: '600px', margin: '0 auto', padding: '96px 24px 100px' }}>
+        <div style={{ marginBottom: '48px', textAlign: 'center' }}>
+          <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#4f46e5', textTransform: 'uppercase', marginBottom: '14px' }}>CONTACT</div>
+          <h1 style={{ fontSize: '34px', fontWeight: '700', color: '#0a0a0f', margin: '0 0 12px', letterSpacing: '-1px' }}>Une question ? On t'écoute.</h1>
           <p style={{ fontSize: '15px', color: '#9ca3af', margin: 0 }}>On répond sous 24h.</p>
         </div>
 
         {sent ? (
-          <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '14px', padding: '40px', textAlign: 'center' }}>
+          <div style={{ background: '#f0fdf4', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', borderRadius: '14px', padding: '40px', textAlign: 'center' }}>
             <CheckCircle size={44} color="#16a34a" strokeWidth={1.5} style={{ marginBottom: '16px' }} />
             <div style={{ fontSize: '18px', fontWeight: '700', color: '#111', marginBottom: '8px' }}>Message envoyé !</div>
             <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '24px' }}>On te répond sous 24h.</div>
-            <button onClick={() => setSent(false)} style={{ padding: '10px 24px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '9px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
+            <button onClick={() => setSent(false)} style={{ padding: '11px 24px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 16px rgba(79,70,229,0.3)' }}>
               Envoyer un autre message
             </button>
           </div>
         ) : (
-          <div style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '32px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
+          <div style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '36px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '16px', marginBottom: '18px' }}>
               <div>
                 <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>Nom *</label>
                 <input value={form.nom} onChange={e => setForm({...form, nom: e.target.value})} placeholder="Marie Dupont" style={INPUT}
@@ -92,7 +92,7 @@ export default function Contact() {
                 onFocus={e => e.target.style.borderColor = '#4f46e5'} onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
             </div>
             <button onClick={handleSubmit}
-              style={{ width: '100%', padding: '13px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+              style={{ width: '100%', padding: '14px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 16px rgba(79,70,229,0.3)' }}>
               Envoyer le message
             </button>
           </div>
