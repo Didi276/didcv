@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { ClipboardList, Link as LinkIcon, FileText, Lightbulb, Download, RotateCcw, BookOpen, Play, Pause, Volume2, VolumeX, Square, Mic, Send, ChevronRight } from 'lucide-react'
+import { ClipboardList, Link as LinkIcon, FileText, Lightbulb, Download, RotateCcw, BookOpen, Play, Pause, Volume2, VolumeX, Square, Mic, Send, ChevronRight, Briefcase } from 'lucide-react'
 import Navbar from './Navbar'
 import { supabase } from './supabase'
 
@@ -460,12 +460,13 @@ export default function Entretien() {
       <style>{`@media print { nav, .no-print { display: none !important; } }`}</style>
       <div className="no-print"><Navbar currentPage="entretien" /></div>
 
-      <div className="no-print" style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', padding: '48px 24px' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-          <h1 style={{ fontSize: '36px', fontWeight: '800', color: '#fff', margin: '0 0 12px', letterSpacing: '-1px' }}>
+      <div className="no-print" style={{ position: 'relative', background: '#0a0a0f', overflow: 'hidden', padding: '48px 24px' }}>
+        <div style={{ position: 'absolute', top: '0', left: '50%', transform: 'translateX(-50%)', width: '600px', height: '300px', maxWidth: '100%', background: 'radial-gradient(circle, #4f46e520 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'relative', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+          <h1 style={{ fontSize: '36px', fontWeight: '700', color: '#fff', margin: '0 0 12px', letterSpacing: '-1px' }}>
             {step === 'setup' ? 'Prépare ton entretien' : 'Entraîne-toi aux entretiens'}
           </h1>
-          <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.8)', margin: 0 }}>
+          <p style={{ fontSize: '16px', color: '#a1a1aa', margin: 0 }}>
             Un recruteur IA disponible 24h/24, adapté à chaque offre
           </p>
         </div>
@@ -508,7 +509,7 @@ export default function Entretien() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     {mesCandidatures.map(c => (
                       <button key={c.id} type="button" onClick={() => choisirCandidature(c)}
-                        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', padding: '12px 14px', borderRadius: '10px', border: `1.5px solid ${candidatureId === c.id ? '#4f46e5' : '#e5e7eb'}`, background: candidatureId === c.id ? '#f8f9ff' : '#fff', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
+                        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', padding: '12px 14px', borderRadius: '10px', border: 'none', boxShadow: candidatureId === c.id ? '0 0 0 2px #4f46e5' : '0 2px 12px rgba(0,0,0,0.06)', background: candidatureId === c.id ? '#f8f9ff' : '#fff', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
                         <span style={{ fontSize: '13px', color: '#111' }}>
                           <strong>{c.entreprise || 'Entreprise ?'}</strong> — {c.titre}
                         </span>
@@ -668,7 +669,7 @@ export default function Entretien() {
                 if (item.type === 'question') {
                   return (
                     <div key={i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                      <div style={{ fontSize: '22px', flexShrink: 0 }}>👔</div>
+                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Briefcase size={15} color="#4f46e5" /></div>
                       <div style={{ background: '#f3f4f6', borderRadius: '14px', borderTopLeftRadius: '4px', padding: '12px 16px', maxWidth: '80%', fontSize: '14px', color: '#111', lineHeight: '1.6' }}>
                         {item.text}
                       </div>
@@ -696,7 +697,7 @@ export default function Entretien() {
                   const { points_forts, a_ameliorer, note, conseil } = item.data
                   return (
                     <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '10px', padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px' }}>
+                      <div style={{ background: '#f0fdf4', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', borderRadius: '10px', padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px' }}>
                         <div>
                           <div style={{ fontSize: '11px', color: '#16a34a', fontWeight: '700', marginBottom: '3px' }}>✓ Points forts</div>
                           <div style={{ fontSize: '13px', color: '#374151', lineHeight: '1.6' }}>{points_forts}</div>
@@ -706,13 +707,13 @@ export default function Entretien() {
                         </div>
                       </div>
                       {a_ameliorer && (
-                        <div style={{ background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '10px', padding: '10px 14px' }}>
+                        <div style={{ background: '#fff7ed', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', borderRadius: '10px', padding: '10px 14px' }}>
                           <div style={{ fontSize: '11px', color: '#c2410c', fontWeight: '700', marginBottom: '3px' }}>△ À améliorer</div>
                           <div style={{ fontSize: '13px', color: '#374151', lineHeight: '1.6' }}>{a_ameliorer}</div>
                         </div>
                       )}
                       {conseil && (
-                        <div style={{ background: '#f8f9ff', border: '1px solid #ede9fe', borderRadius: '10px', padding: '10px 14px' }}>
+                        <div style={{ background: '#f8f9ff', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', borderRadius: '10px', padding: '10px 14px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: '#4f46e5', fontWeight: '700', marginBottom: '3px' }}><Lightbulb size={12} /> Conseil</div>
                           <div style={{ fontSize: '13px', color: '#374151', lineHeight: '1.6' }}>{conseil}</div>
                         </div>
