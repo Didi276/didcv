@@ -74,12 +74,13 @@ export default function Blog() {
         schema={schema}
       />
       <Navbar />
-      <div style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', padding: '48px 24px' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-          <h1 style={{ fontSize: '36px', fontWeight: '800', color: '#fff', margin: '0 0 12px', letterSpacing: '-1px' }}>
+      <div style={{ position: 'relative', background: '#0a0a0f', overflow: 'hidden', padding: '48px 24px' }}>
+        <div style={{ position: 'absolute', top: '0', left: '50%', transform: 'translateX(-50%)', width: '600px', height: '300px', maxWidth: '100%', background: 'radial-gradient(circle, #4f46e520 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'relative', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+          <h1 style={{ fontSize: '36px', fontWeight: '700', color: '#fff', margin: '0 0 12px', letterSpacing: '-1px' }}>
             Conseils carrière
           </h1>
-          <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.75)', margin: 0 }}>
+          <p style={{ fontSize: '16px', color: '#a1a1aa', margin: 0 }}>
             Guides pratiques pour booster votre recherche d'emploi
           </p>
         </div>
@@ -92,7 +93,7 @@ export default function Blog() {
             <h2 style={{ fontSize: '18px', fontWeight: '800', color: '#111', margin: '0 0 16px', letterSpacing: '-0.3px' }}>
               Articles les plus populaires
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '24px' }}>
               {populaires.map(article => (
                 <Link key={article.slug} to={`/blog/${article.slug}`} style={{ textDecoration: 'none' }}>
                   <div style={{ background: '#fff', borderRadius: '16px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '20px', height: '100%', boxSizing: 'border-box', transition: 'transform 0.15s, box-shadow 0.15s' }}
@@ -125,7 +126,7 @@ export default function Blog() {
           ))}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
           {articles.map(article => (
             <Link key={article.slug} to={`/blog/${article.slug}`} style={{ textDecoration: 'none' }}>
               <div style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '20px', height: '100%', boxSizing: 'border-box', transition: 'transform 0.15s, box-shadow 0.15s' }}
