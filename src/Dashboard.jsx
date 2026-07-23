@@ -226,7 +226,7 @@ export default function Dashboard() {
               { label: 'Candidatures', value: candidaturesCount, icon: ClipboardList, color: '#c2410c' },
               { label: 'Entretiens', value: entretiensCompletes, icon: Mic, color: '#16a34a' },
             ].map(s => (
-              <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: isMobile ? '10px 14px' : '14px 16px', background: '#f8f9ff', borderRadius: '10px', border: '1px solid #ede9fe' }}>
+              <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: isMobile ? '10px 14px' : '14px 16px', background: '#fff', borderRadius: '10px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
                 <s.icon size={18} color={s.color} strokeWidth={1.75} />
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontSize: isMobile ? '16px' : '20px', fontWeight: '800', color: s.color, lineHeight: 1 }}>{s.value}</div>
@@ -240,7 +240,7 @@ export default function Dashboard() {
 
       {/* Mes candidatures en cours */}
       {candidaturesRecentes.length > 0 && (
-        <div style={{ maxWidth: '1200px', margin: '16px auto 0', padding: `0 ${isMobile ? '16px' : '40px'}` }}>
+        <div style={{ maxWidth: '1200px', margin: '24px auto 0', padding: `0 ${isMobile ? '16px' : '40px'}` }}>
           <div style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: isMobile ? '16px' : '20px 24px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <div style={{ fontSize: '14px', fontWeight: '700', color: '#111' }}>Mes candidatures en cours</div>
@@ -288,8 +288,8 @@ export default function Dashboard() {
 
       {/* Bandeau profil */}
       {!profile?.prenom && (
-        <div style={{ maxWidth: '1200px', margin: '16px auto 0', padding: `0 ${isMobile ? '16px' : '40px'}` }}>
-          <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '12px', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+        <div style={{ maxWidth: '1200px', margin: '24px auto 0', padding: `0 ${isMobile ? '16px' : '40px'}` }}>
+          <div style={{ background: '#fffbeb', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', borderRadius: '12px', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
             <div style={{ fontSize: '13px', color: '#92400e', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Lightbulb size={16} /> Complete ton profil pour générer des CV plus vite
             </div>
@@ -315,9 +315,9 @@ export default function Dashboard() {
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(240px, 1fr))', gap: isMobile ? '12px' : '20px' }}>
             {cvs.map(cv => (
               <div key={cv.id} onClick={() => { setSelectedCv(cv); setShowLettre(false) }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.1)' }}
-                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.04)' }}
-                style={{ background: '#fff', borderRadius: '14px', border: `2px solid ${selectedCv?.id === cv.id ? '#4f46e5' : '#e5e7eb'}`, overflow: 'hidden', cursor: 'pointer', transition: 'transform 0.15s, box-shadow 0.15s', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = selectedCv?.id === cv.id ? '0 0 0 2px #4f46e5, 0 8px 20px rgba(0,0,0,0.1)' : '0 8px 20px rgba(0,0,0,0.1)' }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = selectedCv?.id === cv.id ? '0 0 0 2px #4f46e5, 0 2px 12px rgba(0,0,0,0.06)' : '0 2px 12px rgba(0,0,0,0.06)' }}
+                style={{ background: '#fff', borderRadius: '14px', border: 'none', overflow: 'hidden', cursor: 'pointer', transition: 'transform 0.15s, box-shadow 0.15s', boxShadow: selectedCv?.id === cv.id ? '0 0 0 2px #4f46e5, 0 2px 12px rgba(0,0,0,0.06)' : '0 2px 12px rgba(0,0,0,0.06)' }}>
                 {/* Apercu */}
                 <div style={{ width: '100%', height: isMobile ? '120px' : '180px', overflow: 'hidden', position: 'relative', background: '#f8f9ff' }}>
                   <div style={{ position: 'absolute', top: 0, left: 0, width: '794px', height: '1123px', transform: `scale(${previewScale})`, transformOrigin: 'top left', pointerEvents: 'none', userSelect: 'none' }}>
