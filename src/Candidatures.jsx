@@ -191,15 +191,15 @@ export default function Candidatures() {
       </div>
 
       {/* Kanban */}
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: isMobile ? '16px 8px' : '24px 40px', overflowX: 'auto' }}>
-        <div style={{ display: 'flex', gap: '12px', minWidth: isMobile ? '900px' : 'auto' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: isMobile ? '16px 8px' : '32px 40px', overflowX: 'auto' }}>
+        <div style={{ display: 'flex', gap: '16px', minWidth: isMobile ? '900px' : 'auto' }}>
           {COLONNES.map(col => {
             const colCards = cards.filter(c => c.statut === col.id)
             const isDragTarget = dragOver === col.id
 
             return (
               <div key={col.id}
-                style={{ flex: 1, minWidth: '200px', background: isDragTarget ? col.bg : '#f3f4f6', borderRadius: '14px', border: `2px solid ${isDragTarget ? col.dot : 'transparent'}`, transition: 'all 0.15s', padding: '12px' }}
+                style={{ flex: 1, minWidth: '200px', background: isDragTarget ? col.bg : '#f8f9fa', borderRadius: '14px', border: 'none', boxShadow: isDragTarget ? `0 0 0 2px ${col.dot}` : 'none', transition: 'box-shadow 0.15s, background 0.15s', padding: '14px' }}
                 onDragOver={e => { e.preventDefault(); setDragOver(col.id) }}
                 onDragLeave={() => setDragOver(null)}
                 onDrop={e => { e.preventDefault(); if (dragId) moveCard(dragId, col.id); setDragOver(null); setDragId(null) }}>
@@ -221,9 +221,9 @@ export default function Candidatures() {
                       onDragStart={() => setDragId(card.id)}
                       onDragEnd={() => setDragId(null)}
                       onClick={() => openEdit(card)}
-                      style={{ background: '#fff', borderRadius: '10px', padding: '12px', cursor: 'pointer', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', border: '1px solid #f0f0f0', opacity: dragId === card.id ? 0.5 : 1, transition: 'all 0.1s', userSelect: 'none' }}
-                      onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'}
-                      onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)'}>
+                      style={{ background: '#fff', borderRadius: '10px', padding: '12px', cursor: 'pointer', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: 'none', opacity: dragId === card.id ? 0.5 : 1, transition: 'box-shadow 0.15s', userSelect: 'none' }}
+                      onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)'}
+                      onMouseLeave={e => e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'}>
                       <div style={{ fontSize: '13px', fontWeight: '700', color: '#111', marginBottom: '4px', lineHeight: '1.3' }}>{card.titre}</div>
                       {card.entreprise && <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>🏢 {card.entreprise}</div>}
                       {card.lieu && <div style={{ fontSize: '11px', color: '#9ca3af', display: 'flex', alignItems: 'center', gap: '4px' }}><MapPin size={10} /> {card.lieu}</div>}
