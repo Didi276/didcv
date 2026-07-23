@@ -2,7 +2,7 @@
   ─── SQL à exécuter dans Supabase ────────────────────────────────────────
 
   -- Nécessaire pour relier une candidature au CV généré pour ce poste (boutons
-  -- "📋 Voir mon CV" et "🎯 Préparer l'entretien" ci-dessous, et le bouton
+  -- "Voir mon CV" et "Préparer l'entretien" ci-dessous, et le bouton
   -- "Ajouter au suivi des candidatures" dans Generate.jsx). Sans cette colonne,
   -- on ne pourrait retrouver le CV correspondant qu'en comparant des titres de
   -- façon approximative, ce qui n'est pas fiable.
@@ -16,6 +16,7 @@ import { supabase } from './supabase'
 import Navbar from './Navbar'
 import { CVTemplate } from './CVTemplates'
 import { downloadCVasPDF } from './pdfUtils'
+import { MapPin, DollarSign, Zap, ClipboardList, Target, BookOpen, Trash2, Download, Plus } from 'lucide-react'
 
 const COLONNES = [
   { id: 'a_postuler',  label: 'À postuler',    color: '#6b7280', bg: '#f9fafb', dot: '#9ca3af' },
@@ -167,8 +168,8 @@ export default function Candidatures() {
               <p style={{ fontSize: '13px', color: '#9ca3af', margin: 0 }}>Gérez toutes vos candidatures en un seul endroit</p>
             </div>
             <button onClick={() => openNew()}
-              style={{ padding: '10px 20px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
-              + Nouvelle candidature
+              style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '10px 20px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', boxShadow: '0 4px 12px rgba(79,70,229,0.3)' }}>
+              <Plus size={15} /> Nouvelle candidature
             </button>
           </div>
 
@@ -225,8 +226,8 @@ export default function Candidatures() {
                       onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)'}>
                       <div style={{ fontSize: '13px', fontWeight: '700', color: '#111', marginBottom: '4px', lineHeight: '1.3' }}>{card.titre}</div>
                       {card.entreprise && <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '4px', fontWeight: '500' }}>🏢 {card.entreprise}</div>}
-                      {card.lieu && <div style={{ fontSize: '11px', color: '#9ca3af' }}>📍 {card.lieu}</div>}
-                      {card.salaire && <div style={{ fontSize: '11px', color: '#16a34a', marginTop: '4px', fontWeight: '600' }}>💰 {card.salaire}</div>}
+                      {card.lieu && <div style={{ fontSize: '11px', color: '#9ca3af', display: 'flex', alignItems: 'center', gap: '4px' }}><MapPin size={10} /> {card.lieu}</div>}
+                      {card.salaire && <div style={{ fontSize: '11px', color: '#16a34a', marginTop: '4px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px' }}><DollarSign size={10} /> {card.salaire}</div>}
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
                         {card.url_offre && (
                           <a href={card.url_offre} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
@@ -240,26 +241,26 @@ export default function Candidatures() {
                       {/* Action selon le statut */}
                       {card.statut === 'a_postuler' && (
                         <button onClick={e => genererCV(card, e)}
-                          style={{ width: '100%', marginTop: '8px', padding: '7px', background: '#eef2ff', color: '#4f46e5', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
-                          ⚡ Générer mon CV
+                          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', width: '100%', marginTop: '8px', padding: '7px', background: '#eef2ff', color: '#4f46e5', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+                          <Zap size={11} /> Générer mon CV
                         </button>
                       )}
                       {card.statut === 'postule' && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '8px' }}>
                           <button onClick={e => voirCV(card, e)}
-                            style={{ width: '100%', padding: '7px', background: '#eff6ff', color: '#1d4ed8', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
-                            📋 Voir mon CV
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', width: '100%', padding: '7px', background: '#eff6ff', color: '#1d4ed8', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+                            <ClipboardList size={11} /> Voir mon CV
                           </button>
                           <button onClick={allerVersEntretien(card, 'entrainement')} title="Tu n'as pas encore eu de réponse mais tu peux t'entraîner en avance"
-                            style={{ width: '100%', padding: '7px', background: '#f5f3ff', color: '#7c3aed', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
-                            🎯 S'entraîner
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', width: '100%', padding: '7px', background: '#f5f3ff', color: '#7c3aed', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+                            <Target size={11} /> S'entraîner
                           </button>
                         </div>
                       )}
                       {card.statut === 'entretien' && (
                         <button onClick={allerVersEntretien(card, 'preparation')}
-                          style={{ width: '100%', marginTop: '8px', padding: '7px', background: '#f5f3ff', color: '#7c3aed', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
-                          🎯 Préparer l'entretien
+                          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', width: '100%', marginTop: '8px', padding: '7px', background: '#f5f3ff', color: '#7c3aed', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+                          <Target size={11} /> Préparer l'entretien
                         </button>
                       )}
                       {card.statut === 'offre' && (
@@ -270,8 +271,8 @@ export default function Candidatures() {
                       )}
                       {card.statut === 'refuse' && (
                         <a href="/formations" onClick={e => e.stopPropagation()}
-                          style={{ display: 'block', width: '100%', marginTop: '8px', padding: '7px', background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none', textAlign: 'center', boxSizing: 'border-box' }}>
-                          📚 Formations recommandées
+                          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', width: '100%', marginTop: '8px', padding: '7px', background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none', textAlign: 'center', boxSizing: 'border-box' }}>
+                          <BookOpen size={11} /> Formations recommandées
                         </a>
                       )}
                     </div>
@@ -345,8 +346,8 @@ export default function Candidatures() {
                 </button>
                 {editCard && (
                   <button onClick={() => handleDelete(editCard.id)}
-                    style={{ padding: '11px 16px', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: '10px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
-                    🗑
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '11px 16px', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: '10px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
+                    <Trash2 size={15} />
                   </button>
                 )}
               </div>
@@ -379,8 +380,8 @@ export default function Candidatures() {
               <div style={{ display: 'flex', gap: '6px' }}>
                 {cvApercu.cv && (
                   <button onClick={() => downloadCVasPDF(document.getElementById('cv-to-print'), cvApercu.cv.cv_data.prenom, cvApercu.cv.cv_data.nom)}
-                    style={{ padding: '6px 14px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
-                    📥
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px 14px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
+                    <Download size={14} />
                   </button>
                 )}
                 <button onClick={() => setCvApercu(null)} style={{ width: '30px', height: '30px', borderRadius: '8px', border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>

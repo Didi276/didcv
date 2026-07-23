@@ -6,6 +6,7 @@ import DateRangePicker from './DateRangePicker'
 import CityInput from './CityInput'
 import SuggestionsIA from './SuggestionsIA'
 import { FORMATIONS } from './formationsData'
+import { Download, CheckCircle, User, Briefcase, GraduationCap, Zap, Plus, FileText, Lock, Trash2, Edit2, BookOpen, MapPin, Calendar, ClipboardList } from 'lucide-react'
 
 // Mots-clés d'un titre de poste -> tags "metiers" utilisés dans formationsData.js
 const METIER_KEYWORDS = [
@@ -370,13 +371,13 @@ export default function Profile() {
   const formationsRecommandees = formationsPourMetier(titre)
 
   const SECTIONS = [
-    { id: 'import',       label: '📥 Import PDF' },
-    { id: 'verification', label: '✅ Vérification' },
-    { id: 'infos',        label: '👤 Infos' },
-    { id: 'experiences',  label: '💼 Experiences' },
-    { id: 'formations',   label: '🎓 Formations' },
-    { id: 'competences',  label: '⚡ Competences' },
-    { id: 'plus',         label: '➕ Langues & Plus' },
+    { id: 'import',       label: 'Import PDF',      icon: Download },
+    { id: 'verification', label: 'Vérification',    icon: CheckCircle },
+    { id: 'infos',        label: 'Infos',           icon: User },
+    { id: 'experiences',  label: 'Experiences',     icon: Briefcase },
+    { id: 'formations',   label: 'Formations',      icon: GraduationCap },
+    { id: 'competences',  label: 'Competences',     icon: Zap },
+    { id: 'plus',         label: 'Langues & Plus',  icon: Plus },
   ]
 
   return (
@@ -394,8 +395,9 @@ export default function Profile() {
             </p>
           </div>
           <button onClick={handleSave} disabled={saving}
-            style={{ padding: '11px 24px', background: saved ? '#16a34a' : '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: saving ? 'default' : 'pointer', fontFamily: 'inherit', transition: 'background 0.3s' }}>
-            {saving ? '⏳ Sauvegarde...' : saved ? '✅ Sauvegarde !' : '💾 Sauvegarder'}
+            style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '11px 24px', background: saved ? '#16a34a' : '#4f46e5', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: '700', cursor: saving ? 'default' : 'pointer', fontFamily: 'inherit', transition: 'background 0.3s', boxShadow: '0 4px 12px rgba(79,70,229,0.3)' }}>
+            {saved && <CheckCircle size={15} />}
+            {saving ? 'Sauvegarde...' : saved ? 'Sauvegarde !' : 'Sauvegarder'}
           </button>
         </div>
 
@@ -403,8 +405,8 @@ export default function Profile() {
         <div style={{ display: 'flex', gap: '4px', marginBottom: '24px', background: '#fff', padding: '5px', borderRadius: '12px', border: '1px solid #e5e7eb', overflowX: 'auto' }}>
           {SECTIONS.map(s => (
             <button key={s.id} onClick={() => setActiveSection(s.id)}
-              style={{ flex: '0 0 auto', padding: '8px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '12px', fontWeight: '600', transition: 'all 0.15s', background: activeSection === s.id ? '#4f46e5' : 'transparent', color: activeSection === s.id ? '#fff' : '#6b7280', position: 'relative' }}>
-              {s.label}
+              style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '12px', fontWeight: '600', transition: 'all 0.15s', background: activeSection === s.id ? '#4f46e5' : 'transparent', color: activeSection === s.id ? '#fff' : '#6b7280', position: 'relative' }}>
+              <s.icon size={13} />{s.label}
               {s.id === 'import' && !importDone && <span style={{ position: 'absolute', top: '4px', right: '4px', width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b' }} />}
             </button>
           ))}
@@ -422,13 +424,13 @@ export default function Profile() {
               </div>
             ) : importDone ? (
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '48px', marginBottom: '14px' }}>✅</div>
+                <CheckCircle size={44} color="#16a34a" strokeWidth={1.75} style={{ marginBottom: '14px' }} />
                 <div style={{ fontSize: '18px', fontWeight: '700', color: '#111', marginBottom: '8px' }}>Profil importé avec succès !</div>
                 <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '24px' }}>Vérifie et ajuste tes informations dans les onglets.</div>
                 <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
                   <button onClick={() => setActiveSection('infos')}
-                    style={{ padding: '11px 22px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
-                    Vérifier mes infos
+                    style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '11px 22px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 12px rgba(79,70,229,0.3)' }}>
+                    <User size={14} /> Vérifier mes infos
                   </button>
                   <label style={{ padding: '11px 22px', background: '#f3f4f6', color: '#374151', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>
                     <input type="file" accept=".pdf" onChange={handleImportCV} style={{ display: 'none' }} />
@@ -448,7 +450,7 @@ export default function Profile() {
                   <div style={{ marginBottom: '20px', padding: '20px', background: '#f8f9ff', borderRadius: '12px', border: '1px solid #ede9fe' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
                       <div>
-                        <div style={{ fontSize: '14px', fontWeight: '700', color: '#4f46e5', marginBottom: '2px' }}>⚡ Depuis un CV DidCV</div>
+                        <div style={{ fontSize: '14px', fontWeight: '700', color: '#4f46e5', marginBottom: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}><Zap size={14} /> Depuis un CV DidCV</div>
                         <div style={{ fontSize: '12px', color: '#9ca3af' }}>Recommandé - import instantané sans IA</div>
                       </div>
                     </div>
@@ -480,7 +482,7 @@ export default function Profile() {
 
                 {/* Option 2 : PDF */}
                 <div style={{ padding: '20px', background: '#fafafa', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
-                  <div style={{ fontSize: '14px', fontWeight: '700', color: '#374151', marginBottom: '14px' }}>📄 Uploader ton CV PDF</div>
+                  <div style={{ fontSize: '14px', fontWeight: '700', color: '#374151', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}><FileText size={14} /> Uploader ton CV PDF</div>
                   <label
                     onDragOver={e => { e.preventDefault(); e.currentTarget.style.borderColor = '#4f46e5'; e.currentTarget.style.background = '#faf9ff' }}
                     onDragLeave={e => { e.currentTarget.style.borderColor = '#d1d5db'; e.currentTarget.style.background = '#fff' }}
@@ -502,8 +504,8 @@ export default function Profile() {
                 </div>
 
                 <button onClick={() => setActiveSection('infos')}
-                  style={{ display: 'block', margin: '12px auto 0', background: 'none', border: '1px solid #e5e7eb', color: '#6b7280', fontSize: '13px', cursor: 'pointer', textDecoration: 'none', fontFamily: 'inherit', padding: '8px 20px', borderRadius: '8px', width: '100%' }}>
-                  ✏️ Remplir mon profil manuellement
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', margin: '12px auto 0', background: 'none', border: '1px solid #e5e7eb', color: '#6b7280', fontSize: '13px', cursor: 'pointer', textDecoration: 'none', fontFamily: 'inherit', padding: '8px 20px', borderRadius: '8px', width: '100%' }}>
+                  <Edit2 size={13} /> Remplir mon profil manuellement
                 </button>
               </div>
             )}
@@ -525,8 +527,8 @@ export default function Profile() {
 
             {/* Récap des infos importées */}
             <div style={{ background: '#f8f9ff', borderRadius: '12px', border: '1px solid #ede9fe', padding: '20px', marginBottom: '24px' }}>
-              <div style={{ fontSize: '13px', fontWeight: '700', color: '#4f46e5', marginBottom: '14px' }}>
-                📋 Informations importées
+              <div style={{ fontSize: '13px', fontWeight: '700', color: '#4f46e5', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <ClipboardList size={14} /> Informations importées
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '10px', fontSize: '13px' }}>
                 {[
@@ -559,7 +561,7 @@ export default function Profile() {
             </div>
 
             <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '10px', padding: '14px 16px', marginBottom: '24px', display: 'flex', gap: '10px' }}>
-              <span style={{ fontSize: '18px', flexShrink: 0 }}>{photo ? '✅' : '📸'}</span>
+              <span style={{ flexShrink: 0, display: 'flex' }}>{photo ? <CheckCircle size={18} color="#16a34a" /> : <span style={{ fontSize: '18px' }}>📸</span>}</span>
               <div style={{ fontSize: '13px', color: '#1e40af', lineHeight: '1.6' }}>
                 {photo
                   ? <><strong>Photo détectée et importée !</strong><br />Vérifie dans l'onglet "Infos" que c'est bien la bonne.</>
@@ -571,17 +573,18 @@ export default function Profile() {
             {/* Actions */}
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <button onClick={() => setActiveSection('infos')}
-                style={{ flex: 1, padding: '12px 20px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
-                👤 Vérifier mes infos
+                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', padding: '12px 20px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 12px rgba(79,70,229,0.3)' }}>
+                <User size={15} /> Vérifier mes infos
               </button>
               <button onClick={() => setActiveSection('experiences')}
-                style={{ flex: 1, padding: '12px 20px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
-                💼 Vérifier mes expériences
+                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', padding: '12px 20px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
+                <Briefcase size={15} /> Vérifier mes expériences
               </button>
             </div>
             <button onClick={handleSave}
-              style={{ width: '100%', marginTop: '10px', padding: '12px', background: '#16a34a', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
-              {saving ? '⏳ Sauvegarde...' : saved ? '✅ Sauvegardé !' : '💾 Tout semble bon - Sauvegarder'}
+              style={{ width: '100%', marginTop: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', padding: '12px', background: '#16a34a', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 12px rgba(22,163,74,0.3)' }}>
+              {saved && <CheckCircle size={15} />}
+              {saving ? 'Sauvegarde...' : saved ? 'Sauvegardé !' : 'Tout semble bon - Sauvegarder'}
             </button>
           </div>
         )}
@@ -603,7 +606,7 @@ export default function Profile() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '28px', paddingBottom: '24px', borderBottom: '1px solid #f0f0f0' }}>
               {photo
                 ? <img src={photo} alt="Photo" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #4f46e5', flexShrink: 0 }} />
-                : <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px', flexShrink: 0 }}>👤</div>
+                : <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><User size={32} color="#4f46e5" strokeWidth={1.75} /></div>
               }
               <div>
                 <div style={{ fontSize: '14px', fontWeight: '700', color: '#111', marginBottom: '6px' }}>Photo de profil</div>
@@ -623,7 +626,7 @@ export default function Profile() {
                 {importDone && prenom ? (
                   <div style={{ padding: '9px 14px', border: '1.5px solid #f0f0f0', borderRadius: '9px', fontSize: '14px', color: '#374151', background: '#fafafa', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontWeight: '600' }}>{prenom}</span>
-                    <span style={{ fontSize: '11px', color: '#c4c4c4' }}>🔒</span>
+                    <Lock size={11} color="#c4c4c4" />
                   </div>
                 ) : (
                   <input value={prenom} onChange={e => setPrenom(e.target.value)} placeholder="Marie" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} />
@@ -633,7 +636,7 @@ export default function Profile() {
                 {importDone && nom ? (
                   <div style={{ padding: '9px 14px', border: '1.5px solid #f0f0f0', borderRadius: '9px', fontSize: '14px', color: '#374151', background: '#fafafa', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontWeight: '600' }}>{nom}</span>
-                    <span style={{ fontSize: '11px', color: '#c4c4c4' }}>🔒</span>
+                    <Lock size={11} color="#c4c4c4" />
                   </div>
                 ) : (
                   <input value={nom} onChange={e => setNom(e.target.value)} placeholder="Dupont" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} />
@@ -648,7 +651,7 @@ export default function Profile() {
               <Field label="Email">
                 <div style={{ padding: '9px 14px', border: '1.5px solid #f0f0f0', borderRadius: '9px', fontSize: '14px', color: '#9ca3af', background: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span>{email}</span>
-                  <span style={{ fontSize: '11px', color: '#c4c4c4' }}>🔒 Email du compte</span>
+                  <span style={{ fontSize: '11px', color: '#c4c4c4', display: 'flex', alignItems: 'center', gap: '4px' }}><Lock size={11} /> Email du compte</span>
                 </div>
               </Field>
               <Field label="LinkedIn" hint="optionnel">
@@ -801,7 +804,7 @@ export default function Profile() {
 
             {formationsRecommandees.length > 0 && (
               <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px solid #f0f0f0' }}>
-                <h3 style={{ fontSize: '14px', fontWeight: '700', color: '#111', margin: '0 0 12px' }}>📚 Formations recommandées pour toi</h3>
+                <h3 style={{ fontSize: '14px', fontWeight: '700', color: '#111', margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: '7px' }}><BookOpen size={15} /> Formations recommandées pour toi</h3>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '10px' }}>
                   {formationsRecommandees.map(f => (
                     <a key={f.id} href={f.lien} target="_blank" rel="noopener noreferrer"
@@ -834,7 +837,7 @@ export default function Profile() {
                       {['Langue maternelle', 'Bilingue (C2)', 'Courant (C1)', 'Avance (B2)', 'Intermediaire (B1)', 'Notions (A2/A1)'].map(n => <option key={n}>{n}</option>)}
                     </select>
                   </Field>
-                  {langues.length > 1 && <button onClick={() => setLangues(langues.filter((_, j) => j !== i))} style={{ padding: '10px', background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', marginBottom: '18px' }}>🗑</button>}
+                  {langues.length > 1 && <button onClick={() => setLangues(langues.filter((_, j) => j !== i))} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px', background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '8px', cursor: 'pointer', marginBottom: '18px' }}><Trash2 size={14} /></button>}
                 </div>
               ))}
               <button onClick={() => setLangues([...langues, { langue: '', niveau: '' }])} style={{ background: 'none', border: '1px dashed #d1d5db', color: '#6b7280', padding: '8px 16px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit' }}>+ Ajouter une langue</button>
@@ -848,7 +851,7 @@ export default function Profile() {
                   <Field label={i === 0 ? 'Titre' : ''}><input value={c.titre} onChange={e => setCertifications(certifications.map((v, j) => j === i ? { ...v, titre: e.target.value } : v))} placeholder="Google Analytics" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
                   <Field label={i === 0 ? 'Organisme' : ''}><input value={c.organisme} onChange={e => setCertifications(certifications.map((v, j) => j === i ? { ...v, organisme: e.target.value } : v))} placeholder="Google" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
                   <Field label={i === 0 ? 'Annee' : ''}><input value={c.annee} onChange={e => setCertifications(certifications.map((v, j) => j === i ? { ...v, annee: e.target.value } : v))} placeholder="2024" style={INPUT} onFocus={focusStyle} onBlur={blurStyle} /></Field>
-                  {certifications.length > 1 && <button onClick={() => setCertifications(certifications.filter((_, j) => j !== i))} style={{ padding: '10px', background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', marginBottom: '18px' }}>🗑</button>}
+                  {certifications.length > 1 && <button onClick={() => setCertifications(certifications.filter((_, j) => j !== i))} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px', background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '8px', cursor: 'pointer', marginBottom: '18px' }}><Trash2 size={14} /></button>}
                 </div>
               ))}
               <button onClick={() => setCertifications([...certifications, { titre: '', organisme: '', annee: '' }])} style={{ background: 'none', border: '1px dashed #d1d5db', color: '#6b7280', padding: '8px 16px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit' }}>+ Ajouter</button>
@@ -883,21 +886,23 @@ export default function Profile() {
             </p>
             <div style={{ background: '#fef3c7', border: '1px solid #fde68a', borderRadius: '10px', padding: '14px 16px', marginBottom: '24px', textAlign: 'left' }}>
               {[
-                '🔤 Ton prénom et ton nom',
-                '📅 Les dates et périodes de poste',
-                '🏢 Les noms d\'entreprises',
-                '📍 Les villes et lieux',
-                '📋 Les intitulés de poste',
+                { icon: null, texte: 'Ton prénom et ton nom' },
+                { icon: Calendar, texte: 'Les dates et périodes de poste' },
+                { icon: null, texte: 'Les noms d\'entreprises' },
+                { icon: MapPin, texte: 'Les villes et lieux' },
+                { icon: ClipboardList, texte: 'Les intitulés de poste' },
               ].map(item => (
-                <div key={item} style={{ fontSize: '13px', color: '#92400e', marginBottom: '6px', fontWeight: '500' }}>{item}</div>
+                <div key={item.texte} style={{ display: 'flex', alignItems: 'center', gap: '7px', fontSize: '13px', color: '#92400e', marginBottom: '6px', fontWeight: '500' }}>
+                  {item.icon && <item.icon size={13} />}{item.texte}
+                </div>
               ))}
             </div>
             <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 24px' }}>
               Prends 2 minutes pour vérifier chaque section avant de sauvegarder.
             </p>
             <button onClick={() => setShowVerifModal(false)}
-              style={{ width: '100%', padding: '14px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
-              ✅ Compris, je vais vérifier mes infos
+              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '14px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 12px rgba(79,70,229,0.3)' }}>
+              <CheckCircle size={16} /> Compris, je vais vérifier mes infos
             </button>
           </div>
         </div>
@@ -906,8 +911,9 @@ export default function Profile() {
       {/* Bouton save fixe */}
       <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 100 }}>
         <button onClick={handleSave} disabled={saving}
-          style={{ padding: '13px 28px', background: saved ? '#16a34a' : '#4f46e5', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: '700', cursor: saving ? 'default' : 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 20px rgba(79,70,229,0.4)', transition: 'background 0.3s' }}>
-          {saving ? '⏳...' : saved ? '✅ Sauvegarde !' : '💾 Sauvegarder'}
+          style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '13px 28px', background: saved ? '#16a34a' : '#4f46e5', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: '700', cursor: saving ? 'default' : 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 20px rgba(79,70,229,0.4)', transition: 'background 0.3s' }}>
+          {saved && <CheckCircle size={15} />}
+          {saving ? '...' : saved ? 'Sauvegarde !' : 'Sauvegarder'}
         </button>
       </div>
     </div>

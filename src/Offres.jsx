@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Search, Settings, Target, Home, MapPin, DollarSign, Zap, CheckCircle } from 'lucide-react'
 import Navbar from './Navbar'
 
 function useWidth() {
@@ -191,7 +192,7 @@ export default function Offres() {
       <FilterSection title="Télétravail">
         <button onClick={() => { const v = !teletravail; setTeletravail(v); handleSearch({ teletravail: v }) }}
           style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '7px 12px', border: 'none', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit', background: teletravail ? '#ede9fe' : 'transparent', color: teletravail ? '#4f46e5' : '#555', fontWeight: teletravail ? '700' : '400', width: '100%', textAlign: 'left' }}>
-          <span>{teletravail ? '✅' : '⬜'}</span> Télétravail possible
+          {teletravail ? <CheckCircle size={14} /> : <span style={{ width: '14px', height: '14px', border: '1.5px solid #d1d5db', borderRadius: '4px', display: 'inline-block' }} />} Télétravail possible
         </button>
       </FilterSection>
 
@@ -226,8 +227,8 @@ export default function Offres() {
             <input value={location} onChange={e => setLocation(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()}
               placeholder="Ville, département..." style={{ flex: 1, padding: '11px 14px', border: isMobile ? '1px solid #f0f0f0' : 'none', outline: 'none', fontSize: '14px', fontFamily: 'inherit', color: '#111', borderRadius: '8px', background: 'transparent' }} />
             <button onClick={() => handleSearch()} disabled={loading || !query.trim()}
-              style={{ padding: '11px 24px', background: loading ? '#a5b4fc' : '#4f46e5', color: '#fff', border: 'none', borderRadius: '9px', fontSize: '14px', fontWeight: '700', cursor: loading ? 'default' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
-              {loading ? '⏳' : '🔍 Rechercher'}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', padding: '11px 24px', background: loading ? '#a5b4fc' : '#4f46e5', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: '700', cursor: loading ? 'default' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', boxShadow: loading ? 'none' : '0 4px 12px rgba(79,70,229,0.3)' }}>
+              {loading ? '...' : <><Search size={15} /> Rechercher</>}
             </button>
           </div>
 
@@ -250,7 +251,7 @@ export default function Offres() {
           <div style={{ marginBottom: '12px' }}>
             <button onClick={() => setShowFilters(!showFilters)}
               style={{ width: '100%', padding: '11px 16px', background: '#fff', border: '1px solid #e5e7eb', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', fontFamily: 'inherit', fontSize: '14px', fontWeight: '600', color: '#374151' }}>
-              <span>🔧 Filtres {(typeContrat || experience || publieeDepuis || teletravail) && '(actifs)'}</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '7px' }}><Settings size={15} /> Filtres {(typeContrat || experience || publieeDepuis || teletravail) && '(actifs)'}</span>
               <span>{showFilters ? '▲' : '▼'}</span>
             </button>
             {showFilters && <div style={{ marginTop: '8px' }}><Sidebar /></div>}
@@ -284,7 +285,7 @@ export default function Offres() {
             {/* État vide */}
             {!searched && !loading && (
               <div style={{ textAlign: 'center', padding: '60px 24px', background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb' }}>
-                <div style={{ fontSize: '48px', marginBottom: '14px' }}>🎯</div>
+                <Target size={44} color="#c4c4c4" strokeWidth={1.5} style={{ marginBottom: '14px' }} />
                 <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#111', margin: '0 0 8px' }}>Lance ta recherche</h3>
                 <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 20px' }}>Accès à des milliers d'offres en temps réel</p>
                 <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -333,7 +334,7 @@ export default function Offres() {
                             ● {offre.source}
                           </span>
                           {offre.type && <span style={{ fontSize: '10px', fontWeight: '600', padding: '2px 8px', borderRadius: '10px', background: '#f3f4f6', color: '#6b7280' }}>{offre.type}</span>}
-                          {offre.remote && <span style={{ fontSize: '10px', fontWeight: '600', padding: '2px 8px', borderRadius: '10px', background: '#f0fdf4', color: '#16a34a' }}>🏠 Télétravail</span>}
+                          {offre.remote && <span style={{ fontSize: '10px', fontWeight: '600', padding: '2px 8px', borderRadius: '10px', background: '#f0fdf4', color: '#16a34a', display: 'inline-flex', alignItems: 'center', gap: '3px' }}><Home size={10} /> Télétravail</span>}
                           {offre.date && <span style={{ fontSize: '11px', color: '#c4c4c4', marginLeft: 'auto' }}>{formatDate(offre.date)}</span>}
                         </div>
 
@@ -343,12 +344,12 @@ export default function Offres() {
 
                         <div style={{ fontSize: '13px', color: '#374151', marginBottom: '4px' }}>
                           {offre.entreprise && <span style={{ fontWeight: '600' }}>{offre.entreprise}</span>}
-                          {offre.lieu && <span style={{ color: '#9ca3af' }}> · 📍 {offre.lieu}</span>}
+                          {offre.lieu && <span style={{ color: '#9ca3af', display: 'inline-flex', alignItems: 'center', gap: '3px' }}> · <MapPin size={11} /> {offre.lieu}</span>}
                         </div>
 
                         {offre.salaire && (
-                          <div style={{ fontSize: '12px', color: '#16a34a', fontWeight: '600', marginBottom: '4px' }}>
-                            💰 {offre.salaire}
+                          <div style={{ fontSize: '12px', color: '#16a34a', fontWeight: '600', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <DollarSign size={12} /> {offre.salaire}
                           </div>
                         )}
 
@@ -362,8 +363,8 @@ export default function Offres() {
                       {/* Actions */}
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flexShrink: 0 }}>
                         <button onClick={() => handleGenererCV(offre)}
-                          style={{ padding: isMobile ? '8px 12px' : '9px 16px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: isMobile ? '11px' : '13px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
-                          ⚡ {isMobile ? 'CV' : 'Générer CV'}
+                          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', padding: isMobile ? '8px 12px' : '9px 16px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '9px', fontSize: isMobile ? '11px' : '13px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
+                          <Zap size={12} /> {isMobile ? 'CV' : 'Générer CV'}
                         </button>
                         {offre.url && (
                           <a href={offre.url} target="_blank" rel="noopener noreferrer"

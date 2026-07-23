@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { FileText, Search, Mail, Link as LinkIcon, Eye, ClipboardList, Mic, Trash2, Edit2, Download, Plus, Lightbulb } from 'lucide-react'
 import { supabase } from './supabase'
 import { CVTemplate } from './CVTemplates'
 import CVEditorBlocks from './CVEditorBlocks'
@@ -208,9 +209,9 @@ export default function Dashboard() {
               </p>
             </div>
             <div style={{ display: 'flex', gap: '8px' }}>
-              {!isMobile && <a href="/offres" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 16px', borderRadius: '9px', border: '1px solid #e5e7eb', background: '#fff', color: '#374151', textDecoration: 'none', fontSize: '13px', fontWeight: '600' }}>🔍 Offres</a>}
-              <a href="/templates" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 18px', borderRadius: '9px', background: '#4f46e5', color: '#fff', textDecoration: 'none', fontSize: '13px', fontWeight: '700' }}>
-                {isMobile ? '+ CV' : '+ Nouveau CV'}
+              {!isMobile && <a href="/offres" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 16px', borderRadius: '12px', border: '1px solid #e5e7eb', background: '#fff', color: '#374151', textDecoration: 'none', fontSize: '13px', fontWeight: '600' }}><Search size={15} /> Offres</a>}
+              <a href="/templates" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 18px', borderRadius: '12px', background: '#4f46e5', color: '#fff', textDecoration: 'none', fontSize: '13px', fontWeight: '700', boxShadow: '0 4px 12px rgba(79,70,229,0.3)' }}>
+                <Plus size={15} /> {isMobile ? 'CV' : 'Nouveau CV'}
               </a>
             </div>
           </div>
@@ -218,15 +219,15 @@ export default function Dashboard() {
           {/* Stats */}
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : w < 1024 ? 'repeat(3, 1fr)' : 'repeat(6, 1fr)', gap: isMobile ? '10px' : '16px', marginTop: '20px' }}>
             {[
-              { label: 'CV générés', value: cvs.length, icon: '📄', color: '#4f46e5' },
-              { label: 'Lettres', value: cvs.filter(c => c.lettre_motivation).length, icon: '✉️', color: '#0d9488' },
-              { label: 'CV partagés', value: Object.values(partages).filter(p => p.actif).length, icon: '🔗', color: '#7c3aed' },
-              { label: 'Vues totales', value: Object.values(partages).reduce((somme, p) => somme + (p.vues || 0), 0), icon: '👁', color: '#0891b2' },
-              { label: 'Candidatures', value: candidaturesCount, icon: '📋', color: '#c2410c' },
-              { label: 'Entretiens', value: entretiensCompletes, icon: '🎙', color: '#16a34a' },
+              { label: 'CV générés', value: cvs.length, icon: FileText, color: '#4f46e5' },
+              { label: 'Lettres', value: cvs.filter(c => c.lettre_motivation).length, icon: Mail, color: '#0d9488' },
+              { label: 'CV partagés', value: Object.values(partages).filter(p => p.actif).length, icon: LinkIcon, color: '#7c3aed' },
+              { label: 'Vues totales', value: Object.values(partages).reduce((somme, p) => somme + (p.vues || 0), 0), icon: Eye, color: '#0891b2' },
+              { label: 'Candidatures', value: candidaturesCount, icon: ClipboardList, color: '#c2410c' },
+              { label: 'Entretiens', value: entretiensCompletes, icon: Mic, color: '#16a34a' },
             ].map(s => (
               <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: isMobile ? '10px 14px' : '14px 16px', background: '#f8f9ff', borderRadius: '10px', border: '1px solid #ede9fe' }}>
-                <span style={{ fontSize: '18px' }}>{s.icon}</span>
+                <s.icon size={18} color={s.color} strokeWidth={1.75} />
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontSize: isMobile ? '16px' : '20px', fontWeight: '800', color: s.color, lineHeight: 1 }}>{s.value}</div>
                   <div style={{ fontSize: '10px', color: '#9ca3af', marginTop: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.label}</div>
@@ -289,8 +290,8 @@ export default function Dashboard() {
       {!profile?.prenom && (
         <div style={{ maxWidth: '1200px', margin: '16px auto 0', padding: `0 ${isMobile ? '16px' : '40px'}` }}>
           <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '12px', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
-            <div style={{ fontSize: '13px', color: '#92400e', fontWeight: '500' }}>
-              💡 Complete ton profil pour générer des CV plus vite
+            <div style={{ fontSize: '13px', color: '#92400e', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Lightbulb size={16} /> Complete ton profil pour générer des CV plus vite
             </div>
             <a href="/profile" style={{ padding: '7px 14px', background: '#f59e0b', color: '#fff', borderRadius: '8px', textDecoration: 'none', fontSize: '12px', fontWeight: '700', flexShrink: 0 }}>
               Compléter
@@ -303,18 +304,20 @@ export default function Dashboard() {
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: isMobile ? '20px 16px 80px' : '28px 40px 60px' }}>
         {cvs.length === 0 ? (
           <div style={{ textAlign: 'center', padding: isMobile ? '48px 24px' : '80px 40px', background: '#fff', borderRadius: '16px', border: '2px dashed #e5e7eb' }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>📄</div>
+            <FileText size={44} color="#c4c4c4" strokeWidth={1.5} style={{ marginBottom: '16px' }} />
             <h3 style={{ fontSize: '20px', fontWeight: '700', color: '#111', margin: '0 0 10px' }}>Aucun CV pour l'instant</h3>
             <p style={{ fontSize: '14px', color: '#9ca3af', margin: '0 0 24px' }}>Génère ton premier CV en 30 secondes</p>
-            <a href="/templates" style={{ display: 'inline-block', padding: '12px 24px', background: '#4f46e5', color: '#fff', borderRadius: '10px', textDecoration: 'none', fontSize: '14px', fontWeight: '700' }}>
-              Générer mon premier CV →
+            <a href="/templates" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '12px 24px', background: '#4f46e5', color: '#fff', borderRadius: '12px', textDecoration: 'none', fontSize: '14px', fontWeight: '700', boxShadow: '0 4px 12px rgba(79,70,229,0.3)' }}>
+              <Plus size={16} /> Générer mon premier CV
             </a>
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(240px, 1fr))', gap: isMobile ? '12px' : '20px' }}>
             {cvs.map(cv => (
               <div key={cv.id} onClick={() => { setSelectedCv(cv); setShowLettre(false) }}
-                style={{ background: '#fff', borderRadius: '14px', border: `2px solid ${selectedCv?.id === cv.id ? '#4f46e5' : '#e5e7eb'}`, overflow: 'hidden', cursor: 'pointer', transition: 'all 0.15s', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.1)' }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.04)' }}
+                style={{ background: '#fff', borderRadius: '14px', border: `2px solid ${selectedCv?.id === cv.id ? '#4f46e5' : '#e5e7eb'}`, overflow: 'hidden', cursor: 'pointer', transition: 'transform 0.15s, box-shadow 0.15s', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
                 {/* Apercu */}
                 <div style={{ width: '100%', height: isMobile ? '120px' : '180px', overflow: 'hidden', position: 'relative', background: '#f8f9ff' }}>
                   <div style={{ position: 'absolute', top: 0, left: 0, width: '794px', height: '1123px', transform: `scale(${previewScale})`, transformOrigin: 'top left', pointerEvents: 'none', userSelect: 'none' }}>
@@ -322,8 +325,8 @@ export default function Dashboard() {
                   </div>
                   <div style={{ position: 'absolute', top: '6px', right: '6px', background: 'rgba(0,0,0,0.5)', color: '#fff', padding: '1px 6px', borderRadius: '5px', fontSize: '9px', fontWeight: '600' }}>{cv.template}</div>
                   {partages[cv.id]?.actif && (
-                    <div style={{ position: 'absolute', top: '6px', left: '6px', background: 'rgba(79,70,229,0.9)', color: '#fff', padding: '1px 7px', borderRadius: '5px', fontSize: '9px', fontWeight: '600' }}>
-                      👁 {partages[cv.id].vues} vue{partages[cv.id].vues !== 1 ? 's' : ''}
+                    <div style={{ position: 'absolute', top: '6px', left: '6px', background: 'rgba(79,70,229,0.9)', color: '#fff', padding: '1px 7px', borderRadius: '5px', fontSize: '9px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                      <Eye size={10} /> {partages[cv.id].vues} vue{partages[cv.id].vues !== 1 ? 's' : ''}
                     </div>
                   )}
                 </div>
@@ -338,21 +341,21 @@ export default function Dashboard() {
 
                   <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
                     <button onClick={(e) => handleDownloadCV(cv, e)}
-                      style={{ flex: 1, padding: isMobile ? '6px 4px' : '7px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '7px', fontSize: isMobile ? '10px' : '11px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit', minWidth: 0 }}>
-                      {downloading === cv.id ? '...' : '📥 PDF'}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', flex: 1, padding: isMobile ? '6px 4px' : '7px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '9px', fontSize: isMobile ? '10px' : '11px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit', minWidth: 0 }}>
+                      {downloading === cv.id ? '...' : <><Download size={12} /> PDF</>}
                     </button>
                     <button onClick={(e) => handleEdit(cv, e)}
-                      style={{ flex: 1, padding: isMobile ? '6px 4px' : '7px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: '7px', fontSize: isMobile ? '10px' : '11px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit', minWidth: 0 }}>
-                      ✏️ {!isMobile && 'Modifier'}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', flex: 1, padding: isMobile ? '6px 4px' : '7px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: '9px', fontSize: isMobile ? '10px' : '11px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit', minWidth: 0 }}>
+                      <Edit2 size={12} /> {!isMobile && 'Modifier'}
                     </button>
                     <button onClick={(e) => handleDelete(cv.id, e)}
-                      style={{ padding: isMobile ? '6px 7px' : '7px 9px', background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '7px', fontSize: isMobile ? '10px' : '11px', cursor: 'pointer', fontFamily: 'inherit' }}>
-                      🗑
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: isMobile ? '6px 7px' : '7px 9px', background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '9px', fontSize: isMobile ? '10px' : '11px', cursor: 'pointer', fontFamily: 'inherit' }}>
+                      <Trash2 size={12} />
                     </button>
                   </div>
                   <button onClick={(e) => handlePartager(cv, e)} disabled={partageLoading === cv.id}
-                    style={{ width: '100%', marginTop: '5px', padding: isMobile ? '6px 4px' : '7px', background: partages[cv.id] ? '#f0fdf4' : '#eef2ff', color: partages[cv.id] ? '#16a34a' : '#4f46e5', border: 'none', borderRadius: '7px', fontSize: isMobile ? '10px' : '11px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
-                    {partageLoading === cv.id ? '...' : partages[cv.id] ? '🔗 Voir le lien' : '🔗 Partager'}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', width: '100%', marginTop: '5px', padding: isMobile ? '6px 4px' : '7px', background: partages[cv.id] ? '#f0fdf4' : '#eef2ff', color: partages[cv.id] ? '#16a34a' : '#4f46e5', border: 'none', borderRadius: '9px', fontSize: isMobile ? '10px' : '11px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
+                    {partageLoading === cv.id ? '...' : <><LinkIcon size={12} /> {partages[cv.id] ? 'Voir le lien' : 'Partager'}</>}
                   </button>
                 </div>
               </div>
@@ -360,10 +363,10 @@ export default function Dashboard() {
 
             {/* Carte nouveau */}
             <a href="/templates" style={{ textDecoration: 'none' }}>
-              <div style={{ background: '#fff', borderRadius: '14px', border: '2px dashed #e5e7eb', cursor: 'pointer', height: isMobile ? '200px' : '100%', minHeight: isMobile ? '200px' : '280px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = '#4f46e5'; e.currentTarget.style.background = '#faf9ff' }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.background = '#fff' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>+</div>
+              <div style={{ background: '#fff', borderRadius: '14px', border: '2px dashed #e5e7eb', cursor: 'pointer', height: isMobile ? '200px' : '100%', minHeight: isMobile ? '200px' : '280px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'transform 0.15s, box-shadow 0.15s, border-color 0.15s, background 0.15s' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#4f46e5'; e.currentTarget.style.background = '#faf9ff'; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.08)' }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.background = '#fff'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={20} color="#4f46e5" /></div>
                 <div style={{ fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>Nouveau CV</div>
               </div>
             </a>
@@ -378,12 +381,12 @@ export default function Dashboard() {
             {/* Header modal */}
             <div style={{ padding: '14px 16px', borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
               <div style={{ display: 'flex', gap: '6px' }}>
-                <button onClick={() => setShowLettre(false)} style={{ padding: '6px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', background: !showLettre ? '#4f46e5' : '#f3f4f6', color: !showLettre ? '#fff' : '#374151' }}>📄 CV</button>
-                {selectedCv.lettre_motivation && <button onClick={() => setShowLettre(true)} style={{ padding: '6px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', background: showLettre ? '#4f46e5' : '#f3f4f6', color: showLettre ? '#fff' : '#374151' }}>✉️ Lettre</button>}
+                <button onClick={() => setShowLettre(false)} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', background: !showLettre ? '#4f46e5' : '#f3f4f6', color: !showLettre ? '#fff' : '#374151' }}><FileText size={13} /> CV</button>
+                {selectedCv.lettre_motivation && <button onClick={() => setShowLettre(true)} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', background: showLettre ? '#4f46e5' : '#f3f4f6', color: showLettre ? '#fff' : '#374151' }}><Mail size={13} /> Lettre</button>}
               </div>
               <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                {!showLettre && <button onClick={(e) => handleEdit(selectedCv, e)} style={{ padding: '6px 12px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>✏️</button>}
-                <button onClick={() => handleDownloadCV(selectedCv)} style={{ padding: '6px 14px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>📥</button>
+                {!showLettre && <button onClick={(e) => handleEdit(selectedCv, e)} style={{ display: 'flex', alignItems: 'center', padding: '6px 12px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}><Edit2 size={13} /></button>}
+                <button onClick={() => handleDownloadCV(selectedCv)} style={{ display: 'flex', alignItems: 'center', padding: '6px 14px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}><Download size={13} /></button>
                 <button onClick={() => setSelectedCv(null)} style={{ width: '30px', height: '30px', borderRadius: '8px', border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
               </div>
             </div>
@@ -411,7 +414,7 @@ export default function Dashboard() {
       {partageOuvert && (
         <div onClick={() => setPartageOuvert(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', backdropFilter: 'blur(4px)' }}>
           <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: '16px', padding: '28px', maxWidth: '420px', width: '100%' }}>
-            <div style={{ fontSize: '15px', fontWeight: '800', color: '#111', marginBottom: '6px' }}>🔗 Lien de partage</div>
+            <div style={{ fontSize: '15px', fontWeight: '800', color: '#111', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}><LinkIcon size={17} /> Lien de partage</div>
             <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 16px', lineHeight: '1.6' }}>
               Toute personne avec ce lien peut voir ce CV. Chaque visite est comptabilisée
               {partageOuvert.vues > 0 && <> — <strong>{partageOuvert.vues} vue{partageOuvert.vues !== 1 ? 's' : ''}</strong> pour l'instant</>}.
@@ -420,7 +423,7 @@ export default function Dashboard() {
               <input readOnly value={`${window.location.origin}/cv/${partageOuvert.slug}`} onFocus={e => e.target.select()}
                 style={{ flex: 1, padding: '10px 12px', border: '1.5px solid #e5e7eb', borderRadius: '8px', fontSize: '13px', color: '#374151', fontFamily: 'inherit', minWidth: 0 }} />
               <button onClick={copierLien}
-                style={{ padding: '10px 16px', background: copie ? '#16a34a' : '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0 }}>
+                style={{ padding: '10px 16px', background: copie ? '#16a34a' : '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0, boxShadow: copie ? 'none' : '0 4px 12px rgba(79,70,229,0.3)' }}>
                 {copie ? '✓ Copié' : 'Copier'}
               </button>
             </div>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Target, Lightbulb, Plus, ChevronRight } from 'lucide-react'
 import Navbar from './Navbar'
 import SEO from './SEO'
 import { supabase } from './supabase'
@@ -55,7 +56,9 @@ function getRecommandations(profilMetiers) {
 
 function FormationCard({ f }) {
   return (
-    <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #ececec', padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+    <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #ececec', padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px', transition: 'transform 0.15s, box-shadow 0.15s' }}
+      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.1)' }}
+      onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ fontSize: '30px' }}>{CATEGORY_ICONS[f.categorie] || '🎓'}</div>
         {f.gratuit && (
@@ -74,8 +77,8 @@ function FormationCard({ f }) {
         <span style={{ fontSize: '11px', fontWeight: '600', color: '#6b7280', background: '#f3f4f6', padding: '4px 10px', borderRadius: '6px' }}>⏱ {f.duree}</span>
       </div>
       <a href={f.lien} target="_blank" rel="noopener noreferrer"
-        style={{ textAlign: 'center', fontSize: '13px', fontWeight: '700', textDecoration: 'none', color: '#fff', background: '#4f46e5', padding: '10px', borderRadius: '8px' }}>
-        Accéder →
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', fontSize: '13px', fontWeight: '700', textDecoration: 'none', color: '#fff', background: '#4f46e5', padding: '10px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(79,70,229,0.3)' }}>
+        Accéder <ChevronRight size={14} />
       </a>
       <TestCompetence formation={f} />
     </div>
@@ -175,8 +178,8 @@ function TestCompetence({ formation }) {
   return (
     <>
       <button onClick={demarrer}
-        style={{ textAlign: 'center', fontSize: '12px', fontWeight: '700', color: '#4f46e5', background: '#eef2ff', border: '1px solid #e0e7ff', borderRadius: '8px', padding: '9px', cursor: 'pointer', fontFamily: 'inherit' }}>
-        🎯 Tester mon niveau
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '12px', fontWeight: '700', color: '#4f46e5', background: '#eef2ff', border: '1px solid #e0e7ff', borderRadius: '9px', padding: '9px', cursor: 'pointer', fontFamily: 'inherit' }}>
+        <Target size={13} /> Tester mon niveau
       </button>
 
       {open && (
@@ -228,8 +231,8 @@ function TestCompetence({ formation }) {
                   })}
                 </div>
                 {revealed && (
-                  <div style={{ padding: '12px 14px', background: '#f8f9ff', border: '1px solid #ede9fe', borderRadius: '10px', fontSize: '12px', color: '#6b7280', lineHeight: '1.6', marginBottom: '16px' }}>
-                    💡 {quiz[step].explication}
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '7px', padding: '12px 14px', background: '#f8f9ff', border: '1px solid #ede9fe', borderRadius: '10px', fontSize: '12px', color: '#6b7280', lineHeight: '1.6', marginBottom: '16px' }}>
+                    <Lightbulb size={14} style={{ flexShrink: 0, marginTop: '1px' }} /> {quiz[step].explication}
                   </div>
                 )}
                 <button onClick={suivant} disabled={!revealed}
@@ -247,8 +250,8 @@ function TestCompetence({ formation }) {
 
                 {score >= 4 && !added && (
                   <button onClick={ajouterAuProfil} disabled={adding}
-                    style={{ width: '100%', padding: '13px', background: '#0f6e56', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: adding ? 'default' : 'pointer', fontFamily: 'inherit', marginBottom: '10px' }}>
-                    {adding ? 'Ajout...' : '+ Ajouter à mon profil'}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', width: '100%', padding: '13px', background: '#0f6e56', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: '700', cursor: adding ? 'default' : 'pointer', fontFamily: 'inherit', marginBottom: '10px', boxShadow: '0 4px 12px rgba(15,110,86,0.3)' }}>
+                    {!adding && <Plus size={15} />}{adding ? 'Ajout...' : 'Ajouter à mon profil'}
                   </button>
                 )}
                 {added && (

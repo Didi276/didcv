@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ChevronRight } from 'lucide-react'
 import Navbar from './Navbar'
 import SEO from './SEO'
 import { ARTICLES, CATEGORIES } from './blogData'
@@ -44,16 +45,16 @@ export default function Blog() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
           {articles.map(article => (
             <Link key={article.slug} to={`/blog/${article.slug}`} style={{ textDecoration: 'none' }}>
-              <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '24px', height: '100%', boxSizing: 'border-box', transition: 'all 0.15s' }}
-                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 24px rgba(79,70,229,0.1)'; e.currentTarget.style.borderColor = '#4f46e5' }}
-                onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = '#e5e7eb' }}>
+              <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '24px', height: '100%', boxSizing: 'border-box', transition: 'transform 0.15s, box-shadow 0.15s, border-color 0.15s' }}
+                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 24px rgba(79,70,229,0.15)'; e.currentTarget.style.borderColor = '#4f46e5'; e.currentTarget.style.transform = 'translateY(-2px)' }}
+                onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.transform = 'translateY(0)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                   <span style={{ fontSize: '11px', fontWeight: '700', padding: '3px 10px', borderRadius: '10px', background: '#ede9fe', color: '#4f46e5' }}>{article.categorie}</span>
                   <span style={{ fontSize: '11px', color: '#9ca3af' }}>{article.duree}</span>
                 </div>
                 <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: '0 0 10px', lineHeight: '1.4', letterSpacing: '-0.2px' }}>{article.titre}</h2>
                 <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 16px', lineHeight: '1.6' }}>{article.description}</p>
-                <div style={{ fontSize: '12px', color: '#4f46e5', fontWeight: '600' }}>Lire la suite →</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: '#4f46e5', fontWeight: '600' }}>Lire la suite <ChevronRight size={13} /></div>
               </div>
             </Link>
           ))}

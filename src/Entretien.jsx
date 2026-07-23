@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { ClipboardList, Link as LinkIcon, FileText, Lightbulb, Download, RotateCcw, BookOpen, Play, Pause, Volume2, VolumeX, Square, Mic, Send, ChevronRight } from 'lucide-react'
 import Navbar from './Navbar'
 import { supabase } from './supabase'
 
@@ -487,10 +488,10 @@ export default function Entretien() {
 
             {/* Source de l'offre */}
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '20px' }}>
-              {[['candidature', '📋 Mes candidatures'], ['url', '🔗 Lien d\'offre'], ['manuel', '✍️ Manuel']].map(([id, label]) => (
+              {[['candidature', ClipboardList, 'Mes candidatures'], ['url', LinkIcon, 'Lien d\'offre'], ['manuel', null, 'Manuel']].map(([id, Icon, label]) => (
                 <button key={id} type="button" onClick={() => setSource(id)}
-                  style={{ padding: '8px 14px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', background: source === id ? '#4f46e5' : '#f3f4f6', color: source === id ? '#fff' : '#374151' }}>
-                  {label}
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', background: source === id ? '#4f46e5' : '#f3f4f6', color: source === id ? '#fff' : '#374151' }}>
+                  {Icon && <Icon size={13} />}{label}
                 </button>
               ))}
             </div>
@@ -565,8 +566,8 @@ export default function Entretien() {
             )}
 
             {cvResume && (
-              <div style={{ marginBottom: '20px', padding: '10px 14px', background: '#f8f9ff', border: '1px solid #ede9fe', borderRadius: '9px', fontSize: '13px', color: '#4f46e5', fontWeight: '600' }}>
-                📄 CV pris en compte pour personnaliser les questions
+              <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '20px', padding: '10px 14px', background: '#f8f9ff', border: '1px solid #ede9fe', borderRadius: '9px', fontSize: '13px', color: '#4f46e5', fontWeight: '600' }}>
+                <FileText size={14} /> CV pris en compte pour personnaliser les questions
               </div>
             )}
 
@@ -623,8 +624,8 @@ export default function Entretien() {
             </div>
 
             <button onClick={demarrer} disabled={!poste.trim()}
-              style={{ width: '100%', padding: '13px', background: poste.trim() ? '#4f46e5' : '#e5e7eb', color: poste.trim() ? '#fff' : '#9ca3af', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '700', cursor: poste.trim() ? 'pointer' : 'default', fontFamily: 'inherit' }}>
-              Démarrer l'entretien
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', width: '100%', padding: '13px', background: poste.trim() ? '#4f46e5' : '#e5e7eb', color: poste.trim() ? '#fff' : '#9ca3af', border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: '700', cursor: poste.trim() ? 'pointer' : 'default', fontFamily: 'inherit', boxShadow: poste.trim() ? '0 4px 12px rgba(79,70,229,0.3)' : 'none' }}>
+              Démarrer l'entretien <ChevronRight size={16} />
             </button>
           </div>
         )}
@@ -639,16 +640,16 @@ export default function Entretien() {
                   {poste} <span style={{ color: '#9ca3af', fontWeight: '500' }}>{entreprise && `· ${entreprise} `}· {type}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-                  <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: '600', whiteSpace: 'nowrap' }}>⏱ {formatTemps(tempsEcoule)}</div>
+                  <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: '600', whiteSpace: 'nowrap' }}>{formatTemps(tempsEcoule)}</div>
                   <button onClick={togglePause} title={pause ? 'Reprendre' : 'Mettre en pause'}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '15px', padding: '2px' }}>
-                    {pause ? '▶️' : '⏸'}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex', alignItems: 'center' }}>
+                    {pause ? <Play size={15} color="#374151" /> : <Pause size={15} color="#374151" />}
                   </button>
                   {modeVocal && synthSupported && (
                     <button onClick={() => { setVocalActif(v => !v); window.speechSynthesis.cancel() }}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', padding: '2px' }}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex', alignItems: 'center' }}
                       title={vocalActif ? 'Désactiver la lecture vocale' : 'Activer la lecture vocale'}>
-                      {vocalActif ? '🔊' : '🔇'}
+                      {vocalActif ? <Volume2 size={16} color="#374151" /> : <VolumeX size={16} color="#374151" />}
                     </button>
                   )}
                   <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: '600', whiteSpace: 'nowrap' }}>
@@ -712,7 +713,7 @@ export default function Entretien() {
                       )}
                       {conseil && (
                         <div style={{ background: '#f8f9ff', border: '1px solid #ede9fe', borderRadius: '10px', padding: '10px 14px' }}>
-                          <div style={{ fontSize: '11px', color: '#4f46e5', fontWeight: '700', marginBottom: '3px' }}>💡 Conseil</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: '#4f46e5', fontWeight: '700', marginBottom: '3px' }}><Lightbulb size={12} /> Conseil</div>
                           <div style={{ fontSize: '13px', color: '#374151', lineHeight: '1.6' }}>{conseil}</div>
                         </div>
                       )}
@@ -754,8 +755,8 @@ export default function Entretien() {
                 <div style={{ textAlign: 'center' }}>
                   <div style={{ fontSize: '13px', color: '#9ca3af', marginBottom: '10px' }}>Entretien en pause</div>
                   <button onClick={togglePause}
-                    style={{ padding: '11px 24px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
-                    ▶️ Reprendre l'entretien
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', padding: '11px 24px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 12px rgba(79,70,229,0.3)' }}>
+                    <Play size={15} /> Reprendre l'entretien
                   </button>
                 </div>
               ) : modeVocal && isMobile && !modeEcrit ? (
@@ -765,11 +766,12 @@ export default function Entretien() {
                     <button onClick={ecoute ? arreterEtEnvoyer : demarrerEcoute} disabled={loading}
                       style={{
                         width: '72px', height: '72px', borderRadius: '50%', border: 'none', cursor: loading ? 'default' : 'pointer',
-                        background: ecoute ? '#dc2626' : '#4f46e5', color: '#fff', fontSize: '28px',
+                        background: ecoute ? '#dc2626' : '#4f46e5', color: '#fff',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
                         boxShadow: ecoute ? '0 0 0 8px rgba(220,38,38,0.15)' : '0 4px 16px rgba(79,70,229,0.3)',
                         animation: ecoute ? 'pulseRouge 1.2s infinite' : 'none',
                       }}>
-                      {ecoute ? '⏹' : '🎤'}
+                      {ecoute ? <Square size={26} /> : <Mic size={28} />}
                     </button>
                   ) : (
                     <div style={{ fontSize: '12px', color: '#9ca3af' }}>Micro non disponible sur ce navigateur</div>
@@ -791,21 +793,22 @@ export default function Entretien() {
                     <button onClick={ecoute ? arreterEtEnvoyer : demarrerEcoute} disabled={loading}
                       style={{
                         width: '44px', height: '44px', borderRadius: '10px', border: 'none', cursor: loading ? 'default' : 'pointer',
-                        background: ecoute ? '#dc2626' : '#f3f4f6', color: ecoute ? '#fff' : '#374151', fontSize: '18px', flexShrink: 0,
+                        background: ecoute ? '#dc2626' : '#f3f4f6', color: ecoute ? '#fff' : '#374151', flexShrink: 0,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
                         animation: ecoute ? 'pulseRouge 1.2s infinite' : 'none',
                       }}
                       title={ecoute ? 'Arrêter et envoyer' : 'Répondre à la voix'}>
-                      {ecoute ? '⏹' : '🎤'}
+                      {ecoute ? <Square size={17} /> : <Mic size={18} />}
                     </button>
                   )}
                   <style>{`@keyframes pulseRouge{0%{box-shadow:0 0 0 0 rgba(220,38,38,0.35)}70%{box-shadow:0 0 0 10px rgba(220,38,38,0)}100%{box-shadow:0 0 0 0 rgba(220,38,38,0)}}`}</style>
                   <button onClick={envoyer} disabled={!reponse.trim() || loading}
-                    style={{ padding: '12px 20px', background: reponse.trim() && !loading ? '#4f46e5' : '#e5e7eb', color: reponse.trim() && !loading ? '#fff' : '#9ca3af', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: reponse.trim() && !loading ? 'pointer' : 'default', fontFamily: 'inherit', flexShrink: 0 }}>
-                    Envoyer
+                    style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '12px 20px', background: reponse.trim() && !loading ? '#4f46e5' : '#e5e7eb', color: reponse.trim() && !loading ? '#fff' : '#9ca3af', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: reponse.trim() && !loading ? 'pointer' : 'default', fontFamily: 'inherit', flexShrink: 0 }}>
+                    <Send size={14} /> Envoyer
                   </button>
                   {modeVocal && isMobile && (
-                    <button onClick={() => setModeEcrit(false)} style={{ background: 'none', border: 'none', color: '#9ca3af', fontSize: '18px', cursor: 'pointer', flexShrink: 0 }} title="Revenir au micro">
-                      🎤
+                    <button onClick={() => setModeEcrit(false)} style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center' }} title="Revenir au micro">
+                      <Mic size={18} />
                     </button>
                   )}
                 </div>
@@ -824,7 +827,7 @@ export default function Entretien() {
               {poste}{entreprise && ` · ${entreprise}`}
             </div>
             <div style={{ textAlign: 'center', fontSize: '12px', color: '#9ca3af', marginBottom: '28px' }}>
-              ⏱ Durée : {formatTemps(dureeFinale)}
+              Durée : {formatTemps(dureeFinale)}
             </div>
 
             {recapitulatif.length > 0 && (
@@ -858,18 +861,18 @@ export default function Entretien() {
             {bilan.conseil_final && (
               <div style={{ background: '#f8f9ff', border: '1px solid #ede9fe', borderRadius: '12px', padding: '16px', marginBottom: '28px' }}>
                 <div style={{ fontSize: '12px', fontWeight: '700', color: '#4f46e5', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Conseil personnalisé</div>
-                <div style={{ fontSize: '14px', color: '#374151', lineHeight: '1.7' }}>💡 {bilan.conseil_final}</div>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '7px', fontSize: '14px', color: '#374151', lineHeight: '1.7' }}><Lightbulb size={15} style={{ flexShrink: 0, marginTop: '2px' }} /> {bilan.conseil_final}</div>
               </div>
             )}
 
             <div className="no-print" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button onClick={telechargerBilan}
-                style={{ width: '100%', padding: '13px', background: '#171412', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
-                📥 Télécharger mon bilan
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', width: '100%', padding: '13px', background: '#171412', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 12px rgba(0,0,0,0.25)' }}>
+                <Download size={15} /> Télécharger mon bilan
               </button>
               <button onClick={recommencer}
-                style={{ width: '100%', padding: '13px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
-                🔄 Recommencer avec les mêmes paramètres
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', width: '100%', padding: '13px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 12px rgba(79,70,229,0.3)' }}>
+                <RotateCcw size={15} /> Recommencer avec les mêmes paramètres
               </button>
               {candidatureId && (
                 noteAjoutee ? (
@@ -878,14 +881,14 @@ export default function Entretien() {
                   </div>
                 ) : (
                   <button onClick={ajouterNoteCandidature}
-                    style={{ width: '100%', padding: '13px', background: '#fff', color: '#7c3aed', border: '1.5px solid #ddd6fe', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
-                    📋 Ajouter une note dans mes candidatures
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', width: '100%', padding: '13px', background: '#fff', color: '#7c3aed', border: '1.5px solid #ddd6fe', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
+                    <ClipboardList size={15} /> Ajouter une note dans mes candidatures
                   </button>
                 )
               )}
               <Link to="/formations"
-                style={{ display: 'block', textAlign: 'center', width: '100%', padding: '13px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none', boxSizing: 'border-box' }}>
-                📚 Formations recommandées
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', textAlign: 'center', width: '100%', padding: '13px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none', boxSizing: 'border-box' }}>
+                <BookOpen size={15} /> Formations recommandées
               </Link>
             </div>
           </div>

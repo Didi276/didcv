@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ChevronRight } from 'lucide-react'
 import Navbar from './Navbar'
 import SEO from './SEO'
 import { GUIDES, SECTEURS } from './guidesData'
@@ -44,15 +45,15 @@ export default function GuidesMetier() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '16px' }}>
           {guides.map(guide => (
             <Link key={guide.slug} to={`/guide/${guide.slug}`} style={{ textDecoration: 'none' }}>
-              <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '20px', transition: 'all 0.15s', display: 'flex', gap: '14px', alignItems: 'flex-start' }}
-                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 24px rgba(79,70,229,0.1)'; e.currentTarget.style.borderColor = '#4f46e5' }}
-                onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = '#e5e7eb' }}>
+              <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '20px', transition: 'transform 0.15s, box-shadow 0.15s, border-color 0.15s', display: 'flex', gap: '14px', alignItems: 'flex-start' }}
+                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 24px rgba(79,70,229,0.15)'; e.currentTarget.style.borderColor = '#4f46e5'; e.currentTarget.style.transform = 'translateY(-2px)' }}
+                onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.transform = 'translateY(0)' }}>
                 <div style={{ fontSize: '32px', flexShrink: 0 }}>{guide.icon}</div>
                 <div>
                   <div style={{ fontSize: '11px', fontWeight: '700', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{guide.secteur}</div>
                   <div style={{ fontSize: '15px', fontWeight: '700', color: '#111', marginBottom: '6px', lineHeight: '1.3' }}>{guide.titre}</div>
                   <div style={{ fontSize: '12px', color: '#6b7280', lineHeight: '1.5' }}>{guide.description.substring(0, 80)}...</div>
-                  <div style={{ fontSize: '12px', color: '#4f46e5', fontWeight: '600', marginTop: '8px' }}>Voir le guide →</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: '#4f46e5', fontWeight: '600', marginTop: '8px' }}>Voir le guide <ChevronRight size={13} /></div>
                 </div>
               </div>
             </Link>
