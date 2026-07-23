@@ -132,7 +132,7 @@ export default function Offres() {
   }
 
   const FilterSection = ({ title, children }) => (
-    <div style={{ marginBottom: '20px' }}>
+    <div style={{ padding: '16px 0', borderTop: '1px solid #f0f0f0' }}>
       <div style={{ fontSize: '11px', fontWeight: '700', color: '#374151', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>{title}</div>
       {children}
     </div>
@@ -148,7 +148,8 @@ export default function Offres() {
   )
 
   const Sidebar = () => (
-    <div style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '20px' }}>
+    <div className="filter-sidebar" style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '20px' }}>
+      <style>{'.filter-sidebar > div:first-child { border-top: none; padding-top: 0; }'}</style>
       <FilterSection title="Secteur">
         {SECTEURS.map(s => (
           <FilterChip key={s} label={s} active={secteur === s}
@@ -197,10 +198,12 @@ export default function Offres() {
       </FilterSection>
 
       {(typeContrat || experience || publieeDepuis || teletravail || secteur) && (
-        <button onClick={() => { setTypeContrat(''); setExperience(''); setPublieeDepuis(''); setTeletravail(false); setSecteur(''); handleSearch({ typeContrat: '', experience: '', publieeDepuis: '', teletravail: false }) }}
-          style={{ width: '100%', padding: '8px', background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit', marginTop: '8px' }}>
-          Réinitialiser les filtres
-        </button>
+        <div style={{ paddingTop: '16px', borderTop: '1px solid #f0f0f0', textAlign: 'center' }}>
+          <button onClick={() => { setTypeContrat(''); setExperience(''); setPublieeDepuis(''); setTeletravail(false); setSecteur(''); handleSearch({ typeContrat: '', experience: '', publieeDepuis: '', teletravail: false }) }}
+            style={{ background: 'none', color: '#9ca3af', border: 'none', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline' }}>
+            Réinitialiser les filtres
+          </button>
+        </div>
       )}
     </div>
   )
@@ -210,12 +213,13 @@ export default function Offres() {
       <Navbar currentPage="offres" />
 
       {/* Hero recherche */}
-      <div style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', padding: isMobile ? '28px 16px 36px' : '40px 40px 48px' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <h1 style={{ fontSize: isMobile ? '24px' : '32px', fontWeight: '800', color: '#fff', margin: '0 0 6px', letterSpacing: '-0.5px' }}>
+      <div style={{ position: 'relative', background: '#0a0a0f', overflow: 'hidden', padding: isMobile ? '28px 16px 36px' : '40px 40px 48px' }}>
+        <div style={{ position: 'absolute', top: '0', left: '50%', transform: 'translateX(-50%)', width: '600px', height: '300px', maxWidth: '100%', background: 'radial-gradient(circle, #4f46e520 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'relative', maxWidth: '800px', margin: '0 auto' }}>
+          <h1 style={{ fontSize: isMobile ? '24px' : '32px', fontWeight: '700', color: '#fff', margin: '0 0 6px', letterSpacing: '-0.5px' }}>
             Trouve ton emploi idéal
           </h1>
-          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)', margin: '0 0 20px' }}>
+          <p style={{ fontSize: '14px', color: '#a1a1aa', margin: '0 0 20px' }}>
             France Travail, LinkedIn, Indeed et plus — tout en un
           </p>
 
@@ -368,7 +372,7 @@ export default function Offres() {
                         </button>
                         {offre.url && (
                           <a href={offre.url} target="_blank" rel="noopener noreferrer"
-                            style={{ padding: isMobile ? '6px 10px' : '8px 16px', background: '#f8f9ff', color: '#4f46e5', border: '1px solid #ede9fe', borderRadius: '8px', fontSize: isMobile ? '10px' : '12px', fontWeight: '600', textDecoration: 'none', textAlign: 'center', display: 'block' }}>
+                            style={{ padding: isMobile ? '6px 10px' : '8px 16px', background: '#f8f9ff', color: '#4f46e5', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', borderRadius: '8px', fontSize: isMobile ? '10px' : '12px', fontWeight: '600', textDecoration: 'none', textAlign: 'center', display: 'block' }}>
                             Voir l'offre
                           </a>
                         )}
