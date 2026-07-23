@@ -33,26 +33,7 @@ const SECTEUR_COLORS = {
   'Créatif': '#fdf4ff',
   'Industrie': '#f1f5f9',
 }
-const SECTEUR_BORDER = {
-  'Finance': '#86efac',
-  'Tech': '#93c5fd',
-  'Commerce': '#fdba74',
-  'Santé': '#fca5a5',
-  'Management': '#c4b5fd',
-  'RH': '#e9d5ff',
-  'Marketing': '#fde047',
-  'BTP': '#fcd34d',
-  'Restauration': '#fda4af',
-  'Transport': '#a5f3fc',
-  'Beauté': '#f9a8d4',
-  'Administratif': '#d1d5db',
-  'Juridique': '#c7d2fe',
-  'Éducation': '#99f6e4',
-  'Créatif': '#e9d5ff',
-  'Industrie': '#cbd5e1',
-}
 const FALLBACK_BG = '#f8f9ff'
-const FALLBACK_BORDER = '#e5e7eb'
 
 export default function GuidesMetier() {
   const [secteur, setSecteur] = useState('')
@@ -67,12 +48,13 @@ export default function GuidesMetier() {
         url="https://didcv.vercel.app/guides"
       />
       <Navbar />
-      <div style={{ background: 'linear-gradient(135deg, #0f6e56, #059669)', padding: '48px 24px' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-          <h1 style={{ fontSize: '36px', fontWeight: '800', color: '#fff', margin: '0 0 12px', letterSpacing: '-1px' }}>
+      <div style={{ position: 'relative', background: '#0a0a0f', overflow: 'hidden', padding: '48px 24px' }}>
+        <div style={{ position: 'absolute', top: '0', left: '50%', transform: 'translateX(-50%)', width: '600px', height: '300px', maxWidth: '100%', background: 'radial-gradient(circle, #4f46e520 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'relative', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+          <h1 style={{ fontSize: '36px', fontWeight: '700', color: '#fff', margin: '0 0 12px', letterSpacing: '-1px' }}>
             Exemples de CV par métier
           </h1>
-          <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.75)', margin: 0 }}>
+          <p style={{ fontSize: '16px', color: '#a1a1aa', margin: 0 }}>
             Modèles et conseils spécialisés pour chaque secteur
           </p>
         </div>
@@ -92,15 +74,14 @@ export default function GuidesMetier() {
           ))}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px' }}>
           {guides.map(guide => {
             const bg = SECTEUR_COLORS[guide.secteur] || FALLBACK_BG
-            const border = SECTEUR_BORDER[guide.secteur] || FALLBACK_BORDER
             return (
               <Link key={guide.slug} to={`/guide/${guide.slug}`} style={{ textDecoration: 'none' }}>
-                <div style={{ background: bg, borderRadius: '16px', border: `1.5px solid ${border}`, padding: '24px', transition: 'transform 0.15s, box-shadow 0.15s', display: 'flex', gap: '16px', alignItems: 'flex-start', height: '100%', boxSizing: 'border-box' }}
-                  onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 10px 28px rgba(0,0,0,0.1)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
-                  onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'translateY(0)' }}>
+                <div style={{ background: bg, borderRadius: '16px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '24px', transition: 'transform 0.15s, box-shadow 0.15s', display: 'flex', gap: '16px', alignItems: 'flex-start', height: '100%', boxSizing: 'border-box' }}
+                  onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 10px 28px rgba(0,0,0,0.12)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
+                  onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'; e.currentTarget.style.transform = 'translateY(0)' }}>
                   <div style={{ fontSize: '40px', flexShrink: 0 }}>{guide.icon}</div>
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: '11px', fontWeight: '700', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '5px' }}>{guide.secteur}</div>
