@@ -6,7 +6,7 @@ import DateRangePicker from './DateRangePicker'
 import CityInput from './CityInput'
 import SuggestionsIA from './SuggestionsIA'
 import { FORMATIONS } from './formationsData'
-import { Download, CheckCircle, User, Briefcase, GraduationCap, Zap, Plus, FileText, Lock, Trash2, Edit2, BookOpen, MapPin, Calendar, ClipboardList } from 'lucide-react'
+import { Download, CheckCircle, User, Briefcase, GraduationCap, Zap, Plus, FileText, Lock, Trash2, Edit2, BookOpen, MapPin, Calendar, ClipboardList, FolderOpen, PartyPopper, AlertTriangle, RefreshCw, Camera, Sparkles } from 'lucide-react'
 
 // Mots-clés d'un titre de poste -> tags "metiers" utilisés dans formationsData.js
 const METIER_KEYWORDS = [
@@ -495,7 +495,7 @@ export default function Profile() {
                     }}
                     style={{ display: 'block', padding: '24px 16px', background: '#fff', border: '2px dashed #d1d5db', borderRadius: '10px', cursor: 'pointer', textAlign: 'center', transition: 'all 0.15s' }}>
                     <input type="file" accept=".pdf" onChange={handleImportCV} style={{ display: 'none' }} />
-                    <div style={{ fontSize: '28px', marginBottom: '8px' }}>📁</div>
+                    <FolderOpen size={26} color="#9ca3af" style={{ marginBottom: '8px' }} />
                     <div style={{ fontSize: '14px', fontWeight: '600', color: '#374151', marginBottom: '4px' }}>
                       Glisse ton CV ici ou clique pour choisir
                     </div>
@@ -516,7 +516,7 @@ export default function Profile() {
         {activeSection === 'verification' && (
           <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '32px' }}>
             <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-              <div style={{ fontSize: '48px', marginBottom: '14px' }}>🎉</div>
+              <PartyPopper size={44} color="#4f46e5" strokeWidth={1.5} style={{ marginBottom: '14px' }} />
               <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#111', margin: '0 0 10px' }}>
                 Profil importé avec succès !
               </h2>
@@ -537,8 +537,8 @@ export default function Profile() {
                 ].map(([label, val]) => (
                   <div key={label} style={{ display: 'flex', gap: '6px' }}>
                     <span style={{ color: '#9ca3af', minWidth: '70px' }}>{label} :</span>
-                    <span style={{ color: val ? '#111' : '#f59e0b', fontWeight: val ? '500' : '400' }}>
-                      {val || '⚠️ Non trouvé'}
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: val ? '#111' : '#f59e0b', fontWeight: val ? '500' : '400' }}>
+                      {val || <><AlertTriangle size={11} /> Non trouvé</>}
                     </span>
                   </div>
                 ))}
@@ -553,7 +553,7 @@ export default function Profile() {
 
             {/* Avertissement */}
             <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '10px', padding: '14px 16px', marginBottom: '12px', display: 'flex', gap: '10px' }}>
-              <span style={{ fontSize: '18px', flexShrink: 0 }}>⚠️</span>
+              <AlertTriangle size={18} color="#92400e" style={{ flexShrink: 0 }} />
               <div style={{ fontSize: '13px', color: '#92400e', lineHeight: '1.6' }}>
                 <strong>Vérifie bien tes informations avant de sauvegarder.</strong><br />
                 L'IA peut faire des erreurs - contrôle les dates, les intitulés de poste et les missions. Corrige ce qui ne va pas dans les onglets.
@@ -596,7 +596,7 @@ export default function Profile() {
 
             {/* Avertissement 1 compte = 1 personne */}
             <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '10px', padding: '12px 16px', marginBottom: '20px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: '16px', flexShrink: 0 }}>⚠️</span>
+              <AlertTriangle size={16} color="#92400e" style={{ flexShrink: 0 }} />
               <div style={{ fontSize: '13px', color: '#92400e', lineHeight: '1.5' }}>
                 <strong>1 compte = 1 personne.</strong> Ton nom et prénom sont liés à ce compte et ne peuvent pas être changés une fois enregistrés. Si tu veux changer de profil, crée un nouveau compte.
               </div>
@@ -611,9 +611,9 @@ export default function Profile() {
               <div>
                 <div style={{ fontSize: '14px', fontWeight: '700', color: '#111', marginBottom: '6px' }}>Photo de profil</div>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  <label style={{ padding: '8px 16px', background: '#4f46e5', color: '#fff', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', display: 'inline-block' }}>
+                  <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#4f46e5', color: '#fff', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>
                     <input type="file" accept="image/*" capture="user" onChange={handlePhoto} style={{ display: 'none' }} />
-                    {photo ? '🔄 Changer' : '📸 Ajouter'}
+                    {photo ? <><RefreshCw size={13} /> Changer</> : <><Camera size={13} /> Ajouter</>}
                   </label>
                   {photo && <button onClick={() => setPhoto(null)} style={{ padding: '8px 14px', background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>Supprimer</button>}
                 </div>
@@ -704,8 +704,8 @@ export default function Profile() {
                       {['Immédiatement', 'Dans 1 mois', 'Dans 3 mois'].map(d => <option key={d}>{d}</option>)}
                     </select>
                   </Field>
-                  <div style={{ background: '#f8f9ff', border: '1px solid #ede9fe', borderRadius: '10px', padding: '12px 14px', fontSize: '13px', color: '#4f46e5', lineHeight: '1.6' }}>
-                    ✨ Seuls ton prénom, initiale du nom, titre professionnel et ville sont visibles. Ton email reste masqué. Seuls les recruteurs certifiés par DidCV peuvent accéder à la banque.
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '7px', background: '#f8f9ff', border: '1px solid #ede9fe', borderRadius: '10px', padding: '12px 14px', fontSize: '13px', color: '#4f46e5', lineHeight: '1.6' }}>
+                    <Sparkles size={14} style={{ flexShrink: 0, marginTop: '2px' }} /> Seuls ton prénom, initiale du nom, titre professionnel et ville sont visibles. Ton email reste masqué. Seuls les recruteurs certifiés par DidCV peuvent accéder à la banque.
                   </div>
                 </div>
               )}
@@ -877,7 +877,7 @@ export default function Profile() {
       {showVerifModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', backdropFilter: 'blur(4px)' }}>
           <div style={{ background: '#fff', borderRadius: '20px', padding: '36px', maxWidth: '480px', width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.2)', textAlign: 'center' }}>
-            <div style={{ fontSize: '52px', marginBottom: '16px' }}>⚠️</div>
+            <AlertTriangle size={44} color="#f59e0b" strokeWidth={1.5} style={{ marginBottom: '16px' }} />
             <h2 style={{ fontSize: '22px', fontWeight: '800', color: '#111', margin: '0 0 12px', letterSpacing: '-0.5px' }}>
               Vérifie bien tes informations !
             </h2>

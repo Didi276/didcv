@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Zap, Check, Loader2 } from 'lucide-react'
 import { supabase } from './supabase'
 
 export default function Auth() {
@@ -53,7 +54,7 @@ export default function Auth() {
             <div style={{ fontWeight: '800', fontSize: '22px', color: '#fff' }}>Did<span style={{ color: 'rgba(255,255,255,0.6)' }}>CV</span></div>
           </a>
           <div style={{ textAlign: 'center', zIndex: 1, maxWidth: '400px' }}>
-            <div style={{ fontSize: '56px', marginBottom: '24px' }}>⚡</div>
+            <Zap size={48} color="#fff" strokeWidth={1.5} style={{ marginBottom: '24px' }} />
             <h2 style={{ fontSize: '32px', fontWeight: '800', color: '#fff', margin: '0 0 16px', letterSpacing: '-1px', lineHeight: '1.1' }}>
               Ton CV parfait<br />en 30 secondes.
             </h2>
@@ -63,7 +64,7 @@ export default function Auth() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', textAlign: 'left' }}>
               {['27 templates professionnels', 'CV + lettre en 30 secondes', 'Score ATS 95% garanti', 'Pour tous les metiers et secteurs'].map(t => (
                 <div key={t} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: '700', color: '#fff', flexShrink: 0 }}>✓</div>
+                  <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}><Check size={13} /></div>
                   <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.85)', fontWeight: '500' }}>{t}</div>
                 </div>
               ))}
@@ -109,9 +110,11 @@ export default function Auth() {
           {success && <div style={{ padding: '12px 16px', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '9px', fontSize: '13px', color: '#16a34a', marginBottom: '16px' }}>{success}</div>}
 
           <button onClick={handleSubmit} disabled={loading}
-            style={{ width: '100%', padding: '14px', background: loading ? '#a5b4fc' : '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '700', cursor: loading ? 'default' : 'pointer', fontFamily: 'inherit', marginBottom: '20px' }}>
-            {loading ? '⏳ Chargement...' : mode === 'login' ? 'Se connecter' : 'Creer mon compte gratuit'}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '14px', background: loading ? '#a5b4fc' : '#4f46e5', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: '700', cursor: loading ? 'default' : 'pointer', fontFamily: 'inherit', marginBottom: '20px', boxShadow: loading ? 'none' : '0 4px 12px rgba(79,70,229,0.3)' }}>
+            {loading && <Loader2 size={16} style={{ animation: 'spin 0.8s linear infinite' }} />}
+            {loading ? 'Chargement...' : mode === 'login' ? 'Se connecter' : 'Creer mon compte gratuit'}
           </button>
+          <style>{'@keyframes spin{to{transform:rotate(360deg)}}'}</style>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
             <div style={{ flex: 1, height: '1px', background: '#f0f0f0' }} />

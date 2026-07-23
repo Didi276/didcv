@@ -202,7 +202,7 @@ export default function Dashboard() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
             <div>
               <h1 style={{ fontSize: isMobile ? '22px' : '26px', fontWeight: '800', color: '#0f0f1a', margin: '0 0 4px', letterSpacing: '-0.5px' }}>
-                Bonjour {prenom} 👋
+                Bonjour {prenom}
               </h1>
               <p style={{ fontSize: '13px', color: '#9ca3af', margin: 0 }}>
                 {cvs.length === 0 ? "Crée ton premier CV optimisé par l'IA" : `${cvs.length} CV généré${cvs.length > 1 ? 's' : ''}`}

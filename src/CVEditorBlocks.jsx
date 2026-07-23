@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { User, FileText, Briefcase, GraduationCap, Zap, Globe, Eye, EyeOff, Trash2, GripVertical, Lightbulb } from 'lucide-react'
 import { CVTemplate } from './CVTemplates'
 import SuggestionsIA from './SuggestionsIA'
 
@@ -115,13 +116,13 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
   const blur = (e) => { e.target.style.borderColor = '#e5e7eb' }
 
   const SECTIONS = [
-    { id: 'infos',       label: '👤 Infos'        },
-    { id: 'accroche',    label: '📝 Accroche'     },
-    { id: 'experiences', label: '💼 Experiences'  },
-    { id: 'formations',  label: '🎓 Formations'   },
-    { id: 'competences', label: '⚡ Competences'  },
-    { id: 'langues',     label: '🌍 Langues'      },
-    { id: 'visibilite',  label: '👁 Visibilite'   },
+    { id: 'infos',       label: 'Infos',        icon: User },
+    { id: 'accroche',    label: 'Accroche',     icon: FileText },
+    { id: 'experiences', label: 'Experiences',  icon: Briefcase },
+    { id: 'formations',  label: 'Formations',   icon: GraduationCap },
+    { id: 'competences', label: 'Competences',  icon: Zap },
+    { id: 'langues',     label: 'Langues',      icon: Globe },
+    { id: 'visibilite',  label: 'Visibilite',   icon: Eye },
   ]
 
   const DRAG_STYLE = { cursor: 'grab', userSelect: 'none' }
@@ -155,8 +156,8 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
           <div style={{ padding: '8px 12px', borderBottom: '1px solid #f0f0f0', display: 'flex', gap: '3px', flexWrap: 'wrap', flexShrink: 0 }}>
             {SECTIONS.map(s => (
               <button key={s.id} onClick={() => setSection(s.id)}
-                style={{ padding: '5px 10px', borderRadius: '7px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '11px', fontWeight: '600', background: section === s.id ? '#4f46e5' : '#f3f4f6', color: section === s.id ? '#fff' : '#6b7280', transition: 'all 0.1s' }}>
-                {s.label}
+                style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '5px 10px', borderRadius: '7px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '11px', fontWeight: '600', background: section === s.id ? '#4f46e5' : '#f3f4f6', color: section === s.id ? '#fff' : '#6b7280', transition: 'all 0.1s' }}>
+                <s.icon size={12} />{s.label}
               </button>
             ))}
           </div>
@@ -188,8 +189,8 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
                   <textarea value={data.accroche || ''} onChange={e => update('accroche', e.target.value)} rows={7}
                     style={{ ...INPUT, resize: 'vertical', lineHeight: '1.6' }} onFocus={focus} onBlur={blur} />
                 </Field>
-                <div style={{ padding: '10px 12px', background: '#f8f9ff', borderRadius: '8px', border: '1px solid #ede9fe', fontSize: '12px', color: '#6b7280', lineHeight: '1.6' }}>
-                  💡 3 a 5 phrases percutantes. Expertise, valeur ajoutee, adequation avec le poste.
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '7px', padding: '10px 12px', background: '#f8f9ff', borderRadius: '8px', border: '1px solid #ede9fe', fontSize: '12px', color: '#6b7280', lineHeight: '1.6' }}>
+                  <Lightbulb size={13} style={{ flexShrink: 0, marginTop: '1px' }} /> 3 a 5 phrases percutantes. Expertise, valeur ajoutee, adequation avec le poste.
                 </div>
               </div>
             )}
@@ -198,7 +199,7 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
             {section === 'experiences' && (
               <div>
                 <div style={{ fontSize: '11px', color: '#9ca3af', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span>⠿</span> Glisse-depose pour reordonner
+                  <GripVertical size={13} /> Glisse-depose pour reordonner
                 </div>
                 {data.experiences?.map((exp, i) => (
                   <div key={i}
@@ -209,13 +210,13 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
                     style={{ marginBottom: '12px', padding: '14px', background: '#f8f9ff', borderRadius: '10px', border: '1px solid #ede9fe', ...DRAG_STYLE }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ color: '#c4c4c4', fontSize: '16px' }}>⠿</span>
+                        <GripVertical size={14} color="#c4c4c4" />
                         <div style={{ fontSize: '12px', fontWeight: '700', color: '#4f46e5' }}>
                           {exp.poste || `Experience ${i + 1}`}
                         </div>
                       </div>
                       {data.experiences.length > 1 && (
-                        <button onClick={() => removeExp(i)} style={{ background: 'none', border: 'none', color: '#dc2626', fontSize: '12px', cursor: 'pointer', padding: '2px 6px' }}>🗑</button>
+                        <button onClick={() => removeExp(i)} style={{ display: 'flex', alignItems: 'center', background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', padding: '2px 6px' }}><Trash2 size={13} /></button>
                       )}
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
@@ -256,7 +257,7 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
             {section === 'formations' && (
               <div>
                 <div style={{ fontSize: '11px', color: '#9ca3af', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span>⠿</span> Glisse-depose pour reordonner
+                  <GripVertical size={13} /> Glisse-depose pour reordonner
                 </div>
                 {data.formations?.map((f, i) => (
                   <div key={i}
@@ -267,11 +268,11 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
                     style={{ marginBottom: '12px', padding: '14px', background: '#f8f9ff', borderRadius: '10px', border: '1px solid #ede9fe', ...DRAG_STYLE }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ color: '#c4c4c4', fontSize: '16px' }}>⠿</span>
+                        <GripVertical size={14} color="#c4c4c4" />
                         <div style={{ fontSize: '12px', fontWeight: '700', color: '#4f46e5' }}>{f.diplome || `Formation ${i + 1}`}</div>
                       </div>
                       {data.formations.length > 1 && (
-                        <button onClick={() => removeForm(i)} style={{ background: 'none', border: 'none', color: '#dc2626', fontSize: '12px', cursor: 'pointer' }}>🗑</button>
+                        <button onClick={() => removeForm(i)} style={{ display: 'flex', alignItems: 'center', background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer' }}><Trash2 size={13} /></button>
                       )}
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '8px' }}>
@@ -304,7 +305,7 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
                     <input value={c} onChange={e => updateComp(i, e.target.value)}
                       placeholder={`Competence ${i+1}`} style={{ ...INPUT, flex: 1 }} onFocus={focus} onBlur={blur} />
                     {data.competences.length > 1 && (
-                      <button onClick={() => removeComp(i)} style={{ background: '#fef2f2', border: 'none', color: '#dc2626', width: '30px', height: '30px', borderRadius: '6px', cursor: 'pointer', flexShrink: 0, fontSize: '12px' }}>🗑</button>
+                      <button onClick={() => removeComp(i)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fef2f2', border: 'none', color: '#dc2626', width: '30px', height: '30px', borderRadius: '6px', cursor: 'pointer', flexShrink: 0 }}><Trash2 size={13} /></button>
                     )}
                   </div>
                 ))}
@@ -329,7 +330,7 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
                       </select>
                     </Field>
                     {data.langues.length > 1 && (
-                      <button onClick={() => removeLang(i)} style={{ background: '#fef2f2', border: 'none', color: '#dc2626', width: '30px', height: '30px', borderRadius: '6px', cursor: 'pointer', marginBottom: '12px', fontSize: '12px' }}>🗑</button>
+                      <button onClick={() => removeLang(i)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fef2f2', border: 'none', color: '#dc2626', width: '30px', height: '30px', borderRadius: '6px', cursor: 'pointer', marginBottom: '12px' }}><Trash2 size={13} /></button>
                     )}
                   </div>
                 ))}
@@ -359,14 +360,14 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
                       </div>
                     </div>
                     <button onClick={() => toggleHidden(key)}
-                      style={{ padding: '6px 14px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontFamily: 'inherit', fontSize: '12px', fontWeight: '600', background: hidden[key] ? '#f3f4f6' : '#4f46e5', color: hidden[key] ? '#6b7280' : '#fff', transition: 'all 0.15s' }}>
-                      {hidden[key] ? '👁 Afficher' : '🙈 Masquer'}
+                      style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontFamily: 'inherit', fontSize: '12px', fontWeight: '600', background: hidden[key] ? '#f3f4f6' : '#4f46e5', color: hidden[key] ? '#6b7280' : '#fff', transition: 'all 0.15s' }}>
+                      {hidden[key] ? <><Eye size={12} /> Afficher</> : <><EyeOff size={12} /> Masquer</>}
                     </button>
                   </div>
                 ))}
 
-                <div style={{ marginTop: '20px', padding: '12px 14px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '10px', fontSize: '12px', color: '#92400e', lineHeight: '1.6' }}>
-                  💡 Les sections masquees ne seront pas incluses dans ton CV telecharge.
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '7px', marginTop: '20px', padding: '12px 14px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '10px', fontSize: '12px', color: '#92400e', lineHeight: '1.6' }}>
+                  <Lightbulb size={13} style={{ flexShrink: 0, marginTop: '1px' }} /> Les sections masquees ne seront pas incluses dans ton CV telecharge.
                 </div>
               </div>
             )}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { MapPin, Clock, Mail } from 'lucide-react'
 import { supabase } from './supabase'
 
 const DISPO_OPTIONS = ['Immédiatement', 'Dans 1 mois', 'Dans 3 mois']
@@ -55,8 +56,8 @@ function CandidatCard({ p, lienCv }) {
       </div>
 
       <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-        {p.ville && <span style={{ fontSize: '11px', fontWeight: '500', background: '#f1f5f9', color: '#374151', padding: '3px 9px', borderRadius: '6px' }}>📍 {p.ville}</span>}
-        {p.disponibilite && <span style={{ fontSize: '11px', fontWeight: '600', background: '#f0fdf4', color: '#16a34a', padding: '3px 9px', borderRadius: '6px' }}>🕒 {p.disponibilite}</span>}
+        {p.ville && <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '11px', fontWeight: '500', background: '#f1f5f9', color: '#374151', padding: '3px 9px', borderRadius: '6px' }}><MapPin size={10} /> {p.ville}</span>}
+        {p.disponibilite && <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '11px', fontWeight: '600', background: '#f0fdf4', color: '#16a34a', padding: '3px 9px', borderRadius: '6px' }}><Clock size={10} /> {p.disponibilite}</span>}
         {typesContrat.map(t => (
           <span key={t} style={{ fontSize: '11px', fontWeight: '600', background: '#eff6ff', color: '#1e3a5f', padding: '3px 9px', borderRadius: '6px' }}>{t}</span>
         ))}
@@ -87,8 +88,8 @@ function CandidatCard({ p, lienCv }) {
             <div style={{ flex: 1, fontSize: '11px', color: '#6b7280', background: '#f8fafc', padding: '9px 10px', borderRadius: '8px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {masquerEmail(p.email)}
             </div>
-            <a href={`mailto:${p.email}`} style={{ padding: '9px 12px', background: '#eff6ff', color: '#1e3a5f', borderRadius: '8px', textDecoration: 'none', fontSize: '11px', fontWeight: '700', whiteSpace: 'nowrap' }}>
-              ✉️
+            <a href={`mailto:${p.email}`} style={{ display: 'flex', alignItems: 'center', padding: '9px 12px', background: '#eff6ff', color: '#1e3a5f', borderRadius: '8px', textDecoration: 'none', fontSize: '11px', fontWeight: '700', whiteSpace: 'nowrap' }}>
+              <Mail size={13} />
             </a>
           </div>
         ) : (

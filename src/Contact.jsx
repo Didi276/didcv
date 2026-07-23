@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { CheckCircle } from 'lucide-react'
 import Navbar from './Navbar'
 import SEO from './SEO'
 
@@ -51,7 +52,7 @@ export default function Contact() {
 
         {sent ? (
           <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '14px', padding: '40px', textAlign: 'center' }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>✅</div>
+            <CheckCircle size={44} color="#16a34a" strokeWidth={1.5} style={{ marginBottom: '16px' }} />
             <div style={{ fontSize: '18px', fontWeight: '700', color: '#111', marginBottom: '8px' }}>Message envoyé !</div>
             <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '24px' }}>On te répond sous 24h.</div>
             <button onClick={() => setSent(false)} style={{ padding: '10px 24px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '9px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>

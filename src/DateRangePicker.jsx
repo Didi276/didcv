@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Calendar } from 'lucide-react'
 
 const MONTHS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
 const CURRENT_YEAR = new Date().getFullYear()
@@ -64,7 +65,7 @@ export default function DateRangePicker({ value, onChange, placeholder = 'Pério
       <div onClick={() => setOpen(!open)}
         style={{ padding: '9px 12px', border: `1.5px solid ${open ? '#4f46e5' : '#e5e7eb'}`, borderRadius: '8px', fontSize: '13px', color: displayValue ? '#111' : '#9ca3af', cursor: 'pointer', background: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center', userSelect: 'none', transition: 'border-color 0.15s' }}>
         <span>{displayValue || placeholder}</span>
-        <span style={{ fontSize: '10px', color: '#9ca3af' }}>📅</span>
+        <Calendar size={13} color="#9ca3af" />
       </div>
 
       {/* Popup */}

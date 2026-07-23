@@ -35,6 +35,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { Lock, Download } from 'lucide-react'
 import { supabase } from './supabase'
 import { CVTemplate } from './CVTemplates'
 import { downloadCVasPDF } from './pdfUtils'
@@ -101,7 +102,7 @@ export default function CVPublic() {
       <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
         <EnTete />
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 60px)', padding: '40px 24px', textAlign: 'center' }}>
-          <div style={{ fontSize: '80px', marginBottom: '16px' }}>🔒</div>
+          <Lock size={64} color="#c4c4c4" strokeWidth={1.5} style={{ marginBottom: '16px' }} />
           <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#111', margin: '0 0 10px', letterSpacing: '-1px' }}>Ce CV n'est plus disponible</h1>
           <p style={{ fontSize: '15px', color: '#9ca3af', margin: '0 0 32px', maxWidth: '400px', lineHeight: '1.6' }}>
             Ce lien n'existe pas, ou son propriétaire a désactivé le partage.
@@ -128,8 +129,8 @@ export default function CVPublic() {
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: isMobile ? '20px 16px 60px' : '32px 24px 80px' }}>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
           <button onClick={() => downloadCVasPDF(document.getElementById('cv-to-print'), cv.cv_data.prenom, cv.cv_data.nom)}
-            style={{ padding: '11px 24px', background: '#171412', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
-            📥 Télécharger
+            style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '11px 24px', background: '#171412', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 12px rgba(0,0,0,0.25)' }}>
+            <Download size={15} /> Télécharger
           </button>
         </div>
 

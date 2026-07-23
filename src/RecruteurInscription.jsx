@@ -37,6 +37,7 @@
 
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { CheckCircle } from 'lucide-react'
 import { supabase } from './supabase'
 
 const DOMAINES_INTERDITS = ['gmail.com', 'hotmail.com', 'hotmail.fr', 'yahoo.com', 'yahoo.fr', 'outlook.com', 'outlook.fr', 'live.com', 'live.fr']
@@ -132,7 +133,7 @@ export default function RecruteurInscription() {
       <div style={{ maxWidth: '560px', margin: '0 auto', padding: '40px 24px 80px' }}>
         {envoye ? (
           <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb', padding: '40px 32px', textAlign: 'center' }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>✅</div>
+            <CheckCircle size={44} color="#16a34a" strokeWidth={1.5} style={{ marginBottom: '16px' }} />
             <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#111', margin: '0 0 10px' }}>Demande envoyée</h2>
             <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: '1.7', margin: 0 }}>
               Votre demande a été reçue. Notre équipe la valide sous 24-48h. Vous recevrez un email de confirmation.

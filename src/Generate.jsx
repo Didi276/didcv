@@ -1,6 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import * as pdfjsLib from 'pdfjs-dist'
+import {
+  Laptop, HeartPulse, HardHat, UtensilsCrossed, ShoppingCart, Truck, Palette, Shield, Sparkles,
+  GraduationCap, Briefcase, BarChart2, CheckCircle, FolderOpen, User, MessageCircle, Zap, Loader2,
+  Edit2, Check, ClipboardList, FileText, Mail, Download, Eye,
+} from 'lucide-react'
 import { supabase } from './supabase'
 import { CVTemplate } from './CVTemplates'
 import CVEditorBlocks from './CVEditorBlocks'
@@ -29,11 +34,11 @@ const PRESET_COLORS = [
 ]
 
 const SECTEUR_LABELS = {
-  tech: '💻 Tech', sante: '🏥 Sante', btp: '🏗 BTP',
-  restauration: '🍽 Restauration', commerce: '🛒 Commerce',
-  transport: '🚛 Transport', creatif: '🎨 Creatif',
-  securite: '🔒 Securite', beaute: '💅 Beaute',
-  junior: '🎓 Junior', cadre: '👔 Cadre', tertiaire: '📊 Tertiaire'
+  tech: { icon: Laptop, label: 'Tech' }, sante: { icon: HeartPulse, label: 'Sante' }, btp: { icon: HardHat, label: 'BTP' },
+  restauration: { icon: UtensilsCrossed, label: 'Restauration' }, commerce: { icon: ShoppingCart, label: 'Commerce' },
+  transport: { icon: Truck, label: 'Transport' }, creatif: { icon: Palette, label: 'Creatif' },
+  securite: { icon: Shield, label: 'Securite' }, beaute: { icon: Sparkles, label: 'Beaute' },
+  junior: { icon: GraduationCap, label: 'Junior' }, cadre: { icon: Briefcase, label: 'Cadre' }, tertiaire: { icon: BarChart2, label: 'Tertiaire' },
 }
 
 // Utilisé quand on arrive avec ?template=auto (depuis Offres.jsx ou une candidature)
@@ -397,12 +402,15 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
       {/* Onglets mobile */}
       {isMobile && (
         <div style={{ display: 'flex', background: '#fff', borderBottom: '1px solid #f0f0f0', position: 'sticky', top: '58px', zIndex: 50 }}>
-          {[['form', '📝 Formulaire'], ['preview', '👁 Apercu']].map(([tab, label]) => (
-            <button key={tab} onClick={() => setMobileTab(tab)}
-              style={{ flex: 1, padding: '12px', border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '700', color: mobileTab === tab ? '#4f46e5' : '#9ca3af', borderBottom: mobileTab === tab ? '2px solid #4f46e5' : '2px solid transparent', transition: 'all 0.15s' }}>
-              {label}
-            </button>
-          ))}
+          {[['form', FileText, 'Formulaire'], ['preview', Eye, 'Apercu']].map(t => {
+            const TabIcon = t[1]
+            return (
+              <button key={t[0]} onClick={() => setMobileTab(t[0])}
+                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '12px', border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '700', color: mobileTab === t[0] ? '#4f46e5' : '#9ca3af', borderBottom: mobileTab === t[0] ? '2px solid #4f46e5' : '2px solid transparent', transition: 'all 0.15s' }}>
+                <TabIcon size={13} />{t[2]}
+              </button>
+            )
+          })}
         </div>
       )}
 
@@ -451,13 +459,13 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
                 <input type="file" accept=".pdf" onChange={handleFileChange} style={{ display: 'none' }} />
                 {cvFile ? (
                   <div>
-                    <div style={{ fontSize: '20px', marginBottom: '4px' }}>✅</div>
+                    <CheckCircle size={18} color="#16a34a" style={{ marginBottom: '4px' }} />
                     <div style={{ fontSize: '12px', fontWeight: '600', color: '#16a34a' }}>{cvFile.name}</div>
                     <div style={{ fontSize: '11px', color: '#9ca3af' }}>{cvTexte.length} caracteres extraits</div>
                   </div>
                 ) : (
                   <div>
-                    <div style={{ fontSize: '24px', marginBottom: '6px' }}>📁</div>
+                    <FolderOpen size={22} color="#9ca3af" style={{ marginBottom: '6px' }} />
                     <div style={{ fontSize: '13px', color: '#6b7280', fontWeight: '500' }}>Clique pour uploader</div>
                     <div style={{ fontSize: '11px', color: '#9ca3af' }}>PDF uniquement</div>
                   </div>
@@ -468,7 +476,7 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
               <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 {photoManuelle
                   ? <img src={photoManuelle} alt="" loading="lazy" style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-                  : <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0 }}>👤</div>
+                  : <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><User size={16} color="#9ca3af" /></div>
                 }
                 <div>
                   <label style={{ cursor: 'pointer' }}>
@@ -501,8 +509,11 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
             {secteurDetecte && (
               <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px' }}>
                 <span style={{ color: '#9ca3af' }}>Secteur detecte :</span>
-                <span style={{ background: '#ede9fe', color: '#5b21b6', padding: '2px 10px', borderRadius: '20px', fontWeight: '600', fontSize: '11px' }}>
-                  {SECTEUR_LABELS[secteurDetecte] || secteurDetecte}
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: '#ede9fe', color: '#5b21b6', padding: '2px 10px', borderRadius: '20px', fontWeight: '600', fontSize: '11px' }}>
+                  {(() => {
+                    const info = SECTEUR_LABELS[secteurDetecte]
+                    return info ? <><info.icon size={11} /> {info.label}</> : secteurDetecte
+                  })()}
                 </span>
               </div>
             )}
@@ -519,7 +530,7 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
                   style={{ width: '26px', height: '26px', borderRadius: '50%', background: c, border: customColor === c ? '3px solid #111' : '2px solid rgba(0,0,0,0.1)', cursor: 'pointer', flexShrink: 0, transition: 'transform 0.1s', transform: customColor === c ? 'scale(1.2)' : 'scale(1)' }} />
               ))}
               <label title="Couleur personnalisee" style={{ position: 'relative', cursor: 'pointer' }}>
-                <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: customColor && !PRESET_COLORS.includes(customColor) ? customColor : 'linear-gradient(135deg,#f093fb,#667eea,#22d3ee)', border: '2px solid rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px' }}>🎨</div>
+                <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: customColor && !PRESET_COLORS.includes(customColor) ? customColor : 'linear-gradient(135deg,#f093fb,#667eea,#22d3ee)', border: '2px solid rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Palette size={12} color="#fff" /></div>
                 <input type="color" onChange={e => setCustomColor(e.target.value)} style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }} />
               </label>
               {customColor && (
@@ -535,11 +546,11 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
             <button onClick={() => setShowChat(!showChat)}
               style={{ width: '100%', padding: '11px 16px', background: showChat ? '#ede9fe' : '#f8f9ff', border: `1.5px solid ${showChat ? '#4f46e5' : '#e5e7eb'}`, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '16px' }}>💬</span>
+                <MessageCircle size={16} color="#4f46e5" />
                 <div style={{ textAlign: 'left' }}>
                   <div style={{ fontSize: '13px', fontWeight: '700', color: showChat ? '#4f46e5' : '#374151' }}>Personnaliser avec l'IA</div>
-                  <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '1px' }}>
-                    {instructions ? '✅ Instructions enregistrees' : 'Dis a l\'IA ce que tu veux mettre en avant'}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: '#9ca3af', marginTop: '1px' }}>
+                    {instructions ? <><CheckCircle size={11} /> Instructions enregistrees</> : 'Dis a l\'IA ce que tu veux mettre en avant'}
                   </div>
                 </div>
               </div>
@@ -594,7 +605,7 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
                 {/* Instructions extraites */}
                 {instructions && (
                   <div style={{ padding: '10px 14px', background: '#f0fdf4', borderTop: '1px solid #86efac' }}>
-                    <div style={{ fontSize: '11px', fontWeight: '700', color: '#16a34a', marginBottom: '4px' }}>✅ Instructions prises en compte</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', fontWeight: '700', color: '#16a34a', marginBottom: '4px' }}><CheckCircle size={12} /> Instructions prises en compte</div>
                     <div style={{ fontSize: '11px', color: '#166534', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>{instructions}</div>
                     <button onClick={() => { setInstructions(''); setChatMessages([]) }}
                       style={{ marginTop: '6px', fontSize: '11px', color: '#9ca3af', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}>
@@ -609,34 +620,36 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
           {/* Bouton generer */}
           <div style={{ padding: '0 24px 24px', flexShrink: 0 }}>
             <button onClick={handleGenerate} disabled={loading}
-              style={{ width: '100%', padding: '14px', background: loading ? '#a5b4fc' : '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '700', cursor: loading ? 'default' : 'pointer', fontFamily: 'inherit', letterSpacing: '-0.2px', transition: 'background 0.15s' }}>
-              {loading ? `⏳ ${progress || 'Generation...'}` : '⚡ Generer CV + Lettre'}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '14px', background: loading ? '#a5b4fc' : '#4f46e5', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: '700', cursor: loading ? 'default' : 'pointer', fontFamily: 'inherit', letterSpacing: '-0.2px', transition: 'background 0.15s', boxShadow: loading ? 'none' : '0 4px 12px rgba(79,70,229,0.3)' }}>
+              {loading ? <Loader2 size={16} style={{ animation: 'spin 0.8s linear infinite' }} /> : <Zap size={16} />}
+              {loading ? `${progress || 'Generation...'}` : 'Generer CV + Lettre'}
             </button>
+            <style>{'@keyframes spin{to{transform:rotate(360deg)}}'}</style>
 
             {cvData && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '10px' }}>
                 {isMobile && (
                   <button onClick={() => setMobileTab('preview')}
-                    style={{ padding: '11px', background: '#f0fdf4', color: '#16a34a', border: '1.5px solid #86efac', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
-                    👁 Voir mon CV
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', padding: '11px', background: '#f0fdf4', color: '#16a34a', border: '1.5px solid #86efac', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+                    <Eye size={15} /> Voir mon CV
                   </button>
                 )}
                 <button onClick={() => setShowEditor(true)}
-                  style={{ padding: '11px', background: '#fff', color: '#4f46e5', border: '1.5px solid #4f46e5', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
-                  ✏️ Modifier mon CV
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', padding: '11px', background: '#fff', color: '#4f46e5', border: '1.5px solid #4f46e5', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
+                  <Edit2 size={14} /> Modifier mon CV
                 </button>
-                <a href="/dashboard" style={{ display: 'block', textAlign: 'center', padding: '11px', background: '#f0fdf4', color: '#16a34a', border: '1.5px solid #86efac', borderRadius: '10px', fontSize: '14px', fontWeight: '600', textDecoration: 'none' }}>
-                  ✅ Aller au dashboard
+                <a href="/dashboard" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', textAlign: 'center', padding: '11px', background: '#f0fdf4', color: '#16a34a', border: '1.5px solid #86efac', borderRadius: '10px', fontSize: '14px', fontWeight: '600', textDecoration: 'none' }}>
+                  <CheckCircle size={15} /> Aller au dashboard
                 </a>
                 {user && cvSauvegardeId && (
                   candidatureAjoutee ? (
-                    <div style={{ padding: '11px', textAlign: 'center', background: '#f5f3ff', color: '#7c3aed', border: '1.5px solid #ddd6fe', borderRadius: '10px', fontSize: '13px', fontWeight: '700' }}>
-                      ✓ Ajoutée au suivi des candidatures
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '11px', textAlign: 'center', background: '#f5f3ff', color: '#7c3aed', border: '1.5px solid #ddd6fe', borderRadius: '10px', fontSize: '13px', fontWeight: '700' }}>
+                      <Check size={13} /> Ajoutée au suivi des candidatures
                     </div>
                   ) : (
                     <button onClick={handleAjouterCandidature} disabled={ajoutCandidatureEnCours}
-                      style={{ padding: '11px', background: '#fff', color: '#7c3aed', border: '1.5px solid #ddd6fe', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: ajoutCandidatureEnCours ? 'default' : 'pointer', fontFamily: 'inherit' }}>
-                      {ajoutCandidatureEnCours ? 'Ajout...' : '📋 Ajouter au suivi des candidatures'}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', padding: '11px', background: '#fff', color: '#7c3aed', border: '1.5px solid #ddd6fe', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: ajoutCandidatureEnCours ? 'default' : 'pointer', fontFamily: 'inherit' }}>
+                      {ajoutCandidatureEnCours ? 'Ajout...' : <><ClipboardList size={14} /> Ajouter au suivi des candidatures</>}
                     </button>
                   )
                 )}
@@ -654,28 +667,31 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
               {/* Onglets + actions */}
               <div style={{ padding: '16px 24px', background: '#fff', borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, position: 'sticky', top: 0, zIndex: 10 }}>
                 <div style={{ display: 'flex', gap: '6px' }}>
-                  {[['cv', '📄 CV'], ...(lettre ? [['lettre', '✉️ Lettre']] : [])].map(([tab, label]) => (
-                    <button key={tab} onClick={() => setActiveTab(tab)}
-                      style={{ padding: '7px 16px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', background: activeTab === tab ? '#4f46e5' : '#f3f4f6', color: activeTab === tab ? '#fff' : '#374151' }}>
-                      {label}
-                    </button>
-                  ))}
+                  {[['cv', FileText, 'CV'], ...(lettre ? [['lettre', Mail, 'Lettre']] : [])].map(t => {
+                    const TabIcon = t[1]
+                    return (
+                      <button key={t[0]} onClick={() => setActiveTab(t[0])}
+                        style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '7px 16px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', background: activeTab === t[0] ? '#4f46e5' : '#f3f4f6', color: activeTab === t[0] ? '#fff' : '#374151' }}>
+                        <TabIcon size={13} />{t[2]}
+                      </button>
+                    )
+                  })}
                   <button onClick={() => setShowTemplatePicker(!showTemplatePicker)}
-                    style={{ padding: '7px 12px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', background: showTemplatePicker ? '#ede9fe' : '#f3f4f6', color: showTemplatePicker ? '#4f46e5' : '#374151' }}>
-                    🎨
+                    style={{ display: 'flex', alignItems: 'center', padding: '7px 12px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', background: showTemplatePicker ? '#ede9fe' : '#f3f4f6', color: showTemplatePicker ? '#4f46e5' : '#374151' }}>
+                    <Palette size={14} />
                   </button>
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
                   {activeTab === 'cv' && (
                     <button onClick={handleDownloadCV}
-                      style={{ padding: '7px 16px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
-                      📥 Telecharger CV
+                      style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
+                      <Download size={13} /> Telecharger CV
                     </button>
                   )}
                   {activeTab === 'lettre' && (
                     <button onClick={handleDownloadLettre}
-                      style={{ padding: '7px 16px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
-                      📥 Telecharger Lettre
+                      style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
+                      <Download size={13} /> Telecharger Lettre
                     </button>
                   )}
                 </div>
@@ -706,7 +722,7 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
                 </div>
               ) : (
                 <div>
-                  <div style={{ fontSize: '64px', marginBottom: '20px' }}>✨</div>
+                  <Sparkles size={52} color="#c4c4c4" strokeWidth={1.5} style={{ marginBottom: '20px' }} />
                   <h3 style={{ fontSize: '20px', fontWeight: '700', color: '#111', margin: '0 0 10px', letterSpacing: '-0.3px' }}>Ton CV apparaitra ici</h3>
                   <p style={{ fontSize: '14px', color: '#9ca3af', margin: 0, lineHeight: '1.6', maxWidth: '300px' }}>
                     Colle une offre d'emploi et clique sur Generer pour voir le resultat en temps reel.

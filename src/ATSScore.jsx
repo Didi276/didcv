@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AlertTriangle, BarChart2, PartyPopper, Zap, CheckCircle, XCircle, BookOpen, Clock } from 'lucide-react'
 import { FORMATIONS } from './formationsData'
 
 // Cherche les formations dont les competences[] correspondent aux mots-cles ATS manquants
@@ -129,9 +130,9 @@ Retourne UNIQUEMENT ce JSON:
         {loading ? (
           <><div style={{ width: '16px', height: '16px', border: '2px solid #f59e0b', borderTop: '2px solid transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /><style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>Analyse ATS en cours...</>
         ) : result ? (
-          <>{result.error ? '⚠️ Réessayer l\'analyse' : `📊 Score ATS : ${result.score_global}/100 ${open ? '▲' : '▼'}`}</>
+          <>{result.error ? <><AlertTriangle size={15} /> Réessayer l'analyse</> : <><BarChart2 size={15} /> Score ATS : {result.score_global}/100 {open ? '▲' : '▼'}</>}</>
         ) : (
-          <>📊 Analyser mon score ATS</>
+          <><BarChart2 size={15} /> Analyser mon score ATS</>
         )}
       </button>
 
@@ -141,8 +142,12 @@ Retourne UNIQUEMENT ce JSON:
           {/* Score global */}
           <div style={{ background: getBg(result.score_global), padding: '20px', textAlign: 'center', borderBottom: '1px solid #f0f0f0' }}>
             <CircleScore score={result.score_global} />
-            <div style={{ fontSize: '14px', fontWeight: '700', color: getColor(result.score_global), marginTop: '10px' }}>
-              {result.score_global >= 80 ? '🎉 Excellent ! Ton CV passe bien les ATS' : result.score_global >= 60 ? '⚡ Bon niveau, quelques améliorations possibles' : '⚠️ Attention, ton CV risque d\'être filtré'}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '14px', fontWeight: '700', color: getColor(result.score_global), marginTop: '10px' }}>
+              {result.score_global >= 80
+                ? <><PartyPopper size={15} /> Excellent ! Ton CV passe bien les ATS</>
+                : result.score_global >= 60
+                  ? <><Zap size={15} /> Bon niveau, quelques améliorations possibles</>
+                  : <><AlertTriangle size={15} /> Attention, ton CV risque d'être filtré</>}
             </div>
           </div>
 
@@ -170,7 +175,7 @@ Retourne UNIQUEMENT ce JSON:
             <div>
               <div style={{ fontSize: '12px', fontWeight: '700', color: '#374151', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Mots-clés</div>
               <div style={{ marginBottom: '6px' }}>
-                <div style={{ fontSize: '11px', color: '#16a34a', fontWeight: '600', marginBottom: '4px' }}>✅ Présents dans ton CV</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: '#16a34a', fontWeight: '600', marginBottom: '4px' }}><CheckCircle size={12} /> Présents dans ton CV</div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
                   {result.mots_cles_trouves?.map(m => (
                     <span key={m} style={{ fontSize: '11px', padding: '2px 8px', background: '#f0fdf4', color: '#16a34a', borderRadius: '10px', fontWeight: '500' }}>{m}</span>
@@ -179,7 +184,7 @@ Retourne UNIQUEMENT ce JSON:
               </div>
               {result.mots_cles_manquants?.length > 0 && (
                 <div>
-                  <div style={{ fontSize: '11px', color: '#dc2626', fontWeight: '600', marginBottom: '4px' }}>❌ Absents — à ajouter</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: '#dc2626', fontWeight: '600', marginBottom: '4px' }}><XCircle size={12} /> Absents — à ajouter</div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
                     {result.mots_cles_manquants?.map(m => (
                       <span key={m} style={{ fontSize: '11px', padding: '2px 8px', background: '#fef2f2', color: '#dc2626', borderRadius: '10px', fontWeight: '500' }}>{m}</span>
@@ -224,13 +229,13 @@ Retourne UNIQUEMENT ce JSON:
               const formationsSuggerees = suggererFormations(result.mots_cles_manquants)
               return formationsSuggerees.length > 0 && (
                 <div>
-                  <div style={{ fontSize: '12px', fontWeight: '700', color: '#374151', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>📚 Formations pour améliorer ton score</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: '700', color: '#374151', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}><BookOpen size={13} /> Formations pour améliorer ton score</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {formationsSuggerees.map(f => (
                       <div key={f.id} style={{ padding: '10px 12px', background: '#f8f9ff', border: '1px solid #ede9fe', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
                         <div style={{ minWidth: 0 }}>
                           <div style={{ fontSize: '12px', fontWeight: '700', color: '#111', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.titre}</div>
-                          <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '2px' }}>⏱ {f.duree}</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: '#9ca3af', marginTop: '2px' }}><Clock size={10} /> {f.duree}</div>
                         </div>
                         <a href={f.lien} target="_blank" rel="noopener noreferrer"
                           style={{ flexShrink: 0, fontSize: '11px', fontWeight: '700', color: '#fff', background: '#4f46e5', padding: '7px 12px', borderRadius: '7px', textDecoration: 'none', whiteSpace: 'nowrap' }}>

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Lightbulb } from 'lucide-react'
 
 export default function SuggestionsIA({ poste, secteur, type = 'missions', onSelect }) {
   const [suggestions, setSuggestions] = useState([])
@@ -50,7 +51,7 @@ export default function SuggestionsIA({ poste, secteur, type = 'missions', onSel
         style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: open && suggestions.length > 0 ? '#ede9fe' : '#f8f9ff', color: '#4f46e5', border: '1.5px solid #ede9fe', borderRadius: '8px', fontSize: '12px', fontWeight: '700', cursor: poste?.trim() ? 'pointer' : 'not-allowed', fontFamily: 'inherit', opacity: poste?.trim() ? 1 : 0.5, transition: 'all 0.15s' }}>
         {loading
           ? <><div style={{ width: '12px', height: '12px', border: '2px solid #c4b5fd', borderTop: '2px solid #4f46e5', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /><style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>Génération...</>
-          : <>{open && suggestions.length > 0 ? (open ? '▲' : '▼') : '💡'} {open && suggestions.length > 0 ? `${suggestions.length} suggestions ${open ? '▲' : '▼'}` : `Suggestions IA (${LABELS[type]})`}</>
+          : <>{open && suggestions.length > 0 ? (open ? '▲' : '▼') : <Lightbulb size={13} />} {open && suggestions.length > 0 ? `${suggestions.length} suggestions ${open ? '▲' : '▼'}` : `Suggestions IA (${LABELS[type]})`}</>
         }
       </button>
 

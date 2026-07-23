@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Download } from 'lucide-react'
+import { Download, Lightbulb } from 'lucide-react'
 import Navbar from './Navbar'
 import SEO from './SEO'
 import { GUIDES } from './guidesData'
@@ -92,7 +92,7 @@ export default function GuideDetail() {
         </div>
 
         <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '14px', padding: '22px', marginBottom: '32px' }}>
-          <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#92400e', margin: '0 0 10px' }}>💡 Conseils pour ce métier</h2>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: '7px', fontSize: '16px', fontWeight: '700', color: '#92400e', margin: '0 0 10px' }}><Lightbulb size={16} /> Conseils pour ce métier</h2>
           <p style={{ fontSize: '14px', color: '#92400e', margin: 0, lineHeight: '1.7' }}>{guide.conseils}</p>
         </div>
 

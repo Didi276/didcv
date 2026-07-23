@@ -1,0 +1,11 @@
+/* Typographie globale du site — remplace Inter partout.
+   Les pages posent encore fontFamily inline (héritage), donc on force
+   ici via !important : c'est le seul moyen d'override un style inline
+   depuis une feuille de styles globale sans reprendre chaque fichier. */
+* {
+  font-family: 'Satoshi', 'Inter', system-ui, sans-serif !important;
+}
+
+h1, h2, h3 {
+  font-family: 'Clash Display', 'Satoshi', 'Inter', system-ui, sans-serif !important;
+}

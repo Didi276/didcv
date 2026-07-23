@@ -1,3 +1,4 @@
+import { Zap, Bot, FileText, Palette } from 'lucide-react'
 import Navbar from './Navbar'
 import SEO from './SEO'
 
@@ -23,28 +24,28 @@ export default function About() {
 
         {[
           {
-            icon: '⚡',
+            icon: Zap,
             title: 'Notre mission',
             text: 'Permettre à chaque candidat, quel que soit son secteur ou son niveau d\'expérience, de générer un CV professionnel et optimisé ATS en moins de 30 secondes. Du comptable au plombier, de l\'étudiant au directeur, DidCV s\'adapte à tous les profils.'
           },
           {
-            icon: '🤖',
+            icon: Bot,
             title: 'Comment ca marche',
             text: 'Notre IA analyse l\'offre d\'emploi que tu cibles, extrait les mots-clés importants pour les ATS, et génère un CV sur mesure à partir de ton profil. Elle produit également une lettre de motivation personnalisée. Tout ca en 30 secondes.'
           },
           {
-            icon: '📄',
+            icon: FileText,
             title: 'Des CVs vraiment compatibles ATS',
             text: 'Contrairement à d\'autres outils qui génèrent des CVs en image, DidCV produit des PDFs avec du texte réel et sélectionnable. Les robots des systèmes de recrutement peuvent lire chaque mot de ton CV et t\'attribuer le bon score.'
           },
           {
-            icon: '🎨',
+            icon: Palette,
             title: '27 templates pour tous les métiers',
             text: 'Finance, tech, santé, BTP, restauration, transport, créatif, étudiant, international... Chaque secteur a son propre template avec un vocabulaire et une mise en page adaptés aux codes du métier.'
           },
         ].map(s => (
-          <div key={s.title} style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '28px', marginBottom: '16px' }}>
-            <div style={{ fontSize: '28px', marginBottom: '12px' }}>{s.icon}</div>
+          <div key={s.title} style={{ background: '#fff', borderRadius: '14px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', padding: '28px', marginBottom: '16px' }}>
+            <s.icon size={26} color="#4f46e5" strokeWidth={1.75} style={{ marginBottom: '12px' }} />
             <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#111', margin: '0 0 10px', letterSpacing: '-0.2px' }}>{s.title}</h2>
             <p style={{ fontSize: '15px', color: '#6b7280', margin: 0, lineHeight: '1.7' }}>{s.text}</p>
           </div>

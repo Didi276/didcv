@@ -16,7 +16,7 @@ import { supabase } from './supabase'
 import Navbar from './Navbar'
 import { CVTemplate } from './CVTemplates'
 import { downloadCVasPDF } from './pdfUtils'
-import { MapPin, DollarSign, Zap, ClipboardList, Target, BookOpen, Trash2, Download, Plus } from 'lucide-react'
+import { MapPin, DollarSign, Zap, ClipboardList, Target, BookOpen, Trash2, Download, Plus, PartyPopper } from 'lucide-react'
 
 const COLONNES = [
   { id: 'a_postuler',  label: 'À postuler',    color: '#6b7280', bg: '#f9fafb', dot: '#9ca3af' },
@@ -265,8 +265,8 @@ export default function Candidatures() {
                       )}
                       {card.statut === 'offre' && (
                         <button onClick={e => { e.stopPropagation(); setFelicitationsCard(card) }}
-                          style={{ width: '100%', marginTop: '8px', padding: '7px', background: '#f0fdf4', color: '#16a34a', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
-                          🎉 Félicitations
+                          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', width: '100%', marginTop: '8px', padding: '7px', background: '#f0fdf4', color: '#16a34a', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+                          <PartyPopper size={11} /> Félicitations
                         </button>
                       )}
                       {card.statut === 'refuse' && (
@@ -404,7 +404,7 @@ export default function Candidatures() {
       {felicitationsCard && (
         <div onClick={() => setFelicitationsCard(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 250, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', backdropFilter: 'blur(4px)' }}>
           <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: '20px', padding: '36px', maxWidth: '440px', width: '100%', textAlign: 'center' }}>
-            <div style={{ fontSize: '52px', marginBottom: '16px' }}>🎉</div>
+            <PartyPopper size={44} color="#16a34a" strokeWidth={1.5} style={{ marginBottom: '16px' }} />
             <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#111', margin: '0 0 10px' }}>Félicitations !</h2>
             <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 24px', lineHeight: '1.7' }}>
               Tu as décroché le poste de <strong>{felicitationsCard.titre}</strong>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Search, Settings, Target, Home, MapPin, DollarSign, Zap, CheckCircle } from 'lucide-react'
+import { Search, Settings, Target, Home, MapPin, DollarSign, Zap, CheckCircle, SearchX, ChevronDown, Loader2 } from 'lucide-react'
 import Navbar from './Navbar'
 
 function useWidth() {
@@ -312,7 +312,7 @@ export default function Offres() {
             {/* Pas de résultats */}
             {searched && !loading && offres.length === 0 && (
               <div style={{ textAlign: 'center', padding: '60px', background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb' }}>
-                <div style={{ fontSize: '40px', marginBottom: '12px' }}>😕</div>
+                <SearchX size={36} color="#c4c4c4" strokeWidth={1.5} style={{ marginBottom: '12px' }} />
                 <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: '0 0 6px' }}>Aucune offre trouvée</h3>
                 <p style={{ fontSize: '13px', color: '#9ca3af', margin: 0 }}>Essaie d'autres mots-clés ou retire des filtres</p>
               </div>
@@ -383,9 +383,11 @@ export default function Offres() {
             {searched && !loading && offres.length > 0 && (
               <div style={{ textAlign: 'center', marginTop: '24px', paddingBottom: '24px' }}>
                 <button onClick={() => handleSearch({}, true)} disabled={loadingMore}
-                  style={{ padding: '12px 32px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', opacity: loadingMore ? 0.7 : 1 }}>
-                  {loadingMore ? '⏳ Chargement...' : "⬇️ Charger plus d'offres"}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', padding: '12px 32px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', opacity: loadingMore ? 0.7 : 1, boxShadow: '0 4px 12px rgba(79,70,229,0.3)' }}>
+                  {loadingMore ? <Loader2 size={15} style={{ animation: 'spin 0.8s linear infinite' }} /> : <ChevronDown size={15} />}
+                  {loadingMore ? 'Chargement...' : "Charger plus d'offres"}
                 </button>
+                <style>{'@keyframes spin{to{transform:rotate(360deg)}}'}</style>
               </div>
             )}
           </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { MapPin, Loader2 } from 'lucide-react'
 
 // Villes principales pour affichage rapide avant toute frappe
 const TOP_CITIES = [
@@ -85,9 +86,10 @@ export default function CityInput({ value, onChange, placeholder = 'Ville' }) {
           placeholder={placeholder}
           style={{ width: '100%', padding: '9px 32px 9px 12px', border: `1.5px solid ${open ? '#4f46e5' : '#e5e7eb'}`, borderRadius: '8px', fontSize: '13px', fontFamily: '"Inter",system-ui,sans-serif', color: '#111', outline: 'none', boxSizing: 'border-box', background: '#fff', transition: 'border-color 0.15s' }}
         />
-        <span style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '14px', pointerEvents: 'none', color: '#9ca3af' }}>
-          {loading ? '⏳' : '📍'}
+        <span style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', display: 'flex', pointerEvents: 'none', color: '#9ca3af' }}>
+          {loading ? <Loader2 size={13} style={{ animation: 'spin 0.8s linear infinite' }} /> : <MapPin size={13} />}
         </span>
+        <style>{'@keyframes spin{to{transform:rotate(360deg)}}'}</style>
       </div>
 
       {/* Dropdown suggestions */}
@@ -98,7 +100,7 @@ export default function CityInput({ value, onChange, placeholder = 'Ville' }) {
               style={{ padding: '9px 14px', fontSize: '13px', color: '#374151', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: i < suggestions.length - 1 ? '1px solid #f8f9ff' : 'none', transition: 'background 0.1s' }}
               onMouseEnter={e => e.currentTarget.style.background = '#faf9ff'}
               onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-              <span style={{ color: '#4f46e5', fontSize: '12px', flexShrink: 0 }}>📍</span>
+              <MapPin size={12} color="#4f46e5" style={{ flexShrink: 0 }} />
               {city}
             </div>
           ))}
