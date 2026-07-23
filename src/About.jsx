@@ -7,7 +7,7 @@ export default function About() {
     <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
       <SEO
         titre="À propos"
-        description="À propos de DidCV — le générateur de CV IA made in France. Notre mission : aider chacun à décrocher son prochain emploi avec un CV optimisé ATS en 30 secondes."
+        description="À propos de DidCV, le générateur de CV IA made in France. Notre mission : aider chacun à décrocher son prochain emploi avec un CV optimisé ATS en 30 secondes."
         url="https://didcv.vercel.app/about"
       />
       <Navbar />

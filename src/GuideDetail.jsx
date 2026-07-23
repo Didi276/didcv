@@ -50,7 +50,7 @@ export default function GuideDetail() {
   return (
     <div style={{ minHeight: '100vh', background: '#fff', fontFamily: '"Inter",system-ui,sans-serif' }}>
       <SEO
-        titre={`${guide.titre} — Guide complet et exemple gratuit`}
+        titre={`${guide.titre}, guide complet et exemple gratuit`}
         description={guide.description}
         url={url}
         schema={schema}

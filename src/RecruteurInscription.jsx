@@ -136,7 +136,7 @@ export default function RecruteurInscription() {
             Espace Recruteurs
           </h1>
           <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.75)', margin: 0 }}>
-            Accède à des candidats certifiés et disponibles — sur validation manuelle
+            Accède à des candidats certifiés et disponibles, sur validation manuelle
           </p>
         </div>
       </div>

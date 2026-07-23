@@ -417,7 +417,7 @@ export default function Dashboard() {
             <div style={{ fontSize: '15px', fontWeight: '800', color: '#111', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}><LinkIcon size={17} /> Lien de partage</div>
             <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 16px', lineHeight: '1.6' }}>
               Toute personne avec ce lien peut voir ce CV. Chaque visite est comptabilisée
-              {partageOuvert.vues > 0 && <> — <strong>{partageOuvert.vues} vue{partageOuvert.vues !== 1 ? 's' : ''}</strong> pour l'instant</>}.
+              {partageOuvert.vues > 0 && <> avec déjà <strong>{partageOuvert.vues} vue{partageOuvert.vues !== 1 ? 's' : ''}</strong> pour l'instant</>}.
             </p>
             <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
               <input readOnly value={`${window.location.origin}/cv/${partageOuvert.slug}`} onFocus={e => e.target.select()}

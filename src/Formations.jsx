@@ -168,7 +168,7 @@ function TestCompetence({ formation }) {
       alert("Complète d'abord ton profil (page Profil) pour pouvoir y ajouter des compétences.")
       return
     }
-    const label = `${formation.titre} — Certifié DidCV`
+    const label = `${formation.titre}, Certifié DidCV`
     const competences = profil.competences || []
     if (!competences.includes(label)) {
       await supabase.from('profiles').update({ competences: [...competences, label] }).eq('user_id', user.id)
@@ -266,7 +266,7 @@ function TestCompetence({ formation }) {
                 )}
                 {added && (
                   <div style={{ padding: '12px', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '10px', fontSize: '13px', color: '#16a34a', fontWeight: '600', marginBottom: '10px' }}>
-                    ✓ Ajouté à ton profil — "{formation.titre} — Certifié DidCV"
+                    ✓ Ajouté à ton profil : "{formation.titre}, Certifié DidCV"
                   </div>
                 )}
                 <button onClick={fermer} style={{ width: '100%', padding: '11px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
@@ -310,7 +310,7 @@ export default function Formations() {
     <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
       <SEO
         titre="Centre de formations professionnelles gratuites"
-        description="Centre de formations professionnelles gratuites — Excel, IA, Communication, Data et plus. Formations sélectionnées et recommandées selon ton métier."
+        description="Centre de formations professionnelles gratuites en Excel, IA, Communication, Data et plus. Formations sélectionnées et recommandées selon ton métier."
         url="https://didcv.vercel.app/formations"
       />
       <Navbar currentPage="formations" />

@@ -147,7 +147,7 @@ export default function Templates() {
                 Choisis ton template
               </h1>
               <p style={{ fontSize: '14px', color: '#9ca3af', margin: 0 }}>
-                {filtered.length} template{filtered.length > 1 ? 's' : ''} — pour tous les profils et secteurs
+                {filtered.length} template{filtered.length > 1 ? 's' : ''} pour tous les profils et secteurs
               </p>
             </div>
           </div>

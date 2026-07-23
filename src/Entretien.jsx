@@ -480,7 +480,7 @@ export default function Entretien() {
             {banniere && (
               <div style={{ marginBottom: '20px', padding: '12px 16px', background: banniere.entrainement ? '#fffbeb' : '#f0fdf4', border: `1px solid ${banniere.entrainement ? '#fde68a' : '#86efac'}`, borderRadius: '10px', fontSize: '13px', color: banniere.entrainement ? '#92400e' : '#16a34a' }}>
                 {banniere.entrainement ? (
-                  <><strong>Entraînement anticipé</strong> — Tu n'as pas encore eu de réponse mais tu peux t'entraîner en avance{banniere.poste && <> pour <strong>{banniere.poste}</strong>{banniere.entreprise && ` chez ${banniere.entreprise}`}</>}.</>
+                  <><strong>Entraînement anticipé</strong>. Tu n'as pas encore eu de réponse mais tu peux t'entraîner en avance{banniere.poste && <> pour <strong>{banniere.poste}</strong>{banniere.entreprise && ` chez ${banniere.entreprise}`}</>}.</>
                 ) : (
                   <>Préparation pour : <strong>{banniere.poste}</strong>{banniere.entreprise && ` chez ${banniere.entreprise}`}</>
                 )}
@@ -511,7 +511,7 @@ export default function Entretien() {
                       <button key={c.id} type="button" onClick={() => choisirCandidature(c)}
                         style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', padding: '12px 14px', borderRadius: '10px', border: 'none', boxShadow: candidatureId === c.id ? '0 0 0 2px #4f46e5' : '0 2px 12px rgba(0,0,0,0.06)', background: candidatureId === c.id ? '#f8f9ff' : '#fff', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
                         <span style={{ fontSize: '13px', color: '#111' }}>
-                          <strong>{c.entreprise || 'Entreprise ?'}</strong> — {c.titre}
+                          <strong>{c.entreprise || 'Entreprise ?'}</strong>, {c.titre}
                         </span>
                         <span style={{ fontSize: '10px', fontWeight: '700', padding: '2px 8px', borderRadius: '10px', background: '#f3f4f6', color: '#6b7280', flexShrink: 0 }}>{STATUT_LABELS[c.statut] || c.statut}</span>
                       </button>

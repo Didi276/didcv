@@ -87,7 +87,7 @@ function CVEditor({ cvData, template, onSave, onClose }) {
             {activeSection === 'photo' && (
               <div style={{display:'flex',flexDirection:'column',gap:'16px'}}>
                 <div style={{fontSize:'13px',color:'#6b7280',lineHeight:'1.6'}}>
-                  La photo est <strong>100% optionnelle</strong>. Une photo de démonstration est affichée par défaut — tu peux la remplacer par la tienne ou choisir de ne pas en mettre du tout.
+                  La photo est <strong>100% optionnelle</strong>. Une photo de démonstration est affichée par défaut, tu peux la remplacer par la tienne ou choisir de ne pas en mettre du tout.
                 </div>
 
                 {/* État actuel de la photo */}
@@ -108,7 +108,7 @@ function CVEditor({ cvData, template, onSave, onClose }) {
                     <img src={cv.photo} alt="Photo CV" loading="lazy" style={{width:'100px',height:'100px',borderRadius:'50%',objectFit:'cover',border:'3px solid #1a56db'}} />
                     <div style={{fontSize:'12px',color:'#16a34a',fontWeight:'500'}}>✓ Ta photo est ajoutée</div>
                     <button onClick={() => setCv({...cv, photo: null})} style={{padding:'8px 16px',background:'#fef2f2',color:'#dc2626',border:'1px solid #fecaca',borderRadius:'8px',cursor:'pointer',fontSize:'13px'}}>
-                      🗑 Supprimer — ne pas mettre de photo
+                      🗑 Supprimer, ne pas mettre de photo
                     </button>
                   </div>
                 ) : (
@@ -118,7 +118,7 @@ function CVEditor({ cvData, template, onSave, onClose }) {
                       <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop&crop=face" alt="Photo démo" loading="lazy" style={{width:'100px',height:'100px',borderRadius:'50%',objectFit:'cover',border:'2px dashed #aaa',opacity:0.7}} />
                       <div style={{position:'absolute',bottom:0,right:0,background:'#fbbf24',borderRadius:'50%',width:'24px',height:'24px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px'}}>📷</div>
                     </div>
-                    <div style={{fontSize:'11px',color:'#9ca3af',textAlign:'center'}}>Photo de démonstration — remplace-la par la tienne</div>
+                    <div style={{fontSize:'11px',color:'#9ca3af',textAlign:'center'}}>Photo de démonstration, remplace-la par la tienne</div>
                     <button onClick={() => setCv({...cv, photo: null})} style={{padding:'8px 16px',background:'#fef2f2',color:'#dc2626',border:'1px solid #fecaca',borderRadius:'8px',cursor:'pointer',fontSize:'12px'}}>
                       🚫 Ne pas mettre de photo sur mon CV
                     </button>
@@ -271,14 +271,14 @@ function CVEditor({ cvData, template, onSave, onClose }) {
                       <div>
                         <label style={{fontSize:'11px',fontWeight:'700',color:'#6b7280',textTransform:'uppercase',display:'block',marginBottom:'4px'}}>Niveau</label>
                         <select value={l.niveau||''} onChange={e=>{const langs=[...cv.langues];langs[i]={...langs[i],niveau:e.target.value};setCv({...cv,langues:langs})}} style={{...inputStyle,fontSize:'13px'}}>
-                          <option value="">— Sélectionner —</option>
+                          <option value="">Sélectionner</option>
                           <option>Natif</option>
-                          <option>C2 — Maîtrise</option>
-                          <option>C1 — Autonome avancé</option>
-                          <option>B2 — Intermédiaire avancé</option>
-                          <option>B1 — Intermédiaire</option>
-                          <option>A2 — Élémentaire</option>
-                          <option>A1 — Débutant</option>
+                          <option>C2, Maîtrise</option>
+                          <option>C1, Autonome avancé</option>
+                          <option>B2, Intermédiaire avancé</option>
+                          <option>B1, Intermédiaire</option>
+                          <option>A2, Élémentaire</option>
+                          <option>A1, Débutant</option>
                         </select>
                       </div>
                     </div>

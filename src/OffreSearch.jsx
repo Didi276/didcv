@@ -36,7 +36,7 @@ export default function OffreSearch({ onSelectOffre }) {
     setSelectedId(offre.id)
     // Construire le texte de l'offre à coller dans le champ
     const texte = `${offre.titre}
-${offre.entreprise} — ${offre.lieu}
+${offre.entreprise}, ${offre.lieu}
 ${offre.type ? `Type : ${offre.type}\n` : ''}${offre.remote ? 'Télétravail possible\n' : ''}
 ${offre.description}
 
@@ -116,7 +116,7 @@ Source : ${offre.url}`
           ) : (
             <>
               <div style={{ padding: '10px 14px', borderBottom: '1px solid #f0f0f0', fontSize: '12px', color: '#888', fontWeight: '600' }}>
-                {offres.length} offres trouvées — clique sur une pour la sélectionner
+                {offres.length} offres trouvées, clique sur une pour la sélectionner
               </div>
               {offres.map(offre => (
                 <div
@@ -189,7 +189,7 @@ Source : ${offre.url}`
           border: '1px solid #86efac', borderRadius: '8px', fontSize: '12px',
           color: '#16a34a', fontWeight: '500', display: 'flex', justifyContent: 'space-between'
         }}>
-          <span>✅ Offre collée dans le champ — tu peux générer ton CV !</span>
+          <span>✅ Offre collée dans le champ, tu peux générer ton CV !</span>
           <button
             onClick={() => { setSelectedId(null); setExpanded(true) }}
             style={{ background: 'none', border: 'none', color: '#16a34a', cursor: 'pointer', fontSize: '12px' }}

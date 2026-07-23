@@ -114,7 +114,7 @@ Règles :
       <div className="generate-wrap">
         <div className="generate-left">
           <h2>Ta lettre de motivation</h2>
-          <p className="generate-sub">Upload ton CV et colle l'offre — l'IA génère une lettre personnalisée.</p>
+          <p className="generate-sub">Upload ton CV et colle l'offre pour que l'IA génère une lettre personnalisée.</p>
 
           <div className="upload-box">
             <div className="upload-label">1. Ton CV actuel (PDF)</div>

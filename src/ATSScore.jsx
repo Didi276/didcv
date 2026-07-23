@@ -184,7 +184,7 @@ Retourne UNIQUEMENT ce JSON:
               </div>
               {result.mots_cles_manquants?.length > 0 && (
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: '#dc2626', fontWeight: '600', marginBottom: '4px' }}><XCircle size={12} /> Absents — à ajouter</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: '#dc2626', fontWeight: '600', marginBottom: '4px' }}><XCircle size={12} /> Absents, à ajouter</div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
                     {result.mots_cles_manquants?.map(m => (
                       <span key={m} style={{ fontSize: '11px', padding: '2px 8px', background: '#fef2f2', color: '#dc2626', borderRadius: '10px', fontWeight: '500' }}>{m}</span>

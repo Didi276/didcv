@@ -298,7 +298,7 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
             {section === 'competences' && (
               <div>
                 <div style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '12px' }}>
-                  Courtes et precises — ex: Excel, Python, Gestion de projet
+                  Courtes et precises, par exemple Excel, Python, Gestion de projet
                 </div>
                 {data.competences?.map((c, i) => (
                   <div key={i} style={{ display: 'flex', gap: '6px', marginBottom: '8px', alignItems: 'center' }}>

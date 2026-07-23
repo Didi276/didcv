@@ -617,7 +617,7 @@ export default function Profile() {
                   </label>
                   {photo && <button onClick={() => setPhoto(null)} style={{ padding: '8px 14px', background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>Supprimer</button>}
                 </div>
-                <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '5px' }}>JPG, PNG — compressée automatiquement</div>
+                <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '5px' }}>JPG, PNG, compressée automatiquement</div>
               </div>
             </div>
 
@@ -700,7 +700,7 @@ export default function Profile() {
                   </Field>
                   <Field label="Disponibilité">
                     <select value={disponibilite} onChange={e => setDisponibilite(e.target.value)} style={{ ...INPUT, cursor: 'pointer' }}>
-                      <option value="">— Sélectionner —</option>
+                      <option value="">Sélectionner</option>
                       {['Immédiatement', 'Dans 1 mois', 'Dans 3 mois'].map(d => <option key={d}>{d}</option>)}
                     </select>
                   </Field>

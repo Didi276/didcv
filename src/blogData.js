@@ -32,7 +32,7 @@ Lisez attentivement l'offre d'emploi et intégrez les mots-clés dans votre CV. 
 Police claire (Inter, Calibri, Arial), taille 10-12pt, espacement aéré, sans fioritures inutiles.
 
 ### 7. Format PDF texte réel
-Toujours exporter en PDF avec du texte sélectionnable — jamais en image. Les ATS ne peuvent pas lire les PDFs image.
+Toujours exporter en PDF avec du texte sélectionnable, jamais en image. Les ATS ne peuvent pas lire les PDFs image.
 
 ## Les sections indispensables
 
@@ -118,7 +118,7 @@ Proposez un entretien et remerciez pour l'attention portée à votre candidature
 
 ## Les erreurs à éviter
 
-- Commencer par "Je me permets de vous contacter" — trop banal
+- Commencer par "Je me permets de vous contacter", une formule trop banale
 - Reformuler le CV dans la lettre
 - Lettre générique non personnalisée
 - Dépasser une page
@@ -139,7 +139,7 @@ Proposez un entretien et remerciez pour l'attention portée à votre candidature
     contenu: `
 ## Le CV étudiant sans expérience : ce n'est pas une fatalité
 
-Tous les professionnels ont commencé sans expérience. La clé est de valoriser ce que vous avez — formations, projets, compétences, engagements.
+Tous les professionnels ont commencé sans expérience. La clé est de valoriser ce que vous avez : formations, projets, compétences, engagements.
 
 ## Ce que vous pouvez mettre à la place des expériences
 
@@ -150,10 +150,10 @@ Les projets de fin d'études, travaux pratiques et projets personnels comptent. 
 Même un stage de 2 mois est une expérience. Même un job d'été au supermarché développe des compétences : rigueur, travail en équipe, gestion du temps.
 
 ### Associations et bénévolat
-Président d'une association étudiante, organisation d'événements, bénévolat — tout cela parle de votre personnalité et de vos soft skills.
+Président d'une association étudiante, organisation d'événements, bénévolat : tout cela parle de votre personnalité et de vos soft skills.
 
 ### Compétences techniques
-Maîtrise de logiciels, langages de programmation, outils bureautiques — mettez tout en valeur.
+Maîtrise de logiciels, langages de programmation, outils bureautiques. Mettez tout en valeur.
 
 ## Structure recommandée pour un CV étudiant
 
@@ -186,7 +186,7 @@ L'alternance combine formation et expérience professionnelle. Les recruteurs sa
 Indiquez votre rythme d'alternance : "3 semaines entreprise / 1 semaine école" ou "50/50". Les recruteurs ont besoin de planifier.
 
 ### Précisez la durée
-"Contrat d'apprentissage — 24 mois à partir de septembre 2025"
+"Contrat d'apprentissage de 24 mois à partir de septembre 2025"
 
 ### Votre école et votre formation
 En alternance, votre formation est aussi importante que votre expérience. Mentionnez le nom complet de votre école, le titre du diplôme préparé et la promotion.
@@ -266,7 +266,7 @@ Les recruteurs voient de plus en plus positivement les profils en reconversion. 
 ## Stratégie pour le CV de reconversion
 
 ### Mettez les compétences transférables en avant
-Identifiez les compétences de votre ancien métier qui sont utiles dans votre nouveau domaine. Gestion de projet, management, relation client, analyse de données — ces compétences traversent les secteurs.
+Identifiez les compétences de votre ancien métier qui sont utiles dans votre nouveau domaine. Gestion de projet, management, relation client, analyse de données : ces compétences traversent les secteurs.
 
 ### Structurez autour des compétences, pas du temps
 Considérez un CV "fonctionnel" qui met les compétences en avant plutôt qu'une liste chronologique d'expériences.
@@ -275,7 +275,7 @@ Considérez un CV "fonctionnel" qui met les compétences en avant plutôt qu'une
 Soyez transparent et positif. "Fort d'une expérience de 10 ans dans la finance, j'ai choisi de me reconvertir dans le développement web pour allier ma rigueur analytique à ma passion pour la technologie."
 
 ### Montrez votre investissement dans la formation
-Formations, certifications, projets personnels, bootcamps — tout ce qui montre que vous avez activement préparé votre reconversion.
+Formations, certifications, projets personnels, bootcamps : tout ce qui montre que vous avez activement préparé votre reconversion.
 
 ## Ce que les recruteurs attendent
 
@@ -480,7 +480,7 @@ Sans résultats quantifiés, vos missions n'ont pas d'impact.
 1 page pour moins de 10 ans d'expérience, 2 pages maximum sinon.
 
 ### 13. Des sections inutiles
-"Objectifs professionnels" ou "Références disponibles sur demande" — supprimez-les.
+"Objectifs professionnels" ou "Références disponibles sur demande", supprimez-les.
 
 ### 14. Police illisible ou trop petite
 Minimum 10pt. Police standard (Inter, Arial, Calibri).
@@ -519,7 +519,7 @@ Prospection B2B/B2C, closing, négociation, gestion de portefeuille, CRM (Salesf
 
 **Accroche :** "Commercial terrain avec 5 ans d'expérience dans la vente de solutions SaaS. Expert en cycle de vente complexe et négociation grands comptes."
 
-**Expérience :** "Responsable Commercial — TechSales (2021-2024) : Développement d'un portefeuille de 80 clients PME, croissance du CA de 32% en 2 ans, management d'une équipe de 3 SDR."
+**Expérience :** "Responsable Commercial chez TechSales (2021-2024) : Développement d'un portefeuille de 80 clients PME, croissance du CA de 32% en 2 ans, management d'une équipe de 3 SDR."
 
 ## Les erreurs à éviter
 
@@ -543,7 +543,7 @@ Le template "Commercial" de DidCV met en avant vos chiffres clés dès le premie
     contenu: `
 ## Les recruteurs tech ne lisent pas un CV comme les autres
 
-Un recruteur technique ou un lead dev passe en moyenne 30 secondes sur un CV développeur. Il cherche votre stack, votre niveau et vos projets concrets — pas un discours marketing.
+Un recruteur technique ou un lead dev passe en moyenne 30 secondes sur un CV développeur. Il cherche votre stack, votre niveau et vos projets concrets, pas un discours marketing.
 
 ## Les erreurs les plus courantes
 
@@ -600,7 +600,7 @@ Postuler à 200 offres au hasard est moins efficace que postuler à 30 offres pa
 
 ## 2. Optimiser son CV pour chaque candidature
 
-Un CV générique passe moins bien les filtres ATS. Adaptez le titre, l'accroche et les mots-clés à chaque offre — DidCV permet de générer un CV adapté à une offre en quelques secondes.
+Un CV générique passe moins bien les filtres ATS. Adaptez le titre, l'accroche et les mots-clés à chaque offre. DidCV permet de générer un CV adapté à une offre en quelques secondes.
 
 ## 3. Activer tous les canaux en parallèle
 
@@ -640,7 +640,7 @@ Décrocher un contrat d'alternance suit des règles différentes d'un recrutemen
 
 ## Quand commencer ses recherches ?
 
-Commencez idéalement **4 à 6 mois avant la rentrée**. Les entreprises reçoivent un pic de candidatures entre avril et juillet — être parmi les premiers augmente vos chances.
+Commencez idéalement **4 à 6 mois avant la rentrée**. Les entreprises reçoivent un pic de candidatures entre avril et juillet. Être parmi les premiers augmente vos chances.
 
 ## Le CV alternance qui fait la différence
 
@@ -663,7 +663,7 @@ Les recruteurs veulent savoir immédiatement si votre rythme est compatible avec
 En l'absence d'expérience professionnelle solide, la motivation et la capacité à apprendre vite sont décisives.
 
 ### Poser des questions sur l'accompagnement
-Demandez qui sera votre tuteur, comment se passe l'intégration — cela montre votre sérieux.
+Demandez qui sera votre tuteur, comment se passe l'intégration. Cela montre votre sérieux.
 
 ## Les canaux à activer
 
@@ -770,7 +770,7 @@ Ces questions ne cherchent pas à vous déstabiliser gratuitement : elles évalu
 
 ## "Avez-vous des questions ?"
 
-**Le piège :** répondre "non, tout est clair" — cela peut être perçu comme un manque d'intérêt.
+**Le piège :** répondre "non, tout est clair", cela peut être perçu comme un manque d'intérêt.
 
 **La bonne approche :** préparez 2 à 3 questions sur l'équipe, les enjeux du poste ou les prochaines étapes du processus.
 
@@ -794,13 +794,13 @@ Dans le BTP, le CV doit avant tout rassurer sur la sécurité, les qualification
 ## Les éléments indispensables
 
 ### Les habilitations et certifications
-Habilitations électriques, CACES, permis de conduire spécifiques, certifications gaz — mentionnez-les avec leur date de validité. C'est souvent le premier critère de sélection.
+Habilitations électriques, CACES, permis de conduire spécifiques, certifications gaz : mentionnez-les avec leur date de validité. C'est souvent le premier critère de sélection.
 
 ### Le type de chantiers
 Précisez si vous avez travaillé sur des chantiers résidentiels, tertiaires, industriels ou publics. Le contexte compte autant que la compétence technique.
 
 ### Les outils et engins maîtrisés
-Nacelle, grue, engins de chantier, logiciels de métré — soyez précis sur votre niveau de maîtrise réel.
+Nacelle, grue, engins de chantier, logiciels de métré : soyez précis sur votre niveau de maîtrise réel.
 
 ## Structurer les missions
 

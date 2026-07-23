@@ -220,7 +220,7 @@ export default function Offres() {
             Trouve ton emploi idéal
           </h1>
           <p style={{ fontSize: '14px', color: '#a1a1aa', margin: '0 0 20px' }}>
-            France Travail, LinkedIn, Indeed et plus — tout en un
+            France Travail, LinkedIn, Indeed et plus, tout en un
           </p>
 
           {/* Barre de recherche */}

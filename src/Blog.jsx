@@ -68,7 +68,7 @@ export default function Blog() {
   return (
     <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
       <SEO
-        titre="Conseils CV et carrière — Blog DidCV"
+        titre="Conseils CV et carrière du blog DidCV"
         description="Guides pratiques pour rédiger votre CV, préparer vos entretiens et optimiser votre recherche d'emploi en France."
         url="https://didcv.vercel.app/blog"
         schema={schema}
@@ -149,7 +149,7 @@ export default function Blog() {
       </div>
 
       <footer style={{ textAlign: 'center', padding: '40px', borderTop: '1px solid #f0f0f0', fontSize: '13px', color: '#9ca3af' }}>
-        <Link to="/" style={{ color: '#4f46e5', textDecoration: 'none', fontWeight: '600' }}>DidCV</Link> — Créez votre CV optimisé ATS gratuitement
+        <Link to="/" style={{ color: '#4f46e5', textDecoration: 'none', fontWeight: '600' }}>DidCV</Link>, créez votre CV optimisé ATS gratuitement
       </footer>
     </div>
   )
