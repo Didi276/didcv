@@ -66,9 +66,9 @@ function getRecommandations(profilMetiers) {
 
 function FormationCard({ f }) {
   return (
-    <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #ececec', padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px', transition: 'transform 0.15s, box-shadow 0.15s' }}
+    <div style={{ background: '#fff', borderRadius: '16px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px', transition: 'transform 0.15s, box-shadow 0.15s' }}
       onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.1)' }}
-      onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}>
+      onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ fontSize: '30px' }}>{CATEGORY_ICONS[f.categorie] || '🎓'}</div>
         {f.gratuit && (
@@ -315,12 +315,13 @@ export default function Formations() {
       />
       <Navbar currentPage="formations" />
 
-      <div style={{ background: '#0f6e56', padding: '56px 24px' }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
-          <h1 style={{ fontSize: '38px', fontWeight: '800', color: '#fff', margin: '0 0 12px', letterSpacing: '-1px' }}>
+      <div style={{ position: 'relative', background: '#0a0a0f', overflow: 'hidden', padding: '56px 24px' }}>
+        <div style={{ position: 'absolute', top: '0', left: '50%', transform: 'translateX(-50%)', width: '600px', height: '300px', maxWidth: '100%', background: 'radial-gradient(circle, #4f46e520 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'relative', maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
+          <h1 style={{ fontSize: '38px', fontWeight: '700', color: '#fff', margin: '0 0 12px', letterSpacing: '-1px' }}>
             Centre de formations
           </h1>
-          <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.8)', margin: 0 }}>
+          <p style={{ fontSize: '16px', color: '#a1a1aa', margin: 0 }}>
             Tout ce que l'école ne t'a pas appris
           </p>
         </div>
@@ -336,7 +337,7 @@ export default function Formations() {
             <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 20px' }}>
               En fonction du profil renseigné dans ton compte
             </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '20px' }}>
               {recommandees.map(f => <FormationCard key={f.id} f={f} />)}
             </div>
           </div>
@@ -365,7 +366,7 @@ export default function Formations() {
           {formations.length} formation{formations.length > 1 ? 's' : ''}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '20px' }}>
           {formations.map(f => <FormationCard key={f.id} f={f} />)}
         </div>
 
