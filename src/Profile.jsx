@@ -384,10 +384,10 @@ export default function Profile() {
     <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
       <Navbar currentPage="profile" />
 
-      <div style={{ maxWidth: '860px', margin: '0 auto', padding: '36px 24px 100px' }}>
+      <div style={{ maxWidth: '860px', margin: '0 auto', padding: '48px 24px 100px' }}>
 
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <h1 style={{ fontSize: '26px', fontWeight: '800', color: '#0f0f1a', margin: '0 0 4px', letterSpacing: '-0.5px' }}>Mon profil</h1>
             <p style={{ fontSize: '14px', color: '#9ca3af', margin: 0 }}>
@@ -447,7 +447,7 @@ export default function Profile() {
 
                 {/* Option 1 : CV sauvegardé sur DidCV */}
                 {savedCvs.length > 0 && (
-                  <div style={{ marginBottom: '20px', padding: '20px', background: '#f8f9ff', borderRadius: '12px', border: '1px solid #ede9fe' }}>
+                  <div style={{ marginBottom: '20px', padding: '20px', background: '#f8f9ff', borderRadius: '12px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
                       <div>
                         <div style={{ fontSize: '14px', fontWeight: '700', color: '#4f46e5', marginBottom: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}><Zap size={14} /> Depuis un CV DidCV</div>
@@ -463,7 +463,7 @@ export default function Profile() {
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {savedCvs.map(cv => (
                           <button key={cv.id} onClick={() => importFromSavedCV(cv)}
-                            style={{ padding: '10px 14px', background: '#fff', border: '1.5px solid #ede9fe', borderRadius: '9px', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            style={{ padding: '10px 14px', background: '#fff', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', borderRadius: '9px', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div>
                               <div style={{ fontSize: '13px', fontWeight: '600', color: '#111' }}>{cv.cv_data.prenom} {cv.cv_data.nom}</div>
                               <div style={{ fontSize: '11px', color: '#9ca3af' }}>{cv.cv_data.titre} · {cv.template}</div>
@@ -526,7 +526,7 @@ export default function Profile() {
             </div>
 
             {/* Récap des infos importées */}
-            <div style={{ background: '#f8f9ff', borderRadius: '12px', border: '1px solid #ede9fe', padding: '20px', marginBottom: '24px' }}>
+            <div style={{ background: '#f8f9ff', borderRadius: '12px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '20px', marginBottom: '24px' }}>
               <div style={{ fontSize: '13px', fontWeight: '700', color: '#4f46e5', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <ClipboardList size={14} /> Informations importées
               </div>
@@ -552,7 +552,7 @@ export default function Profile() {
             </div>
 
             {/* Avertissement */}
-            <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '10px', padding: '14px 16px', marginBottom: '12px', display: 'flex', gap: '10px' }}>
+            <div style={{ background: '#fffbeb', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', borderRadius: '10px', padding: '14px 16px', marginBottom: '12px', display: 'flex', gap: '10px' }}>
               <AlertTriangle size={18} color="#92400e" style={{ flexShrink: 0 }} />
               <div style={{ fontSize: '13px', color: '#92400e', lineHeight: '1.6' }}>
                 <strong>Vérifie bien tes informations avant de sauvegarder.</strong><br />
@@ -560,7 +560,7 @@ export default function Profile() {
               </div>
             </div>
 
-            <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '10px', padding: '14px 16px', marginBottom: '24px', display: 'flex', gap: '10px' }}>
+            <div style={{ background: '#eff6ff', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', borderRadius: '10px', padding: '14px 16px', marginBottom: '24px', display: 'flex', gap: '10px' }}>
               <span style={{ flexShrink: 0, display: 'flex' }}>{photo ? <CheckCircle size={18} color="#16a34a" /> : <span style={{ fontSize: '18px' }}>📸</span>}</span>
               <div style={{ fontSize: '13px', color: '#1e40af', lineHeight: '1.6' }}>
                 {photo
@@ -595,7 +595,7 @@ export default function Profile() {
             <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: '0 0 24px' }}>Informations personnelles</h2>
 
             {/* Avertissement 1 compte = 1 personne */}
-            <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '10px', padding: '12px 16px', marginBottom: '20px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+            <div style={{ background: '#fffbeb', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', borderRadius: '10px', padding: '12px 16px', marginBottom: '20px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
               <AlertTriangle size={16} color="#92400e" style={{ flexShrink: 0 }} />
               <div style={{ fontSize: '13px', color: '#92400e', lineHeight: '1.5' }}>
                 <strong>1 compte = 1 personne.</strong> Ton nom et prénom sont liés à ce compte et ne peuvent pas être changés une fois enregistrés. Si tu veux changer de profil, crée un nouveau compte.
@@ -704,7 +704,7 @@ export default function Profile() {
                       {['Immédiatement', 'Dans 1 mois', 'Dans 3 mois'].map(d => <option key={d}>{d}</option>)}
                     </select>
                   </Field>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '7px', background: '#f8f9ff', border: '1px solid #ede9fe', borderRadius: '10px', padding: '12px 14px', fontSize: '13px', color: '#4f46e5', lineHeight: '1.6' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '7px', background: '#f8f9ff', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', borderRadius: '10px', padding: '12px 14px', fontSize: '13px', color: '#4f46e5', lineHeight: '1.6' }}>
                     <Sparkles size={14} style={{ flexShrink: 0, marginTop: '2px' }} /> Seuls ton prénom, initiale du nom, titre professionnel et ville sont visibles. Ton email reste masqué. Seuls les recruteurs certifiés par DidCV peuvent accéder à la banque.
                   </div>
                 </div>
@@ -715,7 +715,7 @@ export default function Profile() {
 
         {/* ─── EXPERIENCES ─── */}
         {activeSection === 'experiences' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {experiences.map((exp, i) => (
               <div key={i} style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '24px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
@@ -756,7 +756,7 @@ export default function Profile() {
 
         {/* ─── FORMATIONS ─── */}
         {activeSection === 'formations' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {formations.map((f, i) => (
               <div key={i} style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '24px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
@@ -808,9 +808,9 @@ export default function Profile() {
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '10px' }}>
                   {formationsRecommandees.map(f => (
                     <a key={f.id} href={f.lien} target="_blank" rel="noopener noreferrer"
-                      style={{ display: 'block', padding: '14px', background: '#f8f9ff', border: '1px solid #ede9fe', borderRadius: '10px', textDecoration: 'none', transition: 'all 0.15s' }}
-                      onMouseEnter={e => { e.currentTarget.style.borderColor = '#4f46e5'; e.currentTarget.style.background = '#faf9ff' }}
-                      onMouseLeave={e => { e.currentTarget.style.borderColor = '#ede9fe'; e.currentTarget.style.background = '#f8f9ff' }}>
+                      style={{ display: 'block', padding: '14px', background: '#f8f9ff', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', borderRadius: '10px', textDecoration: 'none', transition: 'box-shadow 0.15s, background 0.15s' }}
+                      onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(79,70,229,0.15)'; e.currentTarget.style.background = '#faf9ff' }}
+                      onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'; e.currentTarget.style.background = '#f8f9ff' }}>
                       <div style={{ fontSize: '10px', fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{f.categorie}</div>
                       <div style={{ fontSize: '13px', fontWeight: '700', color: '#111', marginBottom: '4px', lineHeight: '1.3' }}>{f.titre}</div>
                       <div style={{ fontSize: '11px', color: '#9ca3af' }}>⏱ {f.duree} · {f.niveau}</div>
@@ -824,7 +824,7 @@ export default function Profile() {
 
         {/* ─── PLUS ─── */}
         {activeSection === 'plus' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {/* Langues */}
             <div style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '24px' }}>
               <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: '0 0 20px' }}>Langues</h2>
@@ -884,7 +884,7 @@ export default function Profile() {
             <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 20px', lineHeight: '1.7' }}>
               La lecture automatique du PDF n'est <strong>pas parfaite à 100%</strong>. L'IA peut faire des erreurs sur :
             </p>
-            <div style={{ background: '#fef3c7', border: '1px solid #fde68a', borderRadius: '10px', padding: '14px 16px', marginBottom: '24px', textAlign: 'left' }}>
+            <div style={{ background: '#fef3c7', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', borderRadius: '10px', padding: '14px 16px', marginBottom: '24px', textAlign: 'left' }}>
               {[
                 { icon: null, texte: 'Ton prénom et ton nom' },
                 { icon: Calendar, texte: 'Les dates et périodes de poste' },
