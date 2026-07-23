@@ -18,7 +18,7 @@ export default function Privacy() {
           <p style={{ fontSize: '14px', color: '#9ca3af', margin: 0 }}>Dernière mise à jour : juillet 2026</p>
         </div>
 
-        <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '40px' }}>
+        <div style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '40px' }}>
           <Section title="1. Données collectées">
             DidCV collecte les informations que tu fournis directement : adresse email, informations de profil (nom, expériences, formations, compétences), et les CVs que tu génères. Nous ne collectons aucune donnée sensible au sens du RGPD.
           </Section>

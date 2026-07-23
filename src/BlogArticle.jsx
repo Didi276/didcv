@@ -145,9 +145,9 @@ export default function BlogArticle() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {autres.map(a => (
                 <Link key={a.slug} to={`/blog/${a.slug}`} style={{ textDecoration: 'none' }}>
-                  <div style={{ padding: '14px 16px', background: '#f8f9ff', borderRadius: '10px', border: '1px solid #e5e7eb', transition: 'all 0.1s' }}
-                    onMouseEnter={e => e.currentTarget.style.borderColor = '#4f46e5'}
-                    onMouseLeave={e => e.currentTarget.style.borderColor = '#e5e7eb'}>
+                  <div style={{ padding: '14px 16px', background: '#f8f9ff', borderRadius: '10px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', transition: 'box-shadow 0.15s' }}
+                    onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(79,70,229,0.15)'}
+                    onMouseLeave={e => e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'}>
                     <div style={{ fontSize: '14px', fontWeight: '600', color: '#111' }}>{a.titre}</div>
                     <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '3px' }}>{a.duree} de lecture</div>
                   </div>

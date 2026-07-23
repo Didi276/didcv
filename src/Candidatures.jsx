@@ -384,7 +384,7 @@ export default function Candidatures() {
                     <Download size={14} />
                   </button>
                 )}
-                <button onClick={() => setCvApercu(null)} style={{ width: '30px', height: '30px', borderRadius: '8px', border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                <button onClick={() => setCvApercu(null)} style={{ width: '30px', height: '30px', borderRadius: '8px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
               </div>
             </div>
             <div style={{ overflow: 'auto', flex: 1, display: 'flex', justifyContent: 'center', padding: '20px 16px', background: '#f8f9ff' }}>

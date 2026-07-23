@@ -1,9 +1,19 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronRight, CheckCircle, ClipboardList } from 'lucide-react'
 import Navbar from './Navbar'
 import SEO from './SEO'
 import { GUIDES, SECTEURS } from './guidesData'
+
+function useWidth() {
+  const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
+  useEffect(() => {
+    const fn = () => setW(window.innerWidth)
+    window.addEventListener('resize', fn)
+    return () => window.removeEventListener('resize', fn)
+  }, [])
+  return w
+}
 
 const SECTEUR_COLORS = {
   'Finance': '#f0fdf4',
@@ -46,6 +56,7 @@ const FALLBACK_BORDER = '#e5e7eb'
 
 export default function GuidesMetier() {
   const [secteur, setSecteur] = useState('')
+  const isMobile = useWidth() < 768
   const guides = secteur ? GUIDES.filter(g => g.secteur === secteur) : GUIDES
 
   return (
@@ -67,7 +78,7 @@ export default function GuidesMetier() {
         </div>
       </div>
 
-      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '40px 24px' }}>
+      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: isMobile ? '64px 24px 40px' : '96px 24px 40px' }}>
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '32px' }}>
           <button onClick={() => setSecteur('')}
             style={{ padding: '6px 14px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', background: !secteur ? '#4f46e5' : '#f3f4f6', color: !secteur ? '#fff' : '#374151' }}>

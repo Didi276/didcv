@@ -68,7 +68,7 @@ export default function RecruteurConnexion() {
       <EnTete />
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 60px)', padding: '40px 24px' }}>
-        <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb', padding: '36px', maxWidth: '400px', width: '100%' }}>
+        <div style={{ background: '#fff', borderRadius: '16px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '36px', maxWidth: '400px', width: '100%' }}>
           <div style={{ textAlign: 'center', marginBottom: '24px' }}>
             <div style={{ fontWeight: '800', fontSize: '20px', color: '#111', letterSpacing: '-0.5px', marginBottom: '4px' }}>
               <span style={{ color: '#1e3a5f' }}>Did</span>CV Recruteurs

@@ -5,6 +5,16 @@ import SEO from './SEO'
 import { supabase } from './supabase'
 import { FORMATIONS, CATEGORIES } from './formationsData'
 
+function useWidth() {
+  const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
+  useEffect(() => {
+    const fn = () => setW(window.innerWidth)
+    window.addEventListener('resize', fn)
+    return () => window.removeEventListener('resize', fn)
+  }, [])
+  return w
+}
+
 const CATEGORY_ICONS = {
   'Compétences pro': '💼',
   'IA et Tech': '🤖',
@@ -272,6 +282,7 @@ function TestCompetence({ formation }) {
 }
 
 export default function Formations() {
+  const isMobile = useWidth() < 768
   const [categorie, setCategorie] = useState('')
   const [gratuitOnly, setGratuitOnly] = useState(false)
   const [recommandees, setRecommandees] = useState([])
@@ -315,7 +326,7 @@ export default function Formations() {
         </div>
       </div>
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 24px 80px' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: isMobile ? '64px 24px 80px' : '96px 24px 80px' }}>
 
         {recommandees.length > 0 && (
           <div style={{ marginBottom: '48px' }}>

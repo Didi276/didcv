@@ -471,10 +471,10 @@ export default function Entretien() {
         </div>
       </div>
 
-      <div style={{ maxWidth: '720px', margin: '0 auto', padding: '40px 24px 80px' }}>
+      <div style={{ maxWidth: '720px', margin: '0 auto', padding: isMobile ? '64px 24px 80px' : '96px 24px 80px' }}>
 
         {step === 'setup' && (
-          <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb', padding: '32px' }}>
+          <div style={{ background: '#fff', borderRadius: '16px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '32px' }}>
 
             {banniere && (
               <div style={{ marginBottom: '20px', padding: '12px 16px', background: banniere.entrainement ? '#fffbeb' : '#f0fdf4', border: `1px solid ${banniere.entrainement ? '#fde68a' : '#86efac'}`, borderRadius: '10px', fontSize: '13px', color: banniere.entrainement ? '#92400e' : '#16a34a' }}>
@@ -631,7 +631,7 @@ export default function Entretien() {
         )}
 
         {step === 'chat' && (
-          <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ background: '#fff', borderRadius: '16px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
 
             {/* Barre de progression */}
             <div style={{ padding: '16px 20px', borderBottom: '1px solid #f0f0f0' }}>
@@ -818,7 +818,7 @@ export default function Entretien() {
         )}
 
         {step === 'bilan' && bilan && (
-          <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb', padding: '36px' }}>
+          <div style={{ background: '#fff', borderRadius: '16px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '36px' }}>
             <div style={{ fontSize: '12px', fontWeight: '700', color: '#4f46e5', textTransform: 'uppercase', letterSpacing: '1px', textAlign: 'center', marginBottom: '20px' }}>
               Bilan de l'entretien
             </div>

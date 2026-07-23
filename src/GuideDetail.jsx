@@ -115,9 +115,9 @@ export default function GuideDetail() {
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               {autres.map(g => (
                 <Link key={g.slug} to={`/guide/${g.slug}`}
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', background: '#f8f9ff', border: '1px solid #e5e7eb', borderRadius: '10px', textDecoration: 'none', fontSize: '13px', fontWeight: '600', color: '#374151', transition: 'all 0.1s' }}
-                  onMouseEnter={e => e.currentTarget.style.borderColor = '#4f46e5'}
-                  onMouseLeave={e => e.currentTarget.style.borderColor = '#e5e7eb'}>
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', background: '#f8f9ff', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', borderRadius: '10px', textDecoration: 'none', fontSize: '13px', fontWeight: '600', color: '#374151', transition: 'box-shadow 0.15s' }}
+                  onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(79,70,229,0.15)'}
+                  onMouseLeave={e => e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'}>
                   <span>{g.icon}</span> {g.titre}
                 </Link>
               ))}

@@ -1,9 +1,19 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronRight, Calendar, Clock } from 'lucide-react'
 import Navbar from './Navbar'
 import SEO from './SEO'
 import { ARTICLES, CATEGORIES } from './blogData'
+
+function useWidth() {
+  const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
+  useEffect(() => {
+    const fn = () => setW(window.innerWidth)
+    window.addEventListener('resize', fn)
+    return () => window.removeEventListener('resize', fn)
+  }, [])
+  return w
+}
 
 const CATEGORY_COLORS = {
   'CV': ['#4f46e5', '#7c3aed'],
@@ -39,6 +49,7 @@ function Cover({ article, height = '90px' }) {
 
 export default function Blog() {
   const [categorie, setCategorie] = useState('')
+  const isMobile = useWidth() < 768
   const articles = categorie ? ARTICLES.filter(a => a.categorie === categorie) : ARTICLES
   const populaires = ARTICLES.slice(0, 3)
 
@@ -74,7 +85,7 @@ export default function Blog() {
         </div>
       </div>
 
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 24px' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: isMobile ? '64px 24px 40px' : '96px 24px 40px' }}>
 
         {!categorie && populaires.length > 0 && (
           <div style={{ marginBottom: '40px' }}>
@@ -84,9 +95,9 @@ export default function Blog() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '20px' }}>
               {populaires.map(article => (
                 <Link key={article.slug} to={`/blog/${article.slug}`} style={{ textDecoration: 'none' }}>
-                  <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb', padding: '20px', height: '100%', boxSizing: 'border-box', transition: 'transform 0.15s, box-shadow 0.15s, border-color 0.15s' }}
-                    onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 10px 28px rgba(79,70,229,0.18)'; e.currentTarget.style.borderColor = '#4f46e5'; e.currentTarget.style.transform = 'translateY(-2px)' }}
-                    onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.transform = 'translateY(0)' }}>
+                  <div style={{ background: '#fff', borderRadius: '16px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '20px', height: '100%', boxSizing: 'border-box', transition: 'transform 0.15s, box-shadow 0.15s' }}
+                    onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 10px 28px rgba(79,70,229,0.18)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
+                    onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'; e.currentTarget.style.transform = 'translateY(0)' }}>
                     <Cover article={article} height="120px" />
                     <h3 style={{ fontSize: '17px', fontWeight: '800', color: '#111', margin: '0 0 8px', lineHeight: '1.35', letterSpacing: '-0.2px' }}>{article.titre}</h3>
                     <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 14px', lineHeight: '1.6' }}>{article.description}</p>
@@ -117,9 +128,9 @@ export default function Blog() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
           {articles.map(article => (
             <Link key={article.slug} to={`/blog/${article.slug}`} style={{ textDecoration: 'none' }}>
-              <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '20px', height: '100%', boxSizing: 'border-box', transition: 'transform 0.15s, box-shadow 0.15s, border-color 0.15s' }}
-                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 24px rgba(79,70,229,0.15)'; e.currentTarget.style.borderColor = '#4f46e5'; e.currentTarget.style.transform = 'translateY(-2px)' }}
-                onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.transform = 'translateY(0)' }}>
+              <div style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '20px', height: '100%', boxSizing: 'border-box', transition: 'transform 0.15s, box-shadow 0.15s' }}
+                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 24px rgba(79,70,229,0.15)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
+                onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'; e.currentTarget.style.transform = 'translateY(0)' }}>
                 <Cover article={article} />
                 <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: '0 0 10px', lineHeight: '1.4', letterSpacing: '-0.2px' }}>{article.titre}</h2>
                 <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 14px', lineHeight: '1.6' }}>{article.description}</p>

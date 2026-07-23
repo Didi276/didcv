@@ -146,7 +146,7 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
                 Sauvegarder
               </button>
               <button onClick={onClose}
-                style={{ width: '34px', height: '34px', border: '1px solid #e5e7eb', background: '#fff', borderRadius: '8px', cursor: 'pointer', fontSize: '16px' }}>
+                style={{ width: '34px', height: '34px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', background: '#fff', borderRadius: '8px', cursor: 'pointer', fontSize: '16px' }}>
                 ✕
               </button>
             </div>

@@ -166,7 +166,7 @@ Source : ${offre.url}`
                           onClick={e => e.stopPropagation()}
                           style={{
                             padding: '4px 10px', background: '#f3f4f6', color: '#555',
-                            border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '11px',
+                            border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', borderRadius: '6px', fontSize: '11px',
                             textDecoration: 'none', textAlign: 'center', fontWeight: '500'
                           }}
                         >

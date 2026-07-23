@@ -402,7 +402,7 @@ export default function Profile() {
         </div>
 
         {/* Navigation */}
-        <div style={{ display: 'flex', gap: '4px', marginBottom: '24px', background: '#fff', padding: '5px', borderRadius: '12px', border: '1px solid #e5e7eb', overflowX: 'auto' }}>
+        <div style={{ display: 'flex', gap: '4px', marginBottom: '24px', background: '#fff', padding: '5px', borderRadius: '12px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', overflowX: 'auto' }}>
           {SECTIONS.map(s => (
             <button key={s.id} onClick={() => setActiveSection(s.id)}
               style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '12px', fontWeight: '600', transition: 'all 0.15s', background: activeSection === s.id ? '#4f46e5' : 'transparent', color: activeSection === s.id ? '#fff' : '#6b7280', position: 'relative' }}>
@@ -414,7 +414,7 @@ export default function Profile() {
 
         {/* ─── IMPORT PDF ─── */}
         {activeSection === 'import' && (
-          <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '32px' }}>
+          <div style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '32px' }}>
             {importing ? (
               <div style={{ textAlign: 'center', padding: '20px' }}>
                 <div style={{ width: '48px', height: '48px', border: '4px solid #ede9fe', borderTop: '4px solid #4f46e5', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 20px' }} />
@@ -481,7 +481,7 @@ export default function Profile() {
                 )}
 
                 {/* Option 2 : PDF */}
-                <div style={{ padding: '20px', background: '#fafafa', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
+                <div style={{ padding: '20px', background: '#fafafa', borderRadius: '12px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
                   <div style={{ fontSize: '14px', fontWeight: '700', color: '#374151', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}><FileText size={14} /> Uploader ton CV PDF</div>
                   <label
                     onDragOver={e => { e.preventDefault(); e.currentTarget.style.borderColor = '#4f46e5'; e.currentTarget.style.background = '#faf9ff' }}
@@ -504,7 +504,7 @@ export default function Profile() {
                 </div>
 
                 <button onClick={() => setActiveSection('infos')}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', margin: '12px auto 0', background: 'none', border: '1px solid #e5e7eb', color: '#6b7280', fontSize: '13px', cursor: 'pointer', textDecoration: 'none', fontFamily: 'inherit', padding: '8px 20px', borderRadius: '8px', width: '100%' }}>
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', margin: '12px auto 0', background: 'none', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', color: '#6b7280', fontSize: '13px', cursor: 'pointer', textDecoration: 'none', fontFamily: 'inherit', padding: '8px 20px', borderRadius: '8px', width: '100%' }}>
                   <Edit2 size={13} /> Remplir mon profil manuellement
                 </button>
               </div>
@@ -514,7 +514,7 @@ export default function Profile() {
 
         {/* ─── VÉRIFICATION ─── */}
         {activeSection === 'verification' && (
-          <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '32px' }}>
+          <div style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '32px' }}>
             <div style={{ textAlign: 'center', marginBottom: '28px' }}>
               <PartyPopper size={44} color="#4f46e5" strokeWidth={1.5} style={{ marginBottom: '14px' }} />
               <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#111', margin: '0 0 10px' }}>
@@ -591,7 +591,7 @@ export default function Profile() {
 
         {/* ─── INFOS ─── */}
         {activeSection === 'infos' && (
-          <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '28px' }}>
+          <div style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '28px' }}>
             <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: '0 0 24px' }}>Informations personnelles</h2>
 
             {/* Avertissement 1 compte = 1 personne */}
@@ -717,7 +717,7 @@ export default function Profile() {
         {activeSection === 'experiences' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {experiences.map((exp, i) => (
-              <div key={i} style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '24px' }}>
+              <div key={i} style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '24px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                   <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#111', margin: 0 }}>
                     Experience {i + 1} {exp.poste && <span style={{ color: '#4f46e5' }}>- {exp.poste}</span>}
@@ -758,7 +758,7 @@ export default function Profile() {
         {activeSection === 'formations' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {formations.map((f, i) => (
-              <div key={i} style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '24px' }}>
+              <div key={i} style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '24px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                   <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#111', margin: 0 }}>Formation {i + 1} {f.diplome && <span style={{ color: '#4f46e5' }}>- {f.diplome}</span>}</h3>
                   {formations.length > 1 && <button onClick={() => removeForm(i)} style={{ padding: '5px 12px', background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '7px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>Supprimer</button>}
@@ -782,7 +782,7 @@ export default function Profile() {
 
         {/* ─── COMPETENCES ─── */}
         {activeSection === 'competences' && (
-          <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '28px' }}>
+          <div style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '28px' }}>
             <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: '0 0 6px' }}>Competences</h2>
             <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 24px' }}>Outils, logiciels, methodes - ex: Excel, Salesforce, Gestion de projet</p>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '10px', marginBottom: '12px' }}>
@@ -826,7 +826,7 @@ export default function Profile() {
         {activeSection === 'plus' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {/* Langues */}
-            <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '24px' }}>
+            <div style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '24px' }}>
               <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: '0 0 20px' }}>Langues</h2>
               {langues.map((l, i) => (
                 <div key={i} style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr auto', gap: '10px', marginBottom: '10px', alignItems: 'end' }}>
@@ -844,7 +844,7 @@ export default function Profile() {
             </div>
 
             {/* Certifications */}
-            <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '24px' }}>
+            <div style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '24px' }}>
               <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: '0 0 20px' }}>Certifications</h2>
               {certifications.map((c, i) => (
                 <div key={i} style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr 80px auto', gap: '10px', marginBottom: '10px', alignItems: 'end' }}>
@@ -858,7 +858,7 @@ export default function Profile() {
             </div>
 
             {/* Centres d'interet */}
-            <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '24px' }}>
+            <div style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '24px' }}>
               <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: '0 0 6px' }}>Centres d'interet</h2>
               <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 16px' }}>Optionnel</p>
               <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: '10px', marginBottom: '10px' }}>

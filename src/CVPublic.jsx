@@ -111,7 +111,7 @@ export default function CVPublic() {
             <a href="/" style={{ padding: '11px 24px', background: '#4f46e5', color: '#fff', borderRadius: '10px', textDecoration: 'none', fontSize: '14px', fontWeight: '700' }}>
               Accueil
             </a>
-            <a href="/auth" style={{ padding: '11px 24px', background: '#fff', color: '#374151', border: '1px solid #e5e7eb', borderRadius: '10px', textDecoration: 'none', fontSize: '14px', fontWeight: '600' }}>
+            <a href="/auth" style={{ padding: '11px 24px', background: '#fff', color: '#374151', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', borderRadius: '10px', textDecoration: 'none', fontSize: '14px', fontWeight: '600' }}>
               Créer mon CV gratuit
             </a>
           </div>

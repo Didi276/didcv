@@ -209,7 +209,7 @@ export default function Dashboard() {
               </p>
             </div>
             <div style={{ display: 'flex', gap: '8px' }}>
-              {!isMobile && <a href="/offres" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 16px', borderRadius: '12px', border: '1px solid #e5e7eb', background: '#fff', color: '#374151', textDecoration: 'none', fontSize: '13px', fontWeight: '600' }}><Search size={15} /> Offres</a>}
+              {!isMobile && <a href="/offres" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 16px', borderRadius: '12px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', background: '#fff', color: '#374151', textDecoration: 'none', fontSize: '13px', fontWeight: '600' }}><Search size={15} /> Offres</a>}
               <a href="/templates" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 18px', borderRadius: '12px', background: '#4f46e5', color: '#fff', textDecoration: 'none', fontSize: '13px', fontWeight: '700', boxShadow: '0 4px 12px rgba(79,70,229,0.3)' }}>
                 <Plus size={15} /> {isMobile ? 'CV' : 'Nouveau CV'}
               </a>
@@ -241,7 +241,7 @@ export default function Dashboard() {
       {/* Mes candidatures en cours */}
       {candidaturesRecentes.length > 0 && (
         <div style={{ maxWidth: '1200px', margin: '16px auto 0', padding: `0 ${isMobile ? '16px' : '40px'}` }}>
-          <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: isMobile ? '16px' : '20px 24px' }}>
+          <div style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: isMobile ? '16px' : '20px 24px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <div style={{ fontSize: '14px', fontWeight: '700', color: '#111' }}>Mes candidatures en cours</div>
               <a href="/candidatures" style={{ fontSize: '12px', color: '#4f46e5', textDecoration: 'none', fontWeight: '600' }}>Voir tout →</a>
@@ -387,7 +387,7 @@ export default function Dashboard() {
               <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                 {!showLettre && <button onClick={(e) => handleEdit(selectedCv, e)} style={{ display: 'flex', alignItems: 'center', padding: '6px 12px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}><Edit2 size={13} /></button>}
                 <button onClick={() => handleDownloadCV(selectedCv)} style={{ display: 'flex', alignItems: 'center', padding: '6px 14px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}><Download size={13} /></button>
-                <button onClick={() => setSelectedCv(null)} style={{ width: '30px', height: '30px', borderRadius: '8px', border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                <button onClick={() => setSelectedCv(null)} style={{ width: '30px', height: '30px', borderRadius: '8px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
               </div>
             </div>
             {/* Contenu */}

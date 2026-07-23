@@ -63,9 +63,9 @@ export default function SuggestionsIA({ poste, secteur, type = 'missions', onSel
           <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
             {suggestions.map((s, i) => (
               <div key={i} onClick={() => { onSelect(s); }}
-                style={{ padding: '7px 10px', background: '#fff', border: '1px solid #e5e7eb', borderRadius: '7px', fontSize: '12px', color: '#374151', cursor: 'pointer', lineHeight: '1.5', transition: 'all 0.1s', display: 'flex', alignItems: 'flex-start', gap: '8px' }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = '#4f46e5'; e.currentTarget.style.background = '#faf9ff' }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.background = '#fff' }}>
+                style={{ padding: '7px 10px', background: '#fff', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', borderRadius: '7px', fontSize: '12px', color: '#374151', cursor: 'pointer', lineHeight: '1.5', transition: 'box-shadow 0.15s, background 0.15s', display: 'flex', alignItems: 'flex-start', gap: '8px' }}
+                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(79,70,229,0.15)'; e.currentTarget.style.background = '#faf9ff' }}
+                onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'; e.currentTarget.style.background = '#fff' }}>
                 <span style={{ color: '#4f46e5', fontWeight: '700', flexShrink: 0, marginTop: '1px' }}>+</span>
                 {s}
               </div>

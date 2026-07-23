@@ -35,10 +35,20 @@
   ──────────────────────────────────────────────────────────────────────────
 */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { CheckCircle } from 'lucide-react'
 import { supabase } from './supabase'
+
+function useWidth() {
+  const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
+  useEffect(() => {
+    const fn = () => setW(window.innerWidth)
+    window.addEventListener('resize', fn)
+    return () => window.removeEventListener('resize', fn)
+  }, [])
+  return w
+}
 
 const DOMAINES_INTERDITS = ['gmail.com', 'hotmail.com', 'hotmail.fr', 'yahoo.com', 'yahoo.fr', 'outlook.com', 'outlook.fr', 'live.com', 'live.fr']
 
@@ -63,6 +73,7 @@ function EnTete() {
 const EMPTY = { prenom: '', nom: '', email: '', password: '', entreprise: '', poste: '', telephone: '', justification: '' }
 
 export default function RecruteurInscription() {
+  const isMobile = useWidth() < 768
   const [form, setForm] = useState(EMPTY)
   const [certifie, setCertifie] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -130,9 +141,9 @@ export default function RecruteurInscription() {
         </div>
       </div>
 
-      <div style={{ maxWidth: '560px', margin: '0 auto', padding: '40px 24px 80px' }}>
+      <div style={{ maxWidth: '560px', margin: '0 auto', padding: isMobile ? '64px 24px 80px' : '96px 24px 80px' }}>
         {envoye ? (
-          <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb', padding: '40px 32px', textAlign: 'center' }}>
+          <div style={{ background: '#fff', borderRadius: '16px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '40px 32px', textAlign: 'center' }}>
             <CheckCircle size={44} color="#16a34a" strokeWidth={1.5} style={{ marginBottom: '16px' }} />
             <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#111', margin: '0 0 10px' }}>Demande envoyée</h2>
             <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: '1.7', margin: 0 }}>
@@ -140,7 +151,7 @@ export default function RecruteurInscription() {
             </p>
           </div>
         ) : (
-          <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb', padding: '32px' }}>
+          <div style={{ background: '#fff', borderRadius: '16px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '32px' }}>
             <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: '0 0 20px' }}>Demande d'accès recruteur</h2>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>

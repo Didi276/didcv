@@ -148,7 +148,7 @@ export default function Offres() {
   )
 
   const Sidebar = () => (
-    <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '20px' }}>
+    <div style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '20px' }}>
       <FilterSection title="Secteur">
         {SECTEURS.map(s => (
           <FilterChip key={s} label={s} active={secteur === s}
@@ -244,13 +244,13 @@ export default function Offres() {
         </div>
       </div>
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: isMobile ? '16px' : '24px 40px 60px' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: isMobile ? '64px 16px 16px' : '96px 40px 60px' }}>
 
         {/* Filtres mobile */}
         {isMobile && (
           <div style={{ marginBottom: '12px' }}>
             <button onClick={() => setShowFilters(!showFilters)}
-              style={{ width: '100%', padding: '11px 16px', background: '#fff', border: '1px solid #e5e7eb', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', fontFamily: 'inherit', fontSize: '14px', fontWeight: '600', color: '#374151' }}>
+              style={{ width: '100%', padding: '11px 16px', background: '#fff', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', fontFamily: 'inherit', fontSize: '14px', fontWeight: '600', color: '#374151' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: '7px' }}><Settings size={15} /> Filtres {(typeContrat || experience || publieeDepuis || teletravail) && '(actifs)'}</span>
               <span>{showFilters ? '▲' : '▼'}</span>
             </button>
@@ -284,7 +284,7 @@ export default function Offres() {
 
             {/* État vide */}
             {!searched && !loading && (
-              <div style={{ textAlign: 'center', padding: '60px 24px', background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb' }}>
+              <div style={{ textAlign: 'center', padding: '60px 24px', background: '#fff', borderRadius: '16px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
                 <Target size={44} color="#c4c4c4" strokeWidth={1.5} style={{ marginBottom: '14px' }} />
                 <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#111', margin: '0 0 8px' }}>Lance ta recherche</h3>
                 <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 20px' }}>Accès à des milliers d'offres en temps réel</p>
@@ -301,7 +301,7 @@ export default function Offres() {
 
             {/* Loading */}
             {loading && (
-              <div style={{ textAlign: 'center', padding: '60px', background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb' }}>
+              <div style={{ textAlign: 'center', padding: '60px', background: '#fff', borderRadius: '16px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
                 <div style={{ width: '40px', height: '40px', border: '4px solid #ede9fe', borderTop: '4px solid #4f46e5', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }} />
                 <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
                 <div style={{ fontSize: '15px', fontWeight: '600', color: '#374151', marginBottom: '6px' }}>Recherche en cours...</div>
@@ -311,7 +311,7 @@ export default function Offres() {
 
             {/* Pas de résultats */}
             {searched && !loading && offres.length === 0 && (
-              <div style={{ textAlign: 'center', padding: '60px', background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb' }}>
+              <div style={{ textAlign: 'center', padding: '60px', background: '#fff', borderRadius: '16px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
                 <SearchX size={36} color="#c4c4c4" strokeWidth={1.5} style={{ marginBottom: '12px' }} />
                 <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: '0 0 6px' }}>Aucune offre trouvée</h3>
                 <p style={{ fontSize: '13px', color: '#9ca3af', margin: 0 }}>Essaie d'autres mots-clés ou retire des filtres</p>
@@ -323,9 +323,9 @@ export default function Offres() {
               {offres.map(offre => {
                 const srcStyle = SOURCE_COLORS[offre.source] || { bg: '#f3f4f6', color: '#374151', dot: '#9ca3af' }
                 return (
-                  <div key={offre.id} style={{ background: '#fff', borderRadius: '12px', border: '1px solid #e5e7eb', padding: isMobile ? '14px' : '18px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)', transition: 'box-shadow 0.15s' }}
-                    onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)'}
-                    onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)'}>
+                  <div key={offre.id} style={{ background: '#fff', borderRadius: '12px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: isMobile ? '14px' : '18px 20px', transition: 'box-shadow 0.15s' }}
+                    onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)'}
+                    onMouseLeave={e => e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', alignItems: 'flex-start' }}>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         {/* Badge source + date */}
