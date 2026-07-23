@@ -489,6 +489,387 @@ Minimum 10pt. Police standard (Inter, Arial, Calibri).
 Sans les mots-clés de l'offre, votre CV sera filtré avant d'être lu.
     `
   },
+  {
+    slug: 'cv-commercial-exemple',
+    titre: 'CV commercial : exemple et conseils 2025',
+    description: 'Comment structurer un CV commercial orienté résultats avec des exemples concrets pour décrocher un entretien.',
+    date: '2025-07-16',
+    categorie: 'CV',
+    duree: '6 min',
+    contenu: `
+## Ce qui différencie un bon CV commercial
+
+Un recruteur qui lit un CV commercial cherche une seule chose avant tout le reste : **des résultats chiffrés**. Le discours doit être aussi convaincant que celui que vous tiendriez face à un client.
+
+## La structure qui fonctionne
+
+### Une accroche orientée résultats
+"Commercial B2B avec 6 ans d'expérience, spécialisé dans le développement de portefeuille grands comptes. 115% des objectifs atteints en moyenne sur les 3 dernières années."
+
+### Des missions quantifiées
+Chaque ligne d'expérience doit répondre à la question "avec quel résultat ?" :
+- "Développement d'un portefeuille de 120 clients professionnels"
+- "Atteinte de 115% des objectifs de vente sur 3 années consécutives"
+- "Négociation et signature de contrats jusqu'à 500K€"
+
+### Les compétences à mettre en avant
+Prospection B2B/B2C, closing, négociation, gestion de portefeuille, CRM (Salesforce, HubSpot), présentation produit.
+
+## Exemple de CV commercial réussi
+
+**Accroche :** "Commercial terrain avec 5 ans d'expérience dans la vente de solutions SaaS. Expert en cycle de vente complexe et négociation grands comptes."
+
+**Expérience :** "Responsable Commercial — TechSales (2021-2024) : Développement d'un portefeuille de 80 clients PME, croissance du CA de 32% en 2 ans, management d'une équipe de 3 SDR."
+
+## Les erreurs à éviter
+
+- Des missions sans aucun chiffre ("Développement commercial", "Suivi clients")
+- Ne pas préciser le type de vente (B2B, B2C, cycle long ou court)
+- Oublier de mentionner le CRM utilisé
+- Un CV trop générique qui ne dit rien de votre secteur d'expertise
+
+## Template recommandé
+
+Le template "Commercial" de DidCV met en avant vos chiffres clés dès le premier regard, avec une mise en page pensée pour les profils orientés résultats.
+    `
+  },
+  {
+    slug: 'cv-developpeur-erreurs',
+    titre: 'CV développeur : les erreurs à éviter',
+    description: 'Les erreurs les plus fréquentes dans les CV de développeurs et comment présenter votre stack technique efficacement.',
+    date: '2025-07-18',
+    categorie: 'CV',
+    duree: '6 min',
+    contenu: `
+## Les recruteurs tech ne lisent pas un CV comme les autres
+
+Un recruteur technique ou un lead dev passe en moyenne 30 secondes sur un CV développeur. Il cherche votre stack, votre niveau et vos projets concrets — pas un discours marketing.
+
+## Les erreurs les plus courantes
+
+### 1. Une liste de technologies sans hiérarchie
+Lister 40 technologies sans préciser votre niveau réel décrédibilise votre profil. Distinguez ce que vous maîtrisez en production de ce que vous avez juste testé.
+
+### 2. Pas de lien GitHub ou de portfolio
+Pour un développeur, l'absence de lien vers du code réel est une occasion manquée. Même un profil GitHub modeste vaut mieux que rien.
+
+### 3. Des missions non techniques
+"A participé au développement de l'application" ne dit rien. Précisez : quel langage, quelle architecture, quel impact (performance, utilisateurs, revenus).
+
+### 4. Ignorer les soft skills en équipe Agile
+Les recruteurs tech valorisent aussi la collaboration : revue de code, pair programming, mentorat, participation aux rituels Scrum.
+
+### 5. Un CV visuellement trop chargé
+Les développeurs sont jugés aussi sur la simplicité de leur code. Un CV épuré et bien structuré est perçu positivement.
+
+## Comment présenter sa stack technique
+
+Organisez vos compétences par catégorie plutôt qu'en vrac :
+- **Langages :** JavaScript, TypeScript, Python
+- **Front-end :** React, Vue.js
+- **Back-end :** Node.js, Express
+- **Data / Infra :** PostgreSQL, Docker, AWS
+
+## Ce qu'il faut absolument inclure
+
+- Vos projets personnels ou open source
+- Votre profil GitHub et/ou portfolio
+- Le contexte technique de vos expériences (mono-repo, microservices, CI/CD)
+- Votre niveau réel (junior, confirmé, senior) sans le surestimer
+
+## Template recommandé
+
+Le template "Tech" de DidCV structure automatiquement votre stack technique en catégories lisibles pour les recruteurs et les ATS.
+    `
+  },
+  {
+    slug: 'trouver-emploi-rapidement',
+    titre: 'Comment trouver un emploi rapidement en 2025',
+    description: 'Stratégies concrètes pour accélérer votre recherche d\'emploi : candidatures ciblées, réseau, plateformes et suivi.',
+    date: '2025-07-20',
+    categorie: 'Recherche d\'emploi',
+    duree: '8 min',
+    contenu: `
+## Trouver un emploi vite : une question de méthode
+
+La recherche d'emploi qui traîne est souvent une recherche mal organisée : candidatures dispersées, pas de suivi, pas de ciblage. Une méthode structurée réduit considérablement les délais.
+
+## 1. Cibler avant de postuler massivement
+
+Postuler à 200 offres au hasard est moins efficace que postuler à 30 offres parfaitement ciblées. Définissez précisément : le poste, le secteur, la zone géographique et le niveau de salaire visé.
+
+## 2. Optimiser son CV pour chaque candidature
+
+Un CV générique passe moins bien les filtres ATS. Adaptez le titre, l'accroche et les mots-clés à chaque offre — DidCV permet de générer un CV adapté à une offre en quelques secondes.
+
+## 3. Activer tous les canaux en parallèle
+
+- **Job boards** : France Travail, LinkedIn, Indeed, Welcome to the Jungle
+- **Réseau** : contactez d'anciens collègues, camarades de promo, votre réseau LinkedIn
+- **Candidatures spontanées** : ciblez les entreprises qui vous intéressent même sans offre publiée
+- **Cabinets de recrutement et agences d'intérim** : utiles pour des postes non publiés
+
+## 4. Soigner le réseau (le canal le plus rapide)
+
+**Plus de 60% des postes** sont pourvus via le réseau avant même d'être publiés. Activez votre réseau LinkedIn, informez votre entourage de votre recherche et participez à des événements professionnels.
+
+## 5. Suivre ses candidatures rigoureusement
+
+Sans suivi, on perd du temps à relancer au mauvais moment ou à oublier de relancer du tout. Un tableau de suivi (comme celui de DidCV) permet de visualiser où en est chaque candidature et d'agir au bon moment.
+
+## 6. Se préparer aux entretiens en avance
+
+Ne pas attendre d'avoir un entretien programmé pour s'entraîner. Plus vous êtes préparé, plus vous transformez rapidement les entretiens en offres.
+
+## Le rythme à tenir
+
+Une recherche active efficace, c'est environ 5 à 10 candidatures ciblées par semaine, un suivi systématique, et du temps consacré chaque semaine au réseau.
+    `
+  },
+  {
+    slug: 'alternance-decrocher-contrat',
+    titre: 'Alternance 2025 : comment décrocher son contrat',
+    description: 'Guide pratique pour trouver une entreprise en alternance : CV, lettre, entretien et timing à respecter.',
+    date: '2025-07-22',
+    categorie: 'Alternance',
+    duree: '7 min',
+    contenu: `
+## L'alternance : un recrutement à part
+
+Décrocher un contrat d'alternance suit des règles différentes d'un recrutement classique. Le timing, la double contrainte école/entreprise et l'absence d'expérience changent la donne.
+
+## Quand commencer ses recherches ?
+
+Commencez idéalement **4 à 6 mois avant la rentrée**. Les entreprises reçoivent un pic de candidatures entre avril et juillet — être parmi les premiers augmente vos chances.
+
+## Le CV alternance qui fait la différence
+
+### Mettez votre formation en avant
+Indiquez clairement l'école, le diplôme préparé, le rythme d'alternance ("3 semaines entreprise / 1 semaine école") et la durée du contrat.
+
+### Valorisez vos projets et stages
+Sans grande expérience, vos projets académiques et stages précédents deviennent votre argument principal.
+
+## La lettre de motivation en alternance
+
+Expliquez précisément pourquoi cette entreprise, pourquoi ce poste, et comment votre formation s'y rattache. Montrez votre disponibilité et votre motivation pour un engagement de longue durée.
+
+## Réussir l'entretien alternance
+
+### Connaître son rythme d'alternance par cœur
+Les recruteurs veulent savoir immédiatement si votre rythme est compatible avec leurs besoins.
+
+### Montrer sa capacité d'apprentissage
+En l'absence d'expérience professionnelle solide, la motivation et la capacité à apprendre vite sont décisives.
+
+### Poser des questions sur l'accompagnement
+Demandez qui sera votre tuteur, comment se passe l'intégration — cela montre votre sérieux.
+
+## Les canaux à activer
+
+- Le CFA ou l'école (souvent en lien direct avec des entreprises partenaires)
+- Les forums et salons alternance
+- Les plateformes dédiées (La Bonne Alternance, HelloWork)
+- Les candidatures spontanées auprès d'entreprises ciblées
+
+## Ne pas se décourager
+
+Le taux de réponse en alternance est souvent plus faible qu'en CDI classique. Multipliez les candidatures et restez actif jusqu'à la signature du contrat.
+    `
+  },
+  {
+    slug: 'lettre-motivation-stage',
+    titre: 'Lettre de motivation pour un stage : guide complet',
+    description: 'Comment rédiger une lettre de motivation efficace pour décrocher un stage, avec structure et exemples.',
+    date: '2025-07-24',
+    categorie: 'Lettre',
+    duree: '6 min',
+    contenu: `
+## Pourquoi la lettre compte particulièrement pour un stage
+
+Sans expérience professionnelle solide, la lettre de motivation devient un élément clé pour convaincre une entreprise de vous faire confiance sur une courte période.
+
+## La structure d'une lettre de stage efficace
+
+### Paragraphe 1 : pourquoi cette entreprise
+Montrez que vous connaissez l'entreprise, son secteur et ses activités. Évitez les formules passe-partout.
+
+### Paragraphe 2 : pourquoi ce stage correspond à votre formation
+Expliquez le lien entre votre cursus, vos matières étudiées et le poste de stage visé.
+
+### Paragraphe 3 : ce que vous pouvez apporter
+Même sans expérience professionnelle, mettez en avant vos projets, compétences techniques et qualités personnelles pertinentes pour la mission.
+
+### Conclusion
+Précisez vos dates de disponibilité et proposez un entretien.
+
+## Exemple d'accroche pour une lettre de stage
+
+"Étudiante en 3ème année de licence Marketing à [École], je suis à la recherche d'un stage de 4 mois à partir de janvier 2026. Votre approche du marketing digital, notamment [élément précis], correspond exactement au type d'expérience que je recherche pour concrétiser mes compétences."
+
+## Les erreurs fréquentes
+
+- Une lettre trop générique envoyée à toutes les entreprises
+- Ne pas préciser la durée et les dates de disponibilité du stage
+- Oublier de mentionner le cadre académique (convention de stage, école)
+- Recopier simplement le CV sans apporter d'éléments nouveaux
+
+## Ce que les entreprises attendent d'un stagiaire
+
+- Une réelle motivation pour le secteur et l'entreprise
+- De la rigueur et de la ponctualité
+- Une capacité d'apprentissage rapide
+- Une bonne intégration dans l'équipe
+
+## Conseil DidCV
+
+Personnalisez chaque lettre en fonction de l'offre : une lettre générique se repère immédiatement par un recruteur habitué à en lire des dizaines chaque semaine.
+    `
+  },
+  {
+    slug: 'questions-pieges-entretien',
+    titre: 'Les questions pièges en entretien et comment y répondre',
+    description: 'Décryptage des questions difficiles en entretien d\'embauche et des réponses qui font la différence.',
+    date: '2025-07-26',
+    categorie: 'Entretien',
+    duree: '8 min',
+    contenu: `
+## Pourquoi les recruteurs posent des questions pièges
+
+Ces questions ne cherchent pas à vous déstabiliser gratuitement : elles évaluent votre honnêteté, votre capacité de recul et votre gestion du stress.
+
+## "Quel est votre principal défaut ?"
+
+**Le piège :** répondre par un faux défaut déguisé en qualité ("je suis trop perfectionniste").
+
+**La bonne approche :** citez un vrai axe de progrès, avec les actions concrètes que vous mettez en place pour le travailler. Exemple : "J'ai tendance à vouloir tout vérifier moi-même ; j'apprends à déléguer davantage en donnant des points d'étape clairs à mon équipe."
+
+## "Pourquoi avez-vous quitté votre précédent poste ?"
+
+**Le piège :** critiquer ouvertement votre ancien employeur.
+
+**La bonne approche :** restez factuel et positif. Parlez d'évolution de carrière, de recherche de nouveaux défis, sans dénigrer personne.
+
+## "Où vous voyez-vous dans 5 ans ?"
+
+**Le piège :** donner une réponse trop vague ou trop ambitieuse par rapport au poste proposé.
+
+**La bonne approche :** montrez une trajectoire cohérente avec le poste et l'entreprise, tout en restant réaliste.
+
+## "Parlez-moi d'un échec professionnel"
+
+**Le piège :** dire que vous n'avez jamais échoué.
+
+**La bonne approche :** utilisez la méthode STAR (Situation, Tâche, Action, Résultat) pour raconter un vrai échec et surtout ce que vous en avez appris.
+
+## "Pourquoi devrions-nous vous embaucher plutôt qu'un autre candidat ?"
+
+**Le piège :** répéter simplement votre CV.
+
+**La bonne approche :** reliez précisément vos compétences aux besoins spécifiques du poste, avec un exemple concret de résultat obtenu.
+
+## "Avez-vous des questions ?"
+
+**Le piège :** répondre "non, tout est clair" — cela peut être perçu comme un manque d'intérêt.
+
+**La bonne approche :** préparez 2 à 3 questions sur l'équipe, les enjeux du poste ou les prochaines étapes du processus.
+
+## La règle générale
+
+Anticipez ces questions avant chaque entretien et préparez des réponses honnêtes, structurées et orientées vers ce que vous avez appris ou accompli.
+    `
+  },
+  {
+    slug: 'cv-btp-chantier',
+    titre: 'CV BTP et chantier : guide complet 2025',
+    description: 'Comment rédiger un CV efficace pour les métiers du BTP : habilitations, chantiers et compétences terrain.',
+    date: '2025-07-28',
+    categorie: 'CV',
+    duree: '6 min',
+    contenu: `
+## Ce que recherchent les recruteurs du BTP
+
+Dans le BTP, le CV doit avant tout rassurer sur la sécurité, les qualifications et l'expérience terrain concrète. Les recruteurs vont directement chercher vos habilitations et vos chantiers réalisés.
+
+## Les éléments indispensables
+
+### Les habilitations et certifications
+Habilitations électriques, CACES, permis de conduire spécifiques, certifications gaz — mentionnez-les avec leur date de validité. C'est souvent le premier critère de sélection.
+
+### Le type de chantiers
+Précisez si vous avez travaillé sur des chantiers résidentiels, tertiaires, industriels ou publics. Le contexte compte autant que la compétence technique.
+
+### Les outils et engins maîtrisés
+Nacelle, grue, engins de chantier, logiciels de métré — soyez précis sur votre niveau de maîtrise réel.
+
+## Structurer les missions
+
+Décrivez vos missions de manière concrète et mesurable :
+- "Installation et mise en service de tableaux électriques TGBT sur chantier tertiaire"
+- "Coordination avec 4 corps de métier sur un chantier de 2000 m²"
+- "Respect des délais sur 12 chantiers consécutifs sans dépassement de budget"
+
+## La sécurité, un point non négociable
+
+Le secteur du BTP valorise fortement la culture sécurité. Mentionnez vos formations sécurité (SST, habilitations spécifiques) et votre respect des normes en vigueur.
+
+## Les compétences transversales à ne pas oublier
+
+- Lecture de plans et schémas techniques
+- Travail en équipe et coordination inter-métiers
+- Autonomie et gestion des imprévus sur chantier
+- Rigueur et respect des délais
+
+## Template recommandé
+
+Le template "BTP" de DidCV met en avant vos habilitations et vos chantiers dès le premier coup d'œil, dans un format clair et professionnel apprécié des recruteurs du secteur.
+    `
+  },
+  {
+    slug: 'reconversion-par-ou-commencer',
+    titre: 'Reconversion professionnelle : par où commencer',
+    description: 'Les premières étapes concrètes pour réussir sa reconversion professionnelle sans se précipiter.',
+    date: '2025-07-30',
+    categorie: 'Reconversion',
+    duree: '7 min',
+    contenu: `
+## La reconversion : un projet qui se construit étape par étape
+
+Se reconvertir ne s'improvise pas. Une reconversion réussie repose sur une méthode claire plutôt que sur un saut dans l'inconnu.
+
+## Étape 1 : Faire le bilan de son parcours
+
+Avant de choisir une nouvelle voie, listez vos compétences acquises, vos réussites et ce qui vous a le plus motivé dans vos expériences passées. Un bilan de compétences peut vous y aider.
+
+## Étape 2 : Identifier des pistes réalistes
+
+Croisez trois critères : vos compétences transférables, vos centres d'intérêt réels et les débouchés du marché de l'emploi dans le secteur visé. Une reconversion viable se situe à l'intersection des trois.
+
+## Étape 3 : Se renseigner sur le terrain
+
+Avant de vous engager dans une formation longue, échangez avec des professionnels du métier visé (réseau, immersions, stages courts) pour confirmer que la réalité du métier correspond à votre projection.
+
+## Étape 4 : Identifier la formation nécessaire
+
+Toutes les reconversions ne nécessitent pas une formation longue et coûteuse. Certifications courtes, bootcamps, formations en ligne ou VAE (Validation des Acquis de l'Expérience) peuvent suffire selon le métier visé.
+
+## Étape 5 : Financer son projet
+
+Renseignez-vous sur le Compte Personnel de Formation (CPF), le Projet de Transition Professionnelle (PTP), ou les dispositifs France Travail dédiés à la reconversion.
+
+## Étape 6 : Adapter son CV et sa candidature
+
+Structurez votre CV autour des compétences transférables plutôt que de la chronologie stricte, et expliquez votre reconversion de manière positive dans votre accroche.
+
+## Étape 7 : Se lancer progressivement
+
+Il n'est pas nécessaire de tout quitter du jour au lendemain. Un projet à temps partiel, un stage ou une mission courte peuvent constituer une transition en douceur vers votre nouveau métier.
+
+## L'essentiel à retenir
+
+Une reconversion réussie est une reconversion préparée : bilan, exploration terrain, financement identifié et candidature adaptée sont les quatre piliers du succès.
+    `
+  },
 ]
 
 export const CATEGORIES = [...new Set(ARTICLES.map(a => a.categorie))]

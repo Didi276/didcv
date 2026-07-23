@@ -1,9 +1,48 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, CheckCircle, ClipboardList } from 'lucide-react'
 import Navbar from './Navbar'
 import SEO from './SEO'
 import { GUIDES, SECTEURS } from './guidesData'
+
+const SECTEUR_COLORS = {
+  'Finance': '#f0fdf4',
+  'Tech': '#eff6ff',
+  'Commerce': '#fff7ed',
+  'Santé': '#fef2f2',
+  'Management': '#f5f3ff',
+  'RH': '#fdf4ff',
+  'Marketing': '#fef9c3',
+  'BTP': '#fef3c7',
+  'Restauration': '#fff1f2',
+  'Transport': '#ecfeff',
+  'Beauté': '#fdf2f8',
+  'Administratif': '#f3f4f6',
+  'Juridique': '#eef2ff',
+  'Éducation': '#f0fdfa',
+  'Créatif': '#fdf4ff',
+  'Industrie': '#f1f5f9',
+}
+const SECTEUR_BORDER = {
+  'Finance': '#86efac',
+  'Tech': '#93c5fd',
+  'Commerce': '#fdba74',
+  'Santé': '#fca5a5',
+  'Management': '#c4b5fd',
+  'RH': '#e9d5ff',
+  'Marketing': '#fde047',
+  'BTP': '#fcd34d',
+  'Restauration': '#fda4af',
+  'Transport': '#a5f3fc',
+  'Beauté': '#f9a8d4',
+  'Administratif': '#d1d5db',
+  'Juridique': '#c7d2fe',
+  'Éducation': '#99f6e4',
+  'Créatif': '#e9d5ff',
+  'Industrie': '#cbd5e1',
+}
+const FALLBACK_BG = '#f8f9ff'
+const FALLBACK_BORDER = '#e5e7eb'
 
 export default function GuidesMetier() {
   const [secteur, setSecteur] = useState('')
@@ -12,7 +51,7 @@ export default function GuidesMetier() {
   return (
     <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
       <SEO
-        titre="Exemples de CV par métier"
+        titre="Exemples de CV par métier — Guides gratuits DidCV"
         description="Exemples de CV par métier — 24 guides professionnels gratuits avec compétences, missions types et conseils pour réussir votre candidature."
         url="https://didcv.vercel.app/guides"
       />
@@ -42,22 +81,34 @@ export default function GuidesMetier() {
           ))}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '16px' }}>
-          {guides.map(guide => (
-            <Link key={guide.slug} to={`/guide/${guide.slug}`} style={{ textDecoration: 'none' }}>
-              <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '20px', transition: 'transform 0.15s, box-shadow 0.15s, border-color 0.15s', display: 'flex', gap: '14px', alignItems: 'flex-start' }}
-                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 24px rgba(79,70,229,0.15)'; e.currentTarget.style.borderColor = '#4f46e5'; e.currentTarget.style.transform = 'translateY(-2px)' }}
-                onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.transform = 'translateY(0)' }}>
-                <div style={{ fontSize: '32px', flexShrink: 0 }}>{guide.icon}</div>
-                <div>
-                  <div style={{ fontSize: '11px', fontWeight: '700', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{guide.secteur}</div>
-                  <div style={{ fontSize: '15px', fontWeight: '700', color: '#111', marginBottom: '6px', lineHeight: '1.3' }}>{guide.titre}</div>
-                  <div style={{ fontSize: '12px', color: '#6b7280', lineHeight: '1.5' }}>{guide.description.substring(0, 80)}...</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: '#4f46e5', fontWeight: '600', marginTop: '8px' }}>Voir le guide <ChevronRight size={13} /></div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+          {guides.map(guide => {
+            const bg = SECTEUR_COLORS[guide.secteur] || FALLBACK_BG
+            const border = SECTEUR_BORDER[guide.secteur] || FALLBACK_BORDER
+            return (
+              <Link key={guide.slug} to={`/guide/${guide.slug}`} style={{ textDecoration: 'none' }}>
+                <div style={{ background: bg, borderRadius: '16px', border: `1.5px solid ${border}`, padding: '24px', transition: 'transform 0.15s, box-shadow 0.15s', display: 'flex', gap: '16px', alignItems: 'flex-start', height: '100%', boxSizing: 'border-box' }}
+                  onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 10px 28px rgba(0,0,0,0.1)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
+                  onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'translateY(0)' }}>
+                  <div style={{ fontSize: '40px', flexShrink: 0 }}>{guide.icon}</div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: '11px', fontWeight: '700', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '5px' }}>{guide.secteur}</div>
+                    <div style={{ fontSize: '16px', fontWeight: '800', color: '#111', marginBottom: '8px', lineHeight: '1.3' }}>{guide.titre}</div>
+                    <div style={{ fontSize: '13px', color: '#6b7280', lineHeight: '1.55', marginBottom: '12px' }}>{guide.description.substring(0, 90)}...</div>
+                    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '10px' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', fontWeight: '600', color: '#374151', background: 'rgba(255,255,255,0.7)', padding: '3px 9px', borderRadius: '20px' }}>
+                        <CheckCircle size={11} /> {guide.competences.length} compétences
+                      </span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', fontWeight: '600', color: '#374151', background: 'rgba(255,255,255,0.7)', padding: '3px 9px', borderRadius: '20px' }}>
+                        <ClipboardList size={11} /> {guide.missions.length} missions
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: '#4f46e5', fontWeight: '700' }}>Voir le guide <ChevronRight size={13} /></div>
+                  </div>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            )
+          })}
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { Download } from 'lucide-react'
 import Navbar from './Navbar'
 import SEO from './SEO'
 import { GUIDES } from './guidesData'
@@ -30,13 +31,29 @@ export default function GuideDetail() {
   )
 
   const autres = GUIDES.filter(g => g.slug !== slug && g.secteur === guide.secteur).slice(0, 3)
+  const metier = guide.titre.replace('CV ', '')
+  const url = `https://didcv.vercel.app/guide/${guide.slug}`
+
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: `Comment rédiger un ${guide.titre}`,
+    description: guide.description,
+    step: [
+      { '@type': 'HowToStep', name: 'Identifiez les compétences clés', text: guide.competences.join(', ') },
+      { '@type': 'HowToStep', name: 'Valorisez vos missions', text: guide.missions.join('. ') },
+      { '@type': 'HowToStep', name: 'Suivez les conseils d\'experts', text: guide.conseils },
+      { '@type': 'HowToStep', name: 'Générez votre CV', text: `Utilisez le template ${guide.template} recommandé pour ce métier sur DidCV.` },
+    ],
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: '#fff', fontFamily: '"Inter",system-ui,sans-serif' }}>
       <SEO
-        titre={guide.titre}
+        titre={`${guide.titre} — Guide complet et exemple gratuit`}
         description={guide.description}
-        url={`https://didcv.vercel.app/guide/${guide.slug}`}
+        url={url}
+        schema={schema}
       />
       <Navbar />
       <div style={{ maxWidth: '860px', margin: '0 auto', padding: '48px 24px' }}>
@@ -81,13 +98,14 @@ export default function GuideDetail() {
 
         <div style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', borderRadius: '16px', padding: '32px', textAlign: 'center', marginBottom: '48px' }}>
           <div style={{ fontSize: '22px', fontWeight: '800', color: '#fff', marginBottom: '8px' }}>
-            Générez votre CV {guide.titre.replace('CV ', '')} maintenant
+            Télécharger un exemple de CV {metier}
           </div>
           <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.75)', margin: '0 0 20px' }}>
             Template "{guide.template}" recommandé pour ce métier
           </p>
-          <Link to={`/generate?template=${guide.template}`} style={{ display: 'inline-block', padding: '12px 28px', background: '#fff', color: '#4f46e5', borderRadius: '10px', textDecoration: 'none', fontSize: '14px', fontWeight: '700' }}>
-            Créer mon CV gratuitement →
+          <Link to={`/generate?template=${guide.template}`}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '12px 28px', background: '#fff', color: '#4f46e5', borderRadius: '12px', textDecoration: 'none', fontSize: '14px', fontWeight: '700', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
+            <Download size={15} /> Créer mon CV gratuitement
           </Link>
         </div>
 
