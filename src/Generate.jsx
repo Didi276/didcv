@@ -429,7 +429,7 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
             <div style={{ margin: '0 24px 16px', padding: '12px 14px', background: '#f8f9ff', borderRadius: '10px', border: '1px solid #ede9fe', flexShrink: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 {profile.photo
-                  ? <img src={profile.photo} alt="" style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
+                  ? <img src={profile.photo} alt="" loading="lazy" style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
                   : <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#4f46e5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '14px', fontWeight: '700', flexShrink: 0 }}>{profile.prenom?.[0]}{profile.nom?.[0]}</div>
                 }
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -467,7 +467,7 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
               {/* Photo */}
               <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 {photoManuelle
-                  ? <img src={photoManuelle} alt="" style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                  ? <img src={photoManuelle} alt="" loading="lazy" style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                   : <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0 }}>👤</div>
                 }
                 <div>

@@ -605,7 +605,7 @@ export default function Profile() {
             {/* Photo */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '28px', paddingBottom: '24px', borderBottom: '1px solid #f0f0f0' }}>
               {photo
-                ? <img src={photo} alt="Photo" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #4f46e5', flexShrink: 0 }} />
+                ? <img src={photo} alt="Photo" loading="lazy" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #4f46e5', flexShrink: 0 }} />
                 : <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><User size={32} color="#4f46e5" strokeWidth={1.75} /></div>
               }
               <div>

@@ -5,7 +5,7 @@ function Avatar({ cvData, size = 70, shape = 'circle' }) {
   const borderRadius = shape === 'circle' ? '50%' : shape === 'rounded' ? '12px' : '4px'
   if (cvData.photo === null) return null
   const src = cvData.photo || PHOTO_DEMO
-  return <img src={src} alt="Photo" style={{width:size,height:size,borderRadius,objectFit:'cover',display:'block',flexShrink:0}} />
+  return <img src={src} alt="Photo" loading="lazy" style={{width:size,height:size,borderRadius,objectFit:'cover',display:'block',flexShrink:0}} />
 }
 
 function getF(cvData) {

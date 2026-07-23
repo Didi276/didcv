@@ -37,7 +37,7 @@ function CandidatCard({ p, lienCv }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         {p.photo ? (
           <div style={{ width: '52px', height: '52px', borderRadius: '50%', overflow: 'hidden', flexShrink: 0 }}>
-            <img src={p.photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(5px)', transform: 'scale(1.15)' }} />
+            <img src={p.photo} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(5px)', transform: 'scale(1.15)' }} />
           </div>
         ) : (
           <div style={{ width: '52px', height: '52px', borderRadius: '50%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', fontWeight: '700', color: '#1e3a5f', flexShrink: 0 }}>

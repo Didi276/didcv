@@ -7,7 +7,7 @@ function Avatar({ cvData, size = 70, shape = 'circle' }) {
   if (cvData.photo === null) return null
   const src = cvData.photo || PHOTO_DEMO
   return (
-    <img src={src} alt="Photo" style={{
+    <img src={src} alt="Photo" loading="lazy" style={{
       width: size, height: size, borderRadius,
       objectFit: 'cover', display: 'block', flexShrink: 0,
       border: cvData.photo ? 'none' : '2px dashed rgba(128,128,128,0.25)'
