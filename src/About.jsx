@@ -11,10 +11,10 @@ export default function About() {
         url="https://didcv.vercel.app/about"
       />
       <Navbar />
-      <div style={{ maxWidth: '760px', margin: '0 auto', padding: '60px 24px' }}>
-        <div style={{ marginBottom: '48px' }}>
-          <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#4f46e5', textTransform: 'uppercase', marginBottom: '12px' }}>A PROPOS</div>
-          <h1 style={{ fontSize: '36px', fontWeight: '800', color: '#0f0f1a', margin: '0 0 16px', letterSpacing: '-1px', lineHeight: '1.1' }}>
+      <div style={{ maxWidth: '760px', margin: '0 auto', padding: '96px 24px 100px' }}>
+        <div style={{ marginBottom: '64px' }}>
+          <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#4f46e5', textTransform: 'uppercase', marginBottom: '14px' }}>A PROPOS</div>
+          <h1 style={{ fontSize: '40px', fontWeight: '700', color: '#0a0a0f', margin: '0 0 18px', letterSpacing: '-1px', lineHeight: '1.1' }}>
             DidCV, le CV intelligent<br />pour tous les profils
           </h1>
           <p style={{ fontSize: '17px', color: '#6b7280', margin: 0, lineHeight: '1.7' }}>
@@ -44,15 +44,15 @@ export default function About() {
             text: 'Finance, tech, santé, BTP, restauration, transport, créatif, étudiant, international... Chaque secteur a son propre template avec un vocabulaire et une mise en page adaptés aux codes du métier.'
           },
         ].map(s => (
-          <div key={s.title} style={{ background: '#fff', borderRadius: '14px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', padding: '28px', marginBottom: '16px' }}>
-            <s.icon size={26} color="#4f46e5" strokeWidth={1.75} style={{ marginBottom: '12px' }} />
+          <div key={s.title} style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '32px', marginBottom: '20px' }}>
+            <s.icon size={26} color="#4f46e5" strokeWidth={1.75} style={{ marginBottom: '14px' }} />
             <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#111', margin: '0 0 10px', letterSpacing: '-0.2px' }}>{s.title}</h2>
             <p style={{ fontSize: '15px', color: '#6b7280', margin: 0, lineHeight: '1.7' }}>{s.text}</p>
           </div>
         ))}
 
-        <div style={{ textAlign: 'center', marginTop: '48px' }}>
-          <a href="/auth" style={{ display: 'inline-block', padding: '14px 32px', background: '#4f46e5', color: '#fff', borderRadius: '10px', textDecoration: 'none', fontSize: '15px', fontWeight: '700' }}>
+        <div style={{ textAlign: 'center', marginTop: '56px' }}>
+          <a href="/auth" style={{ display: 'inline-block', padding: '15px 32px', background: '#4f46e5', color: '#fff', borderRadius: '12px', textDecoration: 'none', fontSize: '15px', fontWeight: '700', boxShadow: '0 4px 16px rgba(79,70,229,0.3)' }}>
             Créer mon CV gratuitement
           </a>
         </div>
