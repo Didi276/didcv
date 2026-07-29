@@ -8,6 +8,26 @@
   -- façon approximative, ce qui n'est pas fiable.
   ALTER TABLE candidatures ADD COLUMN IF NOT EXISTS cv_id UUID REFERENCES cvs(id) ON DELETE SET NULL;
 
+  -- Suivi multi-entretiens : plusieurs tours d'entretien par candidature
+  -- (RH, technique, manager, cas pratique, final...), chacun avec sa propre
+  -- date, son interlocuteur et son résultat.
+  CREATE TABLE IF NOT EXISTS entretiens (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    candidature_id UUID REFERENCES candidatures(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES auth.users(id),
+    tour INTEGER DEFAULT 1,
+    type TEXT DEFAULT 'RH',
+    date_entretien TIMESTAMPTZ,
+    interlocuteur TEXT DEFAULT '',
+    lieu TEXT DEFAULT '',
+    notes TEXT DEFAULT '',
+    resultat TEXT DEFAULT 'en_attente',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+  );
+  ALTER TABLE entretiens ENABLE ROW LEVEL SECURITY;
+  CREATE POLICY "Users gèrent leurs entretiens" ON entretiens
+  FOR ALL USING (auth.uid() = user_id);
+
   ──────────────────────────────────────────────────────────────────────────
 */
 
@@ -16,7 +36,7 @@ import { supabase } from './supabase'
 import Navbar from './Navbar'
 import { CVTemplate } from './CVTemplates'
 import { downloadCVasPDF } from './pdfUtils'
-import { MapPin, DollarSign, Zap, ClipboardList, Target, BookOpen, Trash2, Download, Plus, PartyPopper } from 'lucide-react'
+import { MapPin, DollarSign, Zap, ClipboardList, Target, BookOpen, Trash2, Download, Plus, PartyPopper, Calendar } from 'lucide-react'
 
 const COLONNES = [
   { id: 'a_postuler',  label: 'À postuler',    color: '#6b7280', bg: '#f9fafb', dot: '#9ca3af' },
@@ -27,6 +47,15 @@ const COLONNES = [
 ]
 
 const EMPTY = { titre: '', entreprise: '', lieu: '', url_offre: '', salaire: '', notes: '', statut: 'a_postuler' }
+
+const TYPES_ENTRETIEN = ['RH', 'Technique', 'Manager', 'Cas pratique', 'Final']
+const RESULTATS = [
+  { id: 'a_venir',    label: 'À venir',             color: '#7c3aed', bg: '#f5f3ff' },
+  { id: 'positif',    label: 'Positif',             color: '#16a34a', bg: '#f0fdf4' },
+  { id: 'negatif',    label: 'Négatif',             color: '#dc2626', bg: '#fef2f2' },
+  { id: 'en_attente', label: 'En attente de retour', color: '#ea580c', bg: '#fff7ed' },
+]
+const EMPTY_ENTRETIEN = { type: 'RH', date_entretien: '', interlocuteur: '', lieu: '', notes: '', resultat: 'a_venir' }
 
 function useWidth() {
   const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
@@ -51,6 +80,11 @@ export default function Candidatures() {
   const [activeCol, setActiveCol] = useState(null)
   const [cvApercu, setCvApercu] = useState(null)
   const [felicitationsCard, setFelicitationsCard] = useState(null)
+  const [entretiens, setEntretiens] = useState({})
+  const [showEntretienForm, setShowEntretienForm] = useState(false)
+  const [entretienCard, setEntretienCard] = useState(null)
+  const [entretienForm, setEntretienForm] = useState(EMPTY_ENTRETIEN)
+  const [savingEntretien, setSavingEntretien] = useState(false)
   const w = useWidth()
   const isMobile = w < 768
 
@@ -61,10 +95,48 @@ export default function Candidatures() {
       setUser(user)
       const { data } = await supabase.from('candidatures').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
       setCards(data || [])
+
+      const { data: entretiensData } = await supabase.from('entretiens').select('*').eq('user_id', user.id).order('tour', { ascending: true })
+      const grouped = {}
+      ;(entretiensData || []).forEach(en => {
+        if (!grouped[en.candidature_id]) grouped[en.candidature_id] = []
+        grouped[en.candidature_id].push(en)
+      })
+      setEntretiens(grouped)
+
       setLoading(false)
     }
     init()
   }, [])
+
+  const openEntretienForm = (card, e) => {
+    e.stopPropagation()
+    setEntretienCard(card)
+    setEntretienForm(EMPTY_ENTRETIEN)
+    setShowEntretienForm(true)
+  }
+
+  const handleSaveEntretien = async () => {
+    if (!entretienCard) return
+    setSavingEntretien(true)
+    const tour = (entretiens[entretienCard.id]?.length || 0) + 1
+    const { data } = await supabase.from('entretiens').insert({
+      candidature_id: entretienCard.id,
+      user_id: user.id,
+      tour,
+      type: entretienForm.type,
+      date_entretien: entretienForm.date_entretien ? new Date(entretienForm.date_entretien).toISOString() : null,
+      interlocuteur: entretienForm.interlocuteur,
+      lieu: entretienForm.lieu,
+      notes: entretienForm.notes,
+      resultat: entretienForm.resultat,
+    }).select().single()
+    if (data) {
+      setEntretiens({ ...entretiens, [entretienCard.id]: [...(entretiens[entretienCard.id] || []), data] })
+    }
+    setSavingEntretien(false)
+    setShowEntretienForm(false)
+  }
 
   const openNew = (statut = 'a_postuler') => {
     setEditCard(null)
@@ -257,12 +329,56 @@ export default function Candidatures() {
                           </button>
                         </div>
                       )}
-                      {card.statut === 'entretien' && (
-                        <button onClick={allerVersEntretien(card, 'preparation')}
-                          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', width: '100%', marginTop: '8px', padding: '7px', background: '#f5f3ff', color: '#7c3aed', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
-                          <Target size={11} /> Préparer l'entretien
-                        </button>
-                      )}
+                      {card.statut === 'entretien' && (() => {
+                        const cardEntretiens = entretiens[card.id] || []
+                        const nbTours = cardEntretiens.length
+                        const dernier = cardEntretiens[nbTours - 1]
+                        const dernierResultat = RESULTATS.find(r => r.id === dernier?.resultat) || RESULTATS[0]
+                        return (
+                          <div style={{ marginTop: '8px' }}>
+                            {nbTours > 0 && (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                                <span style={{ fontSize: '10px', fontWeight: '700', color: '#7c3aed', background: '#f5f3ff', padding: '2px 8px', borderRadius: '10px' }}>
+                                  Tour {nbTours}/3
+                                </span>
+                                {dernier && (
+                                  <span style={{ fontSize: '10px', fontWeight: '700', color: dernierResultat.color, background: dernierResultat.bg, padding: '2px 8px', borderRadius: '10px' }}>
+                                    {dernierResultat.label}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+
+                            {nbTours > 0 && (
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', marginBottom: '8px', paddingLeft: '10px', borderLeft: '2px solid #ede9fe' }}>
+                                {cardEntretiens.map(en => {
+                                  const r = RESULTATS.find(x => x.id === en.resultat) || RESULTATS[0]
+                                  return (
+                                    <div key={en.id} style={{ position: 'relative' }}>
+                                      <div style={{ position: 'absolute', left: '-15px', top: '3px', width: '8px', height: '8px', borderRadius: '50%', background: r.color }} />
+                                      <div style={{ fontSize: '10px', fontWeight: '700', color: '#374151' }}>Tour {en.tour} · {en.type}</div>
+                                      <div style={{ fontSize: '10px', color: '#9ca3af' }}>
+                                        {en.date_entretien ? new Date(en.date_entretien).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Date non définie'}
+                                      </div>
+                                    </div>
+                                  )
+                                })}
+                              </div>
+                            )}
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                              <button onClick={e => openEntretienForm(card, e)}
+                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', width: '100%', padding: '7px', background: '#eef2ff', color: '#4f46e5', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+                                <Calendar size={11} /> Ajouter un entretien
+                              </button>
+                              <button onClick={allerVersEntretien(card, 'preparation')}
+                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', width: '100%', padding: '7px', background: '#f5f3ff', color: '#7c3aed', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
+                                <Target size={11} /> Préparer l'entretien
+                              </button>
+                            </div>
+                          </div>
+                        )
+                      })()}
                       {card.statut === 'offre' && (
                         <button onClick={e => { e.stopPropagation(); setFelicitationsCard(card) }}
                           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', width: '100%', marginTop: '8px', padding: '7px', background: '#f0fdf4', color: '#16a34a', border: 'none', borderRadius: '7px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit' }}>
@@ -366,6 +482,56 @@ export default function Candidatures() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal ajouter un entretien */}
+      {showEntretienForm && entretienCard && (
+        <div onClick={() => setShowEntretienForm(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 300, display: 'flex', alignItems: isMobile ? 'flex-end' : 'center', justifyContent: 'center', padding: isMobile ? 0 : '24px', backdropFilter: 'blur(4px)' }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: isMobile ? '16px 16px 0 0' : '16px', width: '100%', maxWidth: '480px', maxHeight: '90vh', overflow: 'auto' }}>
+            <div style={{ padding: '20px 24px', borderBottom: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#111', margin: 0 }}>
+                Ajouter un entretien - Tour {(entretiens[entretienCard.id]?.length || 0) + 1}
+              </h3>
+              <button onClick={() => setShowEntretienForm(false)} style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#9ca3af', padding: '4px' }}>✕</button>
+            </div>
+
+            <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '5px' }}>Type d'entretien</label>
+                <select value={entretienForm.type} onChange={e => setEntretienForm({...entretienForm, type: e.target.value})} style={{ ...INPUT, cursor: 'pointer' }}>
+                  {TYPES_ENTRETIEN.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '5px' }}>Date et heure</label>
+                <input type="datetime-local" value={entretienForm.date_entretien} onChange={e => setEntretienForm({...entretienForm, date_entretien: e.target.value})} style={INPUT} />
+              </div>
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '5px' }}>Interlocuteur</label>
+                <input value={entretienForm.interlocuteur} onChange={e => setEntretienForm({...entretienForm, interlocuteur: e.target.value})} placeholder="Marie Dupont, Responsable RH" style={INPUT} />
+              </div>
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '5px' }}>Lieu ou lien visio</label>
+                <input value={entretienForm.lieu} onChange={e => setEntretienForm({...entretienForm, lieu: e.target.value})} placeholder="Zoom, bureaux Paris..." style={INPUT} />
+              </div>
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '5px' }}>Notes</label>
+                <textarea value={entretienForm.notes} onChange={e => setEntretienForm({...entretienForm, notes: e.target.value})} rows={3} placeholder="Points abordés, ressenti, questions posées..." style={{ ...INPUT, resize: 'vertical', lineHeight: '1.5' }} />
+              </div>
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '5px' }}>Résultat</label>
+                <select value={entretienForm.resultat} onChange={e => setEntretienForm({...entretienForm, resultat: e.target.value})} style={{ ...INPUT, cursor: 'pointer' }}>
+                  {RESULTATS.map(r => <option key={r.id} value={r.id}>{r.label}</option>)}
+                </select>
+              </div>
+
+              <button onClick={handleSaveEntretien} disabled={savingEntretien}
+                style={{ padding: '11px', background: savingEntretien ? '#a5b4fc' : '#4f46e5', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: savingEntretien ? 'default' : 'pointer', fontFamily: 'inherit' }}>
+                {savingEntretien ? 'Sauvegarde...' : "Ajouter l'entretien"}
+              </button>
             </div>
           </div>
         </div>
