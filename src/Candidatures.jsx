@@ -36,7 +36,7 @@ import { supabase } from './supabase'
 import Navbar from './Navbar'
 import { CVTemplate } from './CVTemplates'
 import { downloadCVasPDF } from './pdfUtils'
-import { MapPin, DollarSign, Zap, ClipboardList, Target, BookOpen, Trash2, Download, Plus, PartyPopper, Calendar } from 'lucide-react'
+import { MapPin, DollarSign, Zap, ClipboardList, Target, BookOpen, Trash2, Download, Plus, PartyPopper, Calendar, Sparkles } from 'lucide-react'
 
 const COLONNES = [
   { id: 'a_postuler',  label: 'À postuler',    color: '#6b7280', bg: '#f9fafb', dot: '#9ca3af' },
@@ -357,9 +357,15 @@ export default function Candidatures() {
                                     <div key={en.id} style={{ position: 'relative' }}>
                                       <div style={{ position: 'absolute', left: '-15px', top: '3px', width: '8px', height: '8px', borderRadius: '50%', background: r.color }} />
                                       <div style={{ fontSize: '10px', fontWeight: '700', color: '#374151' }}>Tour {en.tour} · {en.type}</div>
-                                      <div style={{ fontSize: '10px', color: '#9ca3af' }}>
+                                      <div style={{ fontSize: '10px', color: '#9ca3af', marginBottom: '3px' }}>
                                         {en.date_entretien ? new Date(en.date_entretien).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Date non définie'}
                                       </div>
+                                      <a
+                                        href={`/preparation-entretien?poste=${encodeURIComponent(card.titre || '')}&entreprise=${encodeURIComponent(card.entreprise || '')}&type=${encodeURIComponent(en.type || '')}&date=${encodeURIComponent(en.date_entretien || '')}&url_offre=${encodeURIComponent(card.url_offre || '')}`}
+                                        onClick={e => e.stopPropagation()}
+                                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '10px', color: '#4f46e5', fontWeight: '700', textDecoration: 'none' }}>
+                                        <Sparkles size={10} /> Préparer
+                                      </a>
                                     </div>
                                   )
                                 })}

@@ -7,6 +7,7 @@ import Dashboard from './Dashboard'
 import Profile from './Profile'
 import Formations from './Formations'
 import Entretien from './Entretien'
+import PreparationEntretien from './PreparationEntretien'
 import CVPublic from './CVPublic'
 import Offres from './Offres'
 import RecruteurInscription from './RecruteurInscription'
@@ -39,6 +40,7 @@ function App() {
         <Route path="/candidatures"   element={<Candidatures />} />
         <Route path="/formations"     element={<Formations />} />
         <Route path="/entretien"      element={<Entretien />} />
+        <Route path="/preparation-entretien" element={<PreparationEntretien />} />
         <Route path="/cv/:slug"       element={<CVPublic />} />
         <Route path="/recruteurs/inscription" element={<RecruteurInscription />} />
         <Route path="/recruteurs/connexion"   element={<RecruteurConnexion />} />
