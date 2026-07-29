@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Zap, Check, Loader2 } from 'lucide-react'
 import { supabase } from './supabase'
+import { emailBienvenueDidCV } from './emailTemplates'
 
 export default function Auth() {
   const [mode, setMode] = useState('login')
@@ -30,6 +31,12 @@ export default function Auth() {
     } else {
       const { error } = await supabase.auth.signUp({ email, password })
       if (error) { setError('Erreur lors de la creation du compte.'); setLoading(false); return }
+      const prenom = email.split('@')[0]
+      fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: email, subject: 'Bienvenue sur DidCV !', html: emailBienvenueDidCV(prenom), type: 'bienvenue' }),
+      }).catch(err => console.error('Erreur envoi email de bienvenue:', err))
       setSuccess('Compte cree ! Verifie ton email pour confirmer.')
       setLoading(false)
     }

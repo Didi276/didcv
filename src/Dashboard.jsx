@@ -6,6 +6,9 @@ import CVEditorBlocks from './CVEditorBlocks'
 import Navbar from './Navbar'
 import { downloadCVasPDF, downloadLettreasePDF } from './pdfUtils'
 
+// SQL à exécuter dans Supabase :
+// ALTER TABLE profiles ADD COLUMN IF NOT EXISTS rappels_email BOOLEAN DEFAULT true;
+
 const REGEX_ACCENTS = new RegExp('[' + String.fromCharCode(0x0300) + '-' + String.fromCharCode(0x036f) + ']', 'g')
 
 function slugify(str) {
@@ -54,6 +57,7 @@ export default function Dashboard() {
   const [copie, setCopie] = useState(false)
   const [candidaturesCount, setCandidaturesCount] = useState(0)
   const [candidaturesRecentes, setCandidaturesRecentes] = useState([])
+  const [rappelsEmail, setRappelsEmail] = useState(true)
   const [entretiensCompletes] = useState(() => parseInt(localStorage.getItem('didcv-entretiens-completes') || '0', 10))
   const w = useWidth()
   const isMobile = w < 768
@@ -67,6 +71,7 @@ export default function Dashboard() {
       setCvs(cvData || [])
       const { data: profileData } = await supabase.from('profiles').select('*').eq('user_id', user.id).maybeSingle()
       if (profileData?.prenom) setProfile(profileData)
+      if (profileData) setRappelsEmail(profileData.rappels_email !== false)
       const { data: partagesData } = await supabase.from('cv_partages').select('*').eq('user_id', user.id)
       if (partagesData) {
         const map = {}
@@ -81,6 +86,12 @@ export default function Dashboard() {
     }
     fetchData()
   }, [])
+
+  const handleToggleRappels = async () => {
+    const next = !rappelsEmail
+    setRappelsEmail(next)
+    await supabase.from('profiles').upsert({ user_id: user.id, rappels_email: next }, { onConflict: 'user_id' })
+  }
 
   const handleDelete = async (id, e) => {
     e.stopPropagation()
@@ -209,6 +220,14 @@ export default function Dashboard() {
               </p>
             </div>
             <div style={{ display: 'flex', gap: '8px' }}>
+              <button onClick={handleToggleRappels} title="Recevoir des rappels automatiques avant tes entretiens"
+                style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '9px 14px', borderRadius: '12px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', background: '#fff', color: rappelsEmail ? '#16a34a' : '#9ca3af', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
+                <Mail size={13} />
+                {!isMobile && 'Rappels email'}
+                <span style={{ width: '28px', height: '16px', borderRadius: '10px', background: rappelsEmail ? '#16a34a' : '#e5e7eb', position: 'relative', flexShrink: 0, transition: 'background 0.15s' }}>
+                  <span style={{ position: 'absolute', top: '2px', left: rappelsEmail ? '14px' : '2px', width: '12px', height: '12px', borderRadius: '50%', background: '#fff', transition: 'left 0.15s' }} />
+                </span>
+              </button>
               {!isMobile && <a href="/offres" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 16px', borderRadius: '12px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', background: '#fff', color: '#374151', textDecoration: 'none', fontSize: '13px', fontWeight: '600' }}><Search size={15} /> Offres</a>}
               <a href="/templates" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 18px', borderRadius: '12px', background: '#4f46e5', color: '#fff', textDecoration: 'none', fontSize: '13px', fontWeight: '700', boxShadow: '0 4px 12px rgba(79,70,229,0.3)' }}>
                 <Plus size={15} /> {isMobile ? 'CV' : 'Nouveau CV'}

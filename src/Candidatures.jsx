@@ -28,6 +28,11 @@
   CREATE POLICY "Users gèrent leurs entretiens" ON entretiens
   FOR ALL USING (auth.uid() = user_id);
 
+  -- Suivi des rappels email J-3 / J-1 envoyés pour chaque entretien, pour ne
+  -- jamais envoyer le même rappel deux fois. Voir api/cron-rappels-entretiens.js.
+  ALTER TABLE entretiens ADD COLUMN IF NOT EXISTS rappel_j3_envoye BOOLEAN DEFAULT false;
+  ALTER TABLE entretiens ADD COLUMN IF NOT EXISTS rappel_j1_envoye BOOLEAN DEFAULT false;
+
   ──────────────────────────────────────────────────────────────────────────
 */
 
@@ -116,6 +121,10 @@ export default function Candidatures() {
     setShowEntretienForm(true)
   }
 
+  // Dès qu'un entretien avec une date est enregistré ici, il devient visible
+  // à api/cron-rappels-entretiens.js qui envoie automatiquement les rappels
+  // J-3 et J-1 le jour venu (un navigateur ne peut pas planifier un envoi à
+  // une date future, ce déclenchement se fait donc côté serveur, pas ici).
   const handleSaveEntretien = async () => {
     if (!entretienCard) return
     setSavingEntretien(true)
