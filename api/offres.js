@@ -1,4 +1,11 @@
-// api/offres.js — France Travail + JSearch + Adzuna + CareerJet + La Bonne Alternance
+// api/offres.js — France Travail + Jooble + Arbeitnow + RemoteOK + Adzuna + Direct (offres_directes)
+
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY
+)
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
@@ -110,13 +117,23 @@ export default async function handler(req, res) {
     return r.json()
   }
 
+  // ─── Direct (offres scrapées des pages carrières, voir api/scrape.js) ──
+  const searchDirectes = async () => {
+    let q = supabase.from('offres_directes').select('*').eq('actif', true).ilike('titre', `%${query}%`)
+    if (location) q = q.ilike('lieu', `%${location}%`)
+    const { data, error } = await q.order('date_publication', { ascending: false }).limit(30)
+    if (error) throw error
+    return data
+  }
+
   // ─── Appels parallèles ────────────────────────────────
-  const [ftRes, cjRes, aRes, rkRes, azRes] = await Promise.allSettled([
+  const [ftRes, cjRes, aRes, rkRes, azRes, ddRes] = await Promise.allSettled([
     withTimeout(searchFT(), 9000),
     withTimeout(searchJooble(), 6000),
     withTimeout(searchArbeitnow(), 6000),
     withTimeout(searchRemoteOK(), 5000),
     withTimeout(searchAdzuna(), 8000),
+    withTimeout(searchDirectes(), 6000),
   ])
 
   const offres = []
@@ -221,6 +238,26 @@ export default async function handler(req, res) {
     })
   }
 
+  // ─── Direct ───────────────────────────────────────────
+  if (ddRes.status === 'fulfilled' && Array.isArray(ddRes.value)) {
+    ddRes.value.forEach(job => {
+      offres.push({
+        id: `dd-${job.id}`,
+        source: 'Direct',
+        titre: job.titre || '',
+        entreprise: job.entreprise || '',
+        lieu: job.lieu || '',
+        date: job.date_publication || '',
+        description: (job.description || '').substring(0, 600),
+        url: job.url_candidature || '',
+        type: job.type_contrat || '',
+        salaire: '',
+        experience: '',
+        remote: false,
+      })
+    })
+  }
+
   // ─── Déduplication ────────────────────────────────────
   const seen = new Set()
   const dedup = offres.filter(o => {
@@ -230,8 +267,10 @@ export default async function handler(req, res) {
     return true
   })
 
-  // France Travail en premier
+  // Direct en premier, puis France Travail, puis le reste par date
   dedup.sort((a, b) => {
+    if (a.source === 'Direct' && b.source !== 'Direct') return -1
+    if (b.source === 'Direct' && a.source !== 'Direct') return 1
     if (a.source === 'France Travail' && b.source !== 'France Travail') return -1
     if (b.source === 'France Travail' && a.source !== 'France Travail') return 1
     return new Date(b.date) - new Date(a.date)
@@ -250,6 +289,7 @@ export default async function handler(req, res) {
       arbeitnow: aRes.status === 'fulfilled' ? (aRes.value?.data?.length || 0) : 0,
       remoteok: rkRes.status === 'fulfilled' ? (Array.isArray(rkRes.value) ? rkRes.value.filter(j => j.id).length : 0) : 0,
       adzuna: azRes.status === 'fulfilled' ? (azRes.value?.results?.length || 0) : 0,
+      directes: ddRes.status === 'fulfilled' ? (Array.isArray(ddRes.value) ? ddRes.value.length : 0) : 0,
     }
   })
 }

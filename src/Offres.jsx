@@ -50,6 +50,7 @@ const SOURCE_COLORS = {
   'RemoteOK':       { bg: '#fdf4ff', color: '#6b21a8', dot: '#a855f7' },
   'Adzuna':         { bg: '#fce4ec', color: '#880e4f', dot: '#e91e63' },
   'Jooble':         { bg: '#fff3e0', color: '#e65100', dot: '#ff9800' },
+  'Direct':         { bg: '#eef2ff', color: '#4338ca', dot: '#4f46e5' },
 }
 
 export default function Offres() {
