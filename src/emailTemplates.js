@@ -104,3 +104,28 @@ export const emailBienvenueDidCV = (prenom) => emailShell({
   ctaUrl: 'https://didcv.vercel.app/profile',
   ctaLabel: 'Compléter mon profil',
 })
+
+export const emailResumeHebdomadaire = (prenom, stats, conseil, lienEntretien) => emailShell({
+  titre: 'Ton résumé de la semaine',
+  sousTitre: 'DidCV',
+  corps: `
+    <p>Bonjour ${prenom},</p>
+    <div class="section">
+      <h3>Cette semaine</h3>
+      <div class="item">${stats.nbEntretiens} entretien${stats.nbEntretiens > 1 ? 's' : ''} prévu${stats.nbEntretiens > 1 ? 's' : ''}</div>
+      ${stats.nbSansReponse > 0 ? `<div class="item">${stats.nbSansReponse} candidature${stats.nbSansReponse > 1 ? 's' : ''} sans réponse depuis 2 semaines, pense à relancer</div>` : ''}
+    </div>
+    ${stats.parStatutLabels?.length ? `
+    <div class="section">
+      <h3>Tes candidatures en cours</h3>
+      ${stats.parStatutLabels.map(s => `<div class="item">${s.label} : ${s.n}</div>`).join('')}
+    </div>` : ''}
+    ${conseil ? `
+    <div class="section">
+      <h3>Conseil de la semaine</h3>
+      <div class="item"><a href="${conseil.url}" style="color:#4f46e5;text-decoration:none;font-weight:600">${conseil.titre}</a></div>
+    </div>` : ''}
+  `,
+  ctaUrl: lienEntretien || 'https://didcv.vercel.app/candidatures',
+  ctaLabel: lienEntretien ? "Simuler l'entretien maintenant" : 'Voir mes candidatures',
+})

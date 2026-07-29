@@ -7,8 +7,12 @@
   ],
   "crons": [
     {
-      "path": "/api/cron-rappels-entretiens",
-      "schedule": "0 8 * * *"
+      "path": "/api/interview-reminder",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/weekly-digest",
+      "schedule": "0 8 * * 1"
     }
   ]
 }

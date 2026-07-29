@@ -1,7 +1,7 @@
-// Job planifié (voir "crons" dans vercel.json, une fois par jour) qui envoie
-// les rappels J-3 et J-1 avant chaque entretien planifié. Un navigateur ne
-// peut pas déclencher un email à une date future tout seul : cette route
-// tourne côté serveur indépendamment de toute session utilisateur.
+// Cron quotidien à 9h (voir vercel.json) qui envoie les rappels J-3 et J-1
+// avant chaque entretien planifié. Un navigateur ne peut pas déclencher un
+// email à une date future tout seul : cette route tourne côté serveur,
+// indépendamment de toute session utilisateur.
 //
 // SQL à exécuter dans Supabase :
 // ALTER TABLE entretiens ADD COLUMN IF NOT EXISTS rappel_j3_envoye BOOLEAN DEFAULT false;

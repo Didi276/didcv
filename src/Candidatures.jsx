@@ -122,7 +122,7 @@ export default function Candidatures() {
   }
 
   // Dès qu'un entretien avec une date est enregistré ici, il devient visible
-  // à api/cron-rappels-entretiens.js qui envoie automatiquement les rappels
+  // à api/interview-reminder.js qui envoie automatiquement les rappels
   // J-3 et J-1 le jour venu (un navigateur ne peut pas planifier un envoi à
   // une date future, ce déclenchement se fait donc côté serveur, pas ici).
   const handleSaveEntretien = async () => {
