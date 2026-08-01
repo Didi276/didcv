@@ -242,6 +242,7 @@ export const scraperEntreprise = async (entreprise) => {
   }
 
   // Sauvegarder dans Supabase avec upsert sur le hash
+  let supabaseError = null
   if (offres.length > 0) {
     const { error } = await supabase
       .from('offres_directes')
@@ -255,7 +256,10 @@ export const scraperEntreprise = async (entreprise) => {
         })),
         { onConflict: 'hash', ignoreDuplicates: false }
       )
-    if (error) console.error(`Supabase error pour ${entreprise.nom}:`, error.message)
+    if (error) {
+      console.error(`Supabase error pour ${entreprise.nom}:`, error.message)
+      supabaseError = { entreprise: entreprise.nom, message: error.message }
+    }
   }
 
   // Mettre à jour la date de dernier scraping
@@ -264,7 +268,7 @@ export const scraperEntreprise = async (entreprise) => {
     .update({ derniere_scraping: new Date().toISOString(), nb_offres: offres.length })
     .eq('id', entreprise.id)
 
-  return offres
+  return { offres, supabaseError }
 }
 
 export default async function handler(req, res) {
@@ -289,15 +293,18 @@ export default async function handler(req, res) {
     }
 
     const resultats = []
+    const erreurs_supabase = []
     for (const entreprise of entreprises) {
-      const offres = await scraperEntreprise(entreprise)
+      const { offres, supabaseError } = await scraperEntreprise(entreprise)
       resultats.push({ entreprise: entreprise.nom, nb_offres: offres.length })
+      if (supabaseError) erreurs_supabase.push(supabaseError)
     }
 
     return res.status(200).json({
       success: true,
       entreprises_traitees: resultats.length,
-      resultats
+      resultats,
+      erreurs_supabase
     })
   } catch (e) {
     return res.status(500).json({ error: e.message })
