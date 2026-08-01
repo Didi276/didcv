@@ -280,7 +280,9 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   if (req.method === 'OPTIONS') return res.status(200).end()
 
-  const { entreprise_id, batch_size = 5 } = req.query
+  const { entreprise_id } = req.query
+  const start = parseInt(req.query.start) || 0
+  const batchSize = parseInt(req.query.batch_size) || 5
 
   try {
     // Importer la liste d'entreprises
@@ -291,10 +293,10 @@ export default async function handler(req, res) {
       // Scraper une seule entreprise
       entreprises = ENTREPRISES.filter(e => e.id === parseInt(entreprise_id))
     } else {
-      // Scraper les N premières entreprises non mises à jour depuis 5h
+      // Scraper les N entreprises non mises à jour depuis 5h, à partir de "start"
       entreprises = ENTREPRISES
         .filter(e => e.ats !== 'custom' && e.ats !== 'taleo' && e.slug)
-        .slice(0, parseInt(batch_size))
+        .slice(start, start + batchSize)
     }
 
     const resultats = []
