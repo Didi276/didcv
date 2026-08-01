@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Search, MapPin, Zap, SearchX, ChevronDown, ChevronLeft, Loader2, Briefcase, ExternalLink, Bookmark, X, Calendar, Layers } from 'lucide-react'
+import { Search, MapPin, Zap, SearchX, ChevronDown, ChevronLeft, Briefcase, ExternalLink, Bookmark, X, Calendar, Layers } from 'lucide-react'
 import Navbar from './Navbar'
 import { supabase } from './supabase'
 
@@ -78,10 +78,7 @@ export default function Offres() {
   const [triPar, setTriPar] = useState('pertinence')
   const [offres, setOffres] = useState([])
   const [loading, setLoading] = useState(false)
-  const [loadingMore, setLoadingMore] = useState(false)
   const [searched, setSearched] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [hasMore, setHasMore] = useState(false)
   const [dropdownOuvert, setDropdownOuvert] = useState(null)
   const [selectedId, setSelectedId] = useState(null)
   const [modalMobileOuvert, setModalMobileOuvert] = useState(false)
@@ -95,12 +92,10 @@ export default function Offres() {
     if (prefill) { setQuery(prefill); sessionStorage.removeItem('offre_prefill_query') }
   }, [])
 
-  const handleSearch = async (overrides = {}, loadMore = false) => {
+  const handleSearch = async (overrides = {}) => {
     const q = overrides.query ?? query
     if (!q.trim()) return
-    const page = loadMore ? currentPage + 1 : 1
-    if (loadMore) setLoadingMore(true)
-    else { setLoading(true); setSearched(false); setOffres([]); setCurrentPage(1); setSelectedId(null) }
+    setLoading(true); setSearched(false); setOffres([]); setSelectedId(null)
     setDropdownOuvert(null)
     try {
       const params = new URLSearchParams({
@@ -112,22 +107,15 @@ export default function Offres() {
         teletravail: overrides.teletravail ?? teletravail,
         salaireMin: overrides.salaireMin ?? salaireMin,
         tempsPartiel: overrides.tempsPartiel ?? tempsPartiel,
-        page,
+        page: 1,
       })
       const r = await fetch(`/api/offres?${params}`)
       const data = await r.json()
-      if (loadMore) {
-        setOffres(prev => [...prev, ...(data.offres || [])])
-        setCurrentPage(page)
-      } else {
-        setOffres(data.offres || [])
-        if (data.offres?.length) setSelectedId(data.offres[0].id)
-      }
-      setHasMore(data.hasMore || false)
+      setOffres(data.offres || [])
+      if (data.offres?.length) setSelectedId(data.offres[0].id)
       setSearched(true)
     } catch { setSearched(true) }
     setLoading(false)
-    setLoadingMore(false)
   }
 
   const effacerFiltres = () => {
@@ -378,7 +366,7 @@ export default function Offres() {
         {searched && offres.length > 0 && (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '16px', fontSize: '13px', color: '#6b7280' }}>
             <div>
-              <span style={{ fontWeight: '700', color: '#111' }}>{offres.length} offres</span>
+              <span style={{ fontWeight: '700', color: '#111' }}>{offres.length} offre{offres.length > 1 ? 's' : ''}</span>
               {' '}· Triées par {TRIS.find(t => t.value === triPar)?.label.toLowerCase()}
             </div>
             <FilterDropdown id="tri" label="Trier par : Pertinence" value={triPar === 'pertinence' ? '' : triPar}
@@ -448,16 +436,6 @@ export default function Offres() {
                   </div>
                 )
               })}
-
-              {hasMore && (
-                <div style={{ textAlign: 'center', padding: '20px 4px' }}>
-                  <button onClick={() => handleSearch({}, true)} disabled={loadingMore}
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '9px 20px', background: 'transparent', color: '#374151', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
-                    {loadingMore ? <Loader2 size={14} style={{ animation: 'spin 0.8s linear infinite' }} /> : <ChevronDown size={14} />}
-                    {loadingMore ? 'Chargement...' : "Charger plus d'offres"}
-                  </button>
-                </div>
-              )}
             </div>
 
             {/* Colonne droite : détail (desktop uniquement) */}

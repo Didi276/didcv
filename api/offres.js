@@ -421,6 +421,6 @@ export default async function handler(req, res) {
   return res.status(200).json({
     offres: melange,
     total: melange.length,
-    hasMore: melange.length >= 50
+    hasMore: false
   })
 }
