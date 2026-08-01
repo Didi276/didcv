@@ -119,6 +119,7 @@ async function main() {
   console.log(`Démarrage scraping — ${ENTREPRISES.length} entreprises`)
   let totalOffres = 0
   let entreprisesOK = 0
+  const entreprisesZero = []
 
   for (const entreprise of ENTREPRISES) {
     if (entreprise.ats === 'custom' || entreprise.ats === 'taleo') continue
@@ -158,10 +159,17 @@ async function main() {
       }
     }
 
+    if (offres.length === 0 && entreprise.ats !== 'custom' && entreprise.ats !== 'taleo') {
+      entreprisesZero.push(`${entreprise.nom} (${entreprise.ats}/${entreprise.slug || entreprise.workday_id})`)
+    }
+
     await sleep(500) // 500ms entre chaque entreprise
   }
 
   console.log(`\n🎉 Terminé: ${entreprisesOK} entreprises, ${totalOffres} offres`)
+
+  console.log('\n❌ Entreprises sans offres :')
+  entreprisesZero.forEach(e => console.log(' -', e))
 }
 
 main().catch(console.error)
