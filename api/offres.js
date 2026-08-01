@@ -94,7 +94,7 @@ export default async function handler(req, res) {
   // ─── Arbeitnow (gratuit, sans inscription, offres EU) ───
   const searchArbeitnow = async () => {
     const r = await fetch(
-      `https://www.arbeitnow.com/api/job-board-api?search=${encodeURIComponent(query)}&page=${pageNum}`,
+      `https://www.arbeitnow.com/api/job-board-api?search=${encodeURIComponent(query)}&location=France&page=${pageNum}`,
       { headers: { Accept: 'application/json' } }
     )
     return r.json()
@@ -194,22 +194,39 @@ export default async function handler(req, res) {
 
   // ─── Arbeitnow ────────────────────────────────────────
   if (aRes.status === 'fulfilled' && aRes.value?.data) {
-    aRes.value.data.forEach(job => {
-      offres.push({
-        id: `arb-${job.slug}`,
-        source: 'Arbeitnow',
-        titre: job.title || '',
-        entreprise: job.company_name || '',
-        lieu: job.location || 'Remote',
-        date: job.created_at ? new Date(job.created_at * 1000).toISOString() : '',
-        description: (job.description || '').replace(/<[^>]*>/g, '').substring(0, 600),
-        url: job.url || '',
-        type: job.job_types?.join(', ') || '',
-        salaire: '',
-        experience: '',
-        remote: job.remote || false,
+    const motsAllemands = ['entwickler', 'ingenieur', 'sachbearbeiter',
+      'kaufmann', 'vertrieb', 'buchhaltung', 'projektleiter',
+      'mitarbeiter', 'leiter', 'berater', 'stellenangebot']
+
+    aRes.value.data
+      .filter(job => {
+        const titreMin = (job.title || '').toLowerCase()
+        const lieuMin = (job.location || '').toLowerCase()
+        const isAllemand = motsAllemands.some(m => titreMin.includes(m))
+        const isFrance = lieuMin.includes('france') ||
+                         lieuMin.includes('paris') ||
+                         lieuMin.includes('remote') ||
+                         lieuMin.includes('lyon') ||
+                         lieuMin.includes('marseille') ||
+                         lieuMin === ''
+        return !isAllemand && isFrance
       })
-    })
+      .forEach(job => {
+        offres.push({
+          id: `arb-${job.slug}`,
+          source: 'Arbeitnow',
+          titre: job.title || '',
+          entreprise: job.company_name || '',
+          lieu: job.location || 'Remote',
+          date: job.created_at ? new Date(job.created_at * 1000).toISOString() : '',
+          description: (job.description || '').replace(/<[^>]*>/g, '').substring(0, 600),
+          url: job.url || '',
+          type: job.job_types?.join(', ') || '',
+          salaire: '',
+          experience: '',
+          remote: job.remote || false,
+        })
+      })
   }
 
   // ─── RemoteOK ─────────────────────────────────────────
