@@ -241,13 +241,18 @@ export const scraperEntreprise = async (entreprise) => {
       return []
   }
 
+  // Dédupliquer par hash avant d'insérer
+  const offresUniques = offres.filter((o, index, self) =>
+    index === self.findIndex(t => t.hash === o.hash)
+  )
+
   // Sauvegarder dans Supabase avec upsert sur le hash
   let supabaseError = null
-  if (offres.length > 0) {
+  if (offresUniques.length > 0) {
     const { error } = await supabase
       .from('offres_directes')
       .upsert(
-        offres.map(o => ({
+        offresUniques.map(o => ({
           ...o,
           entreprise_id: entreprise.id,
           secteur: entreprise.secteur,
