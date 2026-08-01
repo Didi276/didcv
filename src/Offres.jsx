@@ -324,15 +324,17 @@ export default function Offres() {
             )}
 
             {/* Liste offres */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '100%', overflow: 'hidden', boxSizing: 'border-box' }}>
               {offres.map(offre => {
                 const srcStyle = SOURCE_COLORS[offre.source] || { bg: '#f3f4f6', color: '#374151', dot: '#9ca3af' }
                 return (
-                  <div key={offre.id} style={{ background: '#fff', borderRadius: '12px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: isMobile ? '14px' : '18px 20px', transition: 'box-shadow 0.15s' }}
+                  <div key={offre.id}
+                    onClick={() => offre.url && window.open(offre.url, '_blank')}
+                    style={{ background: '#fff', borderRadius: '12px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: isMobile ? '14px' : '18px 20px', transition: 'box-shadow 0.15s', overflow: 'hidden', boxSizing: 'border-box', maxWidth: '100%', cursor: offre.url ? 'pointer' : 'default' }}
                     onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)'}
                     onMouseLeave={e => e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', alignItems: 'flex-start' }}>
-                      <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', gap: '12px', alignItems: isMobile ? 'stretch' : 'flex-start' }}>
+                      <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
                         {/* Badge source + date */}
                         <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '6px', flexWrap: 'wrap' }}>
                           <span style={{ fontSize: '10px', fontWeight: '700', padding: '2px 8px', borderRadius: '10px', background: srcStyle.bg, color: srcStyle.color }}>
@@ -343,11 +345,11 @@ export default function Offres() {
                           {offre.date && <span style={{ fontSize: '11px', color: '#c4c4c4', marginLeft: 'auto' }}>{formatDate(offre.date)}</span>}
                         </div>
 
-                        <div style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '700', color: '#111', marginBottom: '4px', lineHeight: '1.3' }}>
+                        <div style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '700', color: '#111', marginBottom: '4px', lineHeight: '1.3', wordBreak: 'break-word' }}>
                           {offre.titre}
                         </div>
 
-                        <div style={{ fontSize: '13px', color: '#374151', marginBottom: '4px' }}>
+                        <div style={{ fontSize: '13px', color: '#374151', marginBottom: '4px', wordBreak: 'break-word' }}>
                           {offre.entreprise && <span style={{ fontWeight: '600' }}>{offre.entreprise}</span>}
                           {offre.lieu && <span style={{ color: '#9ca3af', display: 'inline-flex', alignItems: 'center', gap: '3px' }}> · <MapPin size={11} /> {offre.lieu}</span>}
                         </div>
@@ -359,24 +361,18 @@ export default function Offres() {
                         )}
 
                         {!isMobile && offre.description && (
-                          <p style={{ fontSize: '12px', color: '#6b7280', margin: '6px 0 0', lineHeight: '1.6', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                          <p style={{ fontSize: '12px', color: '#6b7280', margin: '6px 0 0', lineHeight: '1.6', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', wordBreak: 'break-word' }}>
                             {offre.description}
                           </p>
                         )}
                       </div>
 
                       {/* Actions */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flexShrink: 0 }}>
-                        <button onClick={() => handleGenererCV(offre)}
+                      <div style={{ display: 'flex', flexDirection: isMobile ? 'row' : 'column', gap: '6px', flexShrink: 0 }}>
+                        <button onClick={(e) => { e.stopPropagation(); handleGenererCV(offre) }}
                           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', padding: isMobile ? '8px 12px' : '9px 16px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '9px', fontSize: isMobile ? '11px' : '13px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
                           <Zap size={12} /> {isMobile ? 'CV' : 'Générer CV'}
                         </button>
-                        {offre.url && (
-                          <a href={offre.url} target="_blank" rel="noopener noreferrer"
-                            style={{ padding: isMobile ? '6px 10px' : '8px 16px', background: '#f8f9ff', color: '#4f46e5', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', borderRadius: '8px', fontSize: isMobile ? '10px' : '12px', fontWeight: '600', textDecoration: 'none', textAlign: 'center', display: 'block' }}>
-                            Voir l'offre
-                          </a>
-                        )}
                       </div>
                     </div>
                   </div>
