@@ -211,7 +211,9 @@ export const scrapeWorkday = async (workdayId, entrepriseNom, careersUrl, entrep
       'job',
       'Jobs'
     ]
-    const subdomains = ['wd3', 'wd1', 'wd5']
+    const subdomains = entreprise.workday_subdomain
+      ? [entreprise.workday_subdomain]
+      : ['wd3', 'wd1', 'wd5']
 
     for (const path of paths) {
       for (const subdomain of subdomains) {
