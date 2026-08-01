@@ -121,9 +121,7 @@ export default async function handler(req, res) {
   const searchDirectes = async () => {
     let q = supabase.from('offres_directes').select('*').eq('actif', true).ilike('titre', `%${query}%`)
     if (location) q = q.ilike('lieu', `%${location}%`)
-    const { data, error } = await q.order('date_publication', { ascending: false }).limit(30)
-    if (error) throw error
-    return data
+    return q.order('date_publication', { ascending: false }).limit(30)
   }
 
   // ─── Appels parallèles ────────────────────────────────
@@ -135,6 +133,10 @@ export default async function handler(req, res) {
     withTimeout(searchAdzuna(), 8000),
     withTimeout(searchDirectes(), 6000),
   ])
+
+  const directRes = ddRes.status === 'fulfilled'
+    ? ddRes.value
+    : { data: null, error: { message: ddRes.reason?.message || 'timeout' } }
 
   const offres = []
 
@@ -239,8 +241,8 @@ export default async function handler(req, res) {
   }
 
   // ─── Direct ───────────────────────────────────────────
-  if (ddRes.status === 'fulfilled' && Array.isArray(ddRes.value)) {
-    ddRes.value.forEach(row => {
+  if (Array.isArray(directRes.data)) {
+    directRes.data.forEach(row => {
       offres.push({
         id: `direct-${row.id}`,
         source: 'Direct',
@@ -288,7 +290,15 @@ export default async function handler(req, res) {
       arbeitnow: aRes.status === 'fulfilled' ? (aRes.value?.data?.length || 0) : 0,
       remoteok: rkRes.status === 'fulfilled' ? (Array.isArray(rkRes.value) ? rkRes.value.filter(j => j.id).length : 0) : 0,
       adzuna: azRes.status === 'fulfilled' ? (azRes.value?.results?.length || 0) : 0,
-      directes: ddRes.status === 'fulfilled' ? (Array.isArray(ddRes.value) ? ddRes.value.length : 0) : 0,
+      directes: directRes?.data?.length || 0,
+    },
+    debug_direct: {
+      query_used: query,
+      supabase_url: process.env.VITE_SUPABASE_URL ? 'present' : 'absent',
+      service_key: process.env.SUPABASE_SERVICE_ROLE_KEY ? 'present' : 'absent',
+      anon_key: process.env.VITE_SUPABASE_ANON_KEY ? 'present' : 'absent',
+      rows_returned: directRes?.data?.length || 0,
+      error: directRes?.error?.message || null
     }
   })
 }
