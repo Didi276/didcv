@@ -50,7 +50,7 @@ const SOURCE_COLORS = {
   'RemoteOK':       { bg: '#fdf4ff', color: '#6b21a8', dot: '#a855f7' },
   'Adzuna':         { bg: '#fce4ec', color: '#880e4f', dot: '#e91e63' },
   'Jooble':         { bg: '#fff3e0', color: '#e65100', dot: '#ff9800' },
-  'Direct':         { bg: '#eef2ff', color: '#4338ca', dot: '#4f46e5' },
+  'Direct':         { bg: '#fdf4ff', color: '#7e22ce', dot: '#a855f7' },
 }
 
 export default function Offres() {
@@ -275,9 +275,9 @@ export default function Offres() {
               <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
                 <span style={{ fontSize: '15px', fontWeight: '700', color: '#111' }}>{offres.length} offres</span>
                 {Object.entries(sources).map(([src, count]) => {
-                  const labels = { ft: 'France Travail', arbeitnow: 'Arbeitnow', remoteok: 'RemoteOK', adzuna: 'Adzuna', jooble: 'Jooble' }
-                  const colors = { ft: '#2e7d32', arbeitnow: '#1565c0', remoteok: '#6b21a8', adzuna: '#880e4f', jooble: '#e65100' }
-                  const bgs = { ft: '#e8f5e9', arbeitnow: '#e3f2fd', remoteok: '#fdf4ff', adzuna: '#fce4ec', jooble: '#fff3e0' }
+                  const labels = { ft: 'France Travail', arbeitnow: 'Arbeitnow', remoteok: 'RemoteOK', adzuna: 'Adzuna', jooble: 'Jooble', directes: 'Direct' }
+                  const colors = { ft: '#2e7d32', arbeitnow: '#1565c0', remoteok: '#6b21a8', adzuna: '#880e4f', jooble: '#e65100', directes: '#7e22ce' }
+                  const bgs = { ft: '#e8f5e9', arbeitnow: '#e3f2fd', remoteok: '#fdf4ff', adzuna: '#fce4ec', jooble: '#fff3e0', directes: '#fdf4ff' }
                   return count > 0 ? (
                     <span key={src} style={{ fontSize: '12px', padding: '3px 10px', borderRadius: '12px', background: bgs[src], color: colors[src], fontWeight: '600' }}>
                       {labels[src]}: {count}
