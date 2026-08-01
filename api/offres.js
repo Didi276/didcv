@@ -19,8 +19,6 @@ export default async function handler(req, res) {
     publieeDepuis = '',
     teletravail = '',
     salaireMin = '',
-    rayon = '',
-    secteur = '',
     tempsPartiel = '',
     page = '1'
   } = req.query
