@@ -86,6 +86,57 @@ export const scrapeGreenhouse = async (slug, entrepriseNom) => {
   }
 }
 
+// ─── LEVER HTML (fallback quand l'API ne retourne rien — boards privés) ─
+const scrapeLeverHTML = async (slug, entrepriseNom) => {
+  try {
+    const res = await fetch(`https://jobs.lever.co/${slug}`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'fr-FR,fr;q=0.9,en;q=0.8'
+      }
+    })
+    if (!res.ok) return []
+    const html = await res.text()
+
+    // Lever stocke les jobs dans des divs avec classe "posting"
+    const offres = []
+    const postingRegex = /<div class="posting">([\s\S]*?)<\/div>\s*<\/div>/g
+    const titleRegex = /<h5[^>]*>(.*?)<\/h5>/
+    const locationRegex = /<span class="sort-by-location[^"]*"[^>]*>(.*?)<\/span>/
+    const linkRegex = /href="(https:\/\/jobs\.lever\.co\/[^"]+)"/
+
+    let match
+    while ((match = postingRegex.exec(html)) !== null) {
+      const block = match[1]
+      const titleMatch = block.match(titleRegex)
+      const locationMatch = block.match(locationRegex)
+      const linkMatch = block.match(linkRegex)
+
+      if (titleMatch && linkMatch) {
+        offres.push({
+          titre: titleMatch[1].replace(/<[^>]*>/g, '').trim(),
+          entreprise: entrepriseNom,
+          lieu: locationMatch ? locationMatch[1].replace(/<[^>]*>/g, '').trim() : 'France',
+          description: '',
+          url_candidature: linkMatch[1],
+          date_publication: new Date().toISOString(),
+          type_contrat: '',
+          departement: '',
+          ats_source: 'lever_html',
+          hash: btoa(encodeURIComponent(
+            `${titleMatch[1].trim()}-${entrepriseNom}`
+          )).slice(0, 32),
+        })
+      }
+    }
+    return offres
+  } catch (e) {
+    console.error(`LeverHTML ${slug}:`, e.message)
+    return []
+  }
+}
+
 // ─── LEVER (API JSON publique, zéro authentification) ─────────────────
 export const scrapeLever = async (slug, entrepriseNom) => {
   try {
@@ -95,9 +146,12 @@ export const scrapeLever = async (slug, entrepriseNom) => {
       { headers: { 'User-Agent': 'DidCV-JobAggregator/1.0 (contact@didcv.fr)' } }
     )
     console.log(`Lever ${slug}: ${url} -> ${res.status}`)
-    if (!res.ok) return []
+    if (!res.ok) return scrapeLeverHTML(slug, entrepriseNom)
     const data = await res.json()
-    return (Array.isArray(data) ? data : []).map(job => ({
+    if (!Array.isArray(data) || data.length === 0) {
+      return scrapeLeverHTML(slug, entrepriseNom)
+    }
+    return data.map(job => ({
       titre: job.text || '',
       entreprise: entrepriseNom,
       lieu: job.categories?.location || 'France',
@@ -111,7 +165,7 @@ export const scrapeLever = async (slug, entrepriseNom) => {
     }))
   } catch (e) {
     console.error(`Lever ${slug}:`, e.message)
-    return []
+    return scrapeLeverHTML(slug, entrepriseNom)
   }
 }
 
