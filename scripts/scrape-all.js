@@ -135,25 +135,41 @@ async function scrapeLever(slug, nom) {
 }
 
 async function scrapeSmartRecruiters(slug, nom) {
-  try {
-    const r = await fetch(`https://api.smartrecruiters.com/v1/companies/${slug}/postings?limit=100`)
-    if (!r.ok) return []
-    const data = await r.json()
-    return (data.content || []).map(job => ({
-      titre: job.name || '',
-      entreprise: nom,
-      lieu: job.location?.city ? `${job.location.city}, France` : 'France',
-      description: '',
-      url_candidature: `https://jobs.smartrecruiters.com/${slug}/${job.id}`,
-      date_publication: job.releasedDate || new Date().toISOString(),
-      type_contrat: job.typeOfEmployment?.label || '',
-      departement: job.department?.label || '',
-      ats_source: 'smartrecruiters',
-      hash: hashOffre(job.name, nom, job.location?.city || ''),
-      actif: true,
-      date_scraping: new Date().toISOString()
-    }))
-  } catch { return [] }
+  const toutes = []
+  let offset = 0
+  const limit = 100
+
+  while (offset < 3000) {
+    try {
+      const r = await fetch(`https://api.smartrecruiters.com/v1/companies/${slug}/postings?limit=${limit}&offset=${offset}`)
+      if (!r.ok) break
+      const data = await r.json()
+      const content = data.content || []
+      if (content.length === 0) break
+
+      content.forEach(job => {
+        toutes.push({
+          titre: job.name || '',
+          entreprise: nom,
+          lieu: job.location?.city ? `${job.location.city}, ${job.location.country || 'France'}` : 'France',
+          description: '',
+          url_candidature: `https://jobs.smartrecruiters.com/${slug}/${job.id}`,
+          date_publication: job.releasedDate || new Date().toISOString(),
+          type_contrat: job.typeOfEmployment?.label || '',
+          departement: job.department?.label || '',
+          ats_source: 'smartrecruiters',
+          hash: Buffer.from(`${job.name}-${nom}-${job.id}`).toString('base64').slice(0, 32),
+          actif: true,
+          date_scraping: new Date().toISOString()
+        })
+      })
+
+      if (content.length < limit) break
+      offset += limit
+      await sleep(200)
+    } catch { break }
+  }
+  return toutes
 }
 
 async function scrapeWorkday(entreprise) {
