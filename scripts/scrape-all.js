@@ -40,12 +40,81 @@ async function scrapeGreenhouse(slug, nom) {
   } catch { return [] }
 }
 
+async function scrapeLeverHTML(slug, nom) {
+  try {
+    const r = await fetch(`https://jobs.lever.co/${slug}`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml'
+      }
+    })
+    if (!r.ok) return []
+    const html = await r.text()
+
+    const offres = []
+    // Lever stocke les offres en JSON dans la page
+    const jsonMatch = html.match(/window\.lever\.postings\s*=\s*(\[[\s\S]*?\]);/) ||
+                      html.match(/"postings"\s*:\s*(\[[\s\S]*?\])(?=\s*[,}])/)
+
+    if (jsonMatch) {
+      try {
+        const jobs = JSON.parse(jsonMatch[1])
+        jobs.forEach(job => {
+          offres.push({
+            titre: job.text || job.title || '',
+            entreprise: nom,
+            lieu: job.categories?.location || job.location || 'France',
+            description: (job.descriptionPlain || '').slice(0, 800),
+            url_candidature: `https://jobs.lever.co/${slug}/${job.id}`,
+            date_publication: new Date().toISOString(),
+            type_contrat: job.categories?.commitment || '',
+            departement: job.categories?.team || '',
+            ats_source: 'lever_html',
+            hash: Buffer.from(`${job.text}-${nom}`).toString('base64').slice(0, 32),
+            actif: true,
+            date_scraping: new Date().toISOString()
+          })
+        })
+      } catch {}
+    }
+
+    // Fallback regex si JSON non trouvé
+    if (offres.length === 0) {
+      const titleRegex = /<h5[^>]*data-qa="posting-name"[^>]*>([^<]+)<\/h5>/g
+      const linkRegex = /href="(https:\/\/jobs\.lever\.co\/[^"]+)"/g
+      const titles = [...html.matchAll(titleRegex)].map(m => m[1])
+      const links = [...html.matchAll(linkRegex)].map(m => m[1])
+      titles.forEach((titre, i) => {
+        offres.push({
+          titre: titre.trim(),
+          entreprise: nom,
+          lieu: 'France',
+          description: '',
+          url_candidature: links[i] || `https://jobs.lever.co/${slug}`,
+          date_publication: new Date().toISOString(),
+          type_contrat: '',
+          departement: '',
+          ats_source: 'lever_html',
+          hash: Buffer.from(`${titre}-${nom}-${i}`).toString('base64').slice(0, 32),
+          actif: true,
+          date_scraping: new Date().toISOString()
+        })
+      })
+    }
+    return offres
+  } catch (err) {
+    return []
+  }
+}
+
 async function scrapeLever(slug, nom) {
   try {
     const r = await fetch(`https://api.lever.co/v0/postings/${slug}?mode=json`)
-    if (!r.ok) return []
+    if (!r.ok) return scrapeLeverHTML(slug, nom)
     const data = await r.json()
-    if (!Array.isArray(data)) return []
+    if (!Array.isArray(data) || data.length === 0) {
+      return scrapeLeverHTML(slug, nom)
+    }
     return data.map(job => ({
       titre: job.text || '',
       entreprise: nom,
@@ -60,7 +129,9 @@ async function scrapeLever(slug, nom) {
       actif: true,
       date_scraping: new Date().toISOString()
     }))
-  } catch { return [] }
+  } catch {
+    return scrapeLeverHTML(slug, nom)
+  }
 }
 
 async function scrapeSmartRecruiters(slug, nom) {
@@ -121,23 +192,31 @@ async function main() {
   let entreprisesOK = 0
   const entreprisesZero = []
 
+  const corrections = {
+    'Qonto': { ats: 'lever', slug: 'qonto' },
+    'Swile': { ats: 'lever', slug: 'swile' },
+    'Thales DMS': { ats: 'workday', workday_id: 'thales', workday_path: 'Careers' },
+    'Accor': { ats: 'greenhouse', slug: 'accor' },
+  }
+
   for (const entreprise of ENTREPRISES) {
-    if (entreprise.ats === 'custom' || entreprise.ats === 'taleo') continue
+    const e = { ...entreprise, ...(corrections[entreprise.nom] || {}) }
+    if (e.ats === 'custom' || e.ats === 'taleo') continue
 
     let offres = []
 
     try {
-      if (entreprise.ats === 'greenhouse' && entreprise.slug) {
-        offres = await scrapeGreenhouse(entreprise.slug, entreprise.nom)
-      } else if (entreprise.ats === 'lever' && entreprise.slug) {
-        offres = await scrapeLever(entreprise.slug, entreprise.nom)
-      } else if (entreprise.ats === 'smartrecruiters' && entreprise.slug) {
-        offres = await scrapeSmartRecruiters(entreprise.slug, entreprise.nom)
-      } else if (entreprise.ats === 'workday') {
-        offres = await scrapeWorkday(entreprise)
+      if (e.ats === 'greenhouse' && e.slug) {
+        offres = await scrapeGreenhouse(e.slug, e.nom)
+      } else if (e.ats === 'lever' && e.slug) {
+        offres = await scrapeLever(e.slug, e.nom)
+      } else if (e.ats === 'smartrecruiters' && e.slug) {
+        offres = await scrapeSmartRecruiters(e.slug, e.nom)
+      } else if (e.ats === 'workday') {
+        offres = await scrapeWorkday(e)
       }
-    } catch (e) {
-      console.error(`Erreur ${entreprise.nom}:`, e.message)
+    } catch (err) {
+      console.error(`Erreur ${e.nom}:`, err.message)
     }
 
     if (offres.length > 0) {
@@ -148,19 +227,19 @@ async function main() {
       const { error } = await supabase
         .from('offres_directes')
         .upsert(
-          uniques.map(o => ({ ...o, entreprise_id: entreprise.id })),
+          uniques.map(o => ({ ...o, entreprise_id: e.id })),
           { onConflict: 'hash', ignoreDuplicates: false }
         )
 
       if (!error) {
-        console.log(`✅ ${entreprise.nom}: ${offres.length} offres`)
+        console.log(`✅ ${e.nom}: ${offres.length} offres`)
         totalOffres += offres.length
         entreprisesOK++
       }
     }
 
-    if (offres.length === 0 && entreprise.ats !== 'custom' && entreprise.ats !== 'taleo') {
-      entreprisesZero.push(`${entreprise.nom} (${entreprise.ats}/${entreprise.slug || entreprise.workday_id})`)
+    if (offres.length === 0 && e.ats !== 'custom' && e.ats !== 'taleo') {
+      entreprisesZero.push(`${e.nom} (${e.ats}/${e.slug || e.workday_id})`)
     }
 
     await sleep(500) // 500ms entre chaque entreprise
