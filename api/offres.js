@@ -240,19 +240,18 @@ export default async function handler(req, res) {
 
   // ─── Direct ───────────────────────────────────────────
   if (ddRes.status === 'fulfilled' && Array.isArray(ddRes.value)) {
-    ddRes.value.forEach(job => {
+    ddRes.value.forEach(row => {
       offres.push({
-        id: `dd-${job.id}`,
+        id: `direct-${row.id}`,
         source: 'Direct',
-        titre: job.titre || '',
-        entreprise: job.entreprise || '',
-        lieu: job.lieu || '',
-        date: job.date_publication || '',
-        description: (job.description || '').substring(0, 600),
-        url: job.url_candidature || '',
-        type: job.type_contrat || '',
+        titre: row.titre,
+        entreprise: row.entreprise,
+        lieu: row.lieu,
+        date: row.date_publication,
+        description: row.description,
+        url: row.url_candidature,
+        type: row.type_contrat,
         salaire: '',
-        experience: '',
         remote: false,
       })
     })
