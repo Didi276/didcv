@@ -118,10 +118,22 @@ export default async function handler(req, res) {
   }
 
   // ─── Direct (offres scrapées des pages carrières, voir api/scrape.js) ──
+  const normalize = (str) => str
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .trim()
+
   const searchDirectes = async () => {
-    let q = supabase.from('offres_directes').select('*').eq('actif', true).ilike('titre', `%${query}%`)
+    const queryNorm = normalize(query)
+    const mots = queryNorm.split(' ').filter(m => m.length > 2)
+    const orConditions = (mots.length > 0 ? mots : [queryNorm]).map(mot =>
+      `titre.ilike.%${mot}%,description.ilike.%${mot}%,entreprise.ilike.%${mot}%`
+    ).join(',')
+
+    let q = supabase.from('offres_directes').select('*').or(orConditions).eq('actif', true)
     if (location) q = q.ilike('lieu', `%${location}%`)
-    return q.order('date_publication', { ascending: false }).limit(30)
+    return q.order('date_publication', { ascending: false }).limit(50)
   }
 
   // ─── Appels parallèles ────────────────────────────────
@@ -291,14 +303,6 @@ export default async function handler(req, res) {
       remoteok: rkRes.status === 'fulfilled' ? (Array.isArray(rkRes.value) ? rkRes.value.filter(j => j.id).length : 0) : 0,
       adzuna: azRes.status === 'fulfilled' ? (azRes.value?.results?.length || 0) : 0,
       directes: directRes?.data?.length || 0,
-    },
-    debug_direct: {
-      query_used: query,
-      supabase_url: process.env.VITE_SUPABASE_URL ? 'present' : 'absent',
-      service_key: process.env.SUPABASE_SERVICE_ROLE_KEY ? 'present' : 'absent',
-      anon_key: process.env.VITE_SUPABASE_ANON_KEY ? 'present' : 'absent',
-      rows_returned: directRes?.data?.length || 0,
-      error: directRes?.error?.message || null
     }
   })
 }
