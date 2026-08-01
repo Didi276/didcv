@@ -229,6 +229,28 @@ export const ENTREPRISES = [
   { id: 198, nom: 'Keolis', secteur: 'Transport', ats: 'workday', slug: 'keolis', careers_url: 'https://www.keolis.com/fr/carrieres' },
   { id: 199, nom: 'Bolloré Logistics', secteur: 'Logistique', ats: 'custom', slug: null, careers_url: 'https://www.bollore-logistics.com/fr/carrieres' },
   { id: 200, nom: 'CMA CGM', secteur: 'Transport maritime', ats: 'workday', slug: 'cmacgm', careers_url: 'https://www.cmacgm-group.com/fr/carrieres' },
+
+  // ═══ CABINETS DE CONSEIL ET AUDIT ═════════════════════════════════════
+  { id: 201, nom: 'Michael Page', secteur: 'Recrutement', ats: 'greenhouse', slug: 'michaelpage', careers_url: 'https://www.michaelpage.fr/jobs' },
+  { id: 202, nom: 'Robert Half', secteur: 'Recrutement', ats: 'greenhouse', slug: 'roberthalf', careers_url: 'https://www.roberthalf.fr/emplois' },
+  { id: 203, nom: 'Hays France', secteur: 'Recrutement', ats: 'greenhouse', slug: 'hays', careers_url: 'https://www.hays.fr/emploi' },
+  { id: 204, nom: 'Adecco France', secteur: 'Recrutement', ats: 'workday', slug: 'adecco', workday_id: 'adecco', careers_url: 'https://www.adecco.fr/candidat' },
+  { id: 205, nom: 'Manpower France', secteur: 'Recrutement', ats: 'workday', slug: 'manpower', workday_id: 'manpower', careers_url: 'https://www.manpower.fr/candidats' },
+  { id: 206, nom: 'Randstad France', secteur: 'Recrutement', ats: 'workday', slug: 'randstad', workday_id: 'randstad', careers_url: 'https://www.randstad.fr/candidat' },
+  { id: 207, nom: 'PageGroup', secteur: 'Recrutement', ats: 'workday', slug: 'pagegroup', workday_id: 'pagegroup', careers_url: 'https://www.pagegroup.fr' },
+  { id: 208, nom: 'Expectra', secteur: 'Recrutement', ats: 'workday', slug: 'expectra', workday_id: 'randstad', careers_url: 'https://www.expectra.fr' },
+  { id: 209, nom: 'McKinsey France', secteur: 'Conseil', ats: 'workday', slug: 'mckinsey', workday_id: 'mckinsey', careers_url: 'https://www.mckinsey.com/fr/carrieres' },
+  { id: 210, nom: 'BCG France', secteur: 'Conseil', ats: 'greenhouse', slug: 'bcgcareers', careers_url: 'https://careers.bcg.com/france' },
+  { id: 211, nom: 'Roland Berger', secteur: 'Conseil', ats: 'greenhouse', slug: 'rolandberger', careers_url: 'https://www.rolandberger.com/fr/Carrieres' },
+  { id: 212, nom: 'Oliver Wyman', secteur: 'Conseil', ats: 'greenhouse', slug: 'oliverwyman', careers_url: 'https://www.oliverwyman.com/careers' },
+  { id: 213, nom: 'Mazars', secteur: 'Audit/Conseil', ats: 'greenhouse', slug: 'mazars', careers_url: 'https://www.mazars.fr/Accueil/Carrieres' },
+  { id: 214, nom: 'BDO France', secteur: 'Audit', ats: 'greenhouse', slug: 'bdofrance', careers_url: 'https://www.bdo.fr/carrieres' },
+  { id: 215, nom: 'Inetum', secteur: 'IT/Conseil', ats: 'greenhouse', slug: 'inetum', careers_url: 'https://www.inetum.com/fr/carrieres' },
+  { id: 216, nom: 'Aubay', secteur: 'IT/Conseil', ats: 'lever', slug: 'aubay', careers_url: 'https://www.aubay.com/fr/carriere' },
+  { id: 217, nom: 'Devoteam', secteur: 'IT/Conseil', ats: 'greenhouse', slug: 'devoteam', careers_url: 'https://fr.devoteam.com/rejoindre-devoteam' },
+  { id: 218, nom: 'Onepoint', secteur: 'IT/Conseil', ats: 'lever', slug: 'onepoint', careers_url: 'https://www.groupeonepoint.com/fr/carrieres' },
+  { id: 219, nom: 'Ekimetrics', secteur: 'Data/Conseil', ats: 'lever', slug: 'ekimetrics', careers_url: 'https://ekimetrics.com/fr/rejoindre' },
+  { id: 220, nom: 'Converteo', secteur: 'Data/Conseil', ats: 'lever', slug: 'converteo', careers_url: 'https://converteo.com/carrieres' },
 ]
 
 export const ATS_TYPES = ['greenhouse', 'lever', 'smartrecruiters', 'workday', 'successfactors', 'custom', 'taleo']
