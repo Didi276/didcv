@@ -12,7 +12,7 @@
     },
     {
       "path": "/api/scrape?batch_size=20",
-      "schedule": "0 6 * * *"
+      "schedule": "0 12 * * *"
     }
   ]
 }
