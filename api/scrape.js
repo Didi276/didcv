@@ -143,13 +143,14 @@ export const scrapeSmartRecruiters = async (slug, entrepriseNom) => {
 }
 
 // ─── WORKDAY (scraping HTML — URL standardisée) ────────────────────────
-export const scrapeWorkday = async (workdayId, entrepriseNom, careersUrl) => {
+export const scrapeWorkday = async (workdayId, entrepriseNom, careersUrl, entreprise = {}) => {
   try {
+    const path = entreprise.workday_path || 'external'
     // Workday a plusieurs formats d'URL — on essaie les plus courants
     const possibleUrls = [
-      `https://${workdayId}.wd3.myworkdayjobs.com/wday/cxs/${workdayId}/external/jobs`,
-      `https://${workdayId}.wd1.myworkdayjobs.com/wday/cxs/${workdayId}/external/jobs`,
-      `https://${workdayId}.wd5.myworkdayjobs.com/wday/cxs/${workdayId}/external/jobs`,
+      `https://${workdayId}.wd3.myworkdayjobs.com/wday/cxs/${workdayId}/${path}/jobs`,
+      `https://${workdayId}.wd1.myworkdayjobs.com/wday/cxs/${workdayId}/${path}/jobs`,
+      `https://${workdayId}.wd5.myworkdayjobs.com/wday/cxs/${workdayId}/${path}/jobs`,
     ]
     for (const url of possibleUrls) {
       await sleep(2000) // Respecte les serveurs
@@ -231,7 +232,7 @@ export const scraperEntreprise = async (entreprise) => {
       offres = await scrapeSmartRecruiters(entreprise.slug, entreprise.nom)
       break
     case 'workday':
-      offres = await scrapeWorkday(entreprise.workday_id || entreprise.slug, entreprise.nom, entreprise.careers_url)
+      offres = await scrapeWorkday(entreprise.workday_id || entreprise.slug, entreprise.nom, entreprise.careers_url, entreprise)
       break
     case 'successfactors':
       offres = await scrapeSuccessFactors(entreprise.slug, entreprise.nom, entreprise.careers_url)
