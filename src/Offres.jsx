@@ -14,28 +14,46 @@ function useWidth() {
 }
 
 const CONTRATS = [
-  { label: 'Type de contrat', value: '' },
+  { label: 'Tous', value: '' },
   { label: 'CDI', value: 'CDI' },
   { label: 'CDD', value: 'CDD' },
   { label: 'Alternance', value: 'E1' },
-  { label: 'Intérim', value: 'MIS' },
   { label: 'Stage', value: 'NS' },
+  { label: 'Intérim', value: 'MIS' },
+  { label: 'Freelance', value: 'FS' },
   { label: 'Saisonnier', value: 'SAI' },
 ]
 
 const EXPERIENCE = [
-  { label: 'Expérience', value: '' },
-  { label: 'Débutant', value: '1' },
+  { label: 'Tous niveaux', value: '' },
+  { label: 'Débutant accepté', value: '1' },
   { label: '1 à 3 ans', value: '2' },
-  { label: 'Plus de 3 ans', value: '3' },
+  { label: 'Plus de 5 ans', value: '3' },
+]
+
+const SALAIRES = [
+  { label: 'Indifférent', value: '' },
+  { label: '25k€', value: '25000' },
+  { label: '30k€', value: '30000' },
+  { label: '35k€', value: '35000' },
+  { label: '40k€', value: '40000' },
+  { label: '50k€', value: '50000' },
+  { label: '60k€', value: '60000' },
+  { label: '80k€', value: '80000' },
 ]
 
 const PUBLICATION = [
-  { label: 'Date', value: '' },
+  { label: 'Toutes dates', value: '' },
   { label: 'Dernières 24h', value: '1' },
   { label: '3 derniers jours', value: '3' },
   { label: 'Dernière semaine', value: '7' },
   { label: 'Dernier mois', value: '31' },
+]
+
+const TRIS = [
+  { label: 'Pertinence', value: 'pertinence' },
+  { label: 'Date (plus récentes)', value: 'date' },
+  { label: 'Salaire (plus élevé)', value: 'salaire' },
 ]
 
 const SOURCE_COLORS = {
@@ -55,6 +73,14 @@ function logoColor(nom) {
   return LOGO_COLORS[Math.abs(hash) % LOGO_COLORS.length]
 }
 
+function salaireAnnuel(offre) {
+  if (!offre.salaire) return null
+  const nums = offre.salaire.match(/\d+/g)
+  if (!nums) return null
+  const max = Math.max(...nums.map(Number))
+  return max > 10000 ? max : max * 12
+}
+
 export default function Offres() {
   const [query, setQuery] = useState('')
   const [location, setLocation] = useState('')
@@ -62,11 +88,13 @@ export default function Offres() {
   const [experience, setExperience] = useState('')
   const [publieeDepuis, setPublieeDepuis] = useState('')
   const [teletravail, setTeletravail] = useState(false)
+  const [salaireMin, setSalaireMin] = useState('')
+  const [tempsPartiel, setTempsPartiel] = useState(false)
+  const [triPar, setTriPar] = useState('pertinence')
   const [offres, setOffres] = useState([])
   const [loading, setLoading] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [searched, setSearched] = useState(false)
-  const [sources, setSources] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [hasMore, setHasMore] = useState(false)
   const [dropdownOuvert, setDropdownOuvert] = useState(null)
@@ -87,7 +115,7 @@ export default function Offres() {
     if (!q.trim()) return
     const page = loadMore ? currentPage + 1 : 1
     if (loadMore) setLoadingMore(true)
-    else { setLoading(true); setSearched(false); setOffres([]); setSources(null); setCurrentPage(1); setSelectedId(null) }
+    else { setLoading(true); setSearched(false); setOffres([]); setCurrentPage(1); setSelectedId(null) }
     setDropdownOuvert(null)
     try {
       const params = new URLSearchParams({
@@ -97,6 +125,8 @@ export default function Offres() {
         experience: overrides.experience ?? experience,
         publieeDepuis: overrides.publieeDepuis ?? publieeDepuis,
         teletravail: overrides.teletravail ?? teletravail,
+        salaireMin: overrides.salaireMin ?? salaireMin,
+        tempsPartiel: overrides.tempsPartiel ?? tempsPartiel,
         page,
       })
       const r = await fetch(`/api/offres?${params}`)
@@ -108,12 +138,17 @@ export default function Offres() {
         setOffres(data.offres || [])
         if (data.offres?.length) setSelectedId(data.offres[0].id)
       }
-      setSources(data.sources || null)
       setHasMore(data.hasMore || false)
       setSearched(true)
     } catch { setSearched(true) }
     setLoading(false)
     setLoadingMore(false)
+  }
+
+  const effacerFiltres = () => {
+    setTypeContrat(''); setExperience(''); setPublieeDepuis(''); setTeletravail(false)
+    setSalaireMin(''); setTempsPartiel(false)
+    handleSearch({ typeContrat: '', experience: '', publieeDepuis: '', teletravail: false, salaireMin: '', tempsPartiel: false })
   }
 
   const handleGenererCV = (offre) => {
@@ -167,21 +202,21 @@ export default function Offres() {
     catch { return '' }
   }
 
-  const FilterDropdown = ({ id, label, value, options }) => {
+  const FilterDropdown = ({ id, label, value, options, onSelect, align = 'left' }) => {
     const ouvert = dropdownOuvert === id
     const actif = !!value
     return (
       <div style={{ position: 'relative' }}>
         <button type="button" onClick={(e) => { e.stopPropagation(); setDropdownOuvert(ouvert ? null : id) }}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 14px', borderRadius: '9px', border: actif ? '1.5px solid #4f46e5' : '1.5px solid #e5e7eb', background: actif ? '#f8f9ff' : '#fff', color: actif ? '#4f46e5' : '#374151', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
-          {options.find(o => o.value === value)?.label || label}
+          style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 14px', borderRadius: '9px', border: actif ? '1.5px solid #4f46e5' : '1.5px solid #e5e7eb', background: actif ? '#4f46e5' : '#fff', color: actif ? '#fff' : '#374151', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
+          {(actif && options.find(o => o.value === value)?.label) || label}
           <ChevronDown size={13} style={{ transform: ouvert ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
         </button>
         {ouvert && (
-          <div style={{ position: 'absolute', top: 'calc(100% + 6px)', left: 0, background: '#fff', borderRadius: '10px', boxShadow: '0 8px 24px rgba(0,0,0,0.14)', border: '1px solid #f0f0f0', padding: '6px', zIndex: 30, minWidth: '190px' }}>
+          <div style={{ position: 'absolute', top: 'calc(100% + 6px)', [align]: 0, background: '#fff', borderRadius: '10px', boxShadow: '0 8px 24px rgba(0,0,0,0.14)', border: '1px solid #f0f0f0', padding: '6px', zIndex: 30, minWidth: '190px' }}>
             {options.map(o => (
               <button key={o.value} type="button"
-                onClick={() => { setDropdownOuvert(null); const setter = { contrat: setTypeContrat, experience: setExperience, date: setPublieeDepuis }[id]; setter(o.value); handleSearch({ [{ contrat: 'typeContrat', experience: 'experience', date: 'publieeDepuis' }[id]]: o.value }) }}
+                onClick={() => { setDropdownOuvert(null); onSelect(o.value) }}
                 style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 10px', border: 'none', borderRadius: '7px', background: value === o.value ? '#ede9fe' : 'transparent', color: value === o.value ? '#4f46e5' : '#374151', fontSize: '13px', fontWeight: value === o.value ? '700' : '500', cursor: 'pointer', fontFamily: 'inherit' }}>
                 {o.label}
               </button>
@@ -190,6 +225,22 @@ export default function Offres() {
         )}
       </div>
     )
+  }
+
+  const filtreActif = typeContrat || experience || publieeDepuis || teletravail || salaireMin || tempsPartiel
+
+  // Tri client (le mélange "pertinence" vient déjà de l'API)
+  const offresAffichees = [...offres]
+  if (triPar === 'date') {
+    offresAffichees.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+  } else if (triPar === 'salaire') {
+    offresAffichees.sort((a, b) => {
+      const sa = salaireAnnuel(a), sb = salaireAnnuel(b)
+      if (sa === null && sb === null) return 0
+      if (sa === null) return 1
+      if (sb === null) return -1
+      return sb - sa
+    })
   }
 
   const offreSelectionnee = offres.find(o => o.id === selectedId) || null
@@ -307,33 +358,46 @@ export default function Offres() {
 
       {/* Filtres horizontaux */}
       <div style={{ borderBottom: '1px solid #f0f0f0', padding: isMobile ? '12px 16px' : '14px 40px' }}>
-        <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <FilterDropdown id="contrat" label="Type de contrat" value={typeContrat} options={CONTRATS} />
-          <FilterDropdown id="experience" label="Expérience" value={experience} options={EXPERIENCE} />
-          <FilterDropdown id="date" label="Date" value={publieeDepuis} options={PUBLICATION} />
+        <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <FilterDropdown id="contrat" label="Type de contrat" value={typeContrat} options={CONTRATS}
+            onSelect={v => { setTypeContrat(v); handleSearch({ typeContrat: v }) }} />
+          <FilterDropdown id="experience" label="Expérience" value={experience} options={EXPERIENCE}
+            onSelect={v => { setExperience(v); handleSearch({ experience: v }) }} />
+          <FilterDropdown id="salaire" label="Salaire min" value={salaireMin} options={SALAIRES}
+            onSelect={v => { setSalaireMin(v); handleSearch({ salaireMin: v }) }} />
+          <FilterDropdown id="date" label="Date" value={publieeDepuis} options={PUBLICATION}
+            onSelect={v => { setPublieeDepuis(v); handleSearch({ publieeDepuis: v }) }} />
           <button type="button" onClick={() => { const v = !teletravail; setTeletravail(v); handleSearch({ teletravail: v }) }}
             style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 14px', borderRadius: '9px', border: teletravail ? '1.5px solid #4f46e5' : '1.5px solid #e5e7eb', background: teletravail ? '#4f46e5' : '#fff', color: teletravail ? '#fff' : '#374151', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
             <Home size={13} /> Télétravail
           </button>
+          <button type="button" onClick={() => { const v = !tempsPartiel; setTempsPartiel(v); handleSearch({ tempsPartiel: v }) }}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 14px', borderRadius: '9px', border: tempsPartiel ? '1.5px solid #4f46e5' : '1.5px solid #e5e7eb', background: tempsPartiel ? '#4f46e5' : '#fff', color: tempsPartiel ? '#fff' : '#374151', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
+            Temps partiel
+          </button>
+          {filtreActif && (
+            <button type="button" onClick={effacerFiltres}
+              style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '9px 12px', borderRadius: '9px', border: 'none', background: 'none', color: '#9ca3af', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline' }}>
+              <X size={13} /> Effacer
+            </button>
+          )}
         </div>
       </div>
 
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: isMobile ? '16px' : '20px 40px' }}>
 
-        {/* Stats sources */}
-        {searched && sources && (
-          <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
-            <span style={{ fontSize: '15px', fontWeight: '700', color: '#111' }}>{offres.length} offres</span>
-            {Object.entries(sources).map(([src, count]) => {
-              const labels = { ft: 'France Travail', arbeitnow: 'Arbeitnow', remoteok: 'RemoteOK', adzuna: 'Adzuna', jooble: 'Jooble', directes: 'Direct' }
-              const colors = { ft: '#2e7d32', arbeitnow: '#1565c0', remoteok: '#6b21a8', adzuna: '#880e4f', jooble: '#e65100', directes: '#7e22ce' }
-              const bgs = { ft: '#e8f5e9', arbeitnow: '#e3f2fd', remoteok: '#fdf4ff', adzuna: '#fce4ec', jooble: '#fff3e0', directes: '#fdf4ff' }
-              return count > 0 ? (
-                <span key={src} style={{ fontSize: '12px', padding: '3px 10px', borderRadius: '12px', background: bgs[src], color: colors[src], fontWeight: '600' }}>
-                  {labels[src]}: {count}
-                </span>
-              ) : null
-            })}
+        {/* Compteur + tri */}
+        {searched && offres.length > 0 && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
+            <div>
+              <span style={{ fontSize: '15px', fontWeight: '700', color: '#111' }}>{offres.length} offres trouvées</span>
+              <span style={{ fontSize: '13px', color: '#9ca3af', marginLeft: '8px' }}>
+                Triées par {TRIS.find(t => t.value === triPar)?.label.toLowerCase()}
+              </span>
+            </div>
+            <FilterDropdown id="tri" label="Trier par : Pertinence" value={triPar === 'pertinence' ? '' : triPar}
+              options={TRIS.map(t => ({ label: `Trier par : ${t.label}`, value: t.value === 'pertinence' ? '' : t.value }))}
+              onSelect={v => setTriPar(v || 'pertinence')} align="right" />
           </div>
         )}
 
@@ -371,7 +435,7 @@ export default function Offres() {
 
             {/* Colonne gauche : liste */}
             <div style={{ background: '#fff', border: '1px solid #f0f0f0', borderRadius: '14px', overflow: 'hidden', maxHeight: isMobile ? 'none' : 'calc(100vh - 220px)', overflowY: isMobile ? 'visible' : 'auto' }}>
-              {offres.map(offre => {
+              {offresAffichees.map(offre => {
                 const estSelectionne = offre.id === selectedId
                 return (
                   <div key={offre.id} onClick={() => selectionner(offre)}

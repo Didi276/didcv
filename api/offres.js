@@ -18,6 +18,10 @@ export default async function handler(req, res) {
     experience = '',
     publieeDepuis = '',
     teletravail = '',
+    salaireMin = '',
+    rayon = '',
+    secteur = '',
+    tempsPartiel = '',
     page = '1'
   } = req.query
 
@@ -297,29 +301,118 @@ export default async function handler(req, res) {
     return true
   })
 
-  // Direct en premier, puis France Travail, puis le reste par date
-  dedup.sort((a, b) => {
-    if (a.source === 'Direct' && b.source !== 'Direct') return -1
-    if (b.source === 'Direct' && a.source !== 'Direct') return 1
-    if (a.source === 'France Travail' && b.source !== 'France Travail') return -1
-    if (b.source === 'France Travail' && a.source !== 'France Travail') return 1
-    return new Date(b.date) - new Date(a.date)
+  // ─── Filtres avancés post-agrégation ──────────────────
+  let filtrees = dedup
+
+  // Salaire minimum (extraire les nombres du champ salaire)
+  if (salaireMin) {
+    const min = parseInt(salaireMin)
+    filtrees = filtrees.filter(o => {
+      if (!o.salaire) return true // garder si pas d'info salaire
+      const nums = o.salaire.match(/\d+/g)
+      if (!nums) return true
+      const max = Math.max(...nums.map(Number))
+      // Si annuel (> 10000) comparer direct, sinon multiplier par 12
+      const annuel = max > 10000 ? max : max * 12
+      return annuel >= min
+    })
+  }
+
+  // Télétravail
+  if (teletravail === 'true') {
+    filtrees = filtrees.filter(o =>
+      o.remote === true ||
+      /télétravail|remote|distanciel|hybride/i.test(o.titre + ' ' + o.description + ' ' + o.lieu)
+    )
+  }
+
+  // Temps partiel
+  if (tempsPartiel === 'true') {
+    filtrees = filtrees.filter(o =>
+      /temps partiel|mi-temps|part.?time|50%|80%/i.test(o.titre + ' ' + o.type + ' ' + o.description)
+    )
+  }
+
+  // Date de publication (filtrage local en plus du filtre API)
+  if (publieeDepuis) {
+    const jours = parseInt(publieeDepuis)
+    const limite = Date.now() - (jours * 86400000)
+    filtrees = filtrees.filter(o => !o.date || new Date(o.date).getTime() >= limite)
+  }
+
+  // Type de contrat (normalisation cross-sources)
+  if (typeContrat) {
+    const mapping = {
+      'CDI': /CDI|permanent|indéterminée|full.?time/i,
+      'CDD': /CDD|déterminée|temporary|contract/i,
+      'E1': /alternance|apprentissage|apprenti|contrat pro/i,
+      'MIS': /intérim|interim|mission|temporaire/i,
+      'NS': /stage|stagiaire|internship|intern/i,
+      'SAI': /saisonnier|seasonal/i,
+      'FS': /freelance|indépendant|consultant/i,
+    }
+    const regex = mapping[typeContrat]
+    if (regex) {
+      filtrees = filtrees.filter(o => regex.test(o.type + ' ' + o.titre + ' ' + o.description))
+    }
+  }
+
+  // Expérience
+  if (experience) {
+    const mapping = {
+      '1': /débutant|junior|sans expérience|entry.?level|0.?2 ans|première expérience/i,
+      '2': /1.?3 ans|2.?4 ans|intermédiaire|confirmé|mid.?level/i,
+      '3': /senior|expert|5 ans|expérimenté|\+.?5|lead|principal/i,
+    }
+    const regex = mapping[experience]
+    if (regex) {
+      filtrees = filtrees.filter(o =>
+        regex.test(o.experience + ' ' + o.titre + ' ' + o.description)
+      )
+    }
+  }
+
+  // ─── Mélange intelligent des sources (round-robin) ────
+  // 1. Grouper par source
+  const parSource = {}
+  filtrees.forEach(o => {
+    if (!parSource[o.source]) parSource[o.source] = []
+    parSource[o.source].push(o)
   })
 
-  const totalFT = ftRes.status === 'fulfilled' ? (ftRes.value?.Content_Range?.split('/')[1] || 0) : 0
+  // 2. Trier chaque groupe par date décroissante
+  Object.keys(parSource).forEach(src => {
+    parSource[src].sort((a, b) => new Date(b.date) - new Date(a.date))
+  })
+
+  // 3. Entrelacer les sources en round-robin
+  // Priorité : Direct en premier dans chaque tour, puis France Travail, puis le reste
+  const ordre = ['Direct', 'France Travail', 'Jooble', 'Adzuna', 'Arbeitnow', 'RemoteOK']
+  const melange = []
+  let reste = true
+  let i = 0
+
+  while (reste) {
+    reste = false
+    for (const src of ordre) {
+      if (parSource[src] && parSource[src][i]) {
+        melange.push(parSource[src][i])
+        reste = true
+      }
+    }
+    // Sources non listées dans ordre
+    for (const src of Object.keys(parSource)) {
+      if (!ordre.includes(src) && parSource[src][i]) {
+        melange.push(parSource[src][i])
+        reste = true
+      }
+    }
+    i++
+  }
 
   return res.status(200).json({
-    offres: dedup,
-    total: dedup.length,
-    totalFT: parseInt(totalFT) || 0,
-    hasMore: ftEnd < (parseInt(totalFT) || 0),
-    sources: {
-      ft: ftRes.status === 'fulfilled' ? (ftRes.value?.resultats?.length || 0) : 0,
-      jooble: cjRes.status === 'fulfilled' ? (cjRes.value?.jobs?.length || 0) : 0,
-      arbeitnow: aRes.status === 'fulfilled' ? (aRes.value?.data?.length || 0) : 0,
-      remoteok: rkRes.status === 'fulfilled' ? (Array.isArray(rkRes.value) ? rkRes.value.filter(j => j.id).length : 0) : 0,
-      adzuna: azRes.status === 'fulfilled' ? (azRes.value?.results?.length || 0) : 0,
-      directes: directRes?.data?.length || 0,
-    }
+    offres: melange,
+    total: melange.length,
+    hasMore: melange.length >= 50
   })
 }
