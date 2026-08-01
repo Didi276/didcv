@@ -55,7 +55,7 @@ export const ENTREPRISES = [
 
   // ═══ SMARTRECRUITERS (API publique) ════════════════════════════════════
   { id: 46, nom: 'LVMH', secteur: 'Luxe', ats: 'smartrecruiters', slug: 'LVMH', careers_url: 'https://careers.smartrecruiters.com/LVMH' },
-  { id: 47, nom: "L'Oréal", secteur: 'Beauté/Luxe', ats: 'smartrecruiters', slug: 'LOreal', careers_url: 'https://careers.loreal.com' },
+  { id: 47, nom: "L'Oréal", secteur: 'Beauté/Luxe', ats: 'smartrecruiters', slug: 'LOreal', workday_id: 'loreal', careers_url: 'https://careers.loreal.com' },
   { id: 48, nom: 'Kering', secteur: 'Luxe', ats: 'smartrecruiters', slug: 'Kering', careers_url: 'https://careers.kering.com' },
   { id: 49, nom: 'Fnac Darty', secteur: 'Commerce', ats: 'smartrecruiters', slug: 'FnacDarty', careers_url: 'https://careers.smartrecruiters.com/FnacDarty' },
   { id: 50, nom: 'Auchan', secteur: 'Distribution', ats: 'smartrecruiters', slug: 'Auchan', careers_url: 'https://careers.smartrecruiters.com/Auchan' },
@@ -95,7 +95,7 @@ export const ENTREPRISES = [
   { id: 82, nom: 'Plastic Omnium', secteur: 'Automobile', ats: 'workday', slug: 'plasticomnium', workday_id: 'plasticomnium', careers_url: 'https://www.plastic-omnium.com/fr/carrieres' },
   { id: 83, nom: 'Rémy Cointreau', secteur: 'Spiritueux', ats: 'workday', slug: 'remycointreau', workday_id: 'remycointreau', careers_url: 'https://careers.remy-cointreau.com' },
   { id: 84, nom: 'Safran', secteur: 'Aéronautique', ats: 'workday', slug: 'safran', workday_id: 'safran', workday_path: 'Safran', careers_url: 'https://www.safran-group.com/fr/carrieres' },
-  { id: 85, nom: 'Thales', secteur: 'Défense/Aéro', ats: 'workday', slug: 'thales', workday_id: 'thalesgroup', workday_path: 'External', careers_url: 'https://www.thalesgroup.com/fr/candidats' },
+  { id: 85, nom: 'Thales', secteur: 'Défense/Aéro', ats: 'workday', slug: 'thales', workday_id: 'thales', workday_path: 'External', careers_url: 'https://www.thalesgroup.com/fr/candidats' },
   { id: 86, nom: 'Korian', secteur: 'Santé/Ehpad', ats: 'workday', slug: 'korian', workday_id: 'korian', careers_url: 'https://www.korian.fr/recrutement' },
   { id: 87, nom: 'Ipsen', secteur: 'Pharma', ats: 'workday', slug: 'ipsen', workday_id: 'ipsen', careers_url: 'https://www.ipsen.com/fr/carrieres' },
   { id: 88, nom: 'Vallourec', secteur: 'Industrie/Tubes', ats: 'workday', slug: 'vallourec', workday_id: 'vallourec', careers_url: 'https://www.vallourec.com/fr/carrieres' },
@@ -212,7 +212,7 @@ export const ENTREPRISES = [
   { id: 183, nom: 'MBDA', secteur: 'Défense/Missiles', ats: 'custom', slug: null, careers_url: 'https://www.mbda-systems.com/fr/carrieres' },
   { id: 184, nom: 'Nexter', secteur: 'Défense terrestre', ats: 'custom', slug: null, careers_url: 'https://www.nexter-group.fr/fr/carrieres' },
   { id: 185, nom: 'Faurecia/Forvia', secteur: 'Automobile', ats: 'workday', slug: 'forvia', careers_url: 'https://careers.forvia.com' },
-  { id: 186, nom: 'Valeo', secteur: 'Automobile', ats: 'workday', slug: 'valeo', careers_url: 'https://www.valeo.com/fr/carrieres' },
+  { id: 186, nom: 'Valeo', secteur: 'Automobile', ats: 'workday', slug: 'valeo', workday_id: 'valeo', careers_url: 'https://www.valeo.com/fr/carrieres' },
   { id: 187, nom: 'Roquette', secteur: 'Agroalimentaire/Chimie', ats: 'custom', slug: null, careers_url: 'https://www.roquette.com/fr/carrieres' },
   { id: 188, nom: 'Lactalis', secteur: 'Agroalimentaire', ats: 'custom', slug: null, careers_url: 'https://carrieres.lactalis.fr' },
   { id: 189, nom: 'Bonduelle', secteur: 'Agroalimentaire', ats: 'workday', slug: 'bonduelle', careers_url: 'https://www.bonduelle.com/fr/carrieres' },

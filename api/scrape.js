@@ -145,40 +145,48 @@ export const scrapeSmartRecruiters = async (slug, entrepriseNom) => {
 // ─── WORKDAY (scraping HTML — URL standardisée) ────────────────────────
 export const scrapeWorkday = async (workdayId, entrepriseNom, careersUrl, entreprise = {}) => {
   try {
-    const path = entreprise.workday_path || 'external'
-    // Workday a plusieurs formats d'URL — on essaie les plus courants
-    const possibleUrls = [
-      `https://${workdayId}.wd3.myworkdayjobs.com/wday/cxs/${workdayId}/${path}/jobs`,
-      `https://${workdayId}.wd1.myworkdayjobs.com/wday/cxs/${workdayId}/${path}/jobs`,
-      `https://${workdayId}.wd5.myworkdayjobs.com/wday/cxs/${workdayId}/${path}/jobs`,
+    // Workday a plusieurs formats de chemin et de sous-domaine — on essaie les plus courants
+    const paths = [
+      entreprise.workday_path || 'External',
+      'External_Career_Site',
+      'careers',
+      'Careers',
+      'external',
+      'job',
+      'Jobs'
     ]
-    for (const url of possibleUrls) {
-      await sleep(2000) // Respecte les serveurs
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': 'DidCV-JobAggregator/1.0 (contact@didcv.fr)',
-        },
-        body: JSON.stringify({ limit: 50, offset: 0, searchText: '' })
-      })
-      if (!res.ok) continue
-      const data = await res.json()
-      if (data.jobPostings?.length > 0) {
-        return data.jobPostings.map(job => ({
-          titre: job.title || '',
-          entreprise: entrepriseNom,
-          lieu: job.locationsText || job.bulletFields?.[0] || 'France',
-          description: '',
-          url_candidature: job.externalPath
-            ? `${careersUrl}${job.externalPath}`
-            : careersUrl,
-          date_publication: job.postedOn || new Date().toISOString(),
-          type_contrat: job.jobReqId?.includes('INT') ? 'CDI' : '',
-          departement: '',
-          ats_source: 'workday',
-          hash: hashOffre(job.title, entrepriseNom, job.locationsText || ''),
-        }))
+    const subdomains = ['wd3', 'wd1', 'wd5']
+
+    for (const path of paths) {
+      for (const subdomain of subdomains) {
+        const url = `https://${workdayId}.${subdomain}.myworkdayjobs.com/wday/cxs/${workdayId}/${path}/jobs`
+        await sleep(2000) // Respecte les serveurs
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'DidCV-JobAggregator/1.0 (contact@didcv.fr)',
+          },
+          body: JSON.stringify({ limit: 50, offset: 0, searchText: '' })
+        })
+        if (!res.ok) continue
+        const data = await res.json()
+        if (data.jobPostings?.length > 0) {
+          return data.jobPostings.map(job => ({
+            titre: job.title || '',
+            entreprise: entrepriseNom,
+            lieu: job.locationsText || job.bulletFields?.[0] || 'France',
+            description: '',
+            url_candidature: job.externalPath
+              ? `${careersUrl}${job.externalPath}`
+              : careersUrl,
+            date_publication: job.postedOn || new Date().toISOString(),
+            type_contrat: job.jobReqId?.includes('INT') ? 'CDI' : '',
+            departement: '',
+            ats_source: 'workday',
+            hash: hashOffre(job.title, entrepriseNom, job.locationsText || ''),
+          }))
+        }
       }
     }
     return []
