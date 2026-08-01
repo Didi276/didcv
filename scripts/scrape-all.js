@@ -186,6 +186,50 @@ async function scrapeWorkday(entreprise) {
   } catch { return [] }
 }
 
+async function scrapeAshby(slug, nom) {
+  try {
+    const r = await fetch(`https://api.ashbyhq.com/posting-api/job-board/${slug}`)
+    if (!r.ok) return []
+    const d = await r.json()
+    return (d.jobs || []).map(job => ({
+      titre: job.title || '',
+      entreprise: nom,
+      lieu: job.location || 'France',
+      description: (job.descriptionPlain || '').slice(0, 800),
+      url_candidature: job.jobUrl || '',
+      date_publication: job.publishedAt || new Date().toISOString(),
+      type_contrat: job.employmentType || '',
+      departement: job.department || '',
+      ats_source: 'ashby',
+      hash: Buffer.from(`${job.title}-${nom}`).toString('base64').slice(0, 32),
+      actif: true,
+      date_scraping: new Date().toISOString()
+    }))
+  } catch { return [] }
+}
+
+async function scrapeWorkable(slug, nom) {
+  try {
+    const r = await fetch(`https://apply.workable.com/api/v1/widget/accounts/${slug}?details=true`)
+    if (!r.ok) return []
+    const d = await r.json()
+    return (d.jobs || []).map(job => ({
+      titre: job.title || '',
+      entreprise: nom,
+      lieu: job.city ? `${job.city}, ${job.country}` : 'France',
+      description: (job.description || '').replace(/<[^>]*>/g, '').slice(0, 800),
+      url_candidature: job.url || '',
+      date_publication: job.published || new Date().toISOString(),
+      type_contrat: job.employment_type || '',
+      departement: job.department || '',
+      ats_source: 'workable',
+      hash: Buffer.from(`${job.title}-${nom}`).toString('base64').slice(0, 32),
+      actif: true,
+      date_scraping: new Date().toISOString()
+    }))
+  } catch { return [] }
+}
+
 async function main() {
   console.log(`Démarrage scraping — ${ENTREPRISES.length} entreprises`)
   let totalOffres = 0
@@ -214,6 +258,10 @@ async function main() {
         offres = await scrapeSmartRecruiters(e.slug, e.nom)
       } else if (e.ats === 'workday') {
         offres = await scrapeWorkday(e)
+      } else if (e.ats === 'ashby' && e.slug) {
+        offres = await scrapeAshby(e.slug, e.nom)
+      } else if (e.ats === 'workable' && e.slug) {
+        offres = await scrapeWorkable(e.slug, e.nom)
       }
     } catch (err) {
       console.error(`Erreur ${e.nom}:`, err.message)
