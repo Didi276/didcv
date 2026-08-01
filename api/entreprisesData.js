@@ -7,7 +7,7 @@ export const ENTREPRISES = [
   // ═══ GREENHOUSE (API JSON publique gratuite) ═══════════════════════════
   { id: 1, nom: 'Decathlon', secteur: 'Commerce', ats: 'greenhouse', slug: 'decathlontechnology', careers_url: 'https://www.decathlon.fr/emploi' },
   { id: 2, nom: 'Doctolib', secteur: 'Tech/Santé', ats: 'greenhouse', slug: 'doctolib', careers_url: 'https://careers.doctolib.fr' },
-  { id: 3, nom: 'Criteo', secteur: 'Tech', ats: 'greenhouse', slug: 'criteo', careers_url: 'https://careers.criteo.com' },
+  { id: 3, nom: 'Criteo', secteur: 'Tech', ats: 'custom', slug: null, careers_url: 'https://careers.criteo.com' },
   { id: 4, nom: 'Contentsquare', secteur: 'Tech', ats: 'lever', slug: 'contentsquare', careers_url: 'https://contentsquare.com/careers' },
   { id: 5, nom: 'Qonto', secteur: 'Fintech', ats: 'greenhouse', slug: 'qonto', careers_url: 'https://qonto.com/fr/jobs' },
   { id: 6, nom: 'Alan', secteur: 'Insurtech', ats: 'lever', slug: 'alan', careers_url: 'https://alan.com/fr/jobs' },

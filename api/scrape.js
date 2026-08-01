@@ -61,29 +61,37 @@ const hashOffre = (titre, entreprise, lieu) =>
 
 // ─── GREENHOUSE (API JSON publique, zéro authentification) ────────────
 export const scrapeGreenhouse = async (slug, entrepriseNom) => {
-  try {
-    const res = await fetch(
-      `https://boards-api.greenhouse.io/v1/boards/${slug}/jobs?content=true`,
-      { headers: { 'User-Agent': 'DidCV-JobAggregator/1.0 (contact@didcv.fr)' } }
-    )
-    if (!res.ok) return []
-    const data = await res.json()
-    return (data.jobs || []).map(job => ({
-      titre: job.title || '',
-      entreprise: entrepriseNom,
-      lieu: job.location?.name || 'France',
-      description: (job.content || '').replace(/<[^>]*>/g, '').substring(0, 800),
-      url_candidature: job.absolute_url || '',
-      date_publication: job.updated_at || new Date().toISOString(),
-      type_contrat: '',
-      departement: job.departments?.[0]?.name || '',
-      ats_source: 'greenhouse',
-      hash: hashOffre(job.title, entrepriseNom, job.location?.name || ''),
-    }))
-  } catch (e) {
-    console.error(`Greenhouse ${slug}:`, e.message)
-    return []
+  const urls = [
+    `https://boards-api.greenhouse.io/v1/boards/${slug}/jobs?content=true`,
+    `https://job-boards.greenhouse.io/${slug}/jobs.json`,
+    `https://job-boards.eu.greenhouse.io/${slug}/jobs.json`,
+  ]
+
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, {
+        headers: { 'User-Agent': 'DidCV-JobAggregator/1.0 (contact@didcv.fr)' }
+      })
+      if (!res.ok) continue
+      const data = await res.json()
+      const jobs = data.jobs || data
+      if (!Array.isArray(jobs) || jobs.length === 0) continue
+
+      return jobs.map(job => ({
+        titre: job.title || '',
+        entreprise: entrepriseNom,
+        lieu: job.location?.name || 'France',
+        description: (job.content || '').replace(/<[^>]*>/g, '').substring(0, 800),
+        url_candidature: job.absolute_url || '',
+        date_publication: job.updated_at || new Date().toISOString(),
+        type_contrat: '',
+        departement: job.departments?.[0]?.name || '',
+        ats_source: 'greenhouse',
+        hash: hashOffre(job.title, entrepriseNom, job.location?.name || ''),
+      }))
+    } catch {}
   }
+  return []
 }
 
 // ─── LEVER HTML (fallback quand l'API ne retourne rien — boards privés) ─
