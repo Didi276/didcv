@@ -26,8 +26,6 @@ export default async function handler(req, res) {
   if (!query) return res.status(400).json({ error: 'query requis' })
 
   const pageNum = parseInt(page) || 1
-  const ftStart = (pageNum - 1) * 150
-  const ftEnd = ftStart + 149
 
   const withTimeout = (p, ms) => Promise.race([p, new Promise((_, r) => setTimeout(() => r(new Error('timeout')), ms))])
 
@@ -53,19 +51,39 @@ export default async function handler(req, res) {
   const searchFT = async () => {
     const token = await getFTToken()
     if (!token) throw new Error('Token FT invalide')
-    const params = new URLSearchParams()
-    params.set('motsCles', query)
-    params.set('range', `${ftStart}-${ftEnd}`)
-    params.set('sort', '1')
-    if (location) params.set('lieuTravail.libelle', location)
-    if (typeContrat) params.set('typeContrat', typeContrat)
-    if (experience) params.set('experience', experience)
-    if (publieeDepuis) params.set('publieeDepuis', publieeDepuis)
-    const r = await fetch(
-      `https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search?${params}`,
-      { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } }
+
+    const buildParams = (start, end) => {
+      const p = new URLSearchParams()
+      p.set('motsCles', query)
+      p.set('range', `${start}-${end}`)
+      p.set('sort', '1')
+      if (location) p.set('lieuTravail.libelle', location)
+      if (typeContrat) p.set('typeContrat', typeContrat)
+      if (experience) p.set('experience', experience)
+      if (publieeDepuis) p.set('publieeDepuis', publieeDepuis)
+      return p
+    }
+
+    const ranges = []
+    for (let i = 0; i < 10; i++) {
+      ranges.push([i * 150, (i * 150) + 149])
+    }
+
+    const results = await Promise.allSettled(
+      ranges.map(([s, e]) =>
+        fetch(`https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search?${buildParams(s, e)}`,
+          { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } }
+        ).then(r => r.ok ? r.json() : null).catch(() => null)
+      )
     )
-    return r.json()
+
+    const tous = []
+    results.forEach(r => {
+      if (r.status === 'fulfilled' && r.value?.resultats) {
+        tous.push(...r.value.resultats)
+      }
+    })
+    return { resultats: tous }
   }
 
   // ─── Jooble (gratuit, sans inscription, HTTPS) ──────────
@@ -95,11 +113,21 @@ export default async function handler(req, res) {
 
   // ─── Arbeitnow (gratuit, sans inscription, offres EU) ───
   const searchArbeitnow = async () => {
-    const r = await fetch(
-      `https://www.arbeitnow.com/api/job-board-api?search=${encodeURIComponent(query)}&location=France&page=${pageNum}`,
-      { headers: { Accept: 'application/json' } }
+    const pages = [1, 2, 3]
+    const results = await Promise.allSettled(
+      pages.map(p =>
+        fetch(`https://www.arbeitnow.com/api/job-board-api?search=${encodeURIComponent(query)}&location=France&page=${p}`,
+          { headers: { Accept: 'application/json' } }
+        ).then(r => r.ok ? r.json() : null).catch(() => null)
+      )
     )
-    return r.json()
+    const tous = []
+    results.forEach(r => {
+      if (r.status === 'fulfilled' && r.value?.data) {
+        tous.push(...r.value.data)
+      }
+    })
+    return { data: tous }
   }
 
   // ─── RemoteOK (gratuit, sans inscription, offres remote) ─
@@ -113,10 +141,20 @@ export default async function handler(req, res) {
 
   // ─── Adzuna ───────────────────────────────────────────
   const searchAdzuna = async () => {
-    const r = await fetch(
-      `https://api.adzuna.com/v1/api/jobs/fr/search/${pageNum}?app_id=c07dfdb2&app_key=7acb6df75a80e2623290c5d84559e278&what=${encodeURIComponent(query)}&where=${encodeURIComponent(location || 'France')}&results_per_page=20`
+    const pages = [1, 2, 3, 4, 5]
+    const results = await Promise.allSettled(
+      pages.map(p =>
+        fetch(`https://api.adzuna.com/v1/api/jobs/fr/search/${p}?app_id=c07dfdb2&app_key=7acb6df75a80e2623290c5d84559e278&what=${encodeURIComponent(query)}&where=${encodeURIComponent(location || 'France')}&results_per_page=20`)
+          .then(r => r.ok ? r.json() : null).catch(() => null)
+      )
     )
-    return r.json()
+    const tous = []
+    results.forEach(r => {
+      if (r.status === 'fulfilled' && r.value?.results) {
+        tous.push(...r.value.results)
+      }
+    })
+    return { results: tous }
   }
 
   // ─── Direct (offres scrapées des pages carrières, voir api/scrape.js) ──
@@ -135,17 +173,17 @@ export default async function handler(req, res) {
 
     let q = supabase.from('offres_directes').select('*').or(orConditions).eq('actif', true)
     if (location) q = q.ilike('lieu', `%${location}%`)
-    return q.order('date_publication', { ascending: false }).limit(50)
+    return q.order('date_publication', { ascending: false })
   }
 
   // ─── Appels parallèles ────────────────────────────────
   const [ftRes, cjRes, aRes, rkRes, azRes, ddRes] = await Promise.allSettled([
-    withTimeout(searchFT(), 9000),
-    withTimeout(searchJooble(), 6000),
-    withTimeout(searchArbeitnow(), 6000),
+    withTimeout(searchFT(), 20000),
+    withTimeout(searchJooble(), 8000),
+    withTimeout(searchArbeitnow(), 15000),
     withTimeout(searchRemoteOK(), 5000),
-    withTimeout(searchAdzuna(), 8000),
-    withTimeout(searchDirectes(), 6000),
+    withTimeout(searchAdzuna(), 15000),
+    withTimeout(searchDirectes(), 10000),
   ])
 
   const directRes = ddRes.status === 'fulfilled'
