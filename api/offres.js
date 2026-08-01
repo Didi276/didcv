@@ -370,42 +370,52 @@ export default async function handler(req, res) {
     }
   }
 
-  // ─── Mélange intelligent des sources (round-robin) ────
-  // 1. Grouper par source
+  // ─── Mélange pondéré des sources (Direct et France Travail prioritaires) ─
   const parSource = {}
   filtrees.forEach(o => {
     if (!parSource[o.source]) parSource[o.source] = []
     parSource[o.source].push(o)
   })
 
-  // 2. Trier chaque groupe par date décroissante
+  // Trier chaque groupe par date décroissante
   Object.keys(parSource).forEach(src => {
     parSource[src].sort((a, b) => new Date(b.date) - new Date(a.date))
   })
 
-  // 3. Entrelacer les sources en round-robin
-  // Priorité : Direct en premier dans chaque tour, puis France Travail, puis le reste
-  const ordre = ['Direct', 'France Travail', 'Jooble', 'Adzuna', 'Arbeitnow', 'RemoteOK']
-  const melange = []
-  let reste = true
-  let i = 0
+  // Poids par source : combien d'offres on prend à chaque tour
+  const poids = {
+    'Direct': 3,
+    'France Travail': 3,
+    'Jooble': 1,
+    'Adzuna': 1,
+    'Arbeitnow': 1,
+    'RemoteOK': 1,
+  }
 
-  while (reste) {
-    reste = false
-    for (const src of ordre) {
-      if (parSource[src] && parSource[src][i]) {
-        melange.push(parSource[src][i])
-        reste = true
+  const melange = []
+  const indices = {}
+  Object.keys(parSource).forEach(src => { indices[src] = 0 })
+
+  let encore = true
+  while (encore) {
+    encore = false
+
+    // Ordre de priorité dans chaque tour
+    const ordre = ['Direct', 'France Travail', 'Jooble', 'Adzuna', 'Arbeitnow', 'RemoteOK']
+    const sources = [...ordre.filter(s => parSource[s]),
+                     ...Object.keys(parSource).filter(s => !ordre.includes(s))]
+
+    for (const src of sources) {
+      const nb = poids[src] || 1
+      for (let k = 0; k < nb; k++) {
+        const idx = indices[src]
+        if (parSource[src] && parSource[src][idx]) {
+          melange.push(parSource[src][idx])
+          indices[src]++
+          encore = true
+        }
       }
     }
-    // Sources non listées dans ordre
-    for (const src of Object.keys(parSource)) {
-      if (!ordre.includes(src) && parSource[src][i]) {
-        melange.push(parSource[src][i])
-        reste = true
-      }
-    }
-    i++
   }
 
   return res.status(200).json({
