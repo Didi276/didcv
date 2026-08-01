@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { ClipboardList, Link as LinkIcon, FileText, Lightbulb, Download, RotateCcw, BookOpen, Play, Pause, Volume2, VolumeX, Square, Mic, Send, ChevronRight, Briefcase } from 'lucide-react'
+import { ClipboardList, Link as LinkIcon, FileText, Lightbulb, Download, RotateCcw, BookOpen, Play, Pause, Volume2, VolumeX, Square, Mic, Send, ChevronRight } from 'lucide-react'
 import Navbar from './Navbar'
 import { supabase } from './supabase'
 
@@ -669,7 +669,7 @@ export default function Entretien() {
                 if (item.type === 'question') {
                   return (
                     <div key={i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Briefcase size={15} color="#4f46e5" /></div>
+                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '16px' }}>👔</div>
                       <div style={{ background: '#f3f4f6', borderRadius: '14px', borderTopLeftRadius: '4px', padding: '12px 16px', maxWidth: '80%', fontSize: '14px', color: '#111', lineHeight: '1.6' }}>
                         {item.text}
                       </div>

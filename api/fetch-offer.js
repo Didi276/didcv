@@ -9,6 +9,7 @@ export default async function handler(req, res) {
       .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
       .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
       .replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/g, ' ')
       .replace(/\s+/g, ' ')
       .trim()
       .substring(0, 6000)
