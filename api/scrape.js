@@ -89,10 +89,12 @@ export const scrapeGreenhouse = async (slug, entrepriseNom) => {
 // ─── LEVER (API JSON publique, zéro authentification) ─────────────────
 export const scrapeLever = async (slug, entrepriseNom) => {
   try {
+    const url = `https://api.lever.co/v0/postings/${slug}?mode=json`
     const res = await fetch(
-      `https://api.lever.co/v0/postings/${slug}?mode=json`,
+      url,
       { headers: { 'User-Agent': 'DidCV-JobAggregator/1.0 (contact@didcv.fr)' } }
     )
+    console.log(`Lever ${slug}: ${url} -> ${res.status}`)
     if (!res.ok) return []
     const data = await res.json()
     return (Array.isArray(data) ? data : []).map(job => ({
