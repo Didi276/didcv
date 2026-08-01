@@ -246,6 +246,51 @@ async function scrapeWorkable(slug, nom) {
   } catch { return [] }
 }
 
+async function scrapeRecruitee(slug, nom) {
+  try {
+    const r = await fetch(`https://${slug}.recruitee.com/api/offers/`)
+    if (!r.ok) return []
+    const d = await r.json()
+    return (d.offers || []).map(job => ({
+      titre: job.title || '',
+      entreprise: nom,
+      lieu: job.location || 'France',
+      description: (job.description || '').replace(/<[^>]*>/g, '').slice(0, 800),
+      url_candidature: job.careers_url || '',
+      date_publication: job.created_at || new Date().toISOString(),
+      type_contrat: job.employment_type_code || '',
+      departement: job.department || '',
+      ats_source: 'recruitee',
+      hash: Buffer.from(`${job.title}-${nom}-${job.id}`).toString('base64').slice(0, 32),
+      actif: true,
+      date_scraping: new Date().toISOString()
+    }))
+  } catch { return [] }
+}
+
+async function scrapeTeamtailor(slug, nom) {
+  try {
+    const r = await fetch(`https://${slug}.teamtailor.com/jobs.json`)
+    if (!r.ok) return []
+    const d = await r.json()
+    const jobs = Array.isArray(d) ? d : (d.jobs || [])
+    return jobs.map(job => ({
+      titre: job.title || '',
+      entreprise: nom,
+      lieu: job.location || 'France',
+      description: (job.body || '').replace(/<[^>]*>/g, '').slice(0, 800),
+      url_candidature: job.url || '',
+      date_publication: job.created_at || new Date().toISOString(),
+      type_contrat: '',
+      departement: job.department || '',
+      ats_source: 'teamtailor',
+      hash: Buffer.from(`${job.title}-${nom}`).toString('base64').slice(0, 32),
+      actif: true,
+      date_scraping: new Date().toISOString()
+    }))
+  } catch { return [] }
+}
+
 async function main() {
   console.log(`Démarrage scraping — ${ENTREPRISES.length} entreprises`)
   let totalOffres = 0
@@ -278,6 +323,10 @@ async function main() {
         offres = await scrapeAshby(e.slug, e.nom)
       } else if (e.ats === 'workable' && e.slug) {
         offres = await scrapeWorkable(e.slug, e.nom)
+      } else if (e.ats === 'recruitee' && e.slug) {
+        offres = await scrapeRecruitee(e.slug, e.nom)
+      } else if (e.ats === 'teamtailor' && e.slug) {
+        offres = await scrapeTeamtailor(e.slug, e.nom)
       }
     } catch (err) {
       console.error(`Erreur ${e.nom}:`, err.message)

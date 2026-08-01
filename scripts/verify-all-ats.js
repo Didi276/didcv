@@ -3,26 +3,45 @@ import { ENTREPRISES } from '../api/entreprisesData.js'
 
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 
-// Génère des variantes de slug à partir du nom
+// Génère beaucoup plus de variantes de slug
 function genererSlugs(nom) {
-  const base = nom.toLowerCase()
+  const clean = s => s.toLowerCase()
     .normalize('NFD').replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z0-9]/g, '')
 
-  const avecTirets = nom.toLowerCase()
+  const cleanTirets = s => s.toLowerCase()
     .normalize('NFD').replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 
-  const premierMot = nom.split(/[\s&]/)[0].toLowerCase()
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9]/g, '')
+  const base = clean(nom)
+  const tirets = cleanTirets(nom)
+  const premierMot = clean(nom.split(/[\s&\/]/)[0])
+  const sansGroupe = clean(nom.replace(/\s*(groupe|group|france|sa|sas|holding)\s*/gi, ''))
 
-  return [...new Set([base, avecTirets, premierMot, `${base}group`, `${base}fr`, `${base}france`])]
+  return [...new Set([
+    base,
+    tirets,
+    premierMot,
+    sansGroupe,
+    `${base}group`,
+    `${base}groupe`,
+    `${base}fr`,
+    `${base}france`,
+    `${base}careers`,
+    `${base}jobs`,
+    `${base}tech`,
+    `${base}technology`,
+    `${premierMot}group`,
+    `${premierMot}fr`,
+    nom.toUpperCase().replace(/[^A-Z0-9]/g, ''),
+  ])].filter(s => s.length >= 2)
 }
+
+// ═══ TESTS DES 13 ATS ═══
 
 async function testGreenhouse(slug) {
   try {
-    const r = await fetch(`https://boards-api.greenhouse.io/v1/boards/${slug}/jobs`, { timeout: 5000 })
+    const r = await fetch(`https://boards-api.greenhouse.io/v1/boards/${slug}/jobs`)
     if (!r.ok) return 0
     const d = await r.json()
     return d.jobs?.length || 0
@@ -31,7 +50,7 @@ async function testGreenhouse(slug) {
 
 async function testLever(slug) {
   try {
-    const r = await fetch(`https://api.lever.co/v0/postings/${slug}?mode=json`, { timeout: 5000 })
+    const r = await fetch(`https://api.lever.co/v0/postings/${slug}?mode=json`)
     if (!r.ok) return 0
     const d = await r.json()
     return Array.isArray(d) ? d.length : 0
@@ -40,7 +59,7 @@ async function testLever(slug) {
 
 async function testSmartRecruiters(slug) {
   try {
-    const r = await fetch(`https://api.smartrecruiters.com/v1/companies/${slug}/postings?limit=5`, { timeout: 5000 })
+    const r = await fetch(`https://api.smartrecruiters.com/v1/companies/${slug}/postings?limit=5`)
     if (!r.ok) return 0
     const d = await r.json()
     return d.totalFound || d.content?.length || 0
@@ -49,7 +68,7 @@ async function testSmartRecruiters(slug) {
 
 async function testAshby(slug) {
   try {
-    const r = await fetch(`https://api.ashbyhq.com/posting-api/job-board/${slug}`, { timeout: 5000 })
+    const r = await fetch(`https://api.ashbyhq.com/posting-api/job-board/${slug}`)
     if (!r.ok) return 0
     const d = await r.json()
     return d.jobs?.length || 0
@@ -58,18 +77,116 @@ async function testAshby(slug) {
 
 async function testWorkable(slug) {
   try {
-    const r = await fetch(`https://apply.workable.com/api/v1/widget/accounts/${slug}?details=true`, { timeout: 5000 })
+    const r = await fetch(`https://apply.workable.com/api/v1/widget/accounts/${slug}?details=true`)
     if (!r.ok) return 0
     const d = await r.json()
     return d.jobs?.length || 0
   } catch { return 0 }
 }
 
+async function testRecruitee(slug) {
+  try {
+    const r = await fetch(`https://${slug}.recruitee.com/api/offers/`)
+    if (!r.ok) return 0
+    const d = await r.json()
+    return d.offers?.length || 0
+  } catch { return 0 }
+}
+
+async function testTeamtailor(slug) {
+  try {
+    const r = await fetch(`https://${slug}.teamtailor.com/jobs.json`)
+    if (!r.ok) return 0
+    const d = await r.json()
+    return Array.isArray(d) ? d.length : (d.jobs?.length || 0)
+  } catch { return 0 }
+}
+
+async function testPersonio(slug) {
+  try {
+    const r = await fetch(`https://${slug}.jobs.personio.de/search.json`)
+    if (!r.ok) return 0
+    const d = await r.json()
+    return Array.isArray(d) ? d.length : 0
+  } catch { return 0 }
+}
+
+async function testJazzHR(slug) {
+  try {
+    const r = await fetch(`https://${slug}.applytojob.com/apply/jobs/feed?format=json`)
+    if (!r.ok) return 0
+    const d = await r.json()
+    return Array.isArray(d) ? d.length : 0
+  } catch { return 0 }
+}
+
+async function testBreezy(slug) {
+  try {
+    const r = await fetch(`https://${slug}.breezy.hr/json`)
+    if (!r.ok) return 0
+    const d = await r.json()
+    return Array.isArray(d) ? d.length : 0
+  } catch { return 0 }
+}
+
+async function testRippling(slug) {
+  try {
+    const r = await fetch(`https://api.rippling.com/platform/api/ats/v1/board/${slug}/jobs`)
+    if (!r.ok) return 0
+    const d = await r.json()
+    return Array.isArray(d) ? d.length : (d.items?.length || 0)
+  } catch { return 0 }
+}
+
+async function testJobvite(slug) {
+  try {
+    const r = await fetch(`https://api.jobvite.com/api/v2/jobFeed?companyId=${slug}`)
+    if (!r.ok) return 0
+    const d = await r.json()
+    return d.requisitions?.length || 0
+  } catch { return 0 }
+}
+
+// Workday : teste les chemins les plus courants
+async function testWorkday(slug) {
+  const paths = [
+    'External', 'external', 'Careers', 'careers',
+    'External_Career_Site', 'ExternalCareerSite',
+    `${slug}_Careers`, `${slug}Careers`, `${slug}_External`,
+    'Global_Careers', 'GlobalCareers', 'jobs', 'Jobs',
+    'Recrutement', 'recrutement', 'Candidats',
+    'Site_carriere', 'CareerSite', 'Professional_Careers'
+  ]
+  const subdomains = ['wd3', 'wd1', 'wd5', 'wd103', 'wd12']
+
+  for (const sub of subdomains) {
+    for (const path of paths) {
+      try {
+        const r = await fetch(
+          `https://${slug}.${sub}.myworkdayjobs.com/wday/cxs/${slug}/${path}/jobs`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ limit: 5, offset: 0 })
+          }
+        )
+        if (!r.ok) continue
+        const d = await r.json()
+        const n = d.total || d.jobPostings?.length || 0
+        if (n > 0) return { count: n, subdomain: sub, path }
+      } catch {}
+    }
+  }
+  return { count: 0 }
+}
+
+// ═══ MAIN ═══
+
 async function main() {
   const resultats = []
   const nonTrouves = []
 
-  console.log(`Test de ${ENTREPRISES.length} entreprises...\n`)
+  console.log(`🔍 Test v2 — ${ENTREPRISES.length} entreprises, 13 ATS, 15 variantes de slug\n`)
 
   for (const e of ENTREPRISES) {
     const slugs = e.slug ? [e.slug, ...genererSlugs(e.nom)] : genererSlugs(e.nom)
@@ -78,52 +195,50 @@ async function main() {
     for (const slug of slugs) {
       if (trouve) break
 
-      const gh = await testGreenhouse(slug)
-      if (gh > 0) {
-        resultats.push(`{ id: ${e.id}, nom: '${e.nom}', ats: 'greenhouse', slug: '${slug}' }, // ${gh} offres`)
-        console.log(`✅ ${e.nom} → greenhouse/${slug} (${gh} offres)`)
-        trouve = true
-        break
+      const tests = [
+        ['greenhouse', testGreenhouse],
+        ['lever', testLever],
+        ['smartrecruiters', testSmartRecruiters],
+        ['ashby', testAshby],
+        ['workable', testWorkable],
+        ['recruitee', testRecruitee],
+        ['teamtailor', testTeamtailor],
+        ['personio', testPersonio],
+        ['jazzhr', testJazzHR],
+        ['breezy', testBreezy],
+        ['rippling', testRippling],
+        ['jobvite', testJobvite],
+      ]
+
+      for (const [ats, testFn] of tests) {
+        const n = await testFn(slug)
+        if (n > 0) {
+          resultats.push(`{ id: ${e.id}, nom: "${e.nom.replace(/"/g, '\\"')}", ats: '${ats}', slug: '${slug}' }, // ${n} offres`)
+          console.log(`✅ ${e.nom} → ${ats}/${slug} (${n} offres)`)
+          trouve = true
+          break
+        }
       }
 
-      const lv = await testLever(slug)
-      if (lv > 0) {
-        resultats.push(`{ id: ${e.id}, nom: '${e.nom}', ats: 'lever', slug: '${slug}' }, // ${lv} offres`)
-        console.log(`✅ ${e.nom} → lever/${slug} (${lv} offres)`)
-        trouve = true
-        break
-      }
+      await sleep(50)
+    }
 
-      const sr = await testSmartRecruiters(slug)
-      if (sr > 0) {
-        resultats.push(`{ id: ${e.id}, nom: '${e.nom}', ats: 'smartrecruiters', slug: '${slug}' }, // ${sr} offres`)
-        console.log(`✅ ${e.nom} → smartrecruiters/${slug} (${sr} offres)`)
-        trouve = true
-        break
+    // Si rien trouvé, essayer Workday avec les 2 premiers slugs
+    if (!trouve) {
+      for (const slug of slugs.slice(0, 3)) {
+        const wd = await testWorkday(slug)
+        if (wd.count > 0) {
+          resultats.push(`{ id: ${e.id}, nom: "${e.nom.replace(/"/g, '\\"')}", ats: 'workday', workday_id: '${slug}', workday_path: '${wd.path}', workday_subdomain: '${wd.subdomain}' }, // ${wd.count} offres`)
+          console.log(`✅ ${e.nom} → workday/${slug}/${wd.path} (${wd.count} offres)`)
+          trouve = true
+          break
+        }
       }
-
-      const ab = await testAshby(slug)
-      if (ab > 0) {
-        resultats.push(`{ id: ${e.id}, nom: '${e.nom}', ats: 'ashby', slug: '${slug}' }, // ${ab} offres`)
-        console.log(`✅ ${e.nom} → ashby/${slug} (${ab} offres)`)
-        trouve = true
-        break
-      }
-
-      const wk = await testWorkable(slug)
-      if (wk > 0) {
-        resultats.push(`{ id: ${e.id}, nom: '${e.nom}', ats: 'workable', slug: '${slug}' }, // ${wk} offres`)
-        console.log(`✅ ${e.nom} → workable/${slug} (${wk} offres)`)
-        trouve = true
-        break
-      }
-
-      await sleep(100)
     }
 
     if (!trouve) {
       nonTrouves.push(e.nom)
-      console.log(`❌ ${e.nom} — aucun ATS trouvé`)
+      console.log(`❌ ${e.nom}`)
     }
   }
 
