@@ -1,9 +1,20 @@
 import fetch from 'node-fetch'
 import { ENTREPRISES } from '../api/entreprisesData.js'
 
-const sleep = ms => new Promise(r => setTimeout(r, ms))
+const fetchTimeout = async (url, options = {}, ms = 3000) => {
+  const controller = new AbortController()
+  const t = setTimeout(() => controller.abort(), ms)
+  try {
+    const r = await fetch(url, { ...options, signal: controller.signal })
+    clearTimeout(t)
+    return r
+  } catch {
+    clearTimeout(t)
+    return null
+  }
+}
 
-// Génère beaucoup plus de variantes de slug
+// Génère des variantes de slug à partir du nom
 function genererSlugs(nom) {
   const clean = s => s.toLowerCase()
     .normalize('NFD').replace(/[̀-ͯ]/g, '')
@@ -19,21 +30,8 @@ function genererSlugs(nom) {
   const sansGroupe = clean(nom.replace(/\s*(groupe|group|france|sa|sas|holding)\s*/gi, ''))
 
   return [...new Set([
-    base,
-    tirets,
-    premierMot,
-    sansGroupe,
-    `${base}group`,
-    `${base}groupe`,
-    `${base}fr`,
-    `${base}france`,
-    `${base}careers`,
-    `${base}jobs`,
-    `${base}tech`,
-    `${base}technology`,
-    `${premierMot}group`,
-    `${premierMot}fr`,
-    nom.toUpperCase().replace(/[^A-Z0-9]/g, ''),
+    base, tirets, premierMot, sansGroupe,
+    `${base}group`, `${base}fr`, `${base}careers`, `${premierMot}group`,
   ])].filter(s => s.length >= 2)
 }
 
@@ -41,8 +39,8 @@ function genererSlugs(nom) {
 
 async function testGreenhouse(slug) {
   try {
-    const r = await fetch(`https://boards-api.greenhouse.io/v1/boards/${slug}/jobs`)
-    if (!r.ok) return 0
+    const r = await fetchTimeout(`https://boards-api.greenhouse.io/v1/boards/${slug}/jobs`)
+    if (!r || !r.ok) return 0
     const d = await r.json()
     return d.jobs?.length || 0
   } catch { return 0 }
@@ -50,8 +48,8 @@ async function testGreenhouse(slug) {
 
 async function testLever(slug) {
   try {
-    const r = await fetch(`https://api.lever.co/v0/postings/${slug}?mode=json`)
-    if (!r.ok) return 0
+    const r = await fetchTimeout(`https://api.lever.co/v0/postings/${slug}?mode=json`)
+    if (!r || !r.ok) return 0
     const d = await r.json()
     return Array.isArray(d) ? d.length : 0
   } catch { return 0 }
@@ -59,8 +57,8 @@ async function testLever(slug) {
 
 async function testSmartRecruiters(slug) {
   try {
-    const r = await fetch(`https://api.smartrecruiters.com/v1/companies/${slug}/postings?limit=5`)
-    if (!r.ok) return 0
+    const r = await fetchTimeout(`https://api.smartrecruiters.com/v1/companies/${slug}/postings?limit=5`)
+    if (!r || !r.ok) return 0
     const d = await r.json()
     return d.totalFound || d.content?.length || 0
   } catch { return 0 }
@@ -68,8 +66,8 @@ async function testSmartRecruiters(slug) {
 
 async function testAshby(slug) {
   try {
-    const r = await fetch(`https://api.ashbyhq.com/posting-api/job-board/${slug}`)
-    if (!r.ok) return 0
+    const r = await fetchTimeout(`https://api.ashbyhq.com/posting-api/job-board/${slug}`)
+    if (!r || !r.ok) return 0
     const d = await r.json()
     return d.jobs?.length || 0
   } catch { return 0 }
@@ -77,8 +75,8 @@ async function testAshby(slug) {
 
 async function testWorkable(slug) {
   try {
-    const r = await fetch(`https://apply.workable.com/api/v1/widget/accounts/${slug}?details=true`)
-    if (!r.ok) return 0
+    const r = await fetchTimeout(`https://apply.workable.com/api/v1/widget/accounts/${slug}?details=true`)
+    if (!r || !r.ok) return 0
     const d = await r.json()
     return d.jobs?.length || 0
   } catch { return 0 }
@@ -86,8 +84,8 @@ async function testWorkable(slug) {
 
 async function testRecruitee(slug) {
   try {
-    const r = await fetch(`https://${slug}.recruitee.com/api/offers/`)
-    if (!r.ok) return 0
+    const r = await fetchTimeout(`https://${slug}.recruitee.com/api/offers/`)
+    if (!r || !r.ok) return 0
     const d = await r.json()
     return d.offers?.length || 0
   } catch { return 0 }
@@ -95,8 +93,8 @@ async function testRecruitee(slug) {
 
 async function testTeamtailor(slug) {
   try {
-    const r = await fetch(`https://${slug}.teamtailor.com/jobs.json`)
-    if (!r.ok) return 0
+    const r = await fetchTimeout(`https://${slug}.teamtailor.com/jobs.json`)
+    if (!r || !r.ok) return 0
     const d = await r.json()
     return Array.isArray(d) ? d.length : (d.jobs?.length || 0)
   } catch { return 0 }
@@ -104,8 +102,8 @@ async function testTeamtailor(slug) {
 
 async function testPersonio(slug) {
   try {
-    const r = await fetch(`https://${slug}.jobs.personio.de/search.json`)
-    if (!r.ok) return 0
+    const r = await fetchTimeout(`https://${slug}.jobs.personio.de/search.json`)
+    if (!r || !r.ok) return 0
     const d = await r.json()
     return Array.isArray(d) ? d.length : 0
   } catch { return 0 }
@@ -113,8 +111,8 @@ async function testPersonio(slug) {
 
 async function testJazzHR(slug) {
   try {
-    const r = await fetch(`https://${slug}.applytojob.com/apply/jobs/feed?format=json`)
-    if (!r.ok) return 0
+    const r = await fetchTimeout(`https://${slug}.applytojob.com/apply/jobs/feed?format=json`)
+    if (!r || !r.ok) return 0
     const d = await r.json()
     return Array.isArray(d) ? d.length : 0
   } catch { return 0 }
@@ -122,8 +120,8 @@ async function testJazzHR(slug) {
 
 async function testBreezy(slug) {
   try {
-    const r = await fetch(`https://${slug}.breezy.hr/json`)
-    if (!r.ok) return 0
+    const r = await fetchTimeout(`https://${slug}.breezy.hr/json`)
+    if (!r || !r.ok) return 0
     const d = await r.json()
     return Array.isArray(d) ? d.length : 0
   } catch { return 0 }
@@ -131,8 +129,8 @@ async function testBreezy(slug) {
 
 async function testRippling(slug) {
   try {
-    const r = await fetch(`https://api.rippling.com/platform/api/ats/v1/board/${slug}/jobs`)
-    if (!r.ok) return 0
+    const r = await fetchTimeout(`https://api.rippling.com/platform/api/ats/v1/board/${slug}/jobs`)
+    if (!r || !r.ok) return 0
     const d = await r.json()
     return Array.isArray(d) ? d.length : (d.items?.length || 0)
   } catch { return 0 }
@@ -140,14 +138,14 @@ async function testRippling(slug) {
 
 async function testJobvite(slug) {
   try {
-    const r = await fetch(`https://api.jobvite.com/api/v2/jobFeed?companyId=${slug}`)
-    if (!r.ok) return 0
+    const r = await fetchTimeout(`https://api.jobvite.com/api/v2/jobFeed?companyId=${slug}`)
+    if (!r || !r.ok) return 0
     const d = await r.json()
     return d.requisitions?.length || 0
   } catch { return 0 }
 }
 
-// Workday : teste les chemins les plus courants
+// Workday : teste les chemins les plus courants, par batch de 15 en parallèle
 async function testWorkday(slug) {
   const paths = [
     'External', 'external', 'Careers', 'careers',
@@ -155,14 +153,21 @@ async function testWorkday(slug) {
     `${slug}_Careers`, `${slug}Careers`, `${slug}_External`,
     'Global_Careers', 'GlobalCareers', 'jobs', 'Jobs',
     'Recrutement', 'recrutement', 'Candidats',
-    'Site_carriere', 'CareerSite', 'Professional_Careers'
+    'Site_carriere', 'CareerSite', 'Professional_Careers',
+    `${slug}careers`, 'Experienced', 'Search', 'CareerPortal'
   ]
   const subdomains = ['wd3', 'wd1', 'wd5', 'wd103', 'wd12']
 
+  const combos = []
   for (const sub of subdomains) {
-    for (const path of paths) {
-      try {
-        const r = await fetch(
+    for (const path of paths) combos.push({ sub, path })
+  }
+
+  for (let i = 0; i < combos.length; i += 15) {
+    const batch = combos.slice(i, i + 15)
+    const results = await Promise.all(
+      batch.map(async ({ sub, path }) => {
+        const r = await fetchTimeout(
           `https://${slug}.${sub}.myworkdayjobs.com/wday/cxs/${slug}/${path}/jobs`,
           {
             method: 'POST',
@@ -170,12 +175,16 @@ async function testWorkday(slug) {
             body: JSON.stringify({ limit: 5, offset: 0 })
           }
         )
-        if (!r.ok) continue
-        const d = await r.json()
-        const n = d.total || d.jobPostings?.length || 0
-        if (n > 0) return { count: n, subdomain: sub, path }
-      } catch {}
-    }
+        if (!r || !r.ok) return null
+        try {
+          const d = await r.json()
+          const n = d.total || d.jobPostings?.length || 0
+          return n > 0 ? { count: n, subdomain: sub, path } : null
+        } catch { return null }
+      })
+    )
+    const found = results.find(r => r !== null)
+    if (found) return found
   }
   return { count: 0 }
 }
@@ -186,7 +195,7 @@ async function main() {
   const resultats = []
   const nonTrouves = []
 
-  console.log(`🔍 Test v2 — ${ENTREPRISES.length} entreprises, 13 ATS, 15 variantes de slug\n`)
+  console.log(`🔍 Test v3 — ${ENTREPRISES.length} entreprises, 13 ATS en parallèle, 8 variantes de slug\n`)
 
   for (const e of ENTREPRISES) {
     const slugs = e.slug ? [e.slug, ...genererSlugs(e.nom)] : genererSlugs(e.nom)
@@ -210,20 +219,20 @@ async function main() {
         ['jobvite', testJobvite],
       ]
 
-      for (const [ats, testFn] of tests) {
-        const n = await testFn(slug)
-        if (n > 0) {
-          resultats.push(`{ id: ${e.id}, nom: "${e.nom.replace(/"/g, '\\"')}", ats: '${ats}', slug: '${slug}' }, // ${n} offres`)
-          console.log(`✅ ${e.nom} → ${ats}/${slug} (${n} offres)`)
-          trouve = true
-          break
-        }
-      }
+      const resultatsTests = await Promise.all(
+        tests.map(async ([ats, fn]) => ({ ats, count: await fn(slug) }))
+      )
 
-      await sleep(50)
+      const gagnant = resultatsTests.find(r => r.count > 0)
+      if (gagnant) {
+        resultats.push(`{ id: ${e.id}, nom: "${e.nom.replace(/"/g, '\\"')}", ats: '${gagnant.ats}', slug: '${slug}' }, // ${gagnant.count} offres`)
+        console.log(`✅ ${e.nom} → ${gagnant.ats}/${slug} (${gagnant.count} offres)`)
+        trouve = true
+        break
+      }
     }
 
-    // Si rien trouvé, essayer Workday avec les 2 premiers slugs
+    // Si rien trouvé, essayer Workday avec les 3 premiers slugs
     if (!trouve) {
       for (const slug of slugs.slice(0, 3)) {
         const wd = await testWorkday(slug)
