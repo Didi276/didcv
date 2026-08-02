@@ -220,7 +220,7 @@ async function main() {
   console.log(`🔍 Test v3 — ${ENTREPRISES.length} entreprises, 13 ATS en parallèle, 8 variantes de slug\n`)
 
   const tranche = ENTREPRISES.slice(START, END)
-  console.log(`Traitement entreprises ${START} à ${END} (${tranche.length})`)
+  console.log(`Traitement entreprises ${START} à ${END} (${tranche.length} entreprises)`)
   for (const e of tranche) {
     const slugs = e.slug ? [e.slug, ...genererSlugs(e.nom)] : genererSlugs(e.nom)
     let trouve = false
