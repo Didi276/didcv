@@ -291,6 +291,52 @@ async function scrapeTeamtailor(slug, nom) {
   } catch { return [] }
 }
 
+async function scrapePersonio(slug, nom) {
+  try {
+    const r = await fetch(`https://${slug}.jobs.personio.de/search.json`)
+    if (!r.ok) return []
+    const d = await r.json()
+    const jobs = Array.isArray(d) ? d : []
+    return jobs.map(job => ({
+      titre: job.name || '',
+      entreprise: nom,
+      lieu: job.office || 'France',
+      description: '',
+      url_candidature: `https://${slug}.jobs.personio.de/job/${job.id}`,
+      date_publication: job.createdAt || new Date().toISOString(),
+      type_contrat: job.employmentType || '',
+      departement: job.department || '',
+      ats_source: 'personio',
+      hash: Buffer.from(`${job.name}-${nom}-${job.id}`).toString('base64').slice(0, 32),
+      actif: true,
+      date_scraping: new Date().toISOString()
+    }))
+  } catch { return [] }
+}
+
+async function scrapeRippling(slug, nom) {
+  try {
+    const r = await fetch(`https://api.rippling.com/platform/api/ats/v1/board/${slug}/jobs`)
+    if (!r.ok) return []
+    const d = await r.json()
+    const jobs = Array.isArray(d) ? d : (d.items || [])
+    return jobs.map(job => ({
+      titre: job.name || job.title || '',
+      entreprise: nom,
+      lieu: job.workLocation?.label || 'France',
+      description: '',
+      url_candidature: job.url || `https://ats.rippling.com/${slug}/jobs/${job.uuid}`,
+      date_publication: new Date().toISOString(),
+      type_contrat: job.employmentType || '',
+      departement: job.department?.label || '',
+      ats_source: 'rippling',
+      hash: Buffer.from(`${job.name || job.title}-${nom}`).toString('base64').slice(0, 32),
+      actif: true,
+      date_scraping: new Date().toISOString()
+    }))
+  } catch { return [] }
+}
+
 async function main() {
   console.log(`Démarrage scraping — ${ENTREPRISES.length} entreprises`)
   let totalOffres = 0
@@ -327,6 +373,10 @@ async function main() {
         offres = await scrapeRecruitee(e.slug, e.nom)
       } else if (e.ats === 'teamtailor' && e.slug) {
         offres = await scrapeTeamtailor(e.slug, e.nom)
+      } else if (e.ats === 'personio' && e.slug) {
+        offres = await scrapePersonio(e.slug, e.nom)
+      } else if (e.ats === 'rippling' && e.slug) {
+        offres = await scrapeRippling(e.slug, e.nom)
       }
     } catch (err) {
       console.error(`Erreur ${e.nom}:`, err.message)
