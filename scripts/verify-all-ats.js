@@ -148,6 +148,25 @@ async function testJobvite(slug) {
   } catch { return 0 }
 }
 
+async function testTalentsoft(slug) {
+  const urls = [
+    `https://${slug}-career.talent-soft.com/offre-de-emploi/flux-rss.aspx`,
+    `https://${slug}.talent-soft.com/offre-de-emploi/flux-rss.aspx`,
+    `https://recrute.${slug}.org/offre-de-emploi/flux-rss.aspx`,
+    `https://recrute.${slug}.com/offre-de-emploi/flux-rss.aspx`,
+  ]
+  for (const url of urls) {
+    try {
+      const r = await fetchTimeout(url)
+      if (!r || !r.ok) continue
+      const xml = await r.text()
+      const count = (xml.match(/<item>/g) || []).length
+      if (count > 0) return count
+    } catch {}
+  }
+  return 0
+}
+
 // Workday : teste les chemins les plus courants, par batch de 15 en parallèle
 async function testWorkday(slug) {
   const paths = [
@@ -222,6 +241,7 @@ async function main() {
         ['breezy', testBreezy],
         ['rippling', testRippling],
         ['jobvite', testJobvite],
+        ['talentsoft', testTalentsoft],
       ]
 
       const resultatsTests = await Promise.all(

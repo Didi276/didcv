@@ -337,6 +337,56 @@ async function scrapeRippling(slug, nom) {
   } catch { return [] }
 }
 
+async function scrapeTalentsoft(slug, nom) {
+  const urls = [
+    `https://${slug}-career.talent-soft.com/offre-de-emploi/flux-rss.aspx`,
+    `https://${slug}.talent-soft.com/offre-de-emploi/flux-rss.aspx`,
+    `https://recrute.${slug}.org/offre-de-emploi/flux-rss.aspx`,
+    `https://recrute.${slug}.com/offre-de-emploi/flux-rss.aspx`,
+  ]
+
+  for (const url of urls) {
+    try {
+      const r = await fetch(url, {
+        headers: { 'User-Agent': 'DidCV-JobAggregator/1.0 (contact@didcv.fr)' }
+      })
+      if (!r.ok) continue
+      const xml = await r.text()
+      if (!xml.includes('<item')) continue
+
+      const offres = []
+      const items = xml.split('<item>').slice(1)
+
+      for (const item of items) {
+        const titre = (item.match(/<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/s) || [])[1]
+        const lien = (item.match(/<link>(.*?)<\/link>/s) || [])[1]
+        const desc = (item.match(/<description>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/description>/s) || [])[1]
+        const date = (item.match(/<pubDate>(.*?)<\/pubDate>/s) || [])[1]
+
+        if (!titre) continue
+
+        offres.push({
+          titre: titre.trim(),
+          entreprise: nom,
+          lieu: 'France',
+          description: (desc || '').replace(/<[^>]*>/g, '').slice(0, 800),
+          url_candidature: (lien || '').trim(),
+          date_publication: date ? new Date(date).toISOString() : new Date().toISOString(),
+          type_contrat: '',
+          departement: '',
+          ats_source: 'talentsoft_rss',
+          hash: Buffer.from(`${titre.trim()}-${nom}`).toString('base64').slice(0, 32),
+          actif: true,
+          date_scraping: new Date().toISOString()
+        })
+      }
+
+      if (offres.length > 0) return offres
+    } catch {}
+  }
+  return []
+}
+
 async function main() {
   console.log(`Démarrage scraping — ${ENTREPRISES.length} entreprises`)
   let totalOffres = 0
@@ -377,6 +427,8 @@ async function main() {
         offres = await scrapePersonio(e.slug, e.nom)
       } else if (e.ats === 'rippling' && e.slug) {
         offres = await scrapeRippling(e.slug, e.nom)
+      } else if (e.ats === 'talentsoft' && e.slug) {
+        offres = await scrapeTalentsoft(e.slug, e.nom)
       }
     } catch (err) {
       console.error(`Erreur ${e.nom}:`, err.message)
