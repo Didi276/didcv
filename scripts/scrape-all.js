@@ -338,47 +338,76 @@ async function scrapeRippling(slug, nom) {
 }
 
 async function scrapeTalentsoft(slug, nom) {
-  const urls = [
-    `https://${slug}-career.talent-soft.com/offre-de-emploi/flux-rss.aspx`,
-    `https://${slug}.talent-soft.com/offre-de-emploi/flux-rss.aspx`,
-    `https://recrute.${slug}.org/offre-de-emploi/flux-rss.aspx`,
-    `https://recrute.${slug}.com/offre-de-emploi/flux-rss.aspx`,
+  const bases = [
+    `https://${slug}-career.talent-soft.com`,
+    `https://${slug}.talent-soft.com`,
+    `https://recrute.${slug}.com`,
+    `https://recrute.${slug}.fr`,
+    `https://recrute.${slug}.org`,
+    `https://carriere.${slug}.com`,
+    `https://carrieres.${slug}.com`,
   ]
 
-  for (const url of urls) {
+  for (const base of bases) {
     try {
-      const r = await fetch(url, {
+      // 1. Récupérer la page des flux RSS
+      const listUrl = `${base}/offre-de-emploi/tous-les-flux-rss.aspx`
+      const r = await fetch(listUrl, {
         headers: { 'User-Agent': 'DidCV-JobAggregator/1.0 (contact@didcv.fr)' }
       })
       if (!r.ok) continue
-      const xml = await r.text()
-      if (!xml.includes('<item')) continue
+      const html = await r.text()
 
+      // 2. Extraire les URLs des flux RSS
+      const fluxUrls = [...new Set(
+        (html.match(/href="([^"]*flux-rss[^"]*\.aspx[^"]*)"/g) || [])
+          .map(m => m.match(/href="([^"]+)"/)[1])
+          .map(u => u.startsWith('http') ? u : new URL(u, base).href)
+      )].slice(0, 5)
+
+      if (fluxUrls.length === 0) continue
+
+      // 3. Parser chaque flux RSS
       const offres = []
-      const items = xml.split('<item>').slice(1)
+      const vus = new Set()
 
-      for (const item of items) {
-        const titre = (item.match(/<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/s) || [])[1]
-        const lien = (item.match(/<link>(.*?)<\/link>/s) || [])[1]
-        const desc = (item.match(/<description>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/description>/s) || [])[1]
-        const date = (item.match(/<pubDate>(.*?)<\/pubDate>/s) || [])[1]
+      for (const fluxUrl of fluxUrls) {
+        try {
+          const fr = await fetch(fluxUrl, {
+            headers: { 'User-Agent': 'DidCV-JobAggregator/1.0 (contact@didcv.fr)' }
+          })
+          if (!fr.ok) continue
+          const xml = await fr.text()
+          if (!xml.includes('<item')) continue
 
-        if (!titre) continue
+          const items = xml.split('<item>').slice(1)
+          for (const item of items) {
+            const titre = (item.match(/<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/s) || [])[1]
+            const lien = (item.match(/<link>(.*?)<\/link>/s) || [])[1]
+            const desc = (item.match(/<description>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/description>/s) || [])[1]
+            const date = (item.match(/<pubDate>(.*?)<\/pubDate>/s) || [])[1]
 
-        offres.push({
-          titre: titre.trim(),
-          entreprise: nom,
-          lieu: 'France',
-          description: (desc || '').replace(/<[^>]*>/g, '').slice(0, 800),
-          url_candidature: (lien || '').trim(),
-          date_publication: date ? new Date(date).toISOString() : new Date().toISOString(),
-          type_contrat: '',
-          departement: '',
-          ats_source: 'talentsoft_rss',
-          hash: Buffer.from(`${titre.trim()}-${nom}`).toString('base64').slice(0, 32),
-          actif: true,
-          date_scraping: new Date().toISOString()
-        })
+            if (!titre) continue
+            const titreClean = titre.replace(/&amp;/g, '&').trim()
+            if (vus.has(titreClean)) continue
+            vus.add(titreClean)
+
+            offres.push({
+              titre: titreClean,
+              entreprise: nom,
+              lieu: 'France',
+              description: (desc || '').replace(/<[^>]*>/g, '').slice(0, 800),
+              url_candidature: (lien || '').trim(),
+              date_publication: date ? new Date(date).toISOString() : new Date().toISOString(),
+              type_contrat: '',
+              departement: '',
+              ats_source: 'talentsoft',
+              hash: Buffer.from(`${titreClean}-${nom}`).toString('base64').slice(0, 32),
+              actif: true,
+              date_scraping: new Date().toISOString()
+            })
+          }
+        } catch {}
       }
 
       if (offres.length > 0) return offres

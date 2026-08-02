@@ -150,21 +150,31 @@ async function testJobvite(slug) {
 
 async function testTalentsoft(slug) {
   const urls = [
-    `https://${slug}-career.talent-soft.com/offre-de-emploi/flux-rss.aspx`,
-    `https://${slug}.talent-soft.com/offre-de-emploi/flux-rss.aspx`,
-    `https://recrute.${slug}.org/offre-de-emploi/flux-rss.aspx`,
-    `https://recrute.${slug}.com/offre-de-emploi/flux-rss.aspx`,
+    `https://${slug}-career.talent-soft.com/offre-de-emploi/tous-les-flux-rss.aspx`,
+    `https://${slug}.talent-soft.com/offre-de-emploi/tous-les-flux-rss.aspx`,
+    `https://recrute.${slug}.com/offre-de-emploi/tous-les-flux-rss.aspx`,
+    `https://recrute.${slug}.fr/offre-de-emploi/tous-les-flux-rss.aspx`,
+    `https://recrute.${slug}.org/offre-de-emploi/tous-les-flux-rss.aspx`,
+    `https://carriere.${slug}.com/offre-de-emploi/tous-les-flux-rss.aspx`,
+    `https://carrieres.${slug}.com/offre-de-emploi/tous-les-flux-rss.aspx`,
+    `https://emploi.${slug}.com/offre-de-emploi/tous-les-flux-rss.aspx`,
+    `https://jobs.${slug}.com/offre-de-emploi/tous-les-flux-rss.aspx`,
+    `https://${slug}-career.talent-soft.com/offre-de-emploi/liste-offres.aspx`,
   ]
+
   for (const url of urls) {
-    try {
-      const r = await fetchTimeout(url)
-      if (!r || !r.ok) continue
-      const xml = await r.text()
-      const count = (xml.match(/<item>/g) || []).length
-      if (count > 0) return count
-    } catch {}
+    const r = await fetchTimeout(url)
+    if (!r || !r.ok) continue
+    const contenu = await r.text()
+
+    // Compter les flux RSS disponibles ou les offres
+    const fluxMatches = contenu.match(/flux-rss[^"]*\.aspx/g)
+    const offreMatches = contenu.match(/offre-de-emploi\/emploi-[^"]+/g)
+
+    const n = (offreMatches?.length || 0) || (fluxMatches?.length || 0)
+    if (n > 0) return { count: n, url }
   }
-  return 0
+  return { count: 0 }
 }
 
 // Workday : teste les chemins les plus courants, par batch de 15 en parallèle
@@ -241,7 +251,7 @@ async function main() {
         ['breezy', testBreezy],
         ['rippling', testRippling],
         ['jobvite', testJobvite],
-        ['talentsoft', testTalentsoft],
+        ['talentsoft', async (slug) => (await testTalentsoft(slug)).count],
       ]
 
       const resultatsTests = await Promise.all(

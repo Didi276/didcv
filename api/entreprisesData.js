@@ -106,7 +106,7 @@ export const ENTREPRISES = [
   { id: 91, nom: 'TotalEnergies', secteur: 'Énergie', ats: 'successfactors', slug: 'totalenergies', careers_url: 'https://totalenergies.com/fr/carrieres' },
   { id: 92, nom: 'Airbus', secteur: 'Aéronautique', ats: 'successfactors', slug: 'airbus', careers_url: 'https://www.airbus.com/fr/carrieres' },
   { id: 93, nom: 'Renault', secteur: 'Automobile', ats: 'successfactors', slug: 'renault', careers_url: 'https://www.renault.com/fr/carrieres.html' },
-  { id: 94, nom: 'Orange', secteur: 'Télécoms', ats: 'successfactors', slug: 'orange', careers_url: 'https://orange.jobs' },
+  { id: 94, nom: 'Orange', secteur: 'Télécoms', ats: 'talentsoft', slug: 'orange', careers_url: 'https://orange-career.talent-soft.com' },
   { id: 95, nom: 'Arkema', secteur: 'Chimie', ats: 'successfactors', slug: 'arkema', careers_url: 'https://www.arkema.com/fr/carrieres' },
   { id: 96, nom: 'Alstom', secteur: 'Transport ferroviaire', ats: 'successfactors', slug: 'alstom', careers_url: 'https://www.alstom.com/fr/carrieres' },
   { id: 97, nom: 'Deloitte France', secteur: 'Conseil/Audit', ats: 'workday', slug: 'deloitte', careers_url: 'https://www.deloitte.com/fr/fr/careers.html' },
@@ -259,6 +259,8 @@ export const ENTREPRISES = [
   { id: 226, nom: 'Cultura', secteur: 'Commerce/Culture', ats: 'personio', slug: 'cultura', careers_url: 'https://cultura.wd3.myworkdayjobs.com' },
   { id: 227, nom: 'La Mutuelle Générale', secteur: 'Assurance', ats: 'workday', workday_id: 'lmg', workday_path: 'LMG', careers_url: 'https://lmg.wd3.myworkdayjobs.com' },
   { id: 228, nom: 'Abeille Assurances', secteur: 'Assurance', ats: 'workday', workday_id: 'abeilleassurances', workday_path: 'External', workday_subdomain: 'wd103', careers_url: 'https://abeilleassurances.wd3.myworkdayjobs.com' },
+  { id: 229, nom: 'Carglass', secteur: 'Automobile', ats: 'talentsoft', slug: 'carglass', careers_url: 'https://carglass-career.talent-soft.com' },
+  { id: 230, nom: 'AGIRC-ARRCO', secteur: 'Retraite', ats: 'talentsoft', slug: 'agirc-arrco', careers_url: 'https://agirc-arrco-career.talent-soft.com' },
 ]
 
 export const ATS_TYPES = ['greenhouse', 'lever', 'smartrecruiters', 'workday', 'successfactors', 'custom', 'taleo']
