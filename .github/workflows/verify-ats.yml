@@ -1,6 +1,15 @@
 name: Vérification ATS entreprises
 on:
   workflow_dispatch:
+    inputs:
+      start:
+        description: 'Index de début'
+        required: false
+        default: '0'
+      end:
+        description: 'Index de fin'
+        required: false
+        default: '80'
 
 jobs:
   verify:
@@ -13,3 +22,6 @@ jobs:
           node-version: '20'
       - run: npm install node-fetch
       - run: node scripts/verify-all-ats.js
+        env:
+          START: ${{ inputs.start }}
+          END: ${{ inputs.end }}

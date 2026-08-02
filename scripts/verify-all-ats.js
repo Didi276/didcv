@@ -1,6 +1,9 @@
 import fetch from 'node-fetch'
 import { ENTREPRISES } from '../api/entreprisesData.js'
 
+const START = parseInt(process.env.START || '0')
+const END = parseInt(process.env.END || '999')
+
 const fetchTimeout = async (url, options = {}, ms = 3000) => {
   const controller = new AbortController()
   const t = setTimeout(() => controller.abort(), ms)
@@ -197,7 +200,9 @@ async function main() {
 
   console.log(`🔍 Test v3 — ${ENTREPRISES.length} entreprises, 13 ATS en parallèle, 8 variantes de slug\n`)
 
-  for (const e of ENTREPRISES) {
+  const tranche = ENTREPRISES.slice(START, END)
+  console.log(`Traitement entreprises ${START} à ${END} (${tranche.length})`)
+  for (const e of tranche) {
     const slugs = e.slug ? [e.slug, ...genererSlugs(e.nom)] : genererSlugs(e.nom)
     let trouve = false
 
