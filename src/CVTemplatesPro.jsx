@@ -1439,6 +1439,1372 @@ function Contraste({ cvData, color }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// TEMPLATE 11 : HORIZON — Bandeau latéral fin
+// ═══════════════════════════════════════════════════════════════════
+function Horizon({ cvData, color }) {
+  const experiences = cvData.experiences || []
+  const formations = cvData.formations || []
+  const competences = cvData.competences || []
+  const langues = cvData.langues || []
+  const certifications = cvData.certifications || []
+  const centresInteret = cvData.centres_interet || []
+  const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+
+  const sectionTitle = { fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px', color: '#18181b' }
+  const sectionRule = { height: '1px', background: '#e4e4e7', width: '100%', marginTop: '7px', marginBottom: '18px' }
+
+  return (
+    <div id="cv-to-print" style={{
+      width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, display: 'flex',
+      fontFamily: '"Inter", sans-serif', overflow: 'hidden', boxSizing: 'border-box',
+    }}>
+      <div style={{ width: '68px', flexShrink: 0, background: color, boxSizing: 'border-box' }}>
+        {initiales && (
+          <div style={{
+            writingMode: 'vertical-rl', textOrientation: 'mixed',
+            fontSize: '22px', fontWeight: 700, color: 'rgba(255,255,255,0.9)',
+            letterSpacing: '4px', marginTop: '44px', marginLeft: '22px',
+          }}>
+            {initiales}
+          </div>
+        )}
+      </div>
+      <div style={{ flex: 1, background: '#ffffff', padding: '48px 52px 48px 44px', boxSizing: 'border-box', minWidth: 0 }}>
+        <div style={{ marginBottom: '30px' }}>
+          <div style={{ fontSize: '30px', fontWeight: 700, color: '#18181b', letterSpacing: '-0.6px' }}>
+            {cvData.prenom} {cvData.nom}
+          </div>
+          {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 400, color, marginTop: '5px' }}>{cvData.titre}</div>}
+          {contacts.length > 0 && (
+            <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', fontSize: '10.5px', color: '#71717a', marginTop: '16px' }}>
+              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+            </div>
+          )}
+        </div>
+
+        {cvData.accroche && (
+          <div style={{ fontSize: '11.5px', lineHeight: 1.7, color: '#3f3f46', marginBottom: '30px' }}>
+            {cvData.accroche}
+          </div>
+        )}
+
+        {experiences.length > 0 && (
+          <div style={{ marginBottom: '30px' }}>
+            <div style={sectionTitle}>Expériences</div>
+            <div style={sectionRule} />
+            {experiences.map((exp, i) => (
+              <div key={i} style={{ marginBottom: i < experiences.length - 1 ? '22px' : 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#18181b' }}>{exp.poste}</div>
+                  <div style={{ fontSize: '10px', color: '#a1a1aa' }}>{exp.periode}</div>
+                </div>
+                <div style={{ fontSize: '11.5px', fontWeight: 500, color, marginTop: '3px', marginBottom: '8px' }}>
+                  {[exp.entreprise, exp.lieu].filter(Boolean).join(' · ')}
+                </div>
+                {exp.missions?.length > 0 && (
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                    {exp.missions.map((m, j) => (
+                      <li key={j} style={{ position: 'relative', paddingLeft: '14px', fontSize: '10.5px', lineHeight: 1.6, color: '#52525b', marginBottom: '4px' }}>
+                        <span style={{ position: 'absolute', left: 0, top: '6px', width: '3px', height: '3px', background: color }} />
+                        {m}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {formations.length > 0 && (
+          <div style={{ marginBottom: '30px' }}>
+            <div style={sectionTitle}>Formations</div>
+            <div style={sectionRule} />
+            {formations.map((f, i) => (
+              <div key={i} style={{ marginBottom: i < formations.length - 1 ? '22px' : 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#18181b' }}>{f.diplome}</div>
+                  <div style={{ fontSize: '10px', color: '#a1a1aa' }}>{f.periode}</div>
+                </div>
+                <div style={{ fontSize: '11.5px', fontWeight: 500, color, marginTop: '3px' }}>
+                  {[f.etablissement, f.mention].filter(Boolean).join(' — ')}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {competences.length > 0 && (
+          <div style={{ marginBottom: '30px' }}>
+            <div style={sectionTitle}>Compétences</div>
+            <div style={sectionRule} />
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {competences.map((c, i) => (
+                <span key={i} style={{ padding: '5px 12px', background: '#f9fafb', border: '1px solid #f3f4f6', borderRadius: '3px', fontSize: '10.5px', fontWeight: 500, color: '#3f3f46' }}>
+                  {c}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {langues.length > 0 && (
+          <div style={{ marginBottom: certifications.length || centresInteret.length ? '30px' : 0 }}>
+            <div style={sectionTitle}>Langues</div>
+            <div style={sectionRule} />
+            {langues.map((l, i) => (
+              <div key={i} style={{ fontSize: '11px', marginBottom: '5px' }}>
+                <span style={{ fontWeight: 600, color: '#18181b' }}>{l.langue}</span>
+                <span style={{ color: '#71717a' }}> — {l.niveau}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {certifications.length > 0 && (
+          <div style={{ marginBottom: centresInteret.length ? '30px' : 0 }}>
+            <div style={sectionTitle}>Certifications</div>
+            <div style={sectionRule} />
+            {certifications.map((c, i) => (
+              <div key={i} style={{ fontSize: '11px', color: '#3f3f46', marginBottom: '5px' }}>
+                <span style={{ fontWeight: 600 }}>{c.titre}</span>
+                {c.organisme && <span style={{ color: '#71717a' }}> — {c.organisme}</span>}
+                {c.annee && <span style={{ color: '#a1a1aa' }}> ({c.annee})</span>}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {centresInteret.length > 0 && (
+          <div>
+            <div style={sectionTitle}>Centres d'intérêt</div>
+            <div style={sectionRule} />
+            <div style={{ fontSize: '11px', color: '#3f3f46' }}>{centresInteret.join(' · ')}</div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TEMPLATE 12 : PALIER — Sections en escalier
+// ═══════════════════════════════════════════════════════════════════
+function Palier({ cvData, color }) {
+  const experiences = cvData.experiences || []
+  const formations = cvData.formations || []
+  const competences = cvData.competences || []
+  const langues = cvData.langues || []
+  const certifications = cvData.certifications || []
+  const centresInteret = cvData.centres_interet || []
+  const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+
+  const sectionTitle = { fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.8px', color, marginBottom: '16px' }
+
+  return (
+    <div id="cv-to-print" style={{
+      width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
+      padding: '46px 54px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
+    }}>
+      <div style={{ fontSize: '31px', fontWeight: 700, color: '#0c0a09' }}>{cvData.prenom} {cvData.nom}</div>
+      {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 400, color: '#78716c', marginTop: '5px' }}>{cvData.titre}</div>}
+      {contacts.length > 0 && (
+        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', fontSize: '10.5px', color: '#78716c', marginTop: '15px' }}>
+          {contacts.map((c, i) => <span key={i}>{c}</span>)}
+        </div>
+      )}
+      <div style={{ height: '4px', background: color, width: '100%', marginTop: '24px', marginBottom: '30px' }} />
+
+      {cvData.accroche && (
+        <div style={{ marginBottom: '32px' }}>
+          <div style={sectionTitle}>Profil</div>
+          <div style={{ fontSize: '11.5px', lineHeight: 1.7, color: '#44403c' }}>{cvData.accroche}</div>
+        </div>
+      )}
+
+      {experiences.length > 0 && (
+        <div style={{ paddingLeft: '20px', borderLeft: `2px solid ${color}20`, marginBottom: '32px' }}>
+          <div style={sectionTitle}>Expériences</div>
+          {experiences.map((exp, i) => (
+            <div key={i} style={{ marginBottom: i < experiences.length - 1 ? '20px' : 0 }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#0c0a09' }}>{exp.poste}</div>
+              <div style={{ fontSize: '11px', color: '#78716c', marginTop: '3px', marginBottom: '8px' }}>
+                {[exp.entreprise, exp.periode].filter(Boolean).join(' · ')}
+              </div>
+              {exp.missions?.length > 0 && (
+                <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                  {exp.missions.map((m, j) => (
+                    <li key={j} style={{ position: 'relative', paddingLeft: '14px', fontSize: '10.5px', lineHeight: 1.6, color: '#44403c', marginBottom: '4px' }}>
+                      <span style={{ position: 'absolute', left: 0, color }}>—</span>
+                      {m}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {formations.length > 0 && (
+        <div style={{ paddingLeft: '40px', borderLeft: `2px solid ${color}40`, marginBottom: '32px' }}>
+          <div style={sectionTitle}>Formations</div>
+          {formations.map((f, i) => (
+            <div key={i} style={{ marginBottom: i < formations.length - 1 ? '16px' : 0 }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#0c0a09' }}>{f.diplome}</div>
+              <div style={{ fontSize: '11px', color: '#78716c', marginTop: '3px' }}>
+                {[f.etablissement, f.periode].filter(Boolean).join(' · ')}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {competences.length > 0 && (
+        <div style={{ paddingLeft: '20px', borderLeft: `2px solid ${color}20`, marginBottom: '32px' }}>
+          <div style={sectionTitle}>Compétences</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            {competences.map((c, i) => (
+              <span key={i} style={{ padding: '5px 12px', background: '#fafaf9', border: '1px solid #f5f5f4', borderRadius: '3px', fontSize: '10.5px', fontWeight: 500, color: '#44403c' }}>
+                {c}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {langues.length > 0 && (
+        <div style={{ marginBottom: certifications.length || centresInteret.length ? '32px' : 0 }}>
+          <div style={sectionTitle}>Langues</div>
+          {langues.map((l, i) => (
+            <div key={i} style={{ fontSize: '11px', marginBottom: '5px' }}>
+              <span style={{ fontWeight: 600, color: '#0c0a09' }}>{l.langue}</span>
+              <span style={{ color: '#78716c' }}> — {l.niveau}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {certifications.length > 0 && (
+        <div style={{ marginBottom: centresInteret.length ? '32px' : 0 }}>
+          <div style={sectionTitle}>Certifications</div>
+          {certifications.map((c, i) => (
+            <div key={i} style={{ fontSize: '11px', color: '#44403c', marginBottom: '5px' }}>
+              <span style={{ fontWeight: 600 }}>{c.titre}</span>
+              {c.organisme && <span style={{ color: '#78716c' }}> — {c.organisme}</span>}
+              {c.annee && <span style={{ color: '#a8a29e' }}> ({c.annee})</span>}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {centresInteret.length > 0 && (
+        <div>
+          <div style={sectionTitle}>Centres d'intérêt</div>
+          <div style={{ fontSize: '11px', color: '#44403c' }}>{centresInteret.join(' · ')}</div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TEMPLATE 13 : DOSSIER — Style rapport professionnel
+// ═══════════════════════════════════════════════════════════════════
+function Dossier({ cvData, color }) {
+  const experiences = cvData.experiences || []
+  const formations = cvData.formations || []
+  const competences = cvData.competences || []
+  const langues = cvData.langues || []
+  const certifications = cvData.certifications || []
+  const centresInteret = cvData.centres_interet || []
+  const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+
+  let numero = 0
+  const SectionBar = ({ label }) => {
+    numero += 1
+    return (
+      <div style={{ background: '#fafafa', padding: '9px 14px', borderLeft: `4px solid ${color}`, marginBottom: '18px', display: 'flex', alignItems: 'center' }}>
+        <span style={{ fontSize: '11px', fontWeight: 700, color, marginRight: '10px' }}>{String(numero).padStart(2, '0')}</span>
+        <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#18181b' }}>{label}</span>
+      </div>
+    )
+  }
+
+  return (
+    <div id="cv-to-print" style={{
+      width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
+      padding: '50px 56px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
+    }}>
+      <div style={{ border: '2px solid #18181b', padding: '26px 30px', marginBottom: '32px' }}>
+        <div style={{ fontSize: '28px', fontWeight: 700, color: '#18181b' }}>{cvData.prenom} {cvData.nom}</div>
+        {cvData.titre && (
+          <div style={{ fontSize: '13px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1.5px', color, marginTop: '6px' }}>
+            {cvData.titre}
+          </div>
+        )}
+        <div style={{ height: '1px', background: '#e4e4e7', marginTop: '16px', marginBottom: '14px' }} />
+        {contacts.length > 0 && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', fontSize: '10px', color: '#52525b' }}>
+            {contacts.map((c, i) => <div key={i}>{c}</div>)}
+          </div>
+        )}
+      </div>
+
+      {experiences.length > 0 && (
+        <div style={{ marginBottom: '28px' }}>
+          <SectionBar label="Expériences" />
+          <div style={{ paddingLeft: '14px' }}>
+            {experiences.map((exp, i) => (
+              <div key={i} style={{ marginBottom: i < experiences.length - 1 ? '20px' : 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#18181b' }}>{exp.poste}</div>
+                  <div style={{ fontSize: '10px', color: '#a1a1aa' }}>{exp.periode}</div>
+                </div>
+                <div style={{ fontSize: '11.5px', fontWeight: 500, color: '#52525b', marginTop: '2px', marginBottom: '6px' }}>
+                  {[exp.entreprise, exp.lieu].filter(Boolean).join(' · ')}
+                </div>
+                {exp.missions?.length > 0 && (
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                    {exp.missions.map((m, j) => (
+                      <li key={j} style={{ position: 'relative', paddingLeft: '14px', fontSize: '10.5px', lineHeight: 1.6, color: '#52525b', marginBottom: '4px' }}>
+                        <span style={{ position: 'absolute', left: 0, color }}>▪</span>
+                        {m}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {formations.length > 0 && (
+        <div style={{ marginBottom: '28px' }}>
+          <SectionBar label="Formations" />
+          <div style={{ paddingLeft: '14px' }}>
+            {formations.map((f, i) => (
+              <div key={i} style={{ marginBottom: i < formations.length - 1 ? '14px' : 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#18181b' }}>{f.diplome}</div>
+                  <div style={{ fontSize: '10px', color: '#a1a1aa' }}>{f.periode}</div>
+                </div>
+                <div style={{ fontSize: '11.5px', fontWeight: 500, color: '#52525b', marginTop: '2px' }}>{f.etablissement}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {competences.length > 0 && (
+        <div style={{ marginBottom: '28px' }}>
+          <SectionBar label="Compétences" />
+          <div style={{ paddingLeft: '14px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            {competences.map((c, i) => (
+              <span key={i} style={{ padding: '5px 12px', background: '#fafafa', border: '1px solid #f4f4f5', borderRadius: '3px', fontSize: '10.5px', fontWeight: 500, color: '#3f3f46' }}>
+                {c}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {langues.length > 0 && (
+        <div style={{ marginBottom: certifications.length || centresInteret.length ? '28px' : 0 }}>
+          <SectionBar label="Langues" />
+          <div style={{ paddingLeft: '14px' }}>
+            {langues.map((l, i) => (
+              <div key={i} style={{ fontSize: '11px', marginBottom: '5px' }}>
+                <span style={{ fontWeight: 600, color: '#18181b' }}>{l.langue}</span>
+                <span style={{ color: '#52525b' }}> — {l.niveau}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {certifications.length > 0 && (
+        <div style={{ marginBottom: centresInteret.length ? '28px' : 0 }}>
+          <SectionBar label="Certifications" />
+          <div style={{ paddingLeft: '14px' }}>
+            {certifications.map((c, i) => (
+              <div key={i} style={{ fontSize: '11px', color: '#3f3f46', marginBottom: '5px' }}>
+                <span style={{ fontWeight: 600 }}>{c.titre}</span>
+                {c.organisme && <span style={{ color: '#71717a' }}> — {c.organisme}</span>}
+                {c.annee && <span style={{ color: '#a1a1aa' }}> ({c.annee})</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {centresInteret.length > 0 && (
+        <div>
+          <SectionBar label="Centres d'intérêt" />
+          <div style={{ paddingLeft: '14px', fontSize: '11px', color: '#3f3f46' }}>{centresInteret.join(' · ')}</div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TEMPLATE 14 : AURORE — Dégradé subtil en header
+// ═══════════════════════════════════════════════════════════════════
+function Aurore({ cvData, color }) {
+  const experiences = cvData.experiences || []
+  const formations = cvData.formations || []
+  const competences = cvData.competences || []
+  const langues = cvData.langues || []
+  const certifications = cvData.certifications || []
+  const centresInteret = cvData.centres_interet || []
+  const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+
+  const sectionTitle = { fontSize: '11.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.8px', color }
+  const sectionRule = { height: '3px', background: color, width: '28px', marginTop: '7px', marginBottom: '18px' }
+
+  return (
+    <div id="cv-to-print" style={{
+      width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
+      fontFamily: '"Inter", sans-serif', overflow: 'hidden', boxSizing: 'border-box',
+    }}>
+      <div style={{
+        height: '165px', background: `linear-gradient(135deg, ${color} 0%, ${color}cc 55%, ${color}88 100%)`,
+        padding: '40px 52px', boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: '26px',
+      }}>
+        {cvData.photo && (
+          <img src={cvData.photo} alt="" style={{
+            width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover',
+            border: '4px solid rgba(255,255,255,0.35)', flexShrink: 0,
+          }} />
+        )}
+        <div>
+          <div style={{ fontSize: '29px', fontWeight: 700, color: '#ffffff', letterSpacing: '-0.5px' }}>
+            {cvData.prenom} {cvData.nom}
+          </div>
+          {cvData.titre && (
+            <div style={{ fontSize: '14px', fontWeight: 400, color: 'rgba(255,255,255,0.9)', marginTop: '5px' }}>
+              {cvData.titre}
+            </div>
+          )}
+          {contacts.length > 0 && (
+            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: '10px', color: 'rgba(255,255,255,0.8)', marginTop: '12px' }}>
+              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div style={{ padding: '38px 52px', boxSizing: 'border-box' }}>
+        {cvData.accroche && (
+          <div style={{ fontSize: '11.5px', lineHeight: 1.7, color: '#374151', marginBottom: '30px' }}>
+            {cvData.accroche}
+          </div>
+        )}
+
+        {experiences.length > 0 && (
+          <div style={{ marginBottom: '30px' }}>
+            <div style={sectionTitle}>Expériences</div>
+            <div style={sectionRule} />
+            {experiences.map((exp, i) => (
+              <div key={i} style={{ marginBottom: i < experiences.length - 1 ? '20px' : 0 }}>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: '#111827' }}>{exp.poste}</div>
+                <div style={{ fontSize: '11.5px', color, marginTop: '3px' }}>{exp.entreprise}</div>
+                <div style={{ fontSize: '10px', color: '#9ca3af', marginTop: '2px', marginBottom: '8px' }}>
+                  {[exp.periode, exp.lieu].filter(Boolean).join(' · ')}
+                </div>
+                {exp.missions?.length > 0 && (
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                    {exp.missions.map((m, j) => (
+                      <li key={j} style={{ position: 'relative', paddingLeft: '14px', fontSize: '10.5px', lineHeight: 1.6, color: '#4b5563', marginBottom: '4px' }}>
+                        <span style={{ position: 'absolute', left: 0, color: '#d1d5db' }}>—</span>
+                        {m}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {formations.length > 0 && (
+          <div style={{ marginBottom: '30px' }}>
+            <div style={sectionTitle}>Formations</div>
+            <div style={sectionRule} />
+            {formations.map((f, i) => (
+              <div key={i} style={{ marginBottom: i < formations.length - 1 ? '16px' : 0 }}>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: '#111827' }}>{f.diplome}</div>
+                <div style={{ fontSize: '11.5px', color, marginTop: '3px' }}>{f.etablissement}</div>
+                <div style={{ fontSize: '10px', color: '#9ca3af', marginTop: '2px' }}>{f.periode}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {competences.length > 0 && (
+          <div style={{ marginBottom: '30px' }}>
+            <div style={sectionTitle}>Compétences</div>
+            <div style={sectionRule} />
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {competences.map((c, i) => (
+                <span key={i} style={{ padding: '5px 12px', background: `${color}12`, borderRadius: '3px', fontSize: '10.5px', fontWeight: 500, color }}>
+                  {c}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {langues.length > 0 && (
+          <div style={{ marginBottom: certifications.length || centresInteret.length ? '30px' : 0 }}>
+            <div style={sectionTitle}>Langues</div>
+            <div style={sectionRule} />
+            {langues.map((l, i) => (
+              <div key={i} style={{ fontSize: '11px', marginBottom: '5px' }}>
+                <span style={{ fontWeight: 600, color: '#111827' }}>{l.langue}</span>
+                <span style={{ color: '#6b7280' }}> — {l.niveau}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {certifications.length > 0 && (
+          <div style={{ marginBottom: centresInteret.length ? '30px' : 0 }}>
+            <div style={sectionTitle}>Certifications</div>
+            <div style={sectionRule} />
+            {certifications.map((c, i) => (
+              <div key={i} style={{ fontSize: '11px', color: '#374151', marginBottom: '5px' }}>
+                <span style={{ fontWeight: 600 }}>{c.titre}</span>
+                {c.organisme && <span style={{ color: '#6b7280' }}> — {c.organisme}</span>}
+                {c.annee && <span style={{ color: '#9ca3af' }}> ({c.annee})</span>}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {centresInteret.length > 0 && (
+          <div>
+            <div style={sectionTitle}>Centres d'intérêt</div>
+            <div style={sectionRule} />
+            <div style={{ fontSize: '11px', color: '#374151' }}>{centresInteret.join(' · ')}</div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TEMPLATE 15 : REGISTRE — Colonne dates à gauche
+// ═══════════════════════════════════════════════════════════════════
+function Registre({ cvData, color }) {
+  const experiences = cvData.experiences || []
+  const formations = cvData.formations || []
+  const competences = cvData.competences || []
+  const langues = cvData.langues || []
+  const certifications = cvData.certifications || []
+  const centresInteret = cvData.centres_interet || []
+  const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+
+  const sectionTitle = { fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px', color, marginBottom: '20px' }
+
+  const DeuxColonnes = ({ items, renderContenu }) => (
+    <div>
+      {items.map((item, i) => (
+        <div key={i} style={{ display: 'flex', gap: '24px', marginBottom: i < items.length - 1 ? '24px' : 0 }}>
+          <div style={{ width: '96px', flexShrink: 0, textAlign: 'right' }}>
+            <div style={{ fontSize: '10.5px', fontWeight: 500, color: '#171717' }}>{item.periode}</div>
+          </div>
+          <div style={{ width: '1px', alignSelf: 'stretch', background: '#e5e5e5', flexShrink: 0 }} />
+          <div style={{ flex: 1, minWidth: 0 }}>{renderContenu(item)}</div>
+        </div>
+      ))}
+    </div>
+  )
+
+  return (
+    <div id="cv-to-print" style={{
+      width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
+      padding: '48px 54px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
+    }}>
+      <div style={{ fontSize: '30px', fontWeight: 700, color: '#171717' }}>{cvData.prenom} {cvData.nom}</div>
+      {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 400, color: '#737373', marginTop: '5px' }}>{cvData.titre}</div>}
+      {contacts.length > 0 && (
+        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', fontSize: '10.5px', color: '#737373', marginTop: '15px' }}>
+          {contacts.map((c, i) => <span key={i}>{c}</span>)}
+        </div>
+      )}
+      <div style={{ height: '1px', background: '#e5e5e5', marginTop: '24px', marginBottom: '30px' }} />
+
+      {cvData.accroche && (
+        <div style={{ fontSize: '11.5px', lineHeight: 1.7, color: '#404040', marginBottom: '34px' }}>
+          {cvData.accroche}
+        </div>
+      )}
+
+      {experiences.length > 0 && (
+        <div style={{ marginBottom: '34px' }}>
+          <div style={sectionTitle}>Expériences</div>
+          <DeuxColonnes items={experiences} renderContenu={(exp) => (
+            <>
+              <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#171717' }}>{exp.poste}</div>
+              <div style={{ fontSize: '11.5px', color, marginTop: '3px', marginBottom: '8px' }}>
+                {[exp.entreprise, exp.lieu].filter(Boolean).join(' · ')}
+              </div>
+              {exp.missions?.length > 0 && (
+                <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                  {exp.missions.map((m, j) => (
+                    <li key={j} style={{ position: 'relative', paddingLeft: '14px', fontSize: '10.5px', lineHeight: 1.6, color: '#525252', marginBottom: '4px' }}>
+                      <span style={{ position: 'absolute', left: 0, color: '#d4d4d4' }}>—</span>
+                      {m}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
+          )} />
+        </div>
+      )}
+
+      {formations.length > 0 && (
+        <div style={{ marginBottom: '34px' }}>
+          <div style={sectionTitle}>Formations</div>
+          <DeuxColonnes items={formations} renderContenu={(f) => (
+            <>
+              <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#171717' }}>{f.diplome}</div>
+              <div style={{ fontSize: '11.5px', color, marginTop: '3px' }}>{f.etablissement}</div>
+            </>
+          )} />
+        </div>
+      )}
+
+      {competences.length > 0 && (
+        <div style={{ marginBottom: '34px' }}>
+          <div style={sectionTitle}>Compétences</div>
+          <div style={{ fontSize: '10.5px', color: '#525252', lineHeight: 1.9 }}>{competences.join(' · ')}</div>
+        </div>
+      )}
+
+      {langues.length > 0 && (
+        <div style={{ marginBottom: certifications.length || centresInteret.length ? '34px' : 0 }}>
+          <div style={sectionTitle}>Langues</div>
+          {langues.map((l, i) => (
+            <div key={i} style={{ fontSize: '11px', marginBottom: '5px' }}>
+              <span style={{ fontWeight: 600, color: '#171717' }}>{l.langue}</span>
+              <span style={{ color: '#737373' }}> — {l.niveau}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {certifications.length > 0 && (
+        <div style={{ marginBottom: centresInteret.length ? '34px' : 0 }}>
+          <div style={sectionTitle}>Certifications</div>
+          {certifications.map((c, i) => (
+            <div key={i} style={{ fontSize: '11px', color: '#404040', marginBottom: '5px' }}>
+              <span style={{ fontWeight: 600 }}>{c.titre}</span>
+              {c.organisme && <span style={{ color: '#737373' }}> — {c.organisme}</span>}
+              {c.annee && <span style={{ color: '#a3a3a3' }}> ({c.annee})</span>}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {centresInteret.length > 0 && (
+        <div>
+          <div style={sectionTitle}>Centres d'intérêt</div>
+          <div style={{ fontSize: '11px', color: '#404040' }}>{centresInteret.join(' · ')}</div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TEMPLATE 16 : NOCTURNE — Fond sombre élégant
+// ═══════════════════════════════════════════════════════════════════
+function Nocturne({ cvData, color }) {
+  const experiences = cvData.experiences || []
+  const formations = cvData.formations || []
+  const competences = cvData.competences || []
+  const langues = cvData.langues || []
+  const certifications = cvData.certifications || []
+  const centresInteret = cvData.centres_interet || []
+  const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+
+  const sectionTitle = { fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px', color, marginBottom: '18px' }
+
+  return (
+    <div id="cv-to-print" style={{
+      width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#0f172a',
+      padding: '50px 56px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
+    }}>
+      <div style={{ fontSize: '32px', fontWeight: 700, color: '#f8fafc', letterSpacing: '-0.6px' }}>
+        {cvData.prenom} {cvData.nom}
+      </div>
+      {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 400, color, marginTop: '6px' }}>{cvData.titre}</div>}
+      {contacts.length > 0 && (
+        <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', fontSize: '10.5px', color: '#94a3b8', marginTop: '16px' }}>
+          {contacts.map((c, i) => <span key={i}>{c}</span>)}
+        </div>
+      )}
+      <div style={{ height: '2px', background: color, width: '50px', marginTop: '22px', marginBottom: '30px' }} />
+
+      {cvData.accroche && (
+        <div style={{ fontSize: '11.5px', lineHeight: 1.7, color: '#cbd5e1', marginBottom: '30px' }}>
+          {cvData.accroche}
+        </div>
+      )}
+
+      {experiences.length > 0 && (
+        <div style={{ marginBottom: '32px' }}>
+          <div style={sectionTitle}>Expériences</div>
+          {experiences.map((exp, i) => (
+            <div key={i} style={{ marginBottom: i < experiences.length - 1 ? '22px' : 0 }}>
+              <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#f1f5f9' }}>{exp.poste}</div>
+              <div style={{ fontSize: '11.5px', fontWeight: 400, color: '#94a3b8', marginTop: '3px' }}>{exp.entreprise}</div>
+              <div style={{ fontSize: '10px', color: '#64748b', marginTop: '2px', marginBottom: '8px' }}>
+                {[exp.periode, exp.lieu].filter(Boolean).join(' · ')}
+              </div>
+              {exp.missions?.length > 0 && (
+                <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                  {exp.missions.map((m, j) => (
+                    <li key={j} style={{ position: 'relative', paddingLeft: '14px', fontSize: '10.5px', lineHeight: 1.6, color: '#cbd5e1', marginBottom: '4px' }}>
+                      <span style={{ position: 'absolute', left: 0, color }}>—</span>
+                      {m}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {formations.length > 0 && (
+        <div style={{ marginBottom: '32px' }}>
+          <div style={sectionTitle}>Formations</div>
+          {formations.map((f, i) => (
+            <div key={i} style={{ marginBottom: i < formations.length - 1 ? '16px' : 0 }}>
+              <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#f1f5f9' }}>{f.diplome}</div>
+              <div style={{ fontSize: '11.5px', color: '#94a3b8', marginTop: '3px' }}>{f.etablissement}</div>
+              <div style={{ fontSize: '10px', color: '#64748b', marginTop: '2px' }}>{f.periode}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {competences.length > 0 && (
+        <div style={{ marginBottom: '32px' }}>
+          <div style={sectionTitle}>Compétences</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '7px' }}>
+            {competences.map((c, i) => (
+              <span key={i} style={{ padding: '5px 12px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '4px', fontSize: '10.5px', fontWeight: 500, color: '#e2e8f0' }}>
+                {c}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {langues.length > 0 && (
+        <div style={{ marginBottom: certifications.length || centresInteret.length ? '32px' : 0 }}>
+          <div style={sectionTitle}>Langues</div>
+          {langues.map((l, i) => (
+            <div key={i} style={{ fontSize: '11px', marginBottom: '5px' }}>
+              <span style={{ fontWeight: 600, color: '#f1f5f9' }}>{l.langue}</span>
+              <span style={{ color: '#94a3b8' }}> — {l.niveau}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {certifications.length > 0 && (
+        <div style={{ marginBottom: centresInteret.length ? '32px' : 0 }}>
+          <div style={sectionTitle}>Certifications</div>
+          {certifications.map((c, i) => (
+            <div key={i} style={{ fontSize: '11px', color: '#cbd5e1', marginBottom: '5px' }}>
+              <span style={{ fontWeight: 600 }}>{c.titre}</span>
+              {c.organisme && <span style={{ color: '#94a3b8' }}> — {c.organisme}</span>}
+              {c.annee && <span style={{ color: '#64748b' }}> ({c.annee})</span>}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {centresInteret.length > 0 && (
+        <div>
+          <div style={sectionTitle}>Centres d'intérêt</div>
+          <div style={{ fontSize: '11px', color: '#cbd5e1' }}>{centresInteret.join(' · ')}</div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TEMPLATE 17 : COMPACT — Dense pour profils expérimentés
+// ═══════════════════════════════════════════════════════════════════
+function Compact({ cvData, color }) {
+  const experiences = cvData.experiences || []
+  const formations = cvData.formations || []
+  const competences = cvData.competences || []
+  const langues = cvData.langues || []
+  const certifications = cvData.certifications || []
+  const centresInteret = cvData.centres_interet || []
+  const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+
+  const sectionTitle = { fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color }
+  const sectionRule = { height: '1px', background: '#e5e7eb', width: '100%', marginTop: '5px', marginBottom: '12px' }
+
+  return (
+    <div id="cv-to-print" style={{
+      width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
+      padding: '34px 40px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: `2px solid ${color}`, paddingBottom: '14px', marginBottom: '20px' }}>
+        <div>
+          <div style={{ fontSize: '25px', fontWeight: 700, color: '#111827' }}>{cvData.prenom} {cvData.nom}</div>
+          {cvData.titre && <div style={{ fontSize: '12.5px', color: '#6b7280', marginTop: '3px' }}>{cvData.titre}</div>}
+        </div>
+        {contacts.length > 0 && (
+          <div style={{ textAlign: 'right', fontSize: '9.5px', color: '#6b7280' }}>
+            {contacts.map((c, i) => <div key={i}>{c}</div>)}
+          </div>
+        )}
+      </div>
+
+      {cvData.accroche && (
+        <div style={{ fontSize: '10.5px', lineHeight: 1.5, color: '#4b5563', marginBottom: '20px' }}>
+          {cvData.accroche}
+        </div>
+      )}
+
+      {experiences.length > 0 && (
+        <div style={{ marginBottom: '20px' }}>
+          <div style={sectionTitle}>Expériences</div>
+          <div style={sectionRule} />
+          {experiences.map((exp, i) => (
+            <div key={i} style={{ marginBottom: i < experiences.length - 1 ? '14px' : 0 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div style={{ fontSize: '12px', fontWeight: 600, color: '#111827' }}>{exp.poste}</div>
+                <div style={{ fontSize: '9.5px', color: '#9ca3af' }}>{exp.periode}</div>
+              </div>
+              <div style={{ fontSize: '10.5px', color, marginTop: '1px', marginBottom: '5px' }}>
+                {[exp.entreprise, exp.lieu].filter(Boolean).join(' · ')}
+              </div>
+              {exp.missions?.length > 0 && (
+                <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                  {exp.missions.map((m, j) => (
+                    <li key={j} style={{ fontSize: '10px', lineHeight: 1.45, color: '#4b5563', marginBottom: '2px' }}>
+                      <span style={{ marginRight: '6px' }}>·</span>{m}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {formations.length > 0 && (
+        <div style={{ marginBottom: '20px' }}>
+          <div style={sectionTitle}>Formations</div>
+          <div style={sectionRule} />
+          {formations.map((f, i) => (
+            <div key={i} style={{ marginBottom: i < formations.length - 1 ? '10px' : 0 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div style={{ fontSize: '12px', fontWeight: 600, color: '#111827' }}>{f.diplome}</div>
+                <div style={{ fontSize: '9.5px', color: '#9ca3af' }}>{f.periode}</div>
+              </div>
+              <div style={{ fontSize: '10.5px', color, marginTop: '1px' }}>{f.etablissement}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {(competences.length > 0 || langues.length > 0) && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: certifications.length || centresInteret.length ? '20px' : 0 }}>
+          {competences.length > 0 && (
+            <div>
+              <div style={sectionTitle}>Compétences</div>
+              <div style={sectionRule} />
+              <div style={{ fontSize: '10px', color: '#4b5563', lineHeight: 1.8 }}>{competences.join(', ')}</div>
+            </div>
+          )}
+          {langues.length > 0 && (
+            <div>
+              <div style={sectionTitle}>Langues</div>
+              <div style={sectionRule} />
+              {langues.map((l, i) => (
+                <div key={i} style={{ fontSize: '10px', color: '#4b5563', marginBottom: '3px' }}>
+                  <span style={{ fontWeight: 600 }}>{l.langue}</span> — {l.niveau}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {(certifications.length > 0 || centresInteret.length > 0) && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+          {certifications.length > 0 && (
+            <div>
+              <div style={sectionTitle}>Certifications</div>
+              <div style={sectionRule} />
+              {certifications.map((c, i) => (
+                <div key={i} style={{ fontSize: '10px', color: '#4b5563', marginBottom: '3px' }}>
+                  <span style={{ fontWeight: 600 }}>{c.titre}</span>
+                  {c.organisme && <span> — {c.organisme}</span>}
+                </div>
+              ))}
+            </div>
+          )}
+          {centresInteret.length > 0 && (
+            <div>
+              <div style={sectionTitle}>Intérêts</div>
+              <div style={sectionRule} />
+              <div style={{ fontSize: '10px', color: '#4b5563', lineHeight: 1.8 }}>{centresInteret.join(', ')}</div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TEMPLATE 18 : VITRINE — Portfolio créatif
+// ═══════════════════════════════════════════════════════════════════
+function Vitrine({ cvData, color }) {
+  const experiences = cvData.experiences || []
+  const formations = cvData.formations || []
+  const competences = cvData.competences || []
+  const langues = cvData.langues || []
+  const certifications = cvData.certifications || []
+  const centresInteret = cvData.centres_interet || []
+  const contacts = [cvData.email, cvData.telephone, cvData.ville].filter(Boolean)
+  const liens = [cvData.linkedin].filter(Boolean)
+
+  const sectionTitle = { fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color, textAlign: 'center' }
+  const sectionRule = { height: '1px', background: '#e4e4e7', width: '60px', margin: '10px auto 22px' }
+
+  return (
+    <div id="cv-to-print" style={{
+      width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
+      padding: '44px 50px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
+    }}>
+      <div style={{ textAlign: 'center', marginBottom: '34px' }}>
+        <div style={{ fontSize: '34px', fontWeight: 300, color: '#18181b', letterSpacing: '-1px' }}>
+          {cvData.prenom} {cvData.nom}
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', margin: '14px auto' }}>
+          <span style={{ width: '6px', height: '6px', background: color, display: 'inline-block' }} />
+          <span style={{ width: '6px', height: '6px', background: color, display: 'inline-block' }} />
+          <span style={{ width: '6px', height: '6px', background: color, display: 'inline-block' }} />
+        </div>
+        {cvData.titre && (
+          <div style={{ fontSize: '13px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '3px', color: '#71717a' }}>
+            {cvData.titre}
+          </div>
+        )}
+        {contacts.length > 0 && (
+          <div style={{ fontSize: '10px', color: '#a1a1aa', marginTop: '14px' }}>
+            {contacts.join(' / ')}
+          </div>
+        )}
+      </div>
+
+      {cvData.accroche && (
+        <div style={{ textAlign: 'center', maxWidth: '520px', margin: '0 auto 34px', fontSize: '12px', lineHeight: 1.75, color: '#3f3f46' }}>
+          {cvData.accroche}
+        </div>
+      )}
+
+      {experiences.length > 0 && (
+        <div style={{ marginBottom: '32px' }}>
+          <div style={sectionTitle}>Expériences</div>
+          <div style={sectionRule} />
+          {experiences.map((exp, i) => (
+            <div key={i} style={{ background: '#fafafa', borderRadius: '6px', padding: '18px 20px', marginBottom: i < experiences.length - 1 ? '14px' : 0 }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#18181b' }}>{exp.poste}</div>
+              <div style={{ fontSize: '10.5px', color: '#71717a', marginTop: '3px', marginBottom: '8px' }}>
+                {[exp.entreprise, exp.periode].filter(Boolean).join(' · ')}
+              </div>
+              {exp.missions?.length > 0 && (
+                <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                  {exp.missions.map((m, j) => (
+                    <li key={j} style={{ position: 'relative', paddingLeft: '14px', fontSize: '10.5px', lineHeight: 1.6, color: '#52525b', marginBottom: '4px' }}>
+                      <span style={{ position: 'absolute', left: 0, color }}>—</span>
+                      {m}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {formations.length > 0 && (
+        <div style={{ marginBottom: '32px' }}>
+          <div style={sectionTitle}>Formations</div>
+          <div style={sectionRule} />
+          {formations.map((f, i) => (
+            <div key={i} style={{ background: '#fafafa', borderRadius: '6px', padding: '18px 20px', marginBottom: i < formations.length - 1 ? '14px' : 0 }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#18181b' }}>{f.diplome}</div>
+              <div style={{ fontSize: '10.5px', color: '#71717a', marginTop: '3px' }}>
+                {[f.etablissement, f.periode].filter(Boolean).join(' · ')}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {competences.length > 0 && (
+        <div style={{ marginBottom: '32px' }}>
+          <div style={sectionTitle}>Compétences</div>
+          <div style={sectionRule} />
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
+            {competences.map((c, i) => (
+              <span key={i} style={{ padding: '5px 12px', background: '#fafafa', borderRadius: '3px', fontSize: '10.5px', fontWeight: 500, color: '#3f3f46' }}>
+                {c}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {(certifications.length > 0 || centresInteret.length > 0 || langues.length > 0) && (
+        <div style={{ marginBottom: liens.length ? '32px' : 0 }}>
+          {langues.length > 0 && (
+            <div style={{ textAlign: 'center', fontSize: '11px', color: '#3f3f46', marginBottom: '8px' }}>
+              {langues.map(l => `${l.langue} (${l.niveau})`).join(' · ')}
+            </div>
+          )}
+          {certifications.length > 0 && (
+            <div style={{ textAlign: 'center', fontSize: '11px', color: '#3f3f46', marginBottom: '8px' }}>
+              {certifications.map(c => c.titre).join(' · ')}
+            </div>
+          )}
+          {centresInteret.length > 0 && (
+            <div style={{ textAlign: 'center', fontSize: '11px', color: '#71717a' }}>
+              {centresInteret.join(' · ')}
+            </div>
+          )}
+        </div>
+      )}
+
+      {liens.length > 0 && (
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
+          {liens.map((l, i) => (
+            <span key={i} style={{ padding: '5px 14px', background: `${color}12`, borderRadius: '20px', fontSize: '10px', fontWeight: 600, color }}>
+              {l}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TEMPLATE 19 : TERRAIN — Secteur technique et BTP
+// ═══════════════════════════════════════════════════════════════════
+function Terrain({ cvData, color }) {
+  const experiences = cvData.experiences || []
+  const formations = cvData.formations || []
+  const competences = cvData.competences || []
+  const langues = cvData.langues || []
+  const certifications = cvData.certifications || []
+  const centresInteret = cvData.centres_interet || []
+  const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+
+  const SectionBar = ({ label }) => (
+    <div style={{ background: '#f4f4f5', padding: '8px 14px', marginBottom: '16px', borderLeft: `4px solid ${color}` }}>
+      <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#18181b' }}>{label}</span>
+    </div>
+  )
+
+  return (
+    <div id="cv-to-print" style={{
+      width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
+      fontFamily: '"Inter", sans-serif', overflow: 'hidden', boxSizing: 'border-box',
+    }}>
+      <div style={{ background: '#18181b', padding: '32px 48px', boxSizing: 'border-box' }}>
+        <div style={{ fontSize: '28px', fontWeight: 700, color: '#ffffff', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          {cvData.prenom} {cvData.nom}
+        </div>
+        {cvData.titre && (
+          <div style={{ fontSize: '13px', fontWeight: 500, color, marginTop: '6px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+            {cvData.titre}
+          </div>
+        )}
+        {contacts.length > 0 && (
+          <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', fontSize: '10px', color: 'rgba(255,255,255,0.7)', marginTop: '14px' }}>
+            {contacts.map((c, i) => <span key={i}>{c}</span>)}
+          </div>
+        )}
+      </div>
+
+      {certifications.length > 0 && (
+        <div style={{ background: color, padding: '12px 48px', boxSizing: 'border-box' }}>
+          <div style={{ fontSize: '9.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: 'rgba(255,255,255,0.8)', marginBottom: '6px' }}>
+            Habilitations et certifications
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+            {certifications.map((c, i) => (
+              <span key={i} style={{ padding: '3px 10px', background: 'rgba(255,255,255,0.2)', borderRadius: '3px', fontSize: '10px', fontWeight: 600, color: '#ffffff' }}>
+                {c.titre}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div style={{ padding: '34px 48px', boxSizing: 'border-box' }}>
+        {cvData.accroche && (
+          <div style={{ fontSize: '11.5px', lineHeight: 1.65, color: '#3f3f46', marginBottom: '26px' }}>
+            {cvData.accroche}
+          </div>
+        )}
+
+        {experiences.length > 0 && (
+          <div style={{ marginBottom: '26px' }}>
+            <SectionBar label="Expériences" />
+            {experiences.map((exp, i) => (
+              <div key={i} style={{ marginBottom: i < experiences.length - 1 ? '20px' : 0 }}>
+                <div style={{ fontSize: '13px', fontWeight: 700, color: '#18181b', textTransform: 'uppercase', letterSpacing: '0.3px' }}>{exp.poste}</div>
+                <div style={{ fontSize: '11.5px', fontWeight: 500, color: '#52525b', marginTop: '3px' }}>{exp.entreprise}</div>
+                <div style={{ fontSize: '10px', color: '#a1a1aa', marginTop: '2px', marginBottom: '8px' }}>
+                  {[exp.periode, exp.lieu].filter(Boolean).join(' · ')}
+                </div>
+                {exp.missions?.length > 0 && (
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                    {exp.missions.map((m, j) => (
+                      <li key={j} style={{ position: 'relative', paddingLeft: '16px', fontSize: '10.5px', lineHeight: 1.6, color: '#3f3f46', marginBottom: '4px' }}>
+                        <span style={{ position: 'absolute', left: 0, color }}>▸</span>
+                        {m}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {formations.length > 0 && (
+          <div style={{ marginBottom: '26px' }}>
+            <SectionBar label="Formations" />
+            {formations.map((f, i) => (
+              <div key={i} style={{ marginBottom: i < formations.length - 1 ? '14px' : 0 }}>
+                <div style={{ fontSize: '13px', fontWeight: 700, color: '#18181b' }}>{f.diplome}</div>
+                <div style={{ fontSize: '11.5px', color: '#52525b', marginTop: '3px' }}>
+                  {[f.etablissement, f.periode].filter(Boolean).join(' · ')}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {competences.length > 0 && (
+          <div style={{ marginBottom: '26px' }}>
+            <SectionBar label="Compétences" />
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {competences.map((c, i) => (
+                <span key={i} style={{ padding: '5px 12px', background: '#f4f4f5', borderRadius: '3px', fontSize: '10.5px', fontWeight: 500, color: '#3f3f46' }}>
+                  {c}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {langues.length > 0 && (
+          <div style={{ marginBottom: centresInteret.length ? '26px' : 0 }}>
+            <SectionBar label="Langues" />
+            {langues.map((l, i) => (
+              <div key={i} style={{ fontSize: '11px', color: '#3f3f46', marginBottom: '5px' }}>
+                <span style={{ fontWeight: 700 }}>{l.langue}</span> — {l.niveau}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {centresInteret.length > 0 && (
+          <div>
+            <SectionBar label="Centres d'intérêt" />
+            <div style={{ fontSize: '11px', color: '#3f3f46' }}>{centresInteret.join(' · ')}</div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TEMPLATE 20 : SOIN — Secteur santé et social
+// ═══════════════════════════════════════════════════════════════════
+function Soin({ cvData, color }) {
+  const experiences = cvData.experiences || []
+  const formations = cvData.formations || []
+  const competences = cvData.competences || []
+  const langues = cvData.langues || []
+  const certifications = cvData.certifications || []
+  const centresInteret = cvData.centres_interet || []
+  const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+
+  const numeroPro = certifications.find(c => /rpps|adeli/i.test(c.titre || ''))
+  const autresCertifications = certifications.filter(c => c !== numeroPro)
+
+  const leftSectionTitle = { fontSize: '9.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.8px', color, marginBottom: '9px' }
+  const leftSectionRule = { height: '1px', background: `${color}25`, marginBottom: '11px' }
+  const rightSectionTitle = { fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#134e4a' }
+  const rightSectionRule = { height: '2px', background: color, width: '30px', marginTop: '7px', marginBottom: '18px' }
+
+  return (
+    <div id="cv-to-print" style={{
+      width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, display: 'flex',
+      fontFamily: '"Inter", sans-serif', overflow: 'hidden', boxSizing: 'border-box',
+    }}>
+      <div style={{ width: '250px', flexShrink: 0, background: `${color}08`, padding: '34px 26px', boxSizing: 'border-box' }}>
+        {cvData.photo && (
+          <img src={cvData.photo} alt="" style={{
+            width: '92px', height: '92px', borderRadius: '50%', objectFit: 'cover',
+            border: '3px solid #ffffff', boxShadow: '0 2px 6px rgba(0,0,0,0.06)',
+            margin: '0 auto 20px', display: 'block',
+          }} />
+        )}
+        <div style={{ fontSize: '19px', fontWeight: 700, color: '#134e4a', textAlign: 'center', lineHeight: 1.3 }}>
+          {cvData.prenom} {cvData.nom}
+        </div>
+        {cvData.titre && (
+          <div style={{ fontSize: '11px', fontWeight: 500, color, textAlign: 'center', marginTop: '4px', marginBottom: '26px' }}>
+            {cvData.titre}
+          </div>
+        )}
+
+        {contacts.length > 0 && (
+          <div style={{ marginBottom: '24px' }}>
+            <div style={leftSectionTitle}>Contact</div>
+            <div style={leftSectionRule} />
+            {contacts.map((c, i) => (
+              <div key={i} style={{ fontSize: '10.5px', color: '#374151', lineHeight: 1.6 }}>{c}</div>
+            ))}
+          </div>
+        )}
+
+        {formations.length > 0 && (
+          <div style={{ marginBottom: '24px' }}>
+            <div style={leftSectionTitle}>Diplômes</div>
+            <div style={leftSectionRule} />
+            {formations.map((f, i) => (
+              <div key={i} style={{ fontSize: '10.5px', color: '#374151', lineHeight: 1.6, marginBottom: i < formations.length - 1 ? '6px' : 0 }}>
+                {f.diplome}{f.periode && ` — ${f.periode}`}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {langues.length > 0 && (
+          <div style={{ marginBottom: '24px' }}>
+            <div style={leftSectionTitle}>Langues</div>
+            <div style={leftSectionRule} />
+            {langues.map((l, i) => (
+              <div key={i} style={{ fontSize: '10.5px', color: '#374151', lineHeight: 1.6, marginBottom: '4px' }}>
+                <span style={{ fontWeight: 600 }}>{l.langue}</span> — {l.niveau}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {numeroPro && (
+          <div style={{ background: '#ffffff', padding: '10px', borderRadius: '4px', border: `1px solid ${color}25` }}>
+            <div style={{ fontSize: '10px', fontWeight: 600, color: '#134e4a' }}>
+              {numeroPro.titre}{numeroPro.organisme && ` : ${numeroPro.organisme}`}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div style={{ flex: 1, background: '#ffffff', padding: '38px 34px', boxSizing: 'border-box', minWidth: 0 }}>
+        {cvData.accroche && (
+          <div style={{ fontSize: '11.5px', lineHeight: 1.7, color: '#4b5563', marginBottom: '28px' }}>
+            {cvData.accroche}
+          </div>
+        )}
+
+        {experiences.length > 0 && (
+          <div style={{ marginBottom: '28px' }}>
+            <div style={rightSectionTitle}>Expériences</div>
+            <div style={rightSectionRule} />
+            {experiences.map((exp, i) => (
+              <div key={i} style={{ marginBottom: i < experiences.length - 1 ? '20px' : 0 }}>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: '#134e4a' }}>{exp.poste}</div>
+                <div style={{ fontSize: '11.5px', fontWeight: 500, color, marginTop: '3px' }}>{exp.entreprise}</div>
+                <div style={{ fontSize: '10px', color: '#9ca3af', marginTop: '2px', marginBottom: '8px' }}>
+                  {[exp.periode, exp.lieu].filter(Boolean).join(' · ')}
+                </div>
+                {exp.missions?.length > 0 && (
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                    {exp.missions.map((m, j) => (
+                      <li key={j} style={{ position: 'relative', paddingLeft: '14px', fontSize: '10.5px', lineHeight: 1.6, color: '#4b5563', marginBottom: '4px' }}>
+                        <span style={{ position: 'absolute', left: 0, color: '#d1d5db' }}>—</span>
+                        {m}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {competences.length > 0 && (
+          <div style={{ marginBottom: '28px' }}>
+            <div style={rightSectionTitle}>Compétences</div>
+            <div style={rightSectionRule} />
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {competences.map((c, i) => (
+                <span key={i} style={{ padding: '5px 12px', background: '#f9fafb', border: '1px solid #f3f4f6', borderRadius: '3px', fontSize: '10.5px', fontWeight: 500, color: '#374151' }}>
+                  {c}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {autresCertifications.length > 0 && (
+          <div style={{ marginBottom: centresInteret.length ? '28px' : 0 }}>
+            <div style={rightSectionTitle}>Certifications</div>
+            <div style={rightSectionRule} />
+            {autresCertifications.map((c, i) => (
+              <div key={i} style={{ fontSize: '11px', color: '#374151', marginBottom: '5px' }}>
+                <span style={{ fontWeight: 600 }}>{c.titre}</span>
+                {c.organisme && <span style={{ color: '#6b7280' }}> — {c.organisme}</span>}
+                {c.annee && <span style={{ color: '#9ca3af' }}> ({c.annee})</span>}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {centresInteret.length > 0 && (
+          <div>
+            <div style={rightSectionTitle}>Centres d'intérêt</div>
+            <div style={rightSectionRule} />
+            <div style={{ fontSize: '11px', color: '#374151' }}>{centresInteret.join(' · ')}</div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // MÉTADONNÉES
 // ═══════════════════════════════════════════════════════════════════
 export const TEMPLATES_PRO_META = {
@@ -1488,6 +2854,56 @@ export const TEMPLATES_PRO_META = {
     secteurs: ['Commerce', 'Marketing', 'Communication', 'Créatif'],
     niveaux: ['Junior', 'Confirmé'], atsScore: 82, couleurDefaut: '#f59e0b',
     description: 'Un contraste fort qui capte l\'attention immédiatement.', recommande: false },
+
+  horizon: { nom: 'Horizon', style: 'Bandeau latéral',
+    secteurs: ['Tous secteurs', 'Conseil', 'Tech', 'Marketing'],
+    niveaux: ['Junior', 'Confirmé', 'Senior'], atsScore: 94, couleurDefaut: '#4338ca',
+    description: 'Une touche de couleur discrète qui structure sans distraire.', recommande: true },
+
+  palier: { nom: 'Palier', style: 'Sections en escalier',
+    secteurs: ['Tous secteurs', 'Environnement', 'RSE', 'Éducation'],
+    niveaux: ['Confirmé', 'Senior'], atsScore: 90, couleurDefaut: '#059669',
+    description: 'Une progression visuelle qui guide la lecture naturellement.', recommande: false },
+
+  dossier: { nom: 'Dossier', style: 'Rapport professionnel',
+    secteurs: ['Juridique', 'Audit', 'Administration', 'Finance'],
+    niveaux: ['Confirmé', 'Senior', 'Cadre'], atsScore: 97, couleurDefaut: '#b91c1c',
+    description: 'Rigueur et structure. Pour les métiers où la précision compte.', recommande: true },
+
+  aurore: { nom: 'Aurore', style: 'Dégradé moderne',
+    secteurs: ['Marketing', 'Communication', 'Tech', 'Startup'],
+    niveaux: ['Junior', 'Confirmé'], atsScore: 86, couleurDefaut: '#8b5cf6',
+    description: 'Un header qui capte le regard sans jamais surcharger.', recommande: false },
+
+  registre: { nom: 'Registre', style: 'Chronologie latérale',
+    secteurs: ['Tous secteurs', 'Industrie', 'Logistique', 'Ingénierie'],
+    niveaux: ['Confirmé', 'Senior', 'Cadre'], atsScore: 93, couleurDefaut: '#ea580c',
+    description: 'Vos dates en évidence. Idéal pour les parcours longs et linéaires.', recommande: true },
+
+  nocturne: { nom: 'Nocturne', style: 'Fond sombre',
+    secteurs: ['Design', 'Tech', 'Créatif', 'Gaming'],
+    niveaux: ['Junior', 'Confirmé'], atsScore: 78, couleurDefaut: '#38bdf8',
+    description: 'Audacieux et mémorable. À réserver aux candidatures directes.', recommande: false },
+
+  compact: { nom: 'Compact', style: 'Dense',
+    secteurs: ['Tous secteurs', 'Ingénierie', 'Recherche', 'Conseil'],
+    niveaux: ['Senior', 'Cadre', 'Direction'], atsScore: 95, couleurDefaut: '#0891b2',
+    description: 'Quinze ans de carrière sur une page. Sans sacrifier la lisibilité.', recommande: true },
+
+  vitrine: { nom: 'Vitrine', style: 'Portfolio créatif',
+    secteurs: ['Design', 'Photo', 'Art', 'Communication'],
+    niveaux: ['Junior', 'Confirmé'], atsScore: 84, couleurDefaut: '#db2777',
+    description: 'Pensé pour les créatifs qui renvoient vers leur portfolio.', recommande: false },
+
+  terrain: { nom: 'Terrain', style: 'Technique robuste',
+    secteurs: ['BTP', 'Industrie', 'Maintenance', 'Transport'],
+    niveaux: ['Junior', 'Confirmé', 'Senior'], atsScore: 91, couleurDefaut: '#ca8a04',
+    description: 'Habilitations et certifications mises en avant dès le premier regard.', recommande: true },
+
+  soin: { nom: 'Soin', style: 'Santé et social',
+    secteurs: ['Santé', 'Médical', 'Social', 'Paramédical'],
+    niveaux: ['Junior', 'Confirmé', 'Senior'], atsScore: 92, couleurDefaut: '#0d9488',
+    description: 'Diplômes et numéros professionnels bien identifiés. Sobre et rassurant.', recommande: true },
 }
 
 export function getTemplatesPourSecteur(secteur) {
@@ -1510,6 +2926,16 @@ export function CVTemplatePro({ cvData, template = 'meridien', color }) {
     case 'signal': return <Signal cvData={cvData} color={couleur} />
     case 'prestige': return <Prestige cvData={cvData} color={couleur} />
     case 'contraste': return <Contraste cvData={cvData} color={couleur} />
+    case 'horizon': return <Horizon cvData={cvData} color={couleur} />
+    case 'palier': return <Palier cvData={cvData} color={couleur} />
+    case 'dossier': return <Dossier cvData={cvData} color={couleur} />
+    case 'aurore': return <Aurore cvData={cvData} color={couleur} />
+    case 'registre': return <Registre cvData={cvData} color={couleur} />
+    case 'nocturne': return <Nocturne cvData={cvData} color={couleur} />
+    case 'compact': return <Compact cvData={cvData} color={couleur} />
+    case 'vitrine': return <Vitrine cvData={cvData} color={couleur} />
+    case 'terrain': return <Terrain cvData={cvData} color={couleur} />
+    case 'soin': return <Soin cvData={cvData} color={couleur} />
     default: return <Meridien cvData={cvData} color={couleur} />
   }
 }
@@ -1517,4 +2943,6 @@ export function CVTemplatePro({ cvData, template = 'meridien', color }) {
 export {
   Meridien, Atelier, Tribune, Chronique, Manuscrit,
   Grille, Silence, Signal, Prestige, Contraste,
+  Horizon, Palier, Dossier, Aurore, Registre,
+  Nocturne, Compact, Vitrine, Terrain, Soin,
 }
