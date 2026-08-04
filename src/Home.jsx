@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { supabase } from './supabase'
 import SEO from './SEO'
+import { CVTemplatePro, TEMPLATES_PRO_META } from './CVTemplatesPro'
 
 function useWidth() {
   const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
@@ -52,20 +53,30 @@ const ETAPES = [
   { n: '03', titre: 'Tu télécharges et tu postules', desc: 'Un PDF propre, optimisé pour passer les filtres ATS.' },
 ]
 
-const TEMPLATES = [
-  { color: '#1a1a1a', name: 'Finance' },
-  { color: '#0a66c2', name: 'LinkedIn' },
-  { color: '#667eea', name: 'Creative' },
-  { color: '#c9a84c', name: 'Executive' },
-  { color: '#0f6e56', name: 'Moderne' },
-  { color: '#1e40af', name: 'Timeline' },
-  { color: '#4f46e5', name: 'Étudiant' },
-  { color: '#ea580c', name: 'Alternance' },
-  { color: '#0d9488', name: 'Santé' },
-  { color: '#374151', name: 'BTP' },
-  { color: '#92400e', name: 'Resto' },
-  { color: '#1d4ed8', name: 'Transport' },
-]
+// 8 templates Pro variés (recommandés en priorité, styles bien différents)
+// pour la vitrine de la home — la galerie complète (40 modèles) est sur /templates
+const TEMPLATES_CAROUSEL = ['meridien', 'sobre', 'impulsion', 'colonne', 'archive', 'chiffre', 'essentiel', 'clarte']
+
+const CAROUSEL_DEMO_CV = {
+  prenom: 'Camille', nom: 'Moreau', titre: 'Responsable Marketing Digital',
+  email: 'camille.moreau@email.com', telephone: '06 12 34 56 78', ville: 'Lyon',
+  linkedin: 'linkedin.com/in/camillemoreau', photo: null,
+  accroche: "Responsable marketing digital avec 8 ans d'expérience dans la croissance de marques B2C. Spécialisée en acquisition payante et stratégie de contenu.",
+  experiences: [
+    { poste: 'Responsable Marketing Digital', entreprise: 'Groupe Altitude', lieu: 'Lyon', periode: '2021 - Présent',
+      missions: ['Pilotage du budget acquisition de 500K€ avec un ROAS de 4,2', 'Croissance du trafic organique de 180% en 18 mois', 'Management d\'une équipe de 5 personnes'] },
+    { poste: 'Chargée de Marketing', entreprise: 'Novaris', lieu: 'Paris', periode: '2018 - 2021',
+      missions: ['Lancement de 3 campagnes nationales multi-canal', 'Refonte complète de la stratégie éditoriale'] },
+  ],
+  formations: [
+    { diplome: 'Master Marketing Digital', etablissement: 'EM Lyon', periode: '2016 - 2018', mention: 'Mention Bien' },
+    { diplome: 'Licence Économie-Gestion', etablissement: 'Université Lyon 2', periode: '2013 - 2016' },
+  ],
+  competences: ['Google Ads', 'SEO/SEA', 'Analytics', 'HubSpot', 'Content Strategy', 'A/B Testing'],
+  langues: [{ langue: 'Français', niveau: 'Langue maternelle' }, { langue: 'Anglais', niveau: 'Courant (C1)' }],
+  certifications: [{ titre: 'Google Analytics 4', organisme: 'Google', annee: '2024' }],
+  centres_interet: ['Course à pied', 'Photographie', 'Cuisine'],
+}
 
 const FOOTER_LINKS = [
   ['Templates', '#templates'],
@@ -118,7 +129,7 @@ export default function Home() {
     <div style={{ fontFamily: '"Satoshi","Inter",system-ui,sans-serif', color: '#111', background: '#fff', minHeight: '100vh' }}>
       <SEO
         titre="Créez votre CV optimisé ATS en 30 secondes"
-        description="DidCV génère votre CV professionnel et votre lettre de motivation en 30 secondes grâce à l'IA. 27 templates, score ATS, offres d'emploi intégrées. Gratuit."
+        description="DidCV génère votre CV professionnel et votre lettre de motivation en 30 secondes grâce à l'IA. 40 templates, score ATS, offres d'emploi intégrées. Gratuit."
         url="https://didcv.vercel.app"
       />
       <style>{PAGE_CSS}</style>
@@ -305,33 +316,38 @@ export default function Home() {
       <section id="templates" ref={templatesRef} style={{ padding: `${sectionPad.split(' ')[0]} 0`, opacity: templatesInView ? 1 : 0, transform: templatesInView ? 'translateY(0)' : 'translateY(24px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: isMobile ? '0 20px' : '0 48px' }}>
           <h2 style={{ fontSize: isMobile ? '32px' : '52px', fontWeight: '700', letterSpacing: '-1.5px', margin: '0 0 40px', color: '#0a0a0f', textAlign: 'left' }}>
-            27 templates.
+            40 templates.
           </h2>
         </div>
 
         <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', padding: isMobile ? '0 20px 12px' : '0 48px 12px' }}>
-          {TEMPLATES.map((t, i) => (
-            <a key={i} href="/auth" style={{ textDecoration: 'none', flexShrink: 0 }}>
-              <div style={{ width: '180px', borderRadius: '12px', overflow: 'hidden', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.08)', transition: 'box-shadow 0.15s' }}
-                onMouseEnter={e => e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.12)'}
-                onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)'}>
-                <div style={{ height: '110px', background: '#fafafa', padding: '14px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <div style={{ width: '55%', height: '7px', background: t.color, borderRadius: '3px', marginBottom: '2px' }} />
-                  <div style={{ width: '40%', height: '3px', background: '#e5e7eb', borderRadius: '2px', marginBottom: '6px' }} />
-                  <div style={{ width: '85%', height: '2px', background: '#e5e7eb', borderRadius: '2px' }} />
-                  <div style={{ width: '70%', height: '2px', background: '#e5e7eb', borderRadius: '2px' }} />
-                  <div style={{ width: '75%', height: '2px', background: '#e5e7eb', borderRadius: '2px' }} />
+          {TEMPLATES_CAROUSEL.map(id => {
+            const meta = TEMPLATES_PRO_META[id]
+            return (
+              <a key={id} href="/auth" style={{ textDecoration: 'none', flexShrink: 0 }}>
+                <div style={{ width: '180px', borderRadius: '12px', overflow: 'hidden', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.08)', transition: 'box-shadow 0.15s' }}
+                  onMouseEnter={e => e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.12)'}
+                  onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)'}>
+                  <div style={{ width: '180px', height: '230px', overflow: 'hidden', position: 'relative', background: '#fafafa' }}>
+                    <div style={{
+                      position: 'absolute', top: 0, left: 0, width: '794px', height: '1123px',
+                      transform: 'scale(0.2267)', transformOrigin: 'top left',
+                      pointerEvents: 'none', userSelect: 'none',
+                    }}>
+                      <CVTemplatePro cvData={CAROUSEL_DEMO_CV} template={id} color={meta.couleurDefaut} />
+                    </div>
+                  </div>
+                  <div style={{ padding: '10px 14px', fontSize: '12px', fontWeight: '600', color: '#374151' }}>{meta.nom}</div>
                 </div>
-                <div style={{ padding: '10px 14px', fontSize: '12px', fontWeight: '600', color: '#374151' }}>{t.name}</div>
-              </div>
-            </a>
-          ))}
-          <a href="/auth" style={{ textDecoration: 'none', flexShrink: 0 }}>
-            <div style={{ width: '180px', height: '148px', borderRadius: '12px', background: '#f8f9ff', boxShadow: '0 1px 3px rgba(0,0,0,0.08)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', transition: 'box-shadow 0.15s' }}
+              </a>
+            )
+          })}
+          <a href="/templates" style={{ textDecoration: 'none', flexShrink: 0 }}>
+            <div style={{ width: '180px', height: '270px', borderRadius: '12px', background: '#f8f9ff', boxShadow: '0 1px 3px rgba(0,0,0,0.08)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 16px', transition: 'box-shadow 0.15s' }}
               onMouseEnter={e => e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.12)'}
               onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)'}>
-              <div style={{ fontSize: '20px', fontWeight: '700', color: '#4f46e5' }}>+15</div>
-              <div style={{ fontSize: '12px', fontWeight: '600', color: '#4338ca', marginTop: '4px' }}>autres modèles</div>
+              <div style={{ fontSize: '20px', fontWeight: '700', color: '#4f46e5' }}>+32</div>
+              <div style={{ fontSize: '13px', fontWeight: '700', color: '#4338ca', marginTop: '6px' }}>Voir tous les templates</div>
             </div>
           </a>
         </div>
