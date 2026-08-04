@@ -130,7 +130,7 @@ export default function Home() {
       <SEO
         titre="Créez votre CV optimisé ATS en 30 secondes"
         description="DidJob génère votre CV professionnel et votre lettre de motivation en 30 secondes grâce à l'IA. 40 templates, score ATS, offres d'emploi intégrées. Gratuit."
-        url="https://didjob.fr"
+        url="https://did-job.com"
       />
       <style>{PAGE_CSS}</style>
 

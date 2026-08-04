@@ -64,7 +64,7 @@ export default async function handler(req, res) {
 
     try {
       await resend.emails.send({
-        from: 'DidJob <noreply@didcv.fr>',
+        from: 'DidJob <noreply@did-job.com>',
         to: profil.email,
         subject: estJ3 ? `Ton entretien approche - ${poste}` : `Ton entretien est demain - ${poste}`,
         html,

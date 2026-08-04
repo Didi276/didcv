@@ -96,7 +96,7 @@ export default async function handler(req, res) {
 
     try {
       await resend.emails.send({
-        from: 'DidJob <noreply@didcv.fr>',
+        from: 'DidJob <noreply@did-job.com>',
         to: profil.email,
         subject: 'Ton résumé de la semaine sur DidJob',
         html,

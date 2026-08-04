@@ -353,7 +353,7 @@ async function scrapeTalentsoft(slug, nom) {
       // 1. Récupérer la page des flux RSS
       const listUrl = `${base}/offre-de-emploi/tous-les-flux-rss.aspx`
       const r = await fetch(listUrl, {
-        headers: { 'User-Agent': 'DidJob-JobAggregator/1.0 (contact@didcv.fr)' }
+        headers: { 'User-Agent': 'DidJob-Aggregator/1.0 (contact@did-job.com)' }
       })
       if (!r.ok) continue
       const html = await r.text()
@@ -374,7 +374,7 @@ async function scrapeTalentsoft(slug, nom) {
       for (const fluxUrl of fluxUrls) {
         try {
           const fr = await fetch(fluxUrl, {
-            headers: { 'User-Agent': 'DidJob-JobAggregator/1.0 (contact@didcv.fr)' }
+            headers: { 'User-Agent': 'DidJob-Aggregator/1.0 (contact@did-job.com)' }
           })
           if (!fr.ok) continue
           const xml = await fr.text()

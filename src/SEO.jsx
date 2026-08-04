@@ -6,7 +6,7 @@ export default function SEO({ titre, description, url, image, schema }) {
     document.querySelector('meta[name="description"]')?.setAttribute('content', description || '')
     document.querySelector('meta[property="og:title"]')?.setAttribute('content', titre || '')
     document.querySelector('meta[property="og:description"]')?.setAttribute('content', description || '')
-    document.querySelector('link[rel="canonical"]')?.setAttribute('href', url || 'https://didjob.fr')
+    document.querySelector('link[rel="canonical"]')?.setAttribute('href', url || 'https://did-job.com')
     if (image) document.querySelector('meta[property="og:image"]')?.setAttribute('content', image)
   }, [titre, description, url, image])
 

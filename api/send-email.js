@@ -1,5 +1,5 @@
 // Nécessite la variable d'environnement RESEND_API_KEY (compte gratuit sur
-// resend.com). L'adresse d'expédition noreply@didcv.fr doit être vérifiée
+// resend.com). L'adresse d'expédition noreply@did-job.com doit être vérifiée
 // (DNS) dans le compte Resend, sinon l'envoi échoue.
 import { Resend } from 'resend'
 
@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   const { to, subject, html, type } = req.body
   try {
     const { data, error } = await resend.emails.send({
-      from: 'DidJob <noreply@didcv.fr>',
+      from: 'DidJob <noreply@did-job.com>',
       to,
       subject,
       html,

@@ -24,7 +24,7 @@ export default function Contact() {
       return
     }
     // Ouvre le client mail avec les infos pré-remplies
-    const mailto = `mailto:contact@didcv.fr?subject=${encodeURIComponent(`[DidJob] ${form.sujet || 'Contact'}`)}&body=${encodeURIComponent(`Nom: ${form.nom}\nEmail: ${form.email}\n\n${form.message}`)}`
+    const mailto = `mailto:contact@did-job.com?subject=${encodeURIComponent(`[DidJob] ${form.sujet || 'Contact'}`)}&body=${encodeURIComponent(`Nom: ${form.nom}\nEmail: ${form.email}\n\n${form.message}`)}`
     window.open(mailto)
     setSent(true)
   }
