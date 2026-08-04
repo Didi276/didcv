@@ -353,6 +353,17 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
       setLettre(dataLM.content[0].text)
       setActiveTab('cv')
 
+      // Filet de sécurité : recharge la photo directement depuis le profil Supabase
+      // (couvre le cas où le profil n'a pas été chargé en mémoire, ex. prenom manquant)
+      if (user && !json.photo) {
+        const { data: profil } = await supabase
+          .from('profiles')
+          .select('photo')
+          .eq('user_id', user.id)
+          .single()
+        if (profil?.photo) setCvData(prev => ({ ...prev, photo: profil.photo }))
+      }
+
       if (user) {
         const { data: cvInsere } = await supabase.from('cvs').insert({
           user_id: user.id, template: currentTemplate,

@@ -40,7 +40,9 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
   // showPhoto=false retire l'espace photo entierement ; true+photo=null affiche les initiales
   const [showPhoto, setShowPhoto] = useState(cvData.showPhoto !== false)
   const [photo, setPhoto] = useState(cvData.photo || null)
+  const [forme, setForme] = useState(cvData.forme || 'rond')
   const initiales = [data.prenom, data.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const FORME_RADIUS = { rond: '50%', carre: '8px', carre_arrondi: '16px' }
   const dragIdx = useRef(null)
   const w = useWidth()
   const isMobile = w < 768
@@ -138,7 +140,7 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
 
   // Applique les sections cachees et la photo au moment de sauvegarder
   const handleSave = () => {
-    const saved = { ...data, photo, showPhoto }
+    const saved = { ...data, photo, forme: forme || 'rond', showPhoto }
     if (hidden.certifications) saved.certifications = []
     if (hidden.centres_interet) saved.centres_interet = []
     if (hidden.linkedin) saved.linkedin = ''
@@ -204,10 +206,10 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
                 <Field label="Photo de profil">
                   {showPhoto && photo && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                      <img src={photo} alt="" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                      <img src={photo} alt="" style={{ width: '88px', height: '88px', borderRadius: FORME_RADIUS[forme] || '50%', objectFit: 'cover', flexShrink: 0 }} />
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
                         <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                          <input type="file" accept="image/*" onChange={handlePhotoChange} style={{ display: 'none' }} />
+                          <input type="file" accept="image/*" capture="user" onChange={handlePhotoChange} style={{ display: 'none' }} />
                           <Camera size={12} color="#4f46e5" />
                           <span style={{ fontSize: '12px', color: '#4f46e5', fontWeight: '600', textDecoration: 'underline' }}>Changer la photo</span>
                         </label>
@@ -217,7 +219,7 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
                         </button>
                         <button onClick={() => setShowPhoto(false)}
                           style={{ background: 'none', border: 'none', color: '#9ca3af', fontSize: '12px', cursor: 'pointer', textAlign: 'left', padding: 0, fontFamily: 'inherit', textDecoration: 'underline' }}>
-                          Retirer l'espace photo
+                          Masquer la photo
                         </button>
                       </div>
                     </div>
@@ -225,18 +227,18 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
 
                   {showPhoto && !photo && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                      <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4f46e5', fontSize: '26px', fontWeight: '700', flexShrink: 0 }}>
+                      <div style={{ width: '88px', height: '88px', borderRadius: FORME_RADIUS[forme] || '50%', background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4f46e5', fontSize: '28px', fontWeight: '700', flexShrink: 0 }}>
                         {initiales || '?'}
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
                         <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                          <input type="file" accept="image/*" onChange={handlePhotoChange} style={{ display: 'none' }} />
+                          <input type="file" accept="image/*" capture="user" onChange={handlePhotoChange} style={{ display: 'none' }} />
                           <Camera size={12} color="#4f46e5" />
                           <span style={{ fontSize: '12px', color: '#4f46e5', fontWeight: '600', textDecoration: 'underline' }}>Ajouter une photo</span>
                         </label>
                         <button onClick={() => setShowPhoto(false)}
                           style={{ background: 'none', border: 'none', color: '#9ca3af', fontSize: '12px', cursor: 'pointer', textAlign: 'left', padding: 0, fontFamily: 'inherit', textDecoration: 'underline' }}>
-                          Retirer l'espace photo
+                          Masquer la photo
                         </button>
                       </div>
                     </div>
@@ -244,11 +246,30 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
 
                   {!showPhoto && (
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', background: '#f8f9ff', borderRadius: '10px', border: '1px solid #ede9fe' }}>
-                      <div style={{ fontSize: '13px', color: '#9ca3af' }}>Espace photo masqué</div>
+                      <div style={{ fontSize: '13px', color: '#9ca3af' }}>Photo masquée</div>
                       <button onClick={() => setShowPhoto(true)}
                         style={{ padding: '6px 14px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontFamily: 'inherit', fontSize: '12px', fontWeight: '600', background: '#4f46e5', color: '#fff' }}>
-                        Afficher l'espace photo
+                        Afficher la photo
                       </button>
+                    </div>
+                  )}
+
+                  {showPhoto && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
+                      {[
+                        { valeur: 'rond', label: 'Rond', radius: '50%' },
+                        { valeur: 'carre', label: 'Carré', radius: '3px' },
+                        { valeur: 'carre_arrondi', label: 'Carré arrondi', radius: '10px' },
+                      ].map(f => (
+                        <button key={f.valeur} type="button" title={f.label} onClick={() => setForme(f.valeur)}
+                          style={{
+                            width: '36px', height: '36px', borderRadius: f.radius,
+                            border: `2px solid ${forme === f.valeur ? '#111' : '#e5e7eb'}`,
+                            background: forme === f.valeur ? '#111' : '#fff',
+                            cursor: 'pointer', padding: 0, flexShrink: 0,
+                          }}
+                        />
+                      ))}
                     </div>
                   )}
                 </Field>
@@ -471,7 +492,7 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
                 <CVTemplatePro
                   cvData={{
                     ...data,
-                    photo, showPhoto,
+                    photo, forme: forme || 'rond', showPhoto,
                     certifications: hidden.certifications ? [] : data.certifications,
                     centres_interet: hidden.centres_interet ? [] : data.centres_interet,
                     linkedin: hidden.linkedin ? '' : data.linkedin,

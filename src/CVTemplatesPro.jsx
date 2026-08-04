@@ -6,28 +6,38 @@ const PAGE = { width: 794, minHeight: 1123 }
 // Photo de profil partagée par tous les templates qui en affichent une.
 // showPhoto=false retire l'espace entièrement (pas de trou dans le layout) ;
 // showPhoto=true sans photo affiche les initiales en placeholder.
-function PhotoCV({ photo, initiales, size = 90, color, borderRadius = '50%', showPhoto = true }) {
+// forme : 'rond' | 'carre' | 'carre_arrondi' | 'hexagone'
+function PhotoCV({ photo, initiales, size = 90, color, forme = 'rond', showPhoto = true }) {
   if (!showPhoto) return null
 
+  const formes = {
+    rond: '50%',
+    carre: '8px',
+    carre_arrondi: '16px',
+    hexagone: '50%',
+  }
+  const borderRadius = formes[forme] || '50%'
+
+  const style = {
+    width: size, height: size, borderRadius,
+    objectFit: 'cover', display: 'block',
+    flexShrink: 0,
+  }
+
   if (photo) {
-    return (
-      <img src={photo} alt="photo de profil"
-        style={{
-          width: size, height: size, borderRadius,
-          objectFit: 'cover', display: 'block', flexShrink: 0
-        }}
-      />
-    )
+    return <img src={photo} alt="photo" style={style} />
   }
 
   return (
     <div style={{
-      width: size, height: size, borderRadius,
-      background: color + '20',
+      ...style,
+      background: color + '18',
+      border: '2px solid ' + color + '40',
       display: 'flex', alignItems: 'center',
-      justifyContent: 'center', flexShrink: 0,
-      color: color, fontSize: size * 0.32,
-      fontWeight: 700, fontFamily: 'Inter, sans-serif',
+      justifyContent: 'center',
+      color: color, fontSize: size * 0.3,
+      fontWeight: 700, letterSpacing: '-0.5px',
+      fontFamily: 'Inter, sans-serif',
     }}>
       {initiales}
     </div>
@@ -45,6 +55,8 @@ function Meridien({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sectionTitle = { fontSize: '11px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color, marginBottom: '16px' }
   const sectionRule = { width: '32px', height: '2px', background: color, marginBottom: '20px' }
@@ -56,25 +68,34 @@ function Meridien({ cvData, color }) {
       overflow: 'hidden', color: '#111827',
     }}>
       {/* HEADER */}
-      <div style={{ fontSize: '32px', fontWeight: 600, color: '#111827', letterSpacing: '-0.8px', marginBottom: '6px' }}>
-        {cvData.prenom} {cvData.nom}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: '32px', fontWeight: 600, color: '#111827', letterSpacing: '-0.8px', marginBottom: '6px' }}>
+            {cvData.prenom} {cvData.nom}
+          </div>
+          {cvData.titre && (
+            <div style={{ fontSize: '15px', fontWeight: 400, color: '#6b7280', letterSpacing: '0.3px', marginBottom: '18px' }}>
+              {cvData.titre}
+            </div>
+          )}
+          <div style={{ height: '1px', background: '#e5e7eb', width: '100%', marginBottom: '14px' }} />
+          {contacts.length > 0 && (
+            <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', fontSize: '11px', fontWeight: 400, color: '#4b5563' }}>
+              {contacts.map((c, i) => (
+                <span key={i} style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                  {i > 0 && <span style={{ color: '#d1d5db' }}>·</span>}
+                  {c}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+        {showPhoto && (
+          <div style={{ width: 'fit-content', flexShrink: 0, marginLeft: '24px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
+          </div>
+        )}
       </div>
-      {cvData.titre && (
-        <div style={{ fontSize: '15px', fontWeight: 400, color: '#6b7280', letterSpacing: '0.3px', marginBottom: '18px' }}>
-          {cvData.titre}
-        </div>
-      )}
-      <div style={{ height: '1px', background: '#e5e7eb', width: '100%', marginBottom: '14px' }} />
-      {contacts.length > 0 && (
-        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', fontSize: '11px', fontWeight: 400, color: '#4b5563' }}>
-          {contacts.map((c, i) => (
-            <span key={i} style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-              {i > 0 && <span style={{ color: '#d1d5db' }}>·</span>}
-              {c}
-            </span>
-          ))}
-        </div>
-      )}
 
       {/* ACCROCHE */}
       {cvData.accroche && (
@@ -216,8 +237,8 @@ function Atelier({ cvData, color }) {
       {/* COLONNE GAUCHE */}
       <div style={{ width: '264px', flexShrink: 0, background: '#f8f9fa', padding: '36px 28px', boxSizing: 'border-box' }}>
         {showPhoto && (
-          <div style={{ width: 'fit-content', margin: '0 auto 24px', border: '4px solid #ffffff', borderRadius: '50%', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
-            <PhotoCV photo={cvData.photo} initiales={initiales} size={88} color={color} showPhoto={showPhoto} />
+          <div style={{ width: 'fit-content', margin: '0 auto 24px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={96} color={color} forme={cvData.forme} showPhoto={showPhoto} />
           </div>
         )}
         <div style={{ fontSize: '20px', fontWeight: 700, color: '#111827', textAlign: 'center', lineHeight: 1.25, marginBottom: '5px' }}>
@@ -369,8 +390,8 @@ function Tribune({ cvData, color }) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           {showPhoto && (
-            <div style={{ width: 'fit-content', marginRight: '24px', flexShrink: 0, border: '3px solid rgba(255,255,255,0.3)', borderRadius: '50%', overflow: 'hidden' }}>
-              <PhotoCV photo={cvData.photo} initiales={initiales} size={82} color="#ffffff" showPhoto={showPhoto} />
+            <div style={{ width: 'fit-content', marginRight: '24px', flexShrink: 0 }}>
+              <PhotoCV photo={cvData.photo} initiales={initiales} size={88} color="#ffffff" forme={cvData.forme} showPhoto={showPhoto} />
             </div>
           )}
           <div>
@@ -511,6 +532,8 @@ function Chronique({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sectionTitleClassic = { fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#111827', marginBottom: '16px' }
 
@@ -520,13 +543,22 @@ function Chronique({ cvData, color }) {
       padding: '50px 56px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
       {/* HEADER */}
-      <div style={{ fontSize: '28px', fontWeight: 700, color: '#111827' }}>{cvData.prenom} {cvData.nom}</div>
-      {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 400, color: '#6b7280', marginTop: '4px' }}>{cvData.titre}</div>}
-      {contacts.length > 0 && (
-        <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', marginTop: '14px', fontSize: '10.5px', color: '#6b7280' }}>
-          {contacts.map((c, i) => <span key={i}>{c}</span>)}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <div style={{ fontSize: '28px', fontWeight: 700, color: '#111827' }}>{cvData.prenom} {cvData.nom}</div>
+          {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 400, color: '#6b7280', marginTop: '4px' }}>{cvData.titre}</div>}
+          {contacts.length > 0 && (
+            <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', marginTop: '14px', fontSize: '10.5px', color: '#6b7280' }}>
+              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+            </div>
+          )}
         </div>
-      )}
+        {showPhoto && (
+          <div style={{ width: 'fit-content', flexShrink: 0, marginLeft: '24px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
+          </div>
+        )}
+      </div>
       <div style={{ height: '2px', background: color, width: '60px', marginTop: '20px', marginBottom: '30px' }} />
 
       {/* EXPÉRIENCES avec timeline */}
@@ -644,6 +676,8 @@ function Manuscrit({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sectionTitle = { fontFamily: '"Playfair Display", serif', fontSize: '16px', fontWeight: 600, color: '#1a1a1a', textAlign: 'left' }
   const sectionRule = { height: '1px', background: '#e0ddd5', width: '100%', marginTop: '6px', marginBottom: '18px' }
@@ -655,6 +689,11 @@ function Manuscrit({ cvData, color }) {
     }}>
       {/* HEADER */}
       <div style={{ textAlign: 'center' }}>
+        {showPhoto && (
+          <div style={{ width: 'fit-content', margin: '0 auto 16px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
+          </div>
+        )}
         <div style={{ fontFamily: '"Playfair Display", serif', fontSize: '34px', fontWeight: 500, color: '#1a1a1a', letterSpacing: '-0.5px' }}>
           {cvData.prenom} {cvData.nom}
         </div>
@@ -778,6 +817,8 @@ function Grille({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   return (
     <div id="cv-to-print" className="cv-template" style={{
@@ -786,12 +827,19 @@ function Grille({ cvData, color }) {
       fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
       {/* HEADER carte */}
-      <div style={{ background: '#111827', borderRadius: '12px', padding: '32px', boxSizing: 'border-box' }}>
-        <div style={{ fontSize: '28px', fontWeight: 700, color: '#ffffff' }}>{cvData.prenom} {cvData.nom}</div>
-        {cvData.titre && <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)', marginTop: '5px' }}>{cvData.titre}</div>}
-        {contacts.length > 0 && (
-          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginTop: '16px', fontSize: '10px', color: 'rgba(255,255,255,0.6)' }}>
-            {contacts.map((c, i) => <span key={i}>{c}</span>)}
+      <div style={{ background: '#111827', borderRadius: '12px', padding: '32px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <div style={{ fontSize: '28px', fontWeight: 700, color: '#ffffff' }}>{cvData.prenom} {cvData.nom}</div>
+          {cvData.titre && <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)', marginTop: '5px' }}>{cvData.titre}</div>}
+          {contacts.length > 0 && (
+            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginTop: '16px', fontSize: '10px', color: 'rgba(255,255,255,0.6)' }}>
+              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+            </div>
+          )}
+        </div>
+        {showPhoto && (
+          <div style={{ width: 'fit-content', flexShrink: 0, marginLeft: '20px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color="#ffffff" forme={cvData.forme} showPhoto={showPhoto} />
           </div>
         )}
       </div>
@@ -912,6 +960,8 @@ function Silence({ cvData }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sectionTitle = { fontSize: '9px', fontWeight: 500, letterSpacing: '3px', textTransform: 'uppercase', color: '#cccccc', marginBottom: '20px' }
 
@@ -920,19 +970,28 @@ function Silence({ cvData }) {
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '80px 90px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
-      <div style={{ fontSize: '36px', fontWeight: 200, color: '#000000', letterSpacing: '-1px' }}>
-        {cvData.prenom} {cvData.nom}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <div style={{ fontSize: '36px', fontWeight: 200, color: '#000000', letterSpacing: '-1px' }}>
+            {cvData.prenom} {cvData.nom}
+          </div>
+          {cvData.titre && (
+            <div style={{ fontSize: '13px', fontWeight: 300, color: '#999999', marginTop: '8px', letterSpacing: '1px' }}>
+              {cvData.titre}
+            </div>
+          )}
+          {contacts.length > 0 && (
+            <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', fontSize: '10px', fontWeight: 300, color: '#bbbbbb', marginTop: '24px' }}>
+              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+            </div>
+          )}
+        </div>
+        {showPhoto && (
+          <div style={{ width: 'fit-content', flexShrink: 0, marginLeft: '24px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color="#000000" forme={cvData.forme} showPhoto={showPhoto} />
+          </div>
+        )}
       </div>
-      {cvData.titre && (
-        <div style={{ fontSize: '13px', fontWeight: 300, color: '#999999', marginTop: '8px', letterSpacing: '1px' }}>
-          {cvData.titre}
-        </div>
-      )}
-      {contacts.length > 0 && (
-        <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', fontSize: '10px', fontWeight: 300, color: '#bbbbbb', marginTop: '24px' }}>
-          {contacts.map((c, i) => <span key={i}>{c}</span>)}
-        </div>
-      )}
 
       {cvData.accroche && (
         <div style={{ marginTop: '48px', fontSize: '11px', fontWeight: 300, lineHeight: 1.8, color: '#555555' }}>
@@ -1027,6 +1086,8 @@ function Signal({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sectionTitle = { display: 'flex', alignItems: 'center', fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#0f172a', marginBottom: '16px' }
   const sectionSquare = { width: '6px', height: '6px', background: color, marginRight: '8px', flexShrink: 0 }
@@ -1037,18 +1098,25 @@ function Signal({ cvData, color }) {
       padding: '44px 52px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
       {/* HEADER */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '28px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
         <div>
           <div style={{ fontSize: '27px', fontWeight: 700, color: '#0f172a' }}>{cvData.prenom} {cvData.nom}</div>
           {cvData.titre && <div style={{ fontSize: '13px', fontWeight: 500, color, marginTop: '4px' }}>{cvData.titre}</div>}
         </div>
-        {contacts.length > 0 && (
-          <div style={{ textAlign: 'right' }}>
-            {contacts.map((c, i) => (
-              <div key={i} style={{ fontSize: '10px', color: '#64748b', marginBottom: '4px' }}>{c}</div>
-            ))}
-          </div>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          {contacts.length > 0 && (
+            <div style={{ textAlign: 'right' }}>
+              {contacts.map((c, i) => (
+                <div key={i} style={{ fontSize: '10px', color: '#64748b', marginBottom: '4px' }}>{c}</div>
+              ))}
+            </div>
+          )}
+          {showPhoto && (
+            <div style={{ width: 'fit-content', flexShrink: 0 }}>
+              <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* STACK TECHNIQUE */}
@@ -1172,6 +1240,8 @@ function Prestige({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sectionTitle = { fontFamily: '"Source Serif 4", serif', fontSize: '17px', fontWeight: 700, color: '#111827' }
   const sectionRule = { height: '2px', background: color, width: '44px', marginTop: '8px', marginBottom: '20px' }
@@ -1192,18 +1262,25 @@ function Prestige({ cvData, color }) {
       padding: '52px 58px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
       {/* HEADER */}
-      <div style={{ borderBottom: '3px solid #111827', paddingBottom: '22px', marginBottom: '26px' }}>
-        <div style={{ fontFamily: '"Source Serif 4", serif', fontSize: '32px', fontWeight: 700, color: '#111827' }}>
-          {cvData.prenom} {cvData.nom}
-        </div>
-        {cvData.titre && (
-          <div style={{ fontSize: '14px', fontWeight: 500, letterSpacing: '1px', textTransform: 'uppercase', color, marginTop: '8px' }}>
-            {cvData.titre}
+      <div style={{ borderBottom: '3px solid #111827', paddingBottom: '22px', marginBottom: '26px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <div style={{ fontFamily: '"Source Serif 4", serif', fontSize: '32px', fontWeight: 700, color: '#111827' }}>
+            {cvData.prenom} {cvData.nom}
           </div>
-        )}
-        {contacts.length > 0 && (
-          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', fontSize: '10.5px', color: '#6b7280', marginTop: '14px' }}>
-            {contacts.map((c, i) => <span key={i}>{c}</span>)}
+          {cvData.titre && (
+            <div style={{ fontSize: '14px', fontWeight: 500, letterSpacing: '1px', textTransform: 'uppercase', color, marginTop: '8px' }}>
+              {cvData.titre}
+            </div>
+          )}
+          {contacts.length > 0 && (
+            <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', fontSize: '10.5px', color: '#6b7280', marginTop: '14px' }}>
+              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+            </div>
+          )}
+        </div>
+        {showPhoto && (
+          <div style={{ width: 'fit-content', flexShrink: 0, marginLeft: '24px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
           </div>
         )}
       </div>
@@ -1341,8 +1418,8 @@ function Contraste({ cvData, color }) {
       {/* BANDE GAUCHE */}
       <div style={{ width: '230px', flexShrink: 0, background: '#111827', padding: '36px 24px', color: '#ffffff', boxSizing: 'border-box' }}>
         {showPhoto && (
-          <div style={{ width: 'fit-content', margin: '0 auto 22px', border: `3px solid ${color}`, borderRadius: '50%', overflow: 'hidden' }}>
-            <PhotoCV photo={cvData.photo} initiales={initiales} size={82} color={color} showPhoto={showPhoto} />
+          <div style={{ width: 'fit-content', margin: '0 auto 22px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={96} color={color} forme={cvData.forme} showPhoto={showPhoto} />
           </div>
         )}
         <div style={{ fontSize: '19px', fontWeight: 700, color: '#ffffff', textAlign: 'center', lineHeight: 1.3 }}>
@@ -1483,6 +1560,7 @@ function Horizon({ cvData, color }) {
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
   const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sectionTitle = { fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px', color: '#18181b' }
   const sectionRule = { height: '1px', background: '#e4e4e7', width: '100%', marginTop: '7px', marginBottom: '18px' }
@@ -1504,14 +1582,21 @@ function Horizon({ cvData, color }) {
         )}
       </div>
       <div style={{ flex: 1, background: '#ffffff', padding: '48px 52px 48px 44px', boxSizing: 'border-box', minWidth: 0 }}>
-        <div style={{ marginBottom: '30px' }}>
-          <div style={{ fontSize: '30px', fontWeight: 700, color: '#18181b', letterSpacing: '-0.6px' }}>
-            {cvData.prenom} {cvData.nom}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+          <div>
+            <div style={{ fontSize: '30px', fontWeight: 700, color: '#18181b', letterSpacing: '-0.6px' }}>
+              {cvData.prenom} {cvData.nom}
+            </div>
+            {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 400, color, marginTop: '5px' }}>{cvData.titre}</div>}
+            {contacts.length > 0 && (
+              <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', fontSize: '10.5px', color: '#71717a', marginTop: '16px' }}>
+                {contacts.map((c, i) => <span key={i}>{c}</span>)}
+              </div>
+            )}
           </div>
-          {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 400, color, marginTop: '5px' }}>{cvData.titre}</div>}
-          {contacts.length > 0 && (
-            <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', fontSize: '10.5px', color: '#71717a', marginTop: '16px' }}>
-              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+          {showPhoto && (
+            <div style={{ width: 'fit-content', flexShrink: 0, marginLeft: '20px' }}>
+              <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
             </div>
           )}
         </div>
@@ -1632,6 +1717,8 @@ function Palier({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sectionTitle = { fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.8px', color, marginBottom: '16px' }
 
@@ -1640,13 +1727,22 @@ function Palier({ cvData, color }) {
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '46px 54px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
-      <div style={{ fontSize: '31px', fontWeight: 700, color: '#0c0a09' }}>{cvData.prenom} {cvData.nom}</div>
-      {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 400, color: '#78716c', marginTop: '5px' }}>{cvData.titre}</div>}
-      {contacts.length > 0 && (
-        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', fontSize: '10.5px', color: '#78716c', marginTop: '15px' }}>
-          {contacts.map((c, i) => <span key={i}>{c}</span>)}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <div style={{ fontSize: '31px', fontWeight: 700, color: '#0c0a09' }}>{cvData.prenom} {cvData.nom}</div>
+          {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 400, color: '#78716c', marginTop: '5px' }}>{cvData.titre}</div>}
+          {contacts.length > 0 && (
+            <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', fontSize: '10.5px', color: '#78716c', marginTop: '15px' }}>
+              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+            </div>
+          )}
         </div>
-      )}
+        {showPhoto && (
+          <div style={{ width: 'fit-content', flexShrink: 0, marginLeft: '20px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
+          </div>
+        )}
+      </div>
       <div style={{ height: '4px', background: color, width: '100%', marginTop: '24px', marginBottom: '30px' }} />
 
       {cvData.accroche && (
@@ -1753,6 +1849,8 @@ function Dossier({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   let numero = 0
   const SectionBar = ({ label }) => {
@@ -1770,17 +1868,24 @@ function Dossier({ cvData, color }) {
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '50px 56px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
-      <div style={{ border: '2px solid #18181b', padding: '26px 30px', marginBottom: '32px' }}>
-        <div style={{ fontSize: '28px', fontWeight: 700, color: '#18181b' }}>{cvData.prenom} {cvData.nom}</div>
-        {cvData.titre && (
-          <div style={{ fontSize: '13px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1.5px', color, marginTop: '6px' }}>
-            {cvData.titre}
-          </div>
-        )}
-        <div style={{ height: '1px', background: '#e4e4e7', marginTop: '16px', marginBottom: '14px' }} />
-        {contacts.length > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', fontSize: '10px', color: '#52525b' }}>
-            {contacts.map((c, i) => <div key={i}>{c}</div>)}
+      <div style={{ border: '2px solid #18181b', padding: '26px 30px', marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: '28px', fontWeight: 700, color: '#18181b' }}>{cvData.prenom} {cvData.nom}</div>
+          {cvData.titre && (
+            <div style={{ fontSize: '13px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1.5px', color, marginTop: '6px' }}>
+              {cvData.titre}
+            </div>
+          )}
+          <div style={{ height: '1px', background: '#e4e4e7', marginTop: '16px', marginBottom: '14px' }} />
+          {contacts.length > 0 && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', fontSize: '10px', color: '#52525b' }}>
+              {contacts.map((c, i) => <div key={i}>{c}</div>)}
+            </div>
+          )}
+        </div>
+        {showPhoto && (
+          <div style={{ width: 'fit-content', flexShrink: 0, marginLeft: '24px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
           </div>
         )}
       </div>
@@ -1910,8 +2015,8 @@ function Aurore({ cvData, color }) {
         padding: '40px 52px', boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: '26px',
       }}>
         {showPhoto && (
-          <div style={{ width: 'fit-content', flexShrink: 0, border: '4px solid rgba(255,255,255,0.35)', borderRadius: '50%', overflow: 'hidden' }}>
-            <PhotoCV photo={cvData.photo} initiales={initiales} size={92} color="#ffffff" showPhoto={showPhoto} />
+          <div style={{ width: 'fit-content', flexShrink: 0 }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={88} color="#ffffff" forme={cvData.forme} showPhoto={showPhoto} />
           </div>
         )}
         <div>
@@ -2042,6 +2147,8 @@ function Registre({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sectionTitle = { fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px', color, marginBottom: '20px' }
 
@@ -2064,13 +2171,22 @@ function Registre({ cvData, color }) {
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '48px 54px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
-      <div style={{ fontSize: '30px', fontWeight: 700, color: '#171717' }}>{cvData.prenom} {cvData.nom}</div>
-      {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 400, color: '#737373', marginTop: '5px' }}>{cvData.titre}</div>}
-      {contacts.length > 0 && (
-        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', fontSize: '10.5px', color: '#737373', marginTop: '15px' }}>
-          {contacts.map((c, i) => <span key={i}>{c}</span>)}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <div style={{ fontSize: '30px', fontWeight: 700, color: '#171717' }}>{cvData.prenom} {cvData.nom}</div>
+          {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 400, color: '#737373', marginTop: '5px' }}>{cvData.titre}</div>}
+          {contacts.length > 0 && (
+            <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', fontSize: '10.5px', color: '#737373', marginTop: '15px' }}>
+              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+            </div>
+          )}
         </div>
-      )}
+        {showPhoto && (
+          <div style={{ width: 'fit-content', flexShrink: 0, marginLeft: '20px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
+          </div>
+        )}
+      </div>
       <div style={{ height: '1px', background: '#e5e5e5', marginTop: '24px', marginBottom: '30px' }} />
 
       {cvData.accroche && (
@@ -2168,6 +2284,8 @@ function Nocturne({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sectionTitle = { fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px', color, marginBottom: '18px' }
 
@@ -2176,15 +2294,24 @@ function Nocturne({ cvData, color }) {
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#0f172a',
       padding: '50px 56px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
-      <div style={{ fontSize: '32px', fontWeight: 700, color: '#f8fafc', letterSpacing: '-0.6px' }}>
-        {cvData.prenom} {cvData.nom}
-      </div>
-      {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 400, color, marginTop: '6px' }}>{cvData.titre}</div>}
-      {contacts.length > 0 && (
-        <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', fontSize: '10.5px', color: '#94a3b8', marginTop: '16px' }}>
-          {contacts.map((c, i) => <span key={i}>{c}</span>)}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <div style={{ fontSize: '32px', fontWeight: 700, color: '#f8fafc', letterSpacing: '-0.6px' }}>
+            {cvData.prenom} {cvData.nom}
+          </div>
+          {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 400, color, marginTop: '6px' }}>{cvData.titre}</div>}
+          {contacts.length > 0 && (
+            <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', fontSize: '10.5px', color: '#94a3b8', marginTop: '16px' }}>
+              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+            </div>
+          )}
         </div>
-      )}
+        {showPhoto && (
+          <div style={{ width: 'fit-content', flexShrink: 0, marginLeft: '20px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
+          </div>
+        )}
+      </div>
       <div style={{ height: '2px', background: color, width: '50px', marginTop: '22px', marginBottom: '30px' }} />
 
       {cvData.accroche && (
@@ -2290,6 +2417,8 @@ function Compact({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sectionTitle = { fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color }
   const sectionRule = { height: '1px', background: '#e5e7eb', width: '100%', marginTop: '5px', marginBottom: '12px' }
@@ -2299,16 +2428,23 @@ function Compact({ cvData, color }) {
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '34px 40px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: `2px solid ${color}`, paddingBottom: '14px', marginBottom: '20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `2px solid ${color}`, paddingBottom: '14px', marginBottom: '20px' }}>
         <div>
           <div style={{ fontSize: '25px', fontWeight: 700, color: '#111827' }}>{cvData.prenom} {cvData.nom}</div>
           {cvData.titre && <div style={{ fontSize: '12.5px', color: '#6b7280', marginTop: '3px' }}>{cvData.titre}</div>}
         </div>
-        {contacts.length > 0 && (
-          <div style={{ textAlign: 'right', fontSize: '9.5px', color: '#6b7280' }}>
-            {contacts.map((c, i) => <div key={i}>{c}</div>)}
-          </div>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {contacts.length > 0 && (
+            <div style={{ textAlign: 'right', fontSize: '9.5px', color: '#6b7280' }}>
+              {contacts.map((c, i) => <div key={i}>{c}</div>)}
+            </div>
+          )}
+          {showPhoto && (
+            <div style={{ width: 'fit-content', flexShrink: 0 }}>
+              <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
+            </div>
+          )}
+        </div>
       </div>
 
       {cvData.accroche && (
@@ -2422,6 +2558,8 @@ function Vitrine({ cvData, color }) {
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville].filter(Boolean)
   const liens = [cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sectionTitle = { fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2.5px', color, textAlign: 'center' }
   const sectionRule = { height: '1px', background: '#e4e4e7', width: '60px', margin: '10px auto 22px' }
@@ -2432,6 +2570,11 @@ function Vitrine({ cvData, color }) {
       padding: '44px 50px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
       <div style={{ textAlign: 'center', marginBottom: '34px' }}>
+        {showPhoto && (
+          <div style={{ width: 'fit-content', margin: '0 auto 16px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
+          </div>
+        )}
         <div style={{ fontSize: '34px', fontWeight: 300, color: '#18181b', letterSpacing: '-1px' }}>
           {cvData.prenom} {cvData.nom}
         </div>
@@ -2556,6 +2699,8 @@ function Terrain({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const SectionBar = ({ label }) => (
     <div style={{ background: '#f4f4f5', padding: '8px 14px', marginBottom: '16px', borderLeft: `4px solid ${color}` }}>
@@ -2568,20 +2713,27 @@ function Terrain({ cvData, color }) {
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       fontFamily: '"Inter", sans-serif', overflow: 'hidden', boxSizing: 'border-box',
     }}>
-      <div style={{ background: '#18181b', padding: '32px 48px', boxSizing: 'border-box' }}>
-        <div style={{ fontSize: '28px', fontWeight: 700, color: '#ffffff', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-          {cvData.prenom} {cvData.nom}
+      <div style={{ background: '#18181b', padding: '32px 48px', boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: '24px' }}>
+        {showPhoto && (
+          <div style={{ width: 'fit-content', flexShrink: 0 }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={88} color={color} forme={cvData.forme} showPhoto={showPhoto} />
+          </div>
+        )}
+        <div>
+          <div style={{ fontSize: '28px', fontWeight: 700, color: '#ffffff', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            {cvData.prenom} {cvData.nom}
+          </div>
+          {cvData.titre && (
+            <div style={{ fontSize: '13px', fontWeight: 500, color, marginTop: '6px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              {cvData.titre}
+            </div>
+          )}
+          {contacts.length > 0 && (
+            <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', fontSize: '10px', color: 'rgba(255,255,255,0.7)', marginTop: '14px' }}>
+              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+            </div>
+          )}
         </div>
-        {cvData.titre && (
-          <div style={{ fontSize: '13px', fontWeight: 500, color, marginTop: '6px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-            {cvData.titre}
-          </div>
-        )}
-        {contacts.length > 0 && (
-          <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', fontSize: '10px', color: 'rgba(255,255,255,0.7)', marginTop: '14px' }}>
-            {contacts.map((c, i) => <span key={i}>{c}</span>)}
-          </div>
-        )}
       </div>
 
       {certifications.length > 0 && (
@@ -2709,8 +2861,8 @@ function Soin({ cvData, color }) {
     }}>
       <div style={{ width: '250px', flexShrink: 0, background: `${color}08`, padding: '34px 26px', boxSizing: 'border-box' }}>
         {showPhoto && (
-          <div style={{ width: 'fit-content', margin: '0 auto 20px', border: '3px solid #ffffff', borderRadius: '50%', boxShadow: '0 2px 6px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
-            <PhotoCV photo={cvData.photo} initiales={initiales} size={86} color={color} showPhoto={showPhoto} />
+          <div style={{ width: 'fit-content', margin: '0 auto 20px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={96} color={color} forme={cvData.forme} showPhoto={showPhoto} />
           </div>
         )}
         <div style={{ fontSize: '19px', fontWeight: 700, color: '#134e4a', textAlign: 'center', lineHeight: 1.3 }}>
@@ -2849,6 +3001,8 @@ function Parallele({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sectionTitle = { fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px', color, marginBottom: '16px' }
 
@@ -2858,6 +3012,11 @@ function Parallele({ cvData, color }) {
       padding: '44px 48px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
       <div style={{ textAlign: 'center' }}>
+        {showPhoto && (
+          <div style={{ width: 'fit-content', margin: '0 auto 18px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={96} color={color} forme={cvData.forme} showPhoto={showPhoto} />
+          </div>
+        )}
         <div style={{ fontSize: '30px', fontWeight: 700, color: '#111827' }}>{cvData.prenom} {cvData.nom}</div>
         {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 400, color, marginTop: '5px' }}>{cvData.titre}</div>}
         {contacts.length > 0 && (
@@ -2968,6 +3127,8 @@ function Mosaique({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   return (
     <div id="cv-to-print" className="cv-template" style={{
@@ -2976,9 +3137,16 @@ function Mosaique({ cvData, color }) {
       fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
       <div style={{ background: '#111827', borderRadius: '10px', padding: '26px 32px', boxSizing: 'border-box', minHeight: '118px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <div style={{ fontSize: '26px', fontWeight: 700, color: '#ffffff' }}>{cvData.prenom} {cvData.nom}</div>
-          {cvData.titre && <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', marginTop: '4px' }}>{cvData.titre}</div>}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          {showPhoto && (
+            <div style={{ width: 'fit-content', flexShrink: 0 }}>
+              <PhotoCV photo={cvData.photo} initiales={initiales} size={96} color="#ffffff" forme={cvData.forme} showPhoto={showPhoto} />
+            </div>
+          )}
+          <div>
+            <div style={{ fontSize: '26px', fontWeight: 700, color: '#ffffff' }}>{cvData.prenom} {cvData.nom}</div>
+            {cvData.titre && <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', marginTop: '4px' }}>{cvData.titre}</div>}
+          </div>
         </div>
         {contacts.length > 0 && (
           <div style={{ textAlign: 'right' }}>
@@ -3102,6 +3270,8 @@ function Angle({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const SectionTitle = ({ children }) => (
     <div style={{ display: 'flex', alignItems: 'center', marginBottom: '18px' }}>
@@ -3119,14 +3289,21 @@ function Angle({ cvData, color }) {
       <div style={{ position: 'absolute', bottom: '-40px', left: '-40px', width: '160px', height: '160px', borderRadius: '50%', background: `${color}0a`, zIndex: 0 }} />
 
       <div style={{ position: 'relative', zIndex: 1, padding: '48px 52px', boxSizing: 'border-box' }}>
-        <div style={{ marginBottom: '30px' }}>
-          <div style={{ fontSize: '31px', fontWeight: 700, color: '#18181b' }}>{cvData.prenom} {cvData.nom}</div>
-          {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 500, color, marginTop: '5px' }}>{cvData.titre}</div>}
-          {contacts.length > 0 && (
-            <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', fontSize: '10.5px', color: '#71717a', marginTop: '15px' }}>
-              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px' }}>
+          {showPhoto && (
+            <div style={{ width: 'fit-content', flexShrink: 0 }}>
+              <PhotoCV photo={cvData.photo} initiales={initiales} size={88} color={color} forme={cvData.forme} showPhoto={showPhoto} />
             </div>
           )}
+          <div>
+            <div style={{ fontSize: '31px', fontWeight: 700, color: '#18181b' }}>{cvData.prenom} {cvData.nom}</div>
+            {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 500, color, marginTop: '5px' }}>{cvData.titre}</div>}
+            {contacts.length > 0 && (
+              <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', fontSize: '10.5px', color: '#71717a', marginTop: '15px' }}>
+                {contacts.map((c, i) => <span key={i}>{c}</span>)}
+              </div>
+            )}
+          </div>
         </div>
 
         {cvData.accroche && (
@@ -3246,7 +3423,7 @@ function Colonne({ cvData, color }) {
       <div style={{ width: '180px', flexShrink: 0, background: '#fafafa', padding: '34px 20px', boxSizing: 'border-box' }}>
         {showPhoto && (
           <div style={{ width: 'fit-content', margin: '0 auto 18px' }}>
-            <PhotoCV photo={cvData.photo} initiales={initiales} size={76} color={color} showPhoto={showPhoto} />
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={96} color={color} forme={cvData.forme} showPhoto={showPhoto} />
           </div>
         )}
         <div style={{ fontSize: '16px', fontWeight: 700, color: '#111827', textAlign: 'center', lineHeight: 1.3 }}>
@@ -3370,6 +3547,8 @@ function Etape({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   let numero = 0
   const Section = ({ label, children }) => {
@@ -3393,12 +3572,19 @@ function Etape({ cvData, color }) {
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '46px 54px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
-      <div style={{ marginBottom: '36px' }}>
-        <div style={{ fontSize: '32px', fontWeight: 700, color: '#0a0a0a' }}>{cvData.prenom} {cvData.nom}</div>
-        {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 400, color: '#737373', marginTop: '5px' }}>{cvData.titre}</div>}
-        {contacts.length > 0 && (
-          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', fontSize: '10.5px', color: '#737373', marginTop: '15px' }}>
-            {contacts.map((c, i) => <span key={i}>{c}</span>)}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '36px' }}>
+        <div>
+          <div style={{ fontSize: '32px', fontWeight: 700, color: '#0a0a0a' }}>{cvData.prenom} {cvData.nom}</div>
+          {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 400, color: '#737373', marginTop: '5px' }}>{cvData.titre}</div>}
+          {contacts.length > 0 && (
+            <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', fontSize: '10.5px', color: '#737373', marginTop: '15px' }}>
+              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+            </div>
+          )}
+        </div>
+        {showPhoto && (
+          <div style={{ width: 'fit-content', flexShrink: 0, marginLeft: '20px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
           </div>
         )}
       </div>
@@ -3498,6 +3684,8 @@ function Focus({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sectionTitle = { fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px', color }
   const sectionRule = { height: '1px', background: '#e5e7eb', width: '100%', marginTop: '7px', marginBottom: '18px' }
@@ -3507,12 +3695,19 @@ function Focus({ cvData, color }) {
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '46px 52px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
-      <div style={{ marginBottom: '26px' }}>
-        <div style={{ fontSize: '27px', fontWeight: 600, color: '#111827' }}>{cvData.prenom} {cvData.nom}</div>
-        {cvData.titre && <div style={{ fontSize: '13px', fontWeight: 400, color: '#6b7280', marginTop: '4px' }}>{cvData.titre}</div>}
-        {contacts.length > 0 && (
-          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: '10px', color: '#9ca3af', marginTop: '12px' }}>
-            {contacts.map((c, i) => <span key={i}>{c}</span>)}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '26px' }}>
+        <div>
+          <div style={{ fontSize: '27px', fontWeight: 600, color: '#111827' }}>{cvData.prenom} {cvData.nom}</div>
+          {cvData.titre && <div style={{ fontSize: '13px', fontWeight: 400, color: '#6b7280', marginTop: '4px' }}>{cvData.titre}</div>}
+          {contacts.length > 0 && (
+            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: '10px', color: '#9ca3af', marginTop: '12px' }}>
+              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+            </div>
+          )}
+        </div>
+        {showPhoto && (
+          <div style={{ width: 'fit-content', flexShrink: 0, marginLeft: '20px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
           </div>
         )}
       </div>
@@ -3625,6 +3820,8 @@ function Sobre({ cvData }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sectionTitle = { fontFamily: 'Georgia, serif', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#000000' }
   const sectionRule = { height: '1px', background: '#666666', width: '100%', marginTop: '5px', marginBottom: '16px' }
@@ -3635,6 +3832,11 @@ function Sobre({ cvData }) {
       padding: '55px 62px', boxSizing: 'border-box', fontFamily: 'Georgia, serif', overflow: 'hidden',
     }}>
       <div style={{ textAlign: 'center' }}>
+        {showPhoto && (
+          <div style={{ width: 'fit-content', margin: '0 auto 14px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color="#000000" forme={cvData.forme} showPhoto={showPhoto} />
+          </div>
+        )}
         <div style={{ fontSize: '26px', fontWeight: 700, color: '#000000', letterSpacing: '0.5px' }}>
           {cvData.prenom} {cvData.nom}
         </div>
@@ -3775,8 +3977,8 @@ function Duo({ cvData, color }) {
       <div style={{ display: 'flex', height: '150px' }}>
         <div style={{ width: '42%', background: color, padding: '32px 28px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           {showPhoto && (
-            <div style={{ width: 'fit-content', marginBottom: '12px', border: '3px solid rgba(255,255,255,0.3)', borderRadius: '50%', overflow: 'hidden' }}>
-              <PhotoCV photo={cvData.photo} initiales={initiales} size={72} color="#ffffff" showPhoto={showPhoto} />
+            <div style={{ width: 'fit-content' }}>
+              <PhotoCV photo={cvData.photo} initiales={initiales} size={78} color="#ffffff" forme={cvData.forme} showPhoto={showPhoto} />
             </div>
           )}
         </div>
@@ -3896,6 +4098,8 @@ function Chiffre({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   // Met en valeur chiffres, pourcentages et montants dans le texte d'une mission
   const highlightNumbers = (text) => {
@@ -3935,12 +4139,19 @@ function Chiffre({ cvData, color }) {
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '44px 52px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
-      <div style={{ marginBottom: '26px' }}>
-        <div style={{ fontSize: '29px', fontWeight: 700, color: '#0c0a09' }}>{cvData.prenom} {cvData.nom}</div>
-        {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 500, color, marginTop: '5px' }}>{cvData.titre}</div>}
-        {contacts.length > 0 && (
-          <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', fontSize: '10.5px', color: '#78716c', marginTop: '14px' }}>
-            {contacts.map((c, i) => <span key={i}>{c}</span>)}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '26px' }}>
+        <div>
+          <div style={{ fontSize: '29px', fontWeight: 700, color: '#0c0a09' }}>{cvData.prenom} {cvData.nom}</div>
+          {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 500, color, marginTop: '5px' }}>{cvData.titre}</div>}
+          {contacts.length > 0 && (
+            <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', fontSize: '10.5px', color: '#78716c', marginTop: '14px' }}>
+              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+            </div>
+          )}
+        </div>
+        {showPhoto && (
+          <div style={{ width: 'fit-content', flexShrink: 0, marginLeft: '20px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
           </div>
         )}
       </div>
@@ -4063,6 +4274,8 @@ function Archive({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sectionTitle = { fontFamily: '"Source Serif 4", serif', fontSize: '15px', fontWeight: 600, color: '#1c1917', marginBottom: '14px' }
 
@@ -4071,17 +4284,24 @@ function Archive({ cvData, color }) {
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '52px 58px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
-      <div>
-        <div style={{ fontFamily: '"Source Serif 4", serif', fontSize: '28px', fontWeight: 600, color: '#1c1917' }}>
-          {cvData.prenom} {cvData.nom}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <div style={{ fontFamily: '"Source Serif 4", serif', fontSize: '28px', fontWeight: 600, color: '#1c1917' }}>
+            {cvData.prenom} {cvData.nom}
+          </div>
+          {cvData.titre && <div style={{ fontSize: '13px', fontWeight: 400, color: '#57534e', marginTop: '5px' }}>{cvData.titre}</div>}
+          {experiences[0]?.entreprise && (
+            <div style={{ fontSize: '12px', fontStyle: 'italic', color: '#78716c', marginTop: '3px' }}>{experiences[0].entreprise}</div>
+          )}
+          {contacts.length > 0 && (
+            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: '10px', color: '#78716c', marginTop: '14px' }}>
+              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+            </div>
+          )}
         </div>
-        {cvData.titre && <div style={{ fontSize: '13px', fontWeight: 400, color: '#57534e', marginTop: '5px' }}>{cvData.titre}</div>}
-        {experiences[0]?.entreprise && (
-          <div style={{ fontSize: '12px', fontStyle: 'italic', color: '#78716c', marginTop: '3px' }}>{experiences[0].entreprise}</div>
-        )}
-        {contacts.length > 0 && (
-          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: '10px', color: '#78716c', marginTop: '14px' }}>
-            {contacts.map((c, i) => <span key={i}>{c}</span>)}
+        {showPhoto && (
+          <div style={{ width: 'fit-content', flexShrink: 0, marginLeft: '20px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
           </div>
         )}
       </div>
@@ -4174,6 +4394,8 @@ function Ruban({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sectionTitle = { fontSize: '11.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.8px', color: '#18181b' }
   const sectionRule = { height: '3px', background: color, width: '26px', marginTop: '7px', marginBottom: '17px' }
@@ -4186,12 +4408,19 @@ function Ruban({ cvData, color }) {
       <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '14px', background: `linear-gradient(180deg, ${color} 0%, ${color}66 100%)` }} />
 
       <div style={{ paddingLeft: '58px', paddingRight: '50px', paddingTop: '46px', paddingBottom: '46px', boxSizing: 'border-box' }}>
-        <div style={{ marginBottom: '30px' }}>
-          <div style={{ fontSize: '30px', fontWeight: 700, color: '#18181b' }}>{cvData.prenom} {cvData.nom}</div>
-          {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 400, color, marginTop: '5px' }}>{cvData.titre}</div>}
-          {contacts.length > 0 && (
-            <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', fontSize: '10.5px', color: '#71717a', marginTop: '15px' }}>
-              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+          <div>
+            <div style={{ fontSize: '30px', fontWeight: 700, color: '#18181b' }}>{cvData.prenom} {cvData.nom}</div>
+            {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 400, color, marginTop: '5px' }}>{cvData.titre}</div>}
+            {contacts.length > 0 && (
+              <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', fontSize: '10.5px', color: '#71717a', marginTop: '15px' }}>
+                {contacts.map((c, i) => <span key={i}>{c}</span>)}
+              </div>
+            )}
+          </div>
+          {showPhoto && (
+            <div style={{ width: 'fit-content', flexShrink: 0, marginLeft: '20px' }}>
+              <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
             </div>
           )}
         </div>
@@ -4306,6 +4535,8 @@ function Plan({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sectionTitle = { fontSize: '10.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px', color, marginBottom: '14px' }
   const sep = { borderTop: '1px solid #f4f4f5', paddingTop: '20px', marginTop: '20px' }
@@ -4316,12 +4547,19 @@ function Plan({ cvData, color }) {
       padding: '46px 50px', boxSizing: 'border-box', display: 'grid', gap: 0, alignContent: 'start',
       fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
-      <div style={{ paddingBottom: '22px', borderBottom: '2px solid #18181b' }}>
-        <div style={{ fontSize: '29px', fontWeight: 700, color: '#18181b' }}>{cvData.prenom} {cvData.nom}</div>
-        {cvData.titre && <div style={{ fontSize: '13.5px', fontWeight: 400, color: '#52525b', marginTop: '4px' }}>{cvData.titre}</div>}
-        {contacts.length > 0 && (
-          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: '10px', color: '#71717a', marginTop: '12px' }}>
-            {contacts.map((c, i) => <span key={i}>{c}</span>)}
+      <div style={{ paddingBottom: '22px', borderBottom: '2px solid #18181b', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <div style={{ fontSize: '29px', fontWeight: 700, color: '#18181b' }}>{cvData.prenom} {cvData.nom}</div>
+          {cvData.titre && <div style={{ fontSize: '13.5px', fontWeight: 400, color: '#52525b', marginTop: '4px' }}>{cvData.titre}</div>}
+          {contacts.length > 0 && (
+            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: '10px', color: '#71717a', marginTop: '12px' }}>
+              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+            </div>
+          )}
+        </div>
+        {showPhoto && (
+          <div style={{ width: 'fit-content', flexShrink: 0, marginLeft: '20px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
           </div>
         )}
       </div>
@@ -4429,6 +4667,8 @@ function Clarte({ cvData }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sectionTitle = { fontSize: '10px', fontWeight: 600, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#a3a3a3', marginBottom: '22px' }
 
@@ -4437,14 +4677,21 @@ function Clarte({ cvData }) {
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '64px 70px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
-      <div style={{ marginBottom: '46px' }}>
-        <div style={{ fontSize: '38px', fontWeight: 300, color: '#000000', letterSpacing: '-1.2px', lineHeight: 1.1 }}>
-          {cvData.prenom} {cvData.nom}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '46px' }}>
+        <div>
+          <div style={{ fontSize: '38px', fontWeight: 300, color: '#000000', letterSpacing: '-1.2px', lineHeight: 1.1 }}>
+            {cvData.prenom} {cvData.nom}
+          </div>
+          {cvData.titre && <div style={{ fontSize: '15px', fontWeight: 400, color: '#737373', marginTop: '10px' }}>{cvData.titre}</div>}
+          {contacts.length > 0 && (
+            <div style={{ display: 'flex', gap: '22px', flexWrap: 'wrap', fontSize: '10.5px', fontWeight: 400, color: '#a3a3a3', marginTop: '20px' }}>
+              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+            </div>
+          )}
         </div>
-        {cvData.titre && <div style={{ fontSize: '15px', fontWeight: 400, color: '#737373', marginTop: '10px' }}>{cvData.titre}</div>}
-        {contacts.length > 0 && (
-          <div style={{ display: 'flex', gap: '22px', flexWrap: 'wrap', fontSize: '10.5px', fontWeight: 400, color: '#a3a3a3', marginTop: '20px' }}>
-            {contacts.map((c, i) => <span key={i}>{c}</span>)}
+        {showPhoto && (
+          <div style={{ width: 'fit-content', flexShrink: 0, marginLeft: '20px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color="#000000" forme={cvData.forme} showPhoto={showPhoto} />
           </div>
         )}
       </div>
@@ -4533,6 +4780,8 @@ function Signature({ cvData, color }) {
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
   const nomComplet = `${cvData.prenom || ''} ${cvData.nom || ''}`.trim()
   const nomFontSize = nomComplet.length > 18 ? '42px' : '52px'
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sectionTitle = { fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px', color: '#0a0a0a', marginBottom: '18px' }
 
@@ -4541,15 +4790,24 @@ function Signature({ cvData, color }) {
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '42px 50px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
-      <div style={{ fontSize: nomFontSize, fontWeight: 800, color: '#0a0a0a', letterSpacing: '-2.5px', lineHeight: 0.95 }}>
-        {nomComplet}
-      </div>
-      {cvData.titre && <div style={{ fontSize: '15px', fontWeight: 500, color, marginTop: '12px', letterSpacing: '0.5px' }}>{cvData.titre}</div>}
-      {contacts.length > 0 && (
-        <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', fontSize: '10.5px', color: '#737373', marginTop: '16px' }}>
-          {contacts.map((c, i) => <span key={i}>{c}</span>)}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <div style={{ fontSize: nomFontSize, fontWeight: 800, color: '#0a0a0a', letterSpacing: '-2.5px', lineHeight: 0.95 }}>
+            {nomComplet}
+          </div>
+          {cvData.titre && <div style={{ fontSize: '15px', fontWeight: 500, color, marginTop: '12px', letterSpacing: '0.5px' }}>{cvData.titre}</div>}
+          {contacts.length > 0 && (
+            <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', fontSize: '10.5px', color: '#737373', marginTop: '16px' }}>
+              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+            </div>
+          )}
         </div>
-      )}
+        {showPhoto && (
+          <div style={{ width: 'fit-content', flexShrink: 0, marginLeft: '20px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
+          </div>
+        )}
+      </div>
       <div style={{ height: '5px', background: color, width: '90px', marginTop: '24px', marginBottom: '32px' }} />
 
       {cvData.accroche && (
@@ -4647,6 +4905,8 @@ function Cadre({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const box = { background: '#fafaf9', border: '1px solid #f5f5f4', borderRadius: '4px', padding: '18px 20px', marginBottom: '16px' }
   const boxTitle = { fontSize: '10.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.8px', color, marginBottom: '14px' }
@@ -4661,6 +4921,11 @@ function Cadre({ cvData, color }) {
         border: '1px solid #e7e5e4', boxShadow: '0 1px 3px rgba(0,0,0,0.04)', minHeight: 'calc(1123px - 60px)',
       }}>
         <div style={{ textAlign: 'center', paddingBottom: '22px', borderBottom: '1px solid #e7e5e4', marginBottom: '28px' }}>
+          {showPhoto && (
+            <div style={{ width: 'fit-content', margin: '0 auto 14px' }}>
+              <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
+            </div>
+          )}
           <div style={{ fontSize: '28px', fontWeight: 700, color: '#1c1917' }}>{cvData.prenom} {cvData.nom}</div>
           {cvData.titre && <div style={{ fontSize: '13px', fontWeight: 400, color, marginTop: '5px' }}>{cvData.titre}</div>}
           {contacts.length > 0 && (
@@ -4775,6 +5040,8 @@ function Flux({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const Transition = () => (
     <div style={{ height: '3px', background: `linear-gradient(90deg, ${color} 0%, ${color}00 100%)`, marginTop: '26px', marginBottom: '14px' }} />
@@ -4786,12 +5053,19 @@ function Flux({ cvData, color }) {
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '44px 50px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
-      <div style={{ marginBottom: '8px' }}>
-        <div style={{ fontSize: '29px', fontWeight: 700, color: '#111827' }}>{cvData.prenom} {cvData.nom}</div>
-        {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 400, color: '#6b7280', marginTop: '5px' }}>{cvData.titre}</div>}
-        {contacts.length > 0 && (
-          <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', fontSize: '10.5px', color: '#6b7280', marginTop: '14px' }}>
-            {contacts.map((c, i) => <span key={i}>{c}</span>)}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+        <div>
+          <div style={{ fontSize: '29px', fontWeight: 700, color: '#111827' }}>{cvData.prenom} {cvData.nom}</div>
+          {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 400, color: '#6b7280', marginTop: '5px' }}>{cvData.titre}</div>}
+          {contacts.length > 0 && (
+            <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', fontSize: '10.5px', color: '#6b7280', marginTop: '14px' }}>
+              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+            </div>
+          )}
+        </div>
+        {showPhoto && (
+          <div style={{ width: 'fit-content', flexShrink: 0, marginLeft: '20px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
           </div>
         )}
       </div>
@@ -4900,6 +5174,8 @@ function Reserve({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const SectionTitle = ({ children }) => (
     <div style={{ marginBottom: '18px' }}>
@@ -4913,19 +5189,28 @@ function Reserve({ cvData, color }) {
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '58px 64px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
-      <div style={{ fontFamily: '"Source Serif 4", serif', fontSize: '30px', fontWeight: 600, color: '#1c1917', letterSpacing: '-0.3px' }}>
-        {cvData.prenom} {cvData.nom}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <div style={{ fontFamily: '"Source Serif 4", serif', fontSize: '30px', fontWeight: 600, color: '#1c1917', letterSpacing: '-0.3px' }}>
+            {cvData.prenom} {cvData.nom}
+          </div>
+          {cvData.titre && (
+            <div style={{ fontSize: '12px', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '2.5px', color: '#78716c', marginTop: '8px' }}>
+              {cvData.titre}
+            </div>
+          )}
+          {contacts.length > 0 && (
+            <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', fontSize: '10px', color: '#a8a29e', marginTop: '18px' }}>
+              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+            </div>
+          )}
+        </div>
+        {showPhoto && (
+          <div style={{ width: 'fit-content', flexShrink: 0, marginLeft: '20px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
+          </div>
+        )}
       </div>
-      {cvData.titre && (
-        <div style={{ fontSize: '12px', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '2.5px', color: '#78716c', marginTop: '8px' }}>
-          {cvData.titre}
-        </div>
-      )}
-      {contacts.length > 0 && (
-        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', fontSize: '10px', color: '#a8a29e', marginTop: '18px' }}>
-          {contacts.map((c, i) => <span key={i}>{c}</span>)}
-        </div>
-      )}
       <div style={{ height: '1px', background: '#e7e5e4', marginTop: '26px', marginBottom: '30px' }} />
 
       {cvData.accroche && (
@@ -5017,6 +5302,8 @@ function Essentiel({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
   const accrocheTronquee = cvData.accroche && cvData.accroche.length > 200
     ? cvData.accroche.slice(0, 200).trim() + '…'
     : cvData.accroche
@@ -5028,14 +5315,21 @@ function Essentiel({ cvData, color }) {
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '32px 38px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', borderBottom: `1.5px solid ${color}`, paddingBottom: '10px', marginBottom: '14px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1.5px solid ${color}`, paddingBottom: '10px', marginBottom: '14px' }}>
         <div>
           <div style={{ fontSize: '22px', fontWeight: 700, color: '#111827' }}>{cvData.prenom} {cvData.nom}</div>
           {cvData.titre && <div style={{ fontSize: '11.5px', fontWeight: 500, color, marginTop: '3px' }}>{cvData.titre}</div>}
         </div>
-        {contacts.length > 0 && (
-          <div style={{ fontSize: '9px', color: '#6b7280' }}>{contacts.join(' · ')}</div>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {contacts.length > 0 && (
+            <div style={{ fontSize: '9px', color: '#6b7280' }}>{contacts.join(' · ')}</div>
+          )}
+          {showPhoto && (
+            <div style={{ width: 'fit-content', flexShrink: 0 }}>
+              <PhotoCV photo={cvData.photo} initiales={initiales} size={44} color={color} forme={cvData.forme} showPhoto={showPhoto} />
+            </div>
+          )}
+        </div>
       </div>
 
       {accrocheTronquee && (
@@ -5145,7 +5439,7 @@ function Impulsion({ cvData, color }) {
       padding: '40px 46px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '26px' }}>
-        <PhotoCV photo={cvData.photo} initiales={initiales} size={82} color={color} borderRadius="16px" showPhoto={showPhoto} />
+        <PhotoCV photo={cvData.photo} initiales={initiales} size={88} color={color} forme={cvData.forme || 'carre_arrondi'} showPhoto={showPhoto} />
         <div>
           <div style={{ fontSize: '27px', fontWeight: 800, color: '#09090b', letterSpacing: '-0.8px' }}>{cvData.prenom} {cvData.nom}</div>
           {cvData.titre && <div style={{ fontSize: '13px', fontWeight: 500, color, marginTop: '4px' }}>{cvData.titre}</div>}
@@ -5257,6 +5551,8 @@ function Trajectoire({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const anneesExtraites = experiences
     .map(exp => {
@@ -5276,12 +5572,19 @@ function Trajectoire({ cvData, color }) {
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '44px 48px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
-      <div style={{ marginBottom: '28px' }}>
-        <div style={{ fontSize: '28px', fontWeight: 700, color: '#111827' }}>{cvData.prenom} {cvData.nom}</div>
-        {cvData.titre && <div style={{ fontSize: '13.5px', fontWeight: 400, color: '#6b7280', marginTop: '4px' }}>{cvData.titre}</div>}
-        {contacts.length > 0 && (
-          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: '10px', color: '#6b7280', marginTop: '13px' }}>
-            {contacts.map((c, i) => <span key={i}>{c}</span>)}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
+        <div>
+          <div style={{ fontSize: '28px', fontWeight: 700, color: '#111827' }}>{cvData.prenom} {cvData.nom}</div>
+          {cvData.titre && <div style={{ fontSize: '13.5px', fontWeight: 400, color: '#6b7280', marginTop: '4px' }}>{cvData.titre}</div>}
+          {contacts.length > 0 && (
+            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: '10px', color: '#6b7280', marginTop: '13px' }}>
+              {contacts.map((c, i) => <span key={i}>{c}</span>)}
+            </div>
+          )}
+        </div>
+        {showPhoto && (
+          <div style={{ width: 'fit-content', flexShrink: 0, marginLeft: '20px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
           </div>
         )}
       </div>
