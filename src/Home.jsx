@@ -89,6 +89,14 @@ export default function Home() {
   const [howRef, howInView] = useInView()
   const [templatesRef, templatesInView] = useInView()
   const [formationsRef, formationsInView] = useInView()
+  const [stats, setStats] = useState({})
+
+  useEffect(() => {
+    fetch('/api/stats')
+      .then(r => r.json())
+      .then(setStats)
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     const checkUser = async () => {
@@ -213,8 +221,29 @@ export default function Home() {
           }}>
             Créer mon CV gratuitement
           </a>
-          <div style={{ marginTop: '20px', fontSize: '12px', color: '#71717a' }}>
-            Gratuit · Sans carte bancaire · 27 templates
+          <div style={{ display: 'flex', gap: '32px', justifyContent: 'center', marginTop: '32px' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '28px', fontWeight: 700, color: '#ffffff' }}>
+                {stats.total ? stats.total.toLocaleString('fr-FR') : '—'}
+              </div>
+              <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '2px' }}>
+                offres disponibles
+              </div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '28px', fontWeight: 700, color: '#ffffff' }}>
+                {stats.entreprises || '—'}
+              </div>
+              <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '2px' }}>
+                entreprises en direct
+              </div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '28px', fontWeight: 700, color: '#ffffff' }}>40</div>
+              <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '2px' }}>
+                modèles de CV
+              </div>
+            </div>
           </div>
         </div>
       </div>
