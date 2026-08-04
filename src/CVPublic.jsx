@@ -37,7 +37,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Lock, Download } from 'lucide-react'
 import { supabase } from './supabase'
-import { CVTemplate } from './CVTemplates'
+import { CVTemplatePro } from './CVTemplatesPro'
 import { downloadCVasPDF } from './pdfUtils'
 
 function useWidth() {
@@ -137,7 +137,7 @@ export default function CVPublic() {
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <div style={{ width: `${794 * scale}px`, height: `${1123 * scale}px`, boxShadow: '0 8px 40px rgba(0,0,0,0.15)', borderRadius: '4px', overflow: 'hidden', position: 'relative' }}>
             <div style={{ position: 'absolute', top: 0, left: 0, width: '794px', height: '1123px', transform: `scale(${scale})`, transformOrigin: 'top left' }}>
-              <CVTemplate cvData={cv.cv_data} template={cv.template} />
+              <CVTemplatePro cvData={cv.cv_data} template={cv.template} />
             </div>
           </div>
         </div>

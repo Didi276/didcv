@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CVTemplate } from './CVTemplates'
+import { CVTemplatePro } from './CVTemplatesPro'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 
@@ -296,7 +296,7 @@ function CVEditor({ cvData, template, onSave, onClose }) {
         {/* Right — Aperçu en temps réel */}
         <div style={{background:'#e5e7ef',overflow:'auto',display:'flex',alignItems:'flex-start',justifyContent:'center',padding:'24px'}}>
           <div style={{transform:'scale(0.75)',transformOrigin:'top center',width:'794px',flexShrink:0}}>
-            <CVTemplate cvData={cv} template={template} />
+            <CVTemplatePro cvData={cv} template={template} />
           </div>
         </div>
 

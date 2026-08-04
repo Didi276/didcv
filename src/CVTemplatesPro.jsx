@@ -19,7 +19,7 @@ function Meridien({ cvData, color }) {
   const sectionRule = { width: '32px', height: '2px', background: color, marginBottom: '20px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '56px 60px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif',
       overflow: 'hidden', color: '#111827',
@@ -176,7 +176,7 @@ function Atelier({ cvData, color }) {
   const rightSectionTitle = { fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#111827', marginBottom: '18px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, display: 'flex',
       fontFamily: '"Inter", sans-serif', overflow: 'hidden', boxSizing: 'border-box',
     }}>
@@ -325,7 +325,7 @@ function Tribune({ cvData, color }) {
   const sectionRule = { height: '1px', background: '#e5e7eb', width: '100%', marginTop: '8px', marginBottom: '20px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       fontFamily: '"Inter", sans-serif', overflow: 'hidden', boxSizing: 'border-box',
     }}>
@@ -483,7 +483,7 @@ function Chronique({ cvData, color }) {
   const sectionTitleClassic = { fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#111827', marginBottom: '16px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '50px 56px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -617,7 +617,7 @@ function Manuscrit({ cvData, color }) {
   const sectionRule = { height: '1px', background: '#e0ddd5', width: '100%', marginTop: '6px', marginBottom: '18px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#fffef9',
       padding: '60px 64px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -748,7 +748,7 @@ function Grille({ cvData, color }) {
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '40px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '16px',
       fontFamily: '"Inter", sans-serif', overflow: 'hidden',
@@ -884,7 +884,7 @@ function Silence({ cvData }) {
   const sectionTitle = { fontSize: '9px', fontWeight: 500, letterSpacing: '3px', textTransform: 'uppercase', color: '#cccccc', marginBottom: '20px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '80px 90px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -1000,7 +1000,7 @@ function Signal({ cvData, color }) {
   const sectionSquare = { width: '6px', height: '6px', background: color, marginRight: '8px', flexShrink: 0 }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '44px 52px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -1155,7 +1155,7 @@ function Prestige({ cvData, color }) {
   }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '52px 58px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -1300,7 +1300,7 @@ function Contraste({ cvData, color }) {
   const rightSectionRule = { height: '3px', background: color, width: '36px', marginTop: '8px', marginBottom: '20px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, display: 'flex',
       fontFamily: '"Inter", sans-serif', overflow: 'hidden', boxSizing: 'border-box',
     }}>
@@ -1455,7 +1455,7 @@ function Horizon({ cvData, color }) {
   const sectionRule = { height: '1px', background: '#e4e4e7', width: '100%', marginTop: '7px', marginBottom: '18px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, display: 'flex',
       fontFamily: '"Inter", sans-serif', overflow: 'hidden', boxSizing: 'border-box',
     }}>
@@ -1603,7 +1603,7 @@ function Palier({ cvData, color }) {
   const sectionTitle = { fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.8px', color, marginBottom: '16px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '46px 54px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -1733,7 +1733,7 @@ function Dossier({ cvData, color }) {
   }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '50px 56px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -1866,7 +1866,7 @@ function Aurore({ cvData, color }) {
   const sectionRule = { height: '3px', background: color, width: '28px', marginTop: '7px', marginBottom: '18px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       fontFamily: '"Inter", sans-serif', overflow: 'hidden', boxSizing: 'border-box',
     }}>
@@ -2026,7 +2026,7 @@ function Registre({ cvData, color }) {
   )
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '48px 54px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -2138,7 +2138,7 @@ function Nocturne({ cvData, color }) {
   const sectionTitle = { fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px', color, marginBottom: '18px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#0f172a',
       padding: '50px 56px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -2261,7 +2261,7 @@ function Compact({ cvData, color }) {
   const sectionRule = { height: '1px', background: '#e5e7eb', width: '100%', marginTop: '5px', marginBottom: '12px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '34px 40px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -2393,7 +2393,7 @@ function Vitrine({ cvData, color }) {
   const sectionRule = { height: '1px', background: '#e4e4e7', width: '60px', margin: '10px auto 22px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '44px 50px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -2530,7 +2530,7 @@ function Terrain({ cvData, color }) {
   )
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       fontFamily: '"Inter", sans-serif', overflow: 'hidden', boxSizing: 'border-box',
     }}>
@@ -2667,7 +2667,7 @@ function Soin({ cvData, color }) {
   const rightSectionRule = { height: '2px', background: color, width: '30px', marginTop: '7px', marginBottom: '18px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, display: 'flex',
       fontFamily: '"Inter", sans-serif', overflow: 'hidden', boxSizing: 'border-box',
     }}>
@@ -2819,7 +2819,7 @@ function Parallele({ cvData, color }) {
   const sectionTitle = { fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px', color, marginBottom: '16px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '44px 48px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -2936,7 +2936,7 @@ function Mosaique({ cvData, color }) {
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '38px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '14px',
       fontFamily: '"Inter", sans-serif', overflow: 'hidden',
@@ -3077,7 +3077,7 @@ function Angle({ cvData, color }) {
   )
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       position: 'relative', overflow: 'hidden', fontFamily: '"Inter", sans-serif', boxSizing: 'border-box',
     }}>
@@ -3203,7 +3203,7 @@ function Colonne({ cvData, color }) {
   const mainSectionRule = { height: '2px', background: color, width: '34px', marginTop: '7px', marginBottom: '18px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, display: 'flex',
       fontFamily: '"Inter", sans-serif', overflow: 'hidden', boxSizing: 'border-box',
     }}>
@@ -3354,7 +3354,7 @@ function Etape({ cvData, color }) {
   }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '46px 54px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -3468,7 +3468,7 @@ function Focus({ cvData, color }) {
   const sectionRule = { height: '1px', background: '#e5e7eb', width: '100%', marginTop: '7px', marginBottom: '18px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '46px 52px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -3595,7 +3595,7 @@ function Sobre({ cvData }) {
   const sectionRule = { height: '1px', background: '#666666', width: '100%', marginTop: '5px', marginBottom: '16px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '55px 62px', boxSizing: 'border-box', fontFamily: 'Georgia, serif', overflow: 'hidden',
     }}>
@@ -3732,7 +3732,7 @@ function Duo({ cvData, color }) {
   )
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       fontFamily: '"Inter", sans-serif', overflow: 'hidden', boxSizing: 'border-box',
     }}>
@@ -3898,7 +3898,7 @@ function Chiffre({ cvData, color }) {
   const sectionRule = { height: '2px', background: color, width: '32px', marginTop: '7px', marginBottom: '18px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '44px 52px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -4034,7 +4034,7 @@ function Archive({ cvData, color }) {
   const sectionTitle = { fontFamily: '"Source Serif 4", serif', fontSize: '15px', fontWeight: 600, color: '#1c1917', marginBottom: '14px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '52px 58px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -4146,7 +4146,7 @@ function Ruban({ cvData, color }) {
   const sectionRule = { height: '3px', background: color, width: '26px', marginTop: '7px', marginBottom: '17px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       position: 'relative', fontFamily: '"Inter", sans-serif', overflow: 'hidden', boxSizing: 'border-box',
     }}>
@@ -4278,7 +4278,7 @@ function Plan({ cvData, color }) {
   const sep = { borderTop: '1px solid #f4f4f5', paddingTop: '20px', marginTop: '20px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '46px 50px', boxSizing: 'border-box', display: 'grid', gap: 0, alignContent: 'start',
       fontFamily: '"Inter", sans-serif', overflow: 'hidden',
@@ -4400,7 +4400,7 @@ function Clarte({ cvData }) {
   const sectionTitle = { fontSize: '10px', fontWeight: 600, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#a3a3a3', marginBottom: '22px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '64px 70px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -4504,7 +4504,7 @@ function Signature({ cvData, color }) {
   const sectionTitle = { fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px', color: '#0a0a0a', marginBottom: '18px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '42px 50px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -4619,7 +4619,7 @@ function Cadre({ cvData, color }) {
   const boxTitle = { fontSize: '10.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.8px', color, marginBottom: '14px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#f5f5f4',
       padding: '30px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -4749,7 +4749,7 @@ function Flux({ cvData, color }) {
   const sectionTitle = { fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px', color, marginBottom: '16px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '44px 50px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -4876,7 +4876,7 @@ function Reserve({ cvData, color }) {
   )
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '58px 64px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -4991,7 +4991,7 @@ function Essentiel({ cvData, color }) {
   const sectionTitle = { fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color, marginBottom: '8px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '32px 38px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -5106,7 +5106,7 @@ function Impulsion({ cvData, color }) {
   const sectionTitle = { display: 'flex', alignItems: 'center', fontSize: '10.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#09090b', marginBottom: '14px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '40px 46px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
@@ -5246,7 +5246,7 @@ function Trajectoire({ cvData, color }) {
   const sectionRule = { height: '2px', background: color, width: '28px', marginTop: '7px', marginBottom: '17px' }
 
   return (
-    <div id="cv-to-print" style={{
+    <div id="cv-to-print" className="cv-template" style={{
       width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#ffffff',
       padding: '44px 48px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>

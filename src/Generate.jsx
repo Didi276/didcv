@@ -7,7 +7,7 @@ import {
   Edit2, Check, ClipboardList, FileText, Mail, Download, Eye,
 } from 'lucide-react'
 import { supabase } from './supabase'
-import { CVTemplate } from './CVTemplates'
+import { CVTemplatePro, TEMPLATES_PRO_META } from './CVTemplatesPro'
 import CVEditorBlocks from './CVEditorBlocks'
 import Navbar from './Navbar'
 import { detecterSecteur, getSecteurConfig, buildPromptCV } from './secteurConfig'
@@ -43,10 +43,10 @@ const SECTEUR_LABELS = {
 
 // Utilisé quand on arrive avec ?template=auto (depuis Offres.jsx ou une candidature)
 const SECTEUR_TO_TEMPLATE = {
-  tech: 'tech', sante: 'sante', btp: 'btp', restauration: 'restauration',
-  commerce: 'commercial', transport: 'transport', creatif: 'creative',
-  securite: 'corporate', beaute: 'beaute', junior: 'etudiant',
-  cadre: 'executive', tertiaire: 'finance',
+  tech: 'signal', sante: 'soin', btp: 'terrain', restauration: 'meridien',
+  commerce: 'chiffre', transport: 'terrain', creatif: 'vitrine',
+  securite: 'plan', beaute: 'ruban', junior: 'flux',
+  cadre: 'prestige', tertiaire: 'meridien',
 }
 
 function LettreRenderer({ lettre }) {
@@ -78,8 +78,8 @@ function LettreRenderer({ lettre }) {
 
 export default function Generate() {
   const [searchParams] = useSearchParams()
-  const templateChoisi = searchParams.get('template') || 'finance'
-  const [currentTemplate, setCurrentTemplate] = useState(templateChoisi === 'auto' ? 'finance' : templateChoisi)
+  const templateChoisi = searchParams.get('template') || 'meridien'
+  const [currentTemplate, setCurrentTemplate] = useState(templateChoisi === 'auto' ? 'meridien' : templateChoisi)
   const [templateAuto, setTemplateAuto] = useState(templateChoisi === 'auto')
   const [showTemplatePicker, setShowTemplatePicker] = useState(false)
   const w = useWidth()
@@ -141,7 +141,7 @@ export default function Generate() {
 
   // ?template=auto : bascule automatiquement sur un template adapté au secteur détecté
   useEffect(() => {
-    if (templateAuto && secteurDetecte) setCurrentTemplate(SECTEUR_TO_TEMPLATE[secteurDetecte] || 'finance')
+    if (templateAuto && secteurDetecte) setCurrentTemplate(SECTEUR_TO_TEMPLATE[secteurDetecte] || 'meridien')
   }, [secteurDetecte, templateAuto])
 
   const handleFileChange = async (e) => {
@@ -429,7 +429,7 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
                 Changer template
               </a>
             </div>
-            <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 20px' }}>Template : <strong style={{ color: '#374151' }}>{currentTemplate}</strong></p>
+            <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 20px' }}>Template : <strong style={{ color: '#374151' }}>{TEMPLATES_PRO_META[currentTemplate]?.nom || currentTemplate}</strong></p>
           </div>
 
           {/* Profil charge */}
@@ -701,7 +701,7 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
               <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: isMobile ? '16px' : '32px 24px' }}>
                 {activeTab === 'cv' ? (
                   <div style={{ transform: isMobile ? `scale(${Math.min(0.45, (w-32)/794)})` : 'scale(1)', transformOrigin: 'top center', boxShadow: '0 8px 40px rgba(0,0,0,0.15)', borderRadius: '4px', overflow: 'hidden', marginBottom: isMobile ? `-${Math.round(1123*(1-Math.min(0.45,(w-32)/794)))}px` : 0 }}>
-                    <CVTemplate cvData={cvData} template={currentTemplate} customColor={customColor} />
+                    <CVTemplatePro cvData={cvData} template={currentTemplate} color={customColor} />
                   </div>
                 ) : (
                   <div style={{ background: '#fff', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', width: '100%', maxWidth: '680px', overflow: 'hidden' }}>
@@ -739,12 +739,15 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
       {showTemplatePicker && cvData && (
         <div onClick={() => setShowTemplatePicker(false)} style={{ position: 'fixed', inset: 0, zIndex: 150, background: 'rgba(0,0,0,0.3)' }}>
           <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: isMobile ? 'auto' : '70px', bottom: isMobile ? 0 : 'auto', right: 0, left: isMobile ? 0 : 'auto', width: isMobile ? '100%' : '320px', background: '#fff', borderRadius: isMobile ? '16px 16px 0 0' : '14px 0 0 14px', padding: '20px', boxShadow: '-8px 0 32px rgba(0,0,0,0.1)', maxHeight: '80vh', overflowY: 'auto' }}>
-            <div style={{ fontSize: '14px', fontWeight: '700', color: '#111', marginBottom: '16px' }}>Changer de template</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
-              {['finance','linkedin','canva','harvard','siliconvalley','moderne','executive','creative','minimal','tech','elegant','bold','pastel','corporate','swiss','timeline','etudiant','alternance','portfolio','sante','commercial','startup','classique','international','btp','restauration','transport','beaute'].map(t => (
+            <div style={{ fontSize: '14px', fontWeight: '700', color: '#111', marginBottom: '4px' }}>Changer de template</div>
+            <a href="/templates" style={{ display: 'block', fontSize: '11px', color: '#4f46e5', textDecoration: 'none', fontWeight: '600', marginBottom: '14px' }}>
+              Voir les 40 modèles avec filtres →
+            </a>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+              {Object.keys(TEMPLATES_PRO_META).map(t => (
                 <button key={t} onClick={() => { setCurrentTemplate(t); setTemplateAuto(false); setShowTemplatePicker(false) }}
-                  style={{ padding: '8px 4px', background: currentTemplate === t ? '#4f46e5' : '#f8f9ff', color: currentTemplate === t ? '#fff' : '#374151', border: `1.5px solid ${currentTemplate === t ? '#4f46e5' : '#e5e7eb'}`, borderRadius: '8px', fontSize: '10px', fontWeight: currentTemplate === t ? '700' : '500', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'center', textTransform: 'capitalize' }}>
-                  {currentTemplate === t ? '✓ ' : ''}{t}
+                  style={{ padding: '8px 6px', background: currentTemplate === t ? '#4f46e5' : '#f8f9ff', color: currentTemplate === t ? '#fff' : '#374151', border: `1.5px solid ${currentTemplate === t ? '#4f46e5' : '#e5e7eb'}`, borderRadius: '8px', fontSize: '11px', fontWeight: currentTemplate === t ? '700' : '500', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'center' }}>
+                  {currentTemplate === t ? '✓ ' : ''}{TEMPLATES_PRO_META[t].nom}
                 </button>
               ))}
             </div>

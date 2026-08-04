@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { User, FileText, Briefcase, GraduationCap, Zap, Globe, Eye, EyeOff, Trash2, GripVertical, Lightbulb } from 'lucide-react'
-import { CVTemplate } from './CVTemplates'
+import { CVTemplatePro } from './CVTemplatesPro'
 import SuggestionsIA from './SuggestionsIA'
 
 function useWidth() {
@@ -383,7 +383,7 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
           <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: isMobile ? '16px 12px' : '32px 24px', minHeight: 'fit-content' }}>
             <div style={{ width: `${794 * previewScale}px`, height: `${1123 * previewScale}px`, boxShadow: '0 8px 40px rgba(0,0,0,0.2)', borderRadius: '4px', overflow: 'hidden', flexShrink: 0, position: 'relative' }}>
               <div style={{ position: 'absolute', top: 0, left: 0, width: '794px', height: '1123px', transform: `scale(${previewScale})`, transformOrigin: 'top left' }}>
-                <CVTemplate
+                <CVTemplatePro
                   cvData={{
                     ...data,
                     certifications: hidden.certifications ? [] : data.certifications,

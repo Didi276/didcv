@@ -39,7 +39,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from './supabase'
 import Navbar from './Navbar'
-import { CVTemplate } from './CVTemplates'
+import { CVTemplatePro } from './CVTemplatesPro'
 import { downloadCVasPDF } from './pdfUtils'
 import { MapPin, DollarSign, Zap, ClipboardList, Target, BookOpen, Trash2, Download, Plus, PartyPopper, Calendar, Sparkles } from 'lucide-react'
 
@@ -573,7 +573,7 @@ export default function Candidatures() {
                 <div style={{ padding: '60px', color: '#9ca3af', fontSize: '13px' }}>Chargement...</div>
               ) : (
                 <div style={{ transform: isMobile ? `scale(${Math.min(0.45, (w - 32) / 794)})` : 'scale(1)', transformOrigin: 'top center', boxShadow: '0 4px 24px rgba(0,0,0,0.12)', borderRadius: '4px', overflow: 'hidden' }}>
-                  <CVTemplate cvData={cvApercu.cv.cv_data} template={cvApercu.cv.template} />
+                  <CVTemplatePro cvData={cvApercu.cv.cv_data} template={cvApercu.cv.template} />
                 </div>
               )}
             </div>

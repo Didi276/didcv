@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { FileText, Search, Mail, Link as LinkIcon, Eye, ClipboardList, Mic, Trash2, Edit2, Download, Plus, Lightbulb } from 'lucide-react'
 import { supabase } from './supabase'
-import { CVTemplate } from './CVTemplates'
+import { CVTemplatePro } from './CVTemplatesPro'
 import CVEditorBlocks from './CVEditorBlocks'
 import Navbar from './Navbar'
 import { downloadCVasPDF, downloadLettreasePDF } from './pdfUtils'
@@ -340,7 +340,7 @@ export default function Dashboard() {
                 {/* Apercu */}
                 <div style={{ width: '100%', height: isMobile ? '120px' : '180px', overflow: 'hidden', position: 'relative', background: '#f8f9ff' }}>
                   <div style={{ position: 'absolute', top: 0, left: 0, width: '794px', height: '1123px', transform: `scale(${previewScale})`, transformOrigin: 'top left', pointerEvents: 'none', userSelect: 'none' }}>
-                    <CVTemplate cvData={cv.cv_data} template={cv.template} />
+                    <CVTemplatePro cvData={cv.cv_data} template={cv.template} />
                   </div>
                   <div style={{ position: 'absolute', top: '6px', right: '6px', background: 'rgba(0,0,0,0.5)', color: '#fff', padding: '1px 6px', borderRadius: '5px', fontSize: '9px', fontWeight: '600' }}>{cv.template}</div>
                   {partages[cv.id]?.actif && (
@@ -417,7 +417,7 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <div style={{ transform: isMobile ? `scale(${Math.min(0.45, (w - 32) / 794)})` : 'scale(1)', transformOrigin: 'top center', boxShadow: '0 4px 24px rgba(0,0,0,0.12)', borderRadius: '4px', overflow: 'hidden', height: isMobile ? `${Math.round(1123 * Math.min(0.45, (w - 32) / 794))}px` : 'auto' }}>
-                  <CVTemplate cvData={selectedCv.cv_data} template={selectedCv.template} />
+                  <CVTemplatePro cvData={selectedCv.cv_data} template={selectedCv.template} />
                 </div>
               )}
             </div>

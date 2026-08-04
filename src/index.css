@@ -1,8 +1,11 @@
 /* Typographie globale du site — remplace Inter partout.
    Les pages posent encore fontFamily inline (héritage), donc on force
    ici via !important : c'est le seul moyen d'override un style inline
-   depuis une feuille de styles globale sans reprendre chaque fichier. */
-* {
+   depuis une feuille de styles globale sans reprendre chaque fichier.
+   Les templates de CV (.cv-template) sont exemptés : chacun a sa propre
+   typographie (Georgia, Source Serif 4, Playfair Display...) qui fait
+   partie de son design et doit rester intacte à l'écran comme à l'impression. */
+*:not(.cv-template):not(.cv-template *) {
   font-family: 'Satoshi', 'Inter', system-ui, sans-serif !important;
 }
 
