@@ -134,7 +134,7 @@ export default async function handler(req, res) {
   const searchRemoteOK = async () => {
     const r = await fetch(
       `https://remoteok.com/api?tag=${encodeURIComponent(query.split(' ')[0])}`,
-      { headers: { 'User-Agent': 'DidJob/1.0' } }
+      { headers: { 'User-Agent': 'DidJob-Aggregator/1.0 (contact@did-job.com)' } }
     )
     return r.json()
   }
