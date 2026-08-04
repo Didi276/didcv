@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { User, FileText, Briefcase, GraduationCap, Zap, Globe, Eye, EyeOff, Trash2, GripVertical, Lightbulb } from 'lucide-react'
+import { User, FileText, Briefcase, GraduationCap, Zap, Globe, Eye, EyeOff, Trash2, GripVertical, Lightbulb, Camera } from 'lucide-react'
 import { CVTemplatePro } from './CVTemplatesPro'
 import SuggestionsIA from './SuggestionsIA'
 
@@ -37,12 +37,45 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
     centres_interet: false,
     linkedin: false,
   })
+  // showPhoto=false retire l'espace photo entierement ; true+photo=null affiche les initiales
+  const [showPhoto, setShowPhoto] = useState(cvData.showPhoto !== false)
+  const [photo, setPhoto] = useState(cvData.photo || null)
+  const initiales = [data.prenom, data.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
   const dragIdx = useRef(null)
   const w = useWidth()
   const isMobile = w < 768
   const previewScale = isMobile ? Math.min(1, (w - 24) / 794) : 1
 
   const update = (field, val) => setData(d => ({ ...d, [field]: val }))
+
+  // ─── Photo ───────────────────────────────────────────────
+  // Meme logique de compression que Profile.jsx : redimensionne a 200x200px max, JPEG 80%
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Image trop lourde. Utilise une image de moins de 10MB.')
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        const MAX = 200
+        let w = img.width, h = img.height
+        if (w > h) { if (w > MAX) { h = Math.round(h * MAX / w); w = MAX } }
+        else { if (h > MAX) { w = Math.round(w * MAX / h); h = MAX } }
+        canvas.width = w
+        canvas.height = h
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0, w, h)
+        setPhoto(canvas.toDataURL('image/jpeg', 0.8))
+      }
+      img.src = ev.target.result
+    }
+    reader.readAsDataURL(file)
+  }
 
   // ─── Experiences ─────────────────────────────────────────
   const updateExp = (i, field, val) => setData(d => ({
@@ -103,9 +136,9 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
 
   const toggleHidden = (key) => setHidden(h => ({ ...h, [key]: !h[key] }))
 
-  // Applique les sections cachees au moment de sauvegarder
+  // Applique les sections cachees et la photo au moment de sauvegarder
   const handleSave = () => {
-    const saved = { ...data }
+    const saved = { ...data, photo, showPhoto }
     if (hidden.certifications) saved.certifications = []
     if (hidden.centres_interet) saved.centres_interet = []
     if (hidden.linkedin) saved.linkedin = ''
@@ -168,6 +201,58 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
             {/* INFOS */}
             {section === 'infos' && (
               <div>
+                <Field label="Photo de profil">
+                  {showPhoto && photo && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                      <img src={photo} alt="" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
+                        <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                          <input type="file" accept="image/*" onChange={handlePhotoChange} style={{ display: 'none' }} />
+                          <Camera size={12} color="#4f46e5" />
+                          <span style={{ fontSize: '12px', color: '#4f46e5', fontWeight: '600', textDecoration: 'underline' }}>Changer la photo</span>
+                        </label>
+                        <button onClick={() => setPhoto(null)}
+                          style={{ background: 'none', border: 'none', color: '#dc2626', fontSize: '12px', cursor: 'pointer', textAlign: 'left', padding: 0, fontFamily: 'inherit', textDecoration: 'underline' }}>
+                          Supprimer la photo
+                        </button>
+                        <button onClick={() => setShowPhoto(false)}
+                          style={{ background: 'none', border: 'none', color: '#9ca3af', fontSize: '12px', cursor: 'pointer', textAlign: 'left', padding: 0, fontFamily: 'inherit', textDecoration: 'underline' }}>
+                          Retirer l'espace photo
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {showPhoto && !photo && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                      <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4f46e5', fontSize: '26px', fontWeight: '700', flexShrink: 0 }}>
+                        {initiales || '?'}
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
+                        <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                          <input type="file" accept="image/*" onChange={handlePhotoChange} style={{ display: 'none' }} />
+                          <Camera size={12} color="#4f46e5" />
+                          <span style={{ fontSize: '12px', color: '#4f46e5', fontWeight: '600', textDecoration: 'underline' }}>Ajouter une photo</span>
+                        </label>
+                        <button onClick={() => setShowPhoto(false)}
+                          style={{ background: 'none', border: 'none', color: '#9ca3af', fontSize: '12px', cursor: 'pointer', textAlign: 'left', padding: 0, fontFamily: 'inherit', textDecoration: 'underline' }}>
+                          Retirer l'espace photo
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {!showPhoto && (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', background: '#f8f9ff', borderRadius: '10px', border: '1px solid #ede9fe' }}>
+                      <div style={{ fontSize: '13px', color: '#9ca3af' }}>Espace photo masqué</div>
+                      <button onClick={() => setShowPhoto(true)}
+                        style={{ padding: '6px 14px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontFamily: 'inherit', fontSize: '12px', fontWeight: '600', background: '#4f46e5', color: '#fff' }}>
+                        Afficher l'espace photo
+                      </button>
+                    </div>
+                  )}
+                </Field>
+
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '10px' }}>
                   <Field label="Prenom"><input value={data.prenom || ''} onChange={e => update('prenom', e.target.value)} style={INPUT} onFocus={focus} onBlur={blur} /></Field>
                   <Field label="Nom"><input value={data.nom || ''} onChange={e => update('nom', e.target.value)} style={INPUT} onFocus={focus} onBlur={blur} /></Field>
@@ -386,6 +471,7 @@ export default function CVEditorBlocks({ cvData, template, onSave, onClose }) {
                 <CVTemplatePro
                   cvData={{
                     ...data,
+                    photo, showPhoto,
                     certifications: hidden.certifications ? [] : data.certifications,
                     centres_interet: hidden.centres_interet ? [] : data.centres_interet,
                     linkedin: hidden.linkedin ? '' : data.linkedin,

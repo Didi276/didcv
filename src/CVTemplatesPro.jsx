@@ -3,6 +3,37 @@
 
 const PAGE = { width: 794, minHeight: 1123 }
 
+// Photo de profil partagée par tous les templates qui en affichent une.
+// showPhoto=false retire l'espace entièrement (pas de trou dans le layout) ;
+// showPhoto=true sans photo affiche les initiales en placeholder.
+function PhotoCV({ photo, initiales, size = 90, color, borderRadius = '50%', showPhoto = true }) {
+  if (!showPhoto) return null
+
+  if (photo) {
+    return (
+      <img src={photo} alt="photo de profil"
+        style={{
+          width: size, height: size, borderRadius,
+          objectFit: 'cover', display: 'block', flexShrink: 0
+        }}
+      />
+    )
+  }
+
+  return (
+    <div style={{
+      width: size, height: size, borderRadius,
+      background: color + '20',
+      display: 'flex', alignItems: 'center',
+      justifyContent: 'center', flexShrink: 0,
+      color: color, fontSize: size * 0.32,
+      fontWeight: 700, fontFamily: 'Inter, sans-serif',
+    }}>
+      {initiales}
+    </div>
+  )
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // TEMPLATE 1 : MÉRIDIEN — Une colonne premium (corporate)
 // ═══════════════════════════════════════════════════════════════════
@@ -170,6 +201,8 @@ function Atelier({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const leftSectionTitle = { fontSize: '9.5px', fontWeight: 700, letterSpacing: '1.8px', textTransform: 'uppercase', color: '#9ca3af', marginBottom: '10px' }
   const leftSectionRule = { height: '1px', background: '#e5e7eb', width: '100%', marginBottom: '12px' }
@@ -182,12 +215,10 @@ function Atelier({ cvData, color }) {
     }}>
       {/* COLONNE GAUCHE */}
       <div style={{ width: '264px', flexShrink: 0, background: '#f8f9fa', padding: '36px 28px', boxSizing: 'border-box' }}>
-        {cvData.photo && (
-          <img src={cvData.photo} alt="" style={{
-            width: '96px', height: '96px', borderRadius: '50%', objectFit: 'cover',
-            border: '4px solid #ffffff', boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-            margin: '0 auto 24px', display: 'block',
-          }} />
+        {showPhoto && (
+          <div style={{ width: 'fit-content', margin: '0 auto 24px', border: '4px solid #ffffff', borderRadius: '50%', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={88} color={color} showPhoto={showPhoto} />
+          </div>
         )}
         <div style={{ fontSize: '20px', fontWeight: 700, color: '#111827', textAlign: 'center', lineHeight: 1.25, marginBottom: '5px' }}>
           {cvData.prenom} {cvData.nom}
@@ -320,6 +351,8 @@ function Tribune({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sectionTitle = { fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color }
   const sectionRule = { height: '1px', background: '#e5e7eb', width: '100%', marginTop: '8px', marginBottom: '20px' }
@@ -335,11 +368,10 @@ function Tribune({ cvData, color }) {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          {cvData.photo && (
-            <img src={cvData.photo} alt="" style={{
-              width: '88px', height: '88px', borderRadius: '50%', objectFit: 'cover',
-              border: '3px solid rgba(255,255,255,0.3)', marginRight: '24px', flexShrink: 0,
-            }} />
+          {showPhoto && (
+            <div style={{ width: 'fit-content', marginRight: '24px', flexShrink: 0, border: '3px solid rgba(255,255,255,0.3)', borderRadius: '50%', overflow: 'hidden' }}>
+              <PhotoCV photo={cvData.photo} initiales={initiales} size={82} color="#ffffff" showPhoto={showPhoto} />
+            </div>
           )}
           <div>
             <div style={{ fontSize: '30px', fontWeight: 700, color: '#ffffff', letterSpacing: '-0.5px' }}>
@@ -1293,6 +1325,8 @@ function Contraste({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const bandTitle = { fontSize: '9px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color, marginBottom: '10px' }
   const bandRule = { height: '1px', background: 'rgba(255,255,255,0.15)', marginBottom: '12px' }
@@ -1306,11 +1340,10 @@ function Contraste({ cvData, color }) {
     }}>
       {/* BANDE GAUCHE */}
       <div style={{ width: '230px', flexShrink: 0, background: '#111827', padding: '36px 24px', color: '#ffffff', boxSizing: 'border-box' }}>
-        {cvData.photo && (
-          <img src={cvData.photo} alt="" style={{
-            width: '88px', height: '88px', borderRadius: '50%', objectFit: 'cover',
-            border: `3px solid ${color}`, margin: '0 auto 22px', display: 'block',
-          }} />
+        {showPhoto && (
+          <div style={{ width: 'fit-content', margin: '0 auto 22px', border: `3px solid ${color}`, borderRadius: '50%', overflow: 'hidden' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={82} color={color} showPhoto={showPhoto} />
+          </div>
         )}
         <div style={{ fontSize: '19px', fontWeight: 700, color: '#ffffff', textAlign: 'center', lineHeight: 1.3 }}>
           {cvData.prenom} {cvData.nom}
@@ -1861,6 +1894,8 @@ function Aurore({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sectionTitle = { fontSize: '11.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.8px', color }
   const sectionRule = { height: '3px', background: color, width: '28px', marginTop: '7px', marginBottom: '18px' }
@@ -1874,11 +1909,10 @@ function Aurore({ cvData, color }) {
         height: '165px', background: `linear-gradient(135deg, ${color} 0%, ${color}cc 55%, ${color}88 100%)`,
         padding: '40px 52px', boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: '26px',
       }}>
-        {cvData.photo && (
-          <img src={cvData.photo} alt="" style={{
-            width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover',
-            border: '4px solid rgba(255,255,255,0.35)', flexShrink: 0,
-          }} />
+        {showPhoto && (
+          <div style={{ width: 'fit-content', flexShrink: 0, border: '4px solid rgba(255,255,255,0.35)', borderRadius: '50%', overflow: 'hidden' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={92} color="#ffffff" showPhoto={showPhoto} />
+          </div>
         )}
         <div>
           <div style={{ fontSize: '29px', fontWeight: 700, color: '#ffffff', letterSpacing: '-0.5px' }}>
@@ -2657,6 +2691,8 @@ function Soin({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const numeroPro = certifications.find(c => /rpps|adeli/i.test(c.titre || ''))
   const autresCertifications = certifications.filter(c => c !== numeroPro)
@@ -2672,12 +2708,10 @@ function Soin({ cvData, color }) {
       fontFamily: '"Inter", sans-serif', overflow: 'hidden', boxSizing: 'border-box',
     }}>
       <div style={{ width: '250px', flexShrink: 0, background: `${color}08`, padding: '34px 26px', boxSizing: 'border-box' }}>
-        {cvData.photo && (
-          <img src={cvData.photo} alt="" style={{
-            width: '92px', height: '92px', borderRadius: '50%', objectFit: 'cover',
-            border: '3px solid #ffffff', boxShadow: '0 2px 6px rgba(0,0,0,0.06)',
-            margin: '0 auto 20px', display: 'block',
-          }} />
+        {showPhoto && (
+          <div style={{ width: 'fit-content', margin: '0 auto 20px', border: '3px solid #ffffff', borderRadius: '50%', boxShadow: '0 2px 6px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={86} color={color} showPhoto={showPhoto} />
+          </div>
         )}
         <div style={{ fontSize: '19px', fontWeight: 700, color: '#134e4a', textAlign: 'center', lineHeight: 1.3 }}>
           {cvData.prenom} {cvData.nom}
@@ -3197,6 +3231,8 @@ function Colonne({ cvData, color }) {
   const certifications = cvData.certifications || []
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
+  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const sideTitle = { fontSize: '8.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.8px', color: '#9ca3af', marginBottom: '8px' }
   const mainSectionTitle = { fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#111827' }
@@ -3208,11 +3244,10 @@ function Colonne({ cvData, color }) {
       fontFamily: '"Inter", sans-serif', overflow: 'hidden', boxSizing: 'border-box',
     }}>
       <div style={{ width: '180px', flexShrink: 0, background: '#fafafa', padding: '34px 20px', boxSizing: 'border-box' }}>
-        {cvData.photo && (
-          <img src={cvData.photo} alt="" style={{
-            width: '76px', height: '76px', borderRadius: '50%', objectFit: 'cover',
-            margin: '0 auto 18px', display: 'block',
-          }} />
+        {showPhoto && (
+          <div style={{ width: 'fit-content', margin: '0 auto 18px' }}>
+            <PhotoCV photo={cvData.photo} initiales={initiales} size={76} color={color} showPhoto={showPhoto} />
+          </div>
         )}
         <div style={{ fontSize: '16px', fontWeight: 700, color: '#111827', textAlign: 'center', lineHeight: 1.3 }}>
           {cvData.prenom} {cvData.nom}
@@ -3723,6 +3758,7 @@ function Duo({ cvData, color }) {
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
   const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const SectionTitle = ({ children }) => (
     <div style={{ display: 'flex', alignItems: 'center', marginBottom: '17px' }}>
@@ -3738,13 +3774,10 @@ function Duo({ cvData, color }) {
     }}>
       <div style={{ display: 'flex', height: '150px' }}>
         <div style={{ width: '42%', background: color, padding: '32px 28px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          {cvData.photo ? (
-            <img src={cvData.photo} alt="" style={{
-              width: '78px', height: '78px', borderRadius: '50%', objectFit: 'cover',
-              border: '3px solid rgba(255,255,255,0.3)', marginBottom: '12px',
-            }} />
-          ) : (
-            <div style={{ fontSize: '40px', fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>{initiales}</div>
+          {showPhoto && (
+            <div style={{ width: 'fit-content', marginBottom: '12px', border: '3px solid rgba(255,255,255,0.3)', borderRadius: '50%', overflow: 'hidden' }}>
+              <PhotoCV photo={cvData.photo} initiales={initiales} size={72} color="#ffffff" showPhoto={showPhoto} />
+            </div>
           )}
         </div>
         <div style={{ width: '58%', background: '#ffffff', padding: '32px 30px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -5097,6 +5130,7 @@ function Impulsion({ cvData, color }) {
   const centresInteret = cvData.centres_interet || []
   const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
   const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
+  const showPhoto = cvData.showPhoto !== false
 
   const Badge = ({ n }) => (
     <span style={{ padding: '2px 8px', background: '#f4f4f5', borderRadius: '10px', fontSize: '9px', fontWeight: 600, color: '#71717a', marginLeft: '10px' }}>
@@ -5111,15 +5145,7 @@ function Impulsion({ cvData, color }) {
       padding: '40px 46px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '26px' }}>
-        {cvData.photo ? (
-          <img src={cvData.photo} alt="" style={{ width: '82px', height: '82px', borderRadius: '16px', objectFit: 'cover', flexShrink: 0 }} />
-        ) : (
-          <div style={{
-            width: '82px', height: '82px', borderRadius: '16px', background: color, flexShrink: 0,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '28px', fontWeight: 700, color: '#ffffff',
-          }}>{initiales}</div>
-        )}
+        <PhotoCV photo={cvData.photo} initiales={initiales} size={82} color={color} borderRadius="16px" showPhoto={showPhoto} />
         <div>
           <div style={{ fontSize: '27px', fontWeight: 800, color: '#09090b', letterSpacing: '-0.8px' }}>{cvData.prenom} {cvData.nom}</div>
           {cvData.titre && <div style={{ fontSize: '13px', fontWeight: 500, color, marginTop: '4px' }}>{cvData.titre}</div>}
