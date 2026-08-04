@@ -82,7 +82,7 @@ export default function Navbar({ currentPage = '' }) {
         {/* Logo */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '800', fontSize: '21px', textDecoration: 'none', color: '#1a1a1a', marginRight: isMobile ? 'auto' : '4px', letterSpacing: '-0.5px' }}>
           <FileText size={22} color="#4f46e5" strokeWidth={2.25} />
-          <span><span style={{ color: '#4f46e5' }}>Did</span>CV</span>
+          <span><span style={{ color: '#4f46e5' }}>Did</span>Job</span>
         </Link>
 
         {/* Desktop links */}

@@ -129,8 +129,8 @@ export default function Home() {
     <div style={{ fontFamily: '"Satoshi","Inter",system-ui,sans-serif', color: '#111', background: '#fff', minHeight: '100vh' }}>
       <SEO
         titre="Créez votre CV optimisé ATS en 30 secondes"
-        description="DidCV génère votre CV professionnel et votre lettre de motivation en 30 secondes grâce à l'IA. 40 templates, score ATS, offres d'emploi intégrées. Gratuit."
-        url="https://didcv.vercel.app"
+        description="DidJob génère votre CV professionnel et votre lettre de motivation en 30 secondes grâce à l'IA. 40 templates, score ATS, offres d'emploi intégrées. Gratuit."
+        url="https://didjob.fr"
       />
       <style>{PAGE_CSS}</style>
 
@@ -145,7 +145,7 @@ export default function Home() {
         display: 'flex', alignItems: 'center', gap: '32px'
       }}>
         <a href="/" style={{ fontWeight: '700', fontSize: '18px', textDecoration: 'none', color: scrolled ? '#111' : '#fff', letterSpacing: '-0.3px', marginRight: isMobile ? 'auto' : '16px', transition: 'color 0.2s' }}>
-          DidCV
+          DidJob
         </a>
         {!isMobile && (
           <div style={{ display: 'flex', gap: '28px', flex: 1 }}>
@@ -387,7 +387,7 @@ export default function Home() {
       <footer style={{ background: '#0a0a0f', padding: isMobile ? '56px 20px 28px' : '80px 48px 32px' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
           <div style={{ fontWeight: '700', fontSize: '20px', color: '#fff', letterSpacing: '-0.3px', marginBottom: '10px' }}>
-            DidCV
+            DidJob
           </div>
           <p style={{ fontSize: '13px', color: '#71717a', margin: '0 0 32px' }}>
             Le compagnon de ta recherche d'emploi.
@@ -398,7 +398,7 @@ export default function Home() {
             ))}
           </div>
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '20px', fontSize: '11px', color: '#52525b' }}>
-            © 2026 DidCV. Tous droits réservés.
+            © 2026 DidJob. Tous droits réservés.
           </div>
         </div>
       </footer>

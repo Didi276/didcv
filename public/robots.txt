@@ -4,4 +4,4 @@ Disallow: /dashboard
 Disallow: /profile
 Disallow: /generate
 Disallow: /admin
-Sitemap: https://didcv.vercel.app/sitemap.xml
+Sitemap: https://didjob.fr/sitemap.xml

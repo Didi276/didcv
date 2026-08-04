@@ -1,6 +1,6 @@
 {
-  "name": "DidCV — CV IA en 30 secondes",
-  "short_name": "DidCV",
+  "name": "DidJob — CV IA en 30 secondes",
+  "short_name": "DidJob",
   "description": "Générez votre CV optimisé ATS en 30 secondes avec l'IA",
   "start_url": "/",
   "display": "standalone",

@@ -35,7 +35,7 @@ export default function Auth() {
       fetch('/api/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ to: email, subject: 'Bienvenue sur DidCV !', html: emailBienvenueDidCV(prenom), type: 'bienvenue' }),
+        body: JSON.stringify({ to: email, subject: 'Bienvenue sur DidJob !', html: emailBienvenueDidCV(prenom), type: 'bienvenue' }),
       }).catch(err => console.error('Erreur envoi email de bienvenue:', err))
       setSuccess('Compte cree ! Verifie ton email pour confirmer.')
       setLoading(false)
@@ -57,7 +57,7 @@ export default function Auth() {
         <div style={{ background: '#0a0a0f', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '600px', height: '300px', maxWidth: '100%', background: 'radial-gradient(circle, #4f46e520 0%, transparent 70%)', pointerEvents: 'none' }} />
           <a href="/" style={{ textDecoration: 'none', position: 'absolute', top: '32px', left: '36px', zIndex: 1 }}>
-            <div style={{ fontWeight: '700', fontSize: '20px', color: '#fff' }}>DidCV</div>
+            <div style={{ fontWeight: '700', fontSize: '20px', color: '#fff' }}>DidJob</div>
           </a>
           <div style={{ textAlign: 'center', position: 'relative', zIndex: 1, maxWidth: '400px' }}>
             <Zap size={44} color="#fff" strokeWidth={1.5} style={{ marginBottom: '28px' }} />
@@ -86,7 +86,7 @@ export default function Auth() {
           {/* Logo mobile */}
           {isMobile && (
             <a href="/" style={{ display: 'block', textAlign: 'center', fontWeight: '700', fontSize: '22px', textDecoration: 'none', color: '#111', marginBottom: '40px' }}>
-              DidCV
+              DidJob
             </a>
           )}
 
