@@ -59,12 +59,12 @@ export default async function handler(req, res) {
     const estJ3 = en.joursRestants === 3
 
     const html = estJ3
-      ? emailPreparationEntretien(profil.prenom || '', poste, entreprise, en.date_entretien, '<p>Prépare ta checklist personnalisée directement sur DidCV.</p>')
+      ? emailPreparationEntretien(profil.prenom || '', poste, entreprise, en.date_entretien, '<p>Prépare ta checklist personnalisée directement sur DidJob.</p>')
       : emailRappelEntretien(profil.prenom || '', poste, entreprise, new Date(en.date_entretien).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }), en.lieu || '')
 
     try {
       await resend.emails.send({
-        from: 'DidCV <noreply@didcv.fr>',
+        from: 'DidJob <noreply@didcv.fr>',
         to: profil.email,
         subject: estJ3 ? `Ton entretien approche - ${poste}` : `Ton entretien est demain - ${poste}`,
         html,

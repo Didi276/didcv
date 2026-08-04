@@ -47,7 +47,7 @@ export default function BlogArticle() {
   )
 
   const autres = ARTICLES.filter(a => a.slug !== slug && a.categorie === article.categorie).slice(0, 3)
-  const url = `https://didcv.vercel.app/blog/${article.slug}`
+  const url = `https://did-job.com/blog/${article.slug}`
   const sommaire = extraireTableDesMatieres(article.contenu)
 
   const schema = {
@@ -57,8 +57,8 @@ export default function BlogArticle() {
     description: article.description,
     datePublished: article.date,
     dateModified: article.date,
-    author: { '@type': 'Organization', name: 'DidCV' },
-    publisher: { '@type': 'Organization', name: 'DidCV' },
+    author: { '@type': 'Organization', name: 'DidJob' },
+    publisher: { '@type': 'Organization', name: 'DidJob' },
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
   }
 

@@ -20,11 +20,11 @@ export default function CGU() {
 
         <div style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '40px' }}>
           <Section title="1. Acceptation des conditions">
-            En utilisant DidCV, tu acceptes les présentes conditions générales d'utilisation. Si tu n'acceptes pas ces conditions, tu ne dois pas utiliser le service.
+            En utilisant DidJob, tu acceptes les présentes conditions générales d'utilisation. Si tu n'acceptes pas ces conditions, tu ne dois pas utiliser le service.
           </Section>
 
           <Section title="2. Description du service">
-            DidCV est une plateforme de création de CV assistée par intelligence artificielle. Le service permet de générer des CVs et lettres de motivation personnalisés à partir d'un profil utilisateur et d'une offre d'emploi.
+            DidJob est une plateforme de création de CV assistée par intelligence artificielle. Le service permet de générer des CVs et lettres de motivation personnalisés à partir d'un profil utilisateur et d'une offre d'emploi.
           </Section>
 
           <Section title="3. Compte utilisateur">
@@ -36,15 +36,15 @@ export default function CGU() {
           </Section>
 
           <Section title="5. Propriété intellectuelle">
-            Les CVs générés t'appartiennent entièrement. DidCV conserve les droits sur la plateforme, les templates et les algorithmes. Tu ne peux pas reproduire ou revendre les templates DidCV.
+            Les CVs générés t'appartiennent entièrement. DidJob conserve les droits sur la plateforme, les templates et les algorithmes. Tu ne peux pas reproduire ou revendre les templates DidJob.
           </Section>
 
           <Section title="6. Responsabilité">
-            DidCV met tout en oeuvre pour fournir un service de qualité, mais ne garantit pas que les CVs générés permettront d'obtenir un emploi. L'utilisateur est seul responsable du contenu final de son CV.
+            DidJob met tout en oeuvre pour fournir un service de qualité, mais ne garantit pas que les CVs générés permettront d'obtenir un emploi. L'utilisateur est seul responsable du contenu final de son CV.
           </Section>
 
           <Section title="7. Résiliation">
-            Tu peux supprimer ton compte à tout moment depuis les paramètres. DidCV se réserve le droit de suspendre un compte en cas de violation des présentes CGU.
+            Tu peux supprimer ton compte à tout moment depuis les paramètres. DidJob se réserve le droit de suspendre un compte en cas de violation des présentes CGU.
           </Section>
 
           <Section title="8. Droit applicable">

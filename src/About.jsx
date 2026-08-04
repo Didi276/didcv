@@ -7,18 +7,18 @@ export default function About() {
     <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
       <SEO
         titre="À propos"
-        description="À propos de DidCV, le générateur de CV IA made in France. Notre mission : aider chacun à décrocher son prochain emploi avec un CV optimisé ATS en 30 secondes."
-        url="https://didcv.vercel.app/about"
+        description="À propos de DidJob, le générateur de CV IA made in France. Notre mission : aider chacun à décrocher son prochain emploi avec un CV optimisé ATS en 30 secondes."
+        url="https://did-job.com/about"
       />
       <Navbar />
       <div style={{ maxWidth: '760px', margin: '0 auto', padding: '96px 24px 100px' }}>
         <div style={{ marginBottom: '64px' }}>
           <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#4f46e5', textTransform: 'uppercase', marginBottom: '14px' }}>A PROPOS</div>
           <h1 style={{ fontSize: '40px', fontWeight: '700', color: '#0a0a0f', margin: '0 0 18px', letterSpacing: '-1px', lineHeight: '1.1' }}>
-            DidCV, le CV intelligent<br />pour tous les profils
+            DidJob, le CV intelligent<br />pour tous les profils
           </h1>
           <p style={{ fontSize: '17px', color: '#6b7280', margin: 0, lineHeight: '1.7' }}>
-            DidCV est né d'un constat simple : rédiger un bon CV prend trop de temps et les résultats ne passent pas les filtres ATS des recruteurs. On a voulu changer ca.
+            DidJob est né d'un constat simple : rédiger un bon CV prend trop de temps et les résultats ne passent pas les filtres ATS des recruteurs. On a voulu changer ca.
           </p>
         </div>
 
@@ -26,7 +26,7 @@ export default function About() {
           {
             icon: Zap,
             title: 'Notre mission',
-            text: 'Permettre à chaque candidat, quel que soit son secteur ou son niveau d\'expérience, de générer un CV professionnel et optimisé ATS en moins de 30 secondes. Du comptable au plombier, de l\'étudiant au directeur, DidCV s\'adapte à tous les profils.'
+            text: 'Permettre à chaque candidat, quel que soit son secteur ou son niveau d\'expérience, de générer un CV professionnel et optimisé ATS en moins de 30 secondes. Du comptable au plombier, de l\'étudiant au directeur, DidJob s\'adapte à tous les profils.'
           },
           {
             icon: Bot,
@@ -36,7 +36,7 @@ export default function About() {
           {
             icon: FileText,
             title: 'Des CVs vraiment compatibles ATS',
-            text: 'Contrairement à d\'autres outils qui génèrent des CVs en image, DidCV produit des PDFs avec du texte réel et sélectionnable. Les robots des systèmes de recrutement peuvent lire chaque mot de ton CV et t\'attribuer le bon score.'
+            text: 'Contrairement à d\'autres outils qui génèrent des CVs en image, DidJob produit des PDFs avec du texte réel et sélectionnable. Les robots des systèmes de recrutement peuvent lire chaque mot de ton CV et t\'attribuer le bon score.'
           },
           {
             icon: Palette,

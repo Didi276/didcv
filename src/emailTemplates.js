@@ -18,7 +18,7 @@ function emailShell({ titre, sousTitre, corps, ctaUrl, ctaLabel }) {
 <body>
   <div class="container">
     <div class="header">
-      <div style="font-size:12px;opacity:0.7;margin-bottom:8px">DidCV</div>
+      <div style="font-size:12px;opacity:0.7;margin-bottom:8px">DidJob</div>
       <h1>${titre}</h1>
       ${sousTitre ? `<p style="margin:8px 0 0;opacity:0.85">${sousTitre}</p>` : ''}
     </div>
@@ -27,8 +27,8 @@ function emailShell({ titre, sousTitre, corps, ctaUrl, ctaLabel }) {
       ${ctaUrl ? `<a href="${ctaUrl}" class="cta">${ctaLabel}</a>` : ''}
     </div>
     <div class="footer">
-      DidCV • Le compagnon de ta recherche d'emploi<br>
-      <a href="https://didcv.vercel.app/unsubscribe">Se désabonner</a>
+      DidJob • Le compagnon de ta recherche d'emploi<br>
+      <a href="https://did-job.com/unsubscribe">Se désabonner</a>
     </div>
   </div>
 </body>
@@ -43,7 +43,7 @@ export const emailPreparationEntretien = (prenom, poste, entreprise, date, check
     <p>Ton entretien approche. Voici ta checklist de préparation personnalisée.</p>
     ${checklist}
   `,
-  ctaUrl: 'https://didcv.vercel.app/entretien',
+  ctaUrl: 'https://did-job.com/entretien',
   ctaLabel: "Simuler l'entretien maintenant",
 })
 
@@ -60,7 +60,7 @@ export const emailRappelEntretien = (prenom, poste, entreprise, heure, lieu) => 
     </div>
     <p>Prends quelques minutes ce soir pour relire ta checklist et préparer ta tenue.</p>
   `,
-  ctaUrl: 'https://didcv.vercel.app/candidatures',
+  ctaUrl: 'https://did-job.com/candidatures',
   ctaLabel: 'Revoir ma préparation',
 })
 
@@ -72,7 +72,7 @@ export const emailSuiviApresEntretien = (prenom, poste, entreprise) => emailShel
     <p>Tu avais un entretien pour ce poste récemment. Prends un moment pour noter ton ressenti pendant que c'est encore frais, ça t'aidera à progresser sur les prochains entretiens.</p>
     <p>Si tu as déjà un retour, pense à mettre à jour le statut de ta candidature.</p>
   `,
-  ctaUrl: 'https://didcv.vercel.app/candidatures',
+  ctaUrl: 'https://did-job.com/candidatures',
   ctaLabel: 'Mettre à jour ma candidature',
 })
 
@@ -84,12 +84,12 @@ export const emailRelanceCandidat = (prenom, nbrCandidatures) => emailShell({
     <p>Tu as ${nbrCandidatures} candidature${nbrCandidatures > 1 ? 's' : ''} en attente de réponse. Une relance polie après quelques jours montre ta motivation et peut débloquer une réponse.</p>
     <p>Un message court suffit : rappelle le poste, réaffirme ton intérêt, et demande où en est le process de recrutement.</p>
   `,
-  ctaUrl: 'https://didcv.vercel.app/candidatures',
+  ctaUrl: 'https://did-job.com/candidatures',
   ctaLabel: 'Voir mes candidatures',
 })
 
-export const emailBienvenueDidCV = (prenom) => emailShell({
-  titre: 'Bienvenue sur DidCV',
+export const emailBienvenueDidJob = (prenom) => emailShell({
+  titre: 'Bienvenue sur DidJob',
   sousTitre: "Ton compagnon de recherche d'emploi",
   corps: `
     <p>Bonjour ${prenom},</p>
@@ -101,13 +101,13 @@ export const emailBienvenueDidCV = (prenom) => emailShell({
       <div class="item">4. Entraîne-toi aux entretiens avec l'IA</div>
     </div>
   `,
-  ctaUrl: 'https://didcv.vercel.app/profile',
+  ctaUrl: 'https://did-job.com/profile',
   ctaLabel: 'Compléter mon profil',
 })
 
 export const emailResumeHebdomadaire = (prenom, stats, conseil, lienEntretien) => emailShell({
   titre: 'Ton résumé de la semaine',
-  sousTitre: 'DidCV',
+  sousTitre: 'DidJob',
   corps: `
     <p>Bonjour ${prenom},</p>
     <div class="section">
@@ -126,6 +126,6 @@ export const emailResumeHebdomadaire = (prenom, stats, conseil, lienEntretien) =
       <div class="item"><a href="${conseil.url}" style="color:#4f46e5;text-decoration:none;font-weight:600">${conseil.titre}</a></div>
     </div>` : ''}
   `,
-  ctaUrl: lienEntretien || 'https://didcv.vercel.app/candidatures',
+  ctaUrl: lienEntretien || 'https://did-job.com/candidatures',
   ctaLabel: lienEntretien ? "Simuler l'entretien maintenant" : 'Voir mes candidatures',
 })

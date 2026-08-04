@@ -39,7 +39,7 @@ function choisirConseilDeLaSemaine() {
   if (!ARTICLES?.length) return null
   const semaine = Math.floor(Date.now() / (7 * 86400000))
   const article = ARTICLES[semaine % ARTICLES.length]
-  return { titre: article.titre, url: `https://didcv.vercel.app/blog/${article.slug}` }
+  return { titre: article.titre, url: `https://did-job.com/blog/${article.slug}` }
 }
 
 export default async function handler(req, res) {
@@ -92,13 +92,13 @@ export default async function handler(req, res) {
       parStatutLabels: Object.entries(parStatut).map(([statut, n]) => ({ label: LABELS_STATUT[statut] || statut, n })),
     }
 
-    const html = emailResumeHebdomadaire(profil.prenom || '', stats, conseil, nbEntretiens > 0 ? 'https://didcv.vercel.app/entretien' : null)
+    const html = emailResumeHebdomadaire(profil.prenom || '', stats, conseil, nbEntretiens > 0 ? 'https://did-job.com/entretien' : null)
 
     try {
       await resend.emails.send({
-        from: 'DidCV <noreply@didcv.fr>',
+        from: 'DidJob <noreply@didcv.fr>',
         to: profil.email,
-        subject: 'Ton résumé de la semaine sur DidCV',
+        subject: 'Ton résumé de la semaine sur DidJob',
         html,
       })
       envoyes++

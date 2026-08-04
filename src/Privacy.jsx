@@ -20,11 +20,11 @@ export default function Privacy() {
 
         <div style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '40px' }}>
           <Section title="1. Données collectées">
-            DidCV collecte les informations que tu fournis directement : adresse email, informations de profil (nom, expériences, formations, compétences), et les CVs que tu génères. Nous ne collectons aucune donnée sensible au sens du RGPD.
+            DidJob collecte les informations que tu fournis directement : adresse email, informations de profil (nom, expériences, formations, compétences), et les CVs que tu génères. Nous ne collectons aucune donnée sensible au sens du RGPD.
           </Section>
 
           <Section title="2. Utilisation des données">
-            Tes données sont utilisées exclusivement pour fournir le service DidCV : générer tes CVs, sauvegarder ton profil, et améliorer nos algorithmes de génération. Nous ne vendons jamais tes données à des tiers.
+            Tes données sont utilisées exclusivement pour fournir le service DidJob : générer tes CVs, sauvegarder ton profil, et améliorer nos algorithmes de génération. Nous ne vendons jamais tes données à des tiers.
           </Section>
 
           <Section title="3. Intelligence artificielle">
@@ -32,7 +32,7 @@ export default function Privacy() {
           </Section>
 
           <Section title="4. Cookies">
-            DidCV utilise uniquement des cookies essentiels au fonctionnement du service (authentification, session). Aucun cookie publicitaire ou de tracking n'est utilisé.
+            DidJob utilise uniquement des cookies essentiels au fonctionnement du service (authentification, session). Aucun cookie publicitaire ou de tracking n'est utilisé.
           </Section>
 
           <Section title="5. Durée de conservation">

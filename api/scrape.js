@@ -70,7 +70,7 @@ export const scrapeGreenhouse = async (slug, entrepriseNom) => {
   for (const url of urls) {
     try {
       const res = await fetch(url, {
-        headers: { 'User-Agent': 'DidCV-JobAggregator/1.0 (contact@didcv.fr)' }
+        headers: { 'User-Agent': 'DidJob-JobAggregator/1.0 (contact@didcv.fr)' }
       })
       if (!res.ok) continue
       const data = await res.json()
@@ -151,7 +151,7 @@ export const scrapeLever = async (slug, entrepriseNom) => {
     const url = `https://api.lever.co/v0/postings/${slug}?mode=json`
     const res = await fetch(
       url,
-      { headers: { 'User-Agent': 'DidCV-JobAggregator/1.0 (contact@didcv.fr)' } }
+      { headers: { 'User-Agent': 'DidJob-JobAggregator/1.0 (contact@didcv.fr)' } }
     )
     console.log(`Lever ${slug}: ${url} -> ${res.status}`)
     if (!res.ok) return scrapeLeverHTML(slug, entrepriseNom)
@@ -182,7 +182,7 @@ export const scrapeSmartRecruiters = async (slug, entrepriseNom) => {
   try {
     const res = await fetch(
       `https://api.smartrecruiters.com/v1/companies/${slug}/postings?limit=100`,
-      { headers: { 'User-Agent': 'DidCV-JobAggregator/1.0 (contact@didcv.fr)' } }
+      { headers: { 'User-Agent': 'DidJob-JobAggregator/1.0 (contact@didcv.fr)' } }
     )
     if (!res.ok) return []
     const data = await res.json()
@@ -231,7 +231,7 @@ export const scrapeWorkday = async (workdayId, entrepriseNom, careersUrl, entrep
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'User-Agent': 'DidCV-JobAggregator/1.0 (contact@didcv.fr)',
+            'User-Agent': 'DidJob-JobAggregator/1.0 (contact@didcv.fr)',
           },
           body: JSON.stringify({ limit: 50, offset: 0, searchText: '' })
         })
@@ -268,7 +268,7 @@ export const scrapeSuccessFactors = async (slug, entrepriseNom, careersUrl) => {
     await sleep(2000)
     const res = await fetch(
       `https://careers.${slug}.com/api/apply/v2/jobs?domain=${slug}.com&start=0&num=50&locale=fr_FR`,
-      { headers: { 'User-Agent': 'DidCV-JobAggregator/1.0 (contact@didcv.fr)' } }
+      { headers: { 'User-Agent': 'DidJob-JobAggregator/1.0 (contact@didcv.fr)' } }
     )
     if (!res.ok) return []
     const data = await res.json()

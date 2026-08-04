@@ -105,7 +105,7 @@ export default async function handler(req, res) {
   const searchAlternance = async () => {
     if (typeContrat && typeContrat !== 'E1') return null // seulement si alternance demandée ou recherche générale
     const r = await fetch(
-      `https://labonnealternance.apprentissage.beta.gouv.fr/api/V1/jobs?caller=DidCV&romes=&latitude=${location ? '' : '48.866'}&longitude=${location ? '' : '2.333'}&radius=100&insee=&sources=offres_emploi_partenaires`,
+      `https://labonnealternance.apprentissage.beta.gouv.fr/api/V1/jobs?caller=DidJob&romes=&latitude=${location ? '' : '48.866'}&longitude=${location ? '' : '2.333'}&radius=100&insee=&sources=offres_emploi_partenaires`,
       { headers: { Accept: 'application/json' } }
     )
     return r.json()
@@ -134,7 +134,7 @@ export default async function handler(req, res) {
   const searchRemoteOK = async () => {
     const r = await fetch(
       `https://remoteok.com/api?tag=${encodeURIComponent(query.split(' ')[0])}`,
-      { headers: { 'User-Agent': 'DidCV/1.0' } }
+      { headers: { 'User-Agent': 'DidJob/1.0' } }
     )
     return r.json()
   }

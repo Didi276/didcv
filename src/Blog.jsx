@@ -60,17 +60,17 @@ export default function Blog() {
       headline: a.titre,
       description: a.description,
       datePublished: a.date,
-      url: `https://didcv.vercel.app/blog/${a.slug}`,
-      author: { '@type': 'Organization', name: 'DidCV' },
+      url: `https://did-job.com/blog/${a.slug}`,
+      author: { '@type': 'Organization', name: 'DidJob' },
     })),
   }
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
       <SEO
-        titre="Conseils CV et carrière du blog DidCV"
+        titre="Conseils CV et carrière du blog DidJob"
         description="Guides pratiques pour rédiger votre CV, préparer vos entretiens et optimiser votre recherche d'emploi en France."
-        url="https://didcv.vercel.app/blog"
+        url="https://did-job.com/blog"
         schema={schema}
       />
       <Navbar />
@@ -149,7 +149,7 @@ export default function Blog() {
       </div>
 
       <footer style={{ textAlign: 'center', padding: '40px', borderTop: '1px solid #f0f0f0', fontSize: '13px', color: '#9ca3af' }}>
-        <Link to="/" style={{ color: '#4f46e5', textDecoration: 'none', fontWeight: '600' }}>DidCV</Link>, créez votre CV optimisé ATS gratuitement
+        <Link to="/" style={{ color: '#4f46e5', textDecoration: 'none', fontWeight: '600' }}>DidJob</Link>, créez votre CV optimisé ATS gratuitement
       </footer>
     </div>
   )

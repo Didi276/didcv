@@ -24,7 +24,7 @@ export default function Contact() {
       return
     }
     // Ouvre le client mail avec les infos pré-remplies
-    const mailto = `mailto:contact@didcv.fr?subject=${encodeURIComponent(`[DidCV] ${form.sujet || 'Contact'}`)}&body=${encodeURIComponent(`Nom: ${form.nom}\nEmail: ${form.email}\n\n${form.message}`)}`
+    const mailto = `mailto:contact@didcv.fr?subject=${encodeURIComponent(`[DidJob] ${form.sujet || 'Contact'}`)}&body=${encodeURIComponent(`Nom: ${form.nom}\nEmail: ${form.email}\n\n${form.message}`)}`
     window.open(mailto)
     setSent(true)
   }
@@ -39,8 +39,8 @@ export default function Contact() {
     <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
       <SEO
         titre="Contact"
-        description="Contactez l'équipe DidCV pour toute question sur votre CV, votre compte ou nos services. Réponse sous 24h."
-        url="https://didcv.vercel.app/contact"
+        description="Contactez l'équipe DidJob pour toute question sur votre CV, votre compte ou nos services. Réponse sous 24h."
+        url="https://did-job.com/contact"
       />
       <Navbar />
       <div style={{ maxWidth: '600px', margin: '0 auto', padding: '96px 24px 100px' }}>

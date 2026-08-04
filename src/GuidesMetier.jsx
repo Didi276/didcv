@@ -43,9 +43,9 @@ export default function GuidesMetier() {
   return (
     <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
       <SEO
-        titre="Exemples de CV par métier, guides gratuits DidCV"
+        titre="Exemples de CV par métier, guides gratuits DidJob"
         description="Exemples de CV par métier avec 24 guides professionnels gratuits, compétences, missions types et conseils pour réussir votre candidature."
-        url="https://didcv.vercel.app/guides"
+        url="https://did-job.com/guides"
       />
       <Navbar />
       <div style={{ position: 'relative', background: '#0a0a0f', overflow: 'hidden', padding: '48px 24px' }}>

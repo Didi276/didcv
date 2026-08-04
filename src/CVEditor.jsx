@@ -17,7 +17,7 @@ function CVEditor({ cvData, template, onSave, onClose }) {
     const imgData = canvas.toDataURL('image/png')
     const pdf = new jsPDF('p', 'mm', 'a4', true)
     pdf.addImage(imgData, 'PNG', 0, 0, 210, 297, '', 'FAST')
-    pdf.save(`CV-DidCV-${cv.prenom}-${cv.nom}.pdf`)
+    pdf.save(`CV-DidJob-${cv.prenom}-${cv.nom}.pdf`)
   }
 
   // ✅ Upload photo → conversion base64

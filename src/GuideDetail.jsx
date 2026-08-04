@@ -32,7 +32,7 @@ export default function GuideDetail() {
 
   const autres = GUIDES.filter(g => g.slug !== slug && g.secteur === guide.secteur).slice(0, 3)
   const metier = guide.titre.replace('CV ', '')
-  const url = `https://didcv.vercel.app/guide/${guide.slug}`
+  const url = `https://did-job.com/guide/${guide.slug}`
 
   const schema = {
     '@context': 'https://schema.org',
@@ -43,7 +43,7 @@ export default function GuideDetail() {
       { '@type': 'HowToStep', name: 'Identifiez les compétences clés', text: guide.competences.join(', ') },
       { '@type': 'HowToStep', name: 'Valorisez vos missions', text: guide.missions.join('. ') },
       { '@type': 'HowToStep', name: 'Suivez les conseils d\'experts', text: guide.conseils },
-      { '@type': 'HowToStep', name: 'Générez votre CV', text: `Utilisez le template ${guide.template} recommandé pour ce métier sur DidCV.` },
+      { '@type': 'HowToStep', name: 'Générez votre CV', text: `Utilisez le template ${guide.template} recommandé pour ce métier sur DidJob.` },
     ],
   }
 

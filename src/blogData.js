@@ -87,7 +87,7 @@ Utilisez Arial, Calibri, Times New Roman ou Inter. Évitez les polices décorati
 
 ## Score ATS : comment l'améliorer ?
 
-DidCV propose une analyse ATS intégrée qui évalue votre CV contre l'offre d'emploi et vous donne un score détaillé avec les mots-clés manquants.
+DidJob propose une analyse ATS intégrée qui évalue votre CV contre l'offre d'emploi et vous donne un score détaillé avec les mots-clés manquants.
     `
   },
   {
@@ -163,7 +163,7 @@ Maîtrise de logiciels, langages de programmation, outils bureautiques. Mettez t
 4. Langues
 5. Centres d'intérêt (sélectifs et pertinents)
 
-## Conseil DidCV
+## Conseil DidJob
 
 Notre template "Étudiant" est spécialement conçu pour valoriser les formations et projets plutôt que les expériences.
     `
@@ -200,7 +200,7 @@ En alternance, votre formation est aussi importante que votre expérience. Menti
 
 ## Template recommandé
 
-DidCV propose un template "Alternance" qui met en avant à la fois votre formation et vos expériences de manière équilibrée.
+DidJob propose un template "Alternance" qui met en avant à la fois votre formation et vos expériences de manière équilibrée.
     `
   },
   {
@@ -389,7 +389,7 @@ Le CV anglais est plus direct et orienté résultats. Commencez vos missions par
 - Langues : Languages
 - Références : References available upon request
 
-## Template DidCV International
+## Template DidJob International
 
 Notre template "International" est conçu pour s'adapter aux codes du recrutement international, avec une mise en page sobre et professionnelle adaptée aux marchés anglophones.
     `
@@ -530,7 +530,7 @@ Prospection B2B/B2C, closing, négociation, gestion de portefeuille, CRM (Salesf
 
 ## Template recommandé
 
-Le template "Commercial" de DidCV met en avant vos chiffres clés dès le premier regard, avec une mise en page pensée pour les profils orientés résultats.
+Le template "Commercial" de DidJob met en avant vos chiffres clés dès le premier regard, avec une mise en page pensée pour les profils orientés résultats.
     `
   },
   {
@@ -579,7 +579,7 @@ Organisez vos compétences par catégorie plutôt qu'en vrac :
 
 ## Template recommandé
 
-Le template "Tech" de DidCV structure automatiquement votre stack technique en catégories lisibles pour les recruteurs et les ATS.
+Le template "Tech" de DidJob structure automatiquement votre stack technique en catégories lisibles pour les recruteurs et les ATS.
     `
   },
   {
@@ -600,7 +600,7 @@ Postuler à 200 offres au hasard est moins efficace que postuler à 30 offres pa
 
 ## 2. Optimiser son CV pour chaque candidature
 
-Un CV générique passe moins bien les filtres ATS. Adaptez le titre, l'accroche et les mots-clés à chaque offre. DidCV permet de générer un CV adapté à une offre en quelques secondes.
+Un CV générique passe moins bien les filtres ATS. Adaptez le titre, l'accroche et les mots-clés à chaque offre. DidJob permet de générer un CV adapté à une offre en quelques secondes.
 
 ## 3. Activer tous les canaux en parallèle
 
@@ -615,7 +615,7 @@ Un CV générique passe moins bien les filtres ATS. Adaptez le titre, l'accroche
 
 ## 5. Suivre ses candidatures rigoureusement
 
-Sans suivi, on perd du temps à relancer au mauvais moment ou à oublier de relancer du tout. Un tableau de suivi (comme celui de DidCV) permet de visualiser où en est chaque candidature et d'agir au bon moment.
+Sans suivi, on perd du temps à relancer au mauvais moment ou à oublier de relancer du tout. Un tableau de suivi (comme celui de DidJob) permet de visualiser où en est chaque candidature et d'agir au bon moment.
 
 ## 6. Se préparer aux entretiens en avance
 
@@ -721,7 +721,7 @@ Précisez vos dates de disponibilité et proposez un entretien.
 - Une capacité d'apprentissage rapide
 - Une bonne intégration dans l'équipe
 
-## Conseil DidCV
+## Conseil DidJob
 
 Personnalisez chaque lettre en fonction de l'offre : une lettre générique se repère immédiatement par un recruteur habitué à en lire des dizaines chaque semaine.
     `
@@ -822,7 +822,7 @@ Le secteur du BTP valorise fortement la culture sécurité. Mentionnez vos forma
 
 ## Template recommandé
 
-Le template "BTP" de DidCV met en avant vos habilitations et vos chantiers dès le premier coup d'œil, dans un format clair et professionnel apprécié des recruteurs du secteur.
+Le template "BTP" de DidJob met en avant vos habilitations et vos chantiers dès le premier coup d'œil, dans un format clair et professionnel apprécié des recruteurs du secteur.
     `
   },
   {

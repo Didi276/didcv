@@ -59,7 +59,7 @@ export default function AdminRecruteurs() {
       .eq('id', demande.id)
     if (error) { alert('Erreur lors de la validation.'); return }
     setDemandes(demandes.map(d => d.id === demande.id ? { ...d, statut: 'valide', valide_par: adminEmail } : d))
-    window.open(`mailto:${demande.email}?subject=${encodeURIComponent('Ton accès DidCV Recruteurs est validé')}&body=${encodeURIComponent(`Bonjour ${demande.prenom},\n\nBonne nouvelle : ton accès à la banque de talents DidCV a été validé.\n\nTu peux te connecter dès maintenant : ${window.location.origin}/recruteurs/connexion\n\nÀ bientôt,\nL'équipe DidCV`)}`)
+    window.open(`mailto:${demande.email}?subject=${encodeURIComponent('Ton accès DidJob Recruteurs est validé')}&body=${encodeURIComponent(`Bonjour ${demande.prenom},\n\nBonne nouvelle : ton accès à la banque de talents DidJob a été validé.\n\nTu peux te connecter dès maintenant : ${window.location.origin}/recruteurs/connexion\n\nÀ bientôt,\nL'équipe DidJob`)}`)
   }
 
   const ouvrirRefus = (id) => { setRefusEnCours(id); setRaisonRefus('') }
@@ -71,7 +71,7 @@ export default function AdminRecruteurs() {
     if (error) { alert('Erreur lors du refus.'); return }
     setDemandes(demandes.map(d => d.id === demande.id ? { ...d, statut: 'refuse', valide_par: adminEmail } : d))
     const raison = raisonRefus.trim() ? `\n\nMotif : ${raisonRefus.trim()}` : ''
-    window.open(`mailto:${demande.email}?subject=${encodeURIComponent('À propos de ta demande d\'accès DidCV Recruteurs')}&body=${encodeURIComponent(`Bonjour ${demande.prenom},\n\nAprès étude, nous ne sommes pas en mesure de valider ta demande d'accès à la banque de talents DidCV pour le moment.${raison}\n\nL'équipe DidCV`)}`)
+    window.open(`mailto:${demande.email}?subject=${encodeURIComponent('À propos de ta demande d\'accès DidJob Recruteurs')}&body=${encodeURIComponent(`Bonjour ${demande.prenom},\n\nAprès étude, nous ne sommes pas en mesure de valider ta demande d'accès à la banque de talents DidJob pour le moment.${raison}\n\nL'équipe DidJob`)}`)
     setRefusEnCours(null)
     setRaisonRefus('')
   }
@@ -90,7 +90,7 @@ export default function AdminRecruteurs() {
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: '"Inter",system-ui,sans-serif', textAlign: 'center', padding: '24px' }}>
         <Lock size={40} color="#c4c4c4" strokeWidth={1.5} style={{ marginBottom: '16px' }} />
         <h1 style={{ fontSize: '20px', fontWeight: '800', color: '#111', margin: '0 0 8px' }}>Accès refusé</h1>
-        <p style={{ fontSize: '14px', color: '#9ca3af', margin: '0 0 20px' }}>Cette page est réservée aux administrateurs DidCV.</p>
+        <p style={{ fontSize: '14px', color: '#9ca3af', margin: '0 0 20px' }}>Cette page est réservée aux administrateurs DidJob.</p>
         <Link to="/" style={{ padding: '10px 20px', background: '#4f46e5', color: '#fff', borderRadius: '10px', textDecoration: 'none', fontSize: '14px', fontWeight: '700' }}>Accueil</Link>
       </div>
     )

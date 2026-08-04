@@ -192,7 +192,7 @@ export default function RecruteurBanque() {
       <div style={{ background: '#1e3a5f', padding: '44px 24px' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
           <h1 style={{ fontSize: '32px', fontWeight: '800', color: '#fff', margin: '0 0 10px', letterSpacing: '-1px' }}>
-            Banque de talents DidCV
+            Banque de talents DidJob
           </h1>
           <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.75)', margin: 0 }}>
             Candidats certifiés et disponibles
