@@ -1,0 +1,32 @@
+name: Scraping JSON-LD offres entreprises françaises
+on:
+  schedule:
+    - cron: '0 10 * * *'
+  workflow_dispatch:
+    inputs:
+      start:
+        description: 'Index de début'
+        required: false
+        default: '0'
+      end:
+        description: 'Index de fin'
+        required: false
+        default: '500'
+
+jobs:
+  scrape-jsonld:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install @supabase/supabase-js node-fetch ws
+      - name: Run JSON-LD scraper
+        run: node scripts/jsonld-scraper.js
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          START: ${{ inputs.start || '0' }}
+          END: ${{ inputs.end || '500' }}
