@@ -167,7 +167,7 @@ export const ENTREPRISES = [
   { id: 146, nom: 'Monoprix', secteur: 'Distribution', ats: 'custom', slug: null, careers_url: 'https://www.monoprix.fr/cms/c/recrutement' },
   { id: 147, nom: 'H&M France', secteur: 'Mode', ats: 'successfactors', slug: 'hm', careers_url: 'https://career.hm.com' },
   { id: 148, nom: 'Zara France', secteur: 'Mode', ats: 'recruitee', slug: 'zara', careers_url: 'https://www.inditex.com/fr/carrieres' },
-  { id: 149, nom: 'Sephora', secteur: 'Beauté/Retail', ats: 'talentsoft', slug: 'sephoracareers', careers_url: 'https://careers.smartrecruiters.com/Sephora' },
+  { id: 149, nom: 'Sephora', secteur: 'Beauté/Retail', ats: 'talentsoft', slug: 'sephoracareers', careers_url: 'https://sephoracareers-career.talent-soft.com' },
   { id: 150, nom: 'Yves Rocher', secteur: 'Beauté', ats: 'custom', slug: null, careers_url: 'https://www.yves-rocher.fr/carrieres' },
 
   // ═══ TECH ET STARTUPS FRANÇAISES ═════════════════════════════════════
@@ -175,7 +175,7 @@ export const ENTREPRISES = [
   { id: 152, nom: 'Infomaniak', secteur: 'Cloud/Tech', ats: 'custom', slug: null, careers_url: 'https://www.infomaniak.com/fr/jobs' },
   { id: 153, nom: 'Dailymotion', secteur: 'Vidéo/Tech', ats: 'smartrecruiters', slug: 'dailymotion', careers_url: 'https://www.dailymotion.com/fr/careers' },
   { id: 154, nom: 'Voodoo', secteur: 'Jeux vidéo', ats: 'ashby', slug: 'voodoo', careers_url: 'https://www.voodoo.io/jobs' },
-  { id: 155, nom: 'Homa Games', secteur: 'Jeux vidéo', ats: 'personio', slug: 'homa-games', careers_url: 'https://jobs.lever.co/homagames' },
+  { id: 155, nom: 'Homa Games', secteur: 'Jeux vidéo', ats: 'personio', slug: 'homa-games', careers_url: 'https://homa-games.jobs.personio.de' },
   { id: 156, nom: 'Ubisoft', secteur: 'Jeux vidéo', ats: 'greenhouse', slug: 'ubisoft', careers_url: 'https://www.ubisoft.com/fr-fr/company/careers' },
   { id: 157, nom: 'Gameloft', secteur: 'Jeux vidéo', ats: 'smartrecruiters', slug: 'gameloft', careers_url: 'https://www.gameloft.com/careers' },
   { id: 158, nom: 'Dalkia', secteur: 'Énergie services', ats: 'talentsoft', slug: 'dalkia', careers_url: 'https://www.dalkia.fr/nous-rejoindre' },
@@ -263,5 +263,9 @@ export const ENTREPRISES = [
   { id: 230, nom: 'AGIRC-ARRCO', secteur: 'Retraite', ats: 'talentsoft', slug: 'agirc-arrco', careers_url: 'https://agirc-arrco-career.talent-soft.com' },
 ]
 
-export const ATS_TYPES = ['greenhouse', 'lever', 'smartrecruiters', 'workday', 'successfactors', 'custom', 'taleo']
+export const ATS_TYPES = [
+  'greenhouse', 'lever', 'smartrecruiters', 'workday',
+  'ashby', 'workable', 'recruitee', 'personio',
+  'rippling', 'talentsoft', 'teamtailor', 'custom'
+]
 export const SECTEURS_FR = [...new Set(ENTREPRISES.map(e => e.secteur))]
