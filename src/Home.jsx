@@ -243,10 +243,10 @@ export default function Home() {
             </div>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '28px', fontWeight: 700, color: '#ffffff' }}>
-                {stats.entreprises || '—'}
+                Chaque jour
               </div>
               <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '2px' }}>
-                entreprises en direct
+                nouvelles offres
               </div>
             </div>
             <div style={{ textAlign: 'center' }}>
