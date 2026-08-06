@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import fetch from 'node-fetch'
 import ws from 'ws'
+import { ENTREPRISES } from '../api/entreprisesData.js'
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
@@ -9,6 +10,15 @@ const supabase = createClient(
 )
 
 const sleep = ms => new Promise(r => setTimeout(r, ms))
+
+// Entreprises déjà couvertes par le scraper ATS dédié (scripts/scrape-all.js)
+// via un ATS hébergé sur leur propre domaine — inutile de les re-scraper en JSON-LD.
+const domainesDejaGeres = new Set(
+  ENTREPRISES
+    .filter(e => e.ats !== 'custom')
+    .map(e => e.careers_url?.replace('https://', '').split('/')[0] || '')
+    .filter(Boolean)
+)
 
 async function extractJobPostings(url, entrepriseNom) {
   try {
@@ -118,54 +128,76 @@ async function parseSitemap(sitemapUrl) {
 }
 
 async function scraperEntrepriseJsonLD(domaine, nom) {
-  const sitemapUrls = [
-    `https://${domaine}/sitemap.xml`,
-    `https://${domaine}/sitemap_index.xml`,
-    `https://www.${domaine}/sitemap.xml`,
-    `https://${domaine}/jobs-sitemap.xml`,
-    `https://${domaine}/carriere-sitemap.xml`,
+  // URLs de pages carrières à tester directement
+  const careerPages = [
+    `https://${domaine}/careers`,
+    `https://${domaine}/careers/`,
+    `https://www.${domaine}/careers`,
+    `https://${domaine}/emplois`,
+    `https://${domaine}/offres-emploi`,
+    `https://${domaine}/offres-d-emploi`,
+    `https://${domaine}/recrutement`,
+    `https://${domaine}/jobs`,
+    `https://${domaine}/jobs/`,
+    `https://www.${domaine}/jobs`,
+    `https://${domaine}/fr/careers`,
+    `https://${domaine}/fr/jobs`,
+    `https://${domaine}/fr/offres`,
+    `https://careers.${domaine}`,
+    `https://jobs.${domaine}`,
+    `https://recrutement.${domaine}`,
+    `https://emploi.${domaine}`,
+    `https://carrieres.${domaine}`,
   ]
-  let jobUrls = []
-  for (const sitemapUrl of sitemapUrls) {
-    const urls = await parseSitemap(sitemapUrl)
-    if (urls.length > 0) {
-      jobUrls = urls
-      console.log(`  📄 ${nom}: ${urls.length} URLs trouvées`)
+
+  // D'abord essayer les pages carrières directement
+  // (plus rapide que le sitemap pour la plupart des cas)
+  let toutesOffres = []
+  const vus = new Set()
+
+  for (const page of careerPages) {
+    const offres = await extractJobPostings(page, nom)
+    for (const o of offres) {
+      if (!vus.has(o.hash)) {
+        vus.add(o.hash)
+        toutesOffres.push(o)
+      }
+    }
+    if (toutesOffres.length > 0) {
+      console.log(`  ✅ JSON-LD trouvé sur ${page}`)
       break
     }
-    await sleep(300)
+    await sleep(200)
   }
-  if (jobUrls.length === 0) {
-    const careerPages = [
-      `https://${domaine}/careers`,
-      `https://${domaine}/emplois`,
-      `https://${domaine}/offres`,
-      `https://${domaine}/recrutement`,
-      `https://${domaine}/jobs`,
-      `https://www.${domaine}/careers`,
-      `https://www.${domaine}/emplois`,
+
+  // Si rien trouvé via pages carrières, essayer le sitemap
+  if (toutesOffres.length === 0) {
+    const sitemapUrls = [
+      `https://${domaine}/sitemap.xml`,
+      `https://www.${domaine}/sitemap.xml`,
     ]
-    for (const page of careerPages) {
-      const offres = await extractJobPostings(page, nom)
-      if (offres.length > 0) {
-        jobUrls = [page]
+    let jobUrls = []
+    for (const sitemapUrl of sitemapUrls) {
+      const urls = await parseSitemap(sitemapUrl)
+      if (urls.length > 0) {
+        jobUrls = urls
+        console.log(`  📄 ${nom}: ${urls.length} URLs dans sitemap`)
         break
+      }
+      await sleep(300)
+    }
+    for (const url of jobUrls.slice(0, 50)) {
+      const offres = await extractJobPostings(url, nom)
+      for (const o of offres) {
+        if (!vus.has(o.hash)) {
+          vus.add(o.hash)
+          toutesOffres.push(o)
+        }
       }
       await sleep(200)
     }
   }
-  const toutesOffres = []
-  const vus = new Set()
-  for (const url of jobUrls.slice(0, 100)) {
-    const offres = await extractJobPostings(url, nom)
-    for (const offre of offres) {
-      if (!vus.has(offre.hash)) {
-        vus.add(offre.hash)
-        toutesOffres.push(offre)
-      }
-    }
-    await sleep(200)
-  }
+
   return toutesOffres
 }
 
@@ -173,83 +205,47 @@ async function scraperEntrepriseJsonLD(domaine, nom) {
 export const ENTREPRISES_2000 = [
 
   // CAC 40 (40 entreprises)
-  { domaine: 'totalenergies.com', nom: 'TotalEnergies' },
   { domaine: 'lvmh.com', nom: 'LVMH' },
-  { domaine: 'sanofi.com', nom: 'Sanofi' },
   { domaine: 'bnpparibas.com', nom: 'BNP Paribas' },
-  { domaine: 'airbus.com', nom: 'Airbus' },
   { domaine: 'loreal.com', nom: "L'Oréal" },
   { domaine: 'societegenerale.com', nom: 'Société Générale' },
-  { domaine: 'capgemini.com', nom: 'Capgemini' },
   { domaine: 'axa.com', nom: 'AXA' },
   { domaine: 'carrefour.com', nom: 'Carrefour' },
   { domaine: 'renaultgroup.com', nom: 'Renault Groupe' },
-  { domaine: 'stellantis.com', nom: 'Stellantis' },
-  { domaine: 'thalesgroup.com', nom: 'Thales' },
-  { domaine: 'michelin.com', nom: 'Michelin' },
   { domaine: 'orange.com', nom: 'Orange' },
   { domaine: 'danone.com', nom: 'Danone' },
   { domaine: 'safran.com', nom: 'Safran' },
-  { domaine: 'se.com', nom: 'Schneider Electric' },
   { domaine: 'saint-gobain.com', nom: 'Saint-Gobain' },
   { domaine: 'vivendi.com', nom: 'Vivendi' },
-  { domaine: 'engie.com', nom: 'Engie' },
-  { domaine: 'airliquide.com', nom: 'Air Liquide' },
   { domaine: 'pernod-ricard.com', nom: 'Pernod Ricard' },
   { domaine: 'hermes.com', nom: 'Hermès' },
   { domaine: 'legrand.com', nom: 'Legrand' },
-  { domaine: 'vinci.com', nom: 'Vinci' },
   { domaine: 'bouygues.com', nom: 'Bouygues' },
   { domaine: 'essilorluxottica.com', nom: 'EssilorLuxottica' },
   { domaine: 'kering.com', nom: 'Kering' },
-  { domaine: 'publicisgroupe.com', nom: 'Publicis Groupe' },
   { domaine: 'accor.com', nom: 'Accor' },
-  { domaine: '3ds.com', nom: 'Dassault Systèmes' },
   { domaine: 'edenred.com', nom: 'Edenred' },
   { domaine: 'sodexo.com', nom: 'Sodexo' },
-  { domaine: 'veolia.com', nom: 'Veolia' },
-  { domaine: 'alstom.com', nom: 'Alstom' },
   { domaine: 'bureauveritas.com', nom: 'Bureau Veritas' },
   { domaine: 'teleperformance.com', nom: 'Teleperformance' },
   { domaine: 'eurofins.com', nom: 'Eurofins' },
   { domaine: 'worldline.com', nom: 'Worldline' },
 
   // SBF 120 ADDITIONNELS (~80 entreprises)
-  { domaine: 'valeo.com', nom: 'Valeo' },
   { domaine: 'forvia.com', nom: 'Forvia/Faurecia' },
-  { domaine: 'nexans.com', nom: 'Nexans' },
-  { domaine: 'imerys.com', nom: 'Imerys' },
-  { domaine: 'vallourec.com', nom: 'Vallourec' },
   { domaine: 'rexel.com', nom: 'Rexel' },
-  { domaine: 'soitec.com', nom: 'Soitec' },
   { domaine: 'sartorius.com', nom: 'Sartorius Stedim Biotech' },
-  { domaine: 'plastic-omnium.com', nom: 'Plastic Omnium' },
-  { domaine: 'ipsen.com', nom: 'Ipsen' },
-  { domaine: 'coface.com', nom: 'Coface' },
-  { domaine: 'arkema.com', nom: 'Arkema' },
-  { domaine: 'amundi.com', nom: 'Amundi' },
   { domaine: 'cnp.fr', nom: 'CNP Assurances' },
-  { domaine: 'nexity.fr', nom: 'Nexity' },
-  { domaine: 'korian.fr', nom: 'Korian' },
   { domaine: 'maisonsdumonde.com', nom: 'Maisons du Monde' },
-  { domaine: 'getlinkgroup.com', nom: 'Getlink' },
-  { domaine: 'bic.com', nom: 'BIC' },
   { domaine: 'remy-cointreau.com', nom: 'Rémy Cointreau' },
   { domaine: 'lagardere.com', nom: 'Lagardère' },
   { domaine: 'vicat.fr', nom: 'Vicat' },
-  { domaine: 'eiffage.com', nom: 'Eiffage' },
   { domaine: 'soprasteria.com', nom: 'Sopra Steria' },
   { domaine: 'atos.net', nom: 'Atos' },
-  { domaine: 'alten.fr', nom: 'Alten' },
   { domaine: 'assystem.com', nom: 'Assystem' },
   { domaine: 'expleogroup.com', nom: 'Expleo' },
   { domaine: 'fnacdarty.com', nom: 'Fnac Darty' },
-  { domaine: 'bonduelle.com', nom: 'Bonduelle' },
-  { domaine: 'roquette.com', nom: 'Roquette' },
-  { domaine: 'tereos.com', nom: 'Tereos' },
   { domaine: 'suez.com', nom: 'Suez' },
-  { domaine: 'eliorgroup.com', nom: 'Elior Group' },
-  { domaine: 'icade.fr', nom: 'Icade' },
   { domaine: 'sfl.fr', nom: 'Société Foncière Lyonnaise' },
   { domaine: 'altarea.com', nom: 'Altarea' },
   { domaine: 'covivio.eu', nom: 'Covivio' },
@@ -274,7 +270,6 @@ export const ENTREPRISES_2000 = [
   { domaine: 'melia.com', nom: 'Meliá France' },
 
   // BANQUES & FINANCE (~80)
-  { domaine: 'credit-agricole.com', nom: 'Crédit Agricole' },
   { domaine: 'bpce.fr', nom: 'BPCE' },
   { domaine: 'labanquepostale.fr', nom: 'La Banque Postale' },
   { domaine: 'natixis.com', nom: 'Natixis' },
@@ -327,7 +322,6 @@ export const ENTREPRISES_2000 = [
 
   // ASSURANCE (~50)
   { domaine: 'groupama.fr', nom: 'Groupama' },
-  { domaine: 'maif.fr', nom: 'MAIF' },
   { domaine: 'macif.fr', nom: 'MACIF' },
   { domaine: 'covea.fr', nom: 'Covéa' },
   { domaine: 'ag2rlamondiale.fr', nom: 'AG2R La Mondiale' },
@@ -351,22 +345,17 @@ export const ENTREPRISES_2000 = [
   { domaine: 'thelem.fr', nom: 'Thelem Assurances' },
   { domaine: 'wakam.com', nom: 'Wakam' },
   { domaine: 'lifeaz.com', nom: 'Lifeaz' },
-  { domaine: 'luko.eu', nom: 'Luko' },
   { domaine: 'lovys.fr', nom: 'Lovys' },
   { domaine: 'acheel.com', nom: 'Acheel' },
   { domaine: 'fluo.eu', nom: 'Fluo' },
   { domaine: 'stoik.com', nom: 'Stoik' },
 
   // ENERGIE & ENVIRONNEMENT (~60)
-  { domaine: 'edf.fr', nom: 'EDF' },
   { domaine: 'enedis.fr', nom: 'Enedis' },
   { domaine: 'rte-france.com', nom: 'RTE' },
   { domaine: 'grdf.fr', nom: 'GRDF' },
   { domaine: 'grtgaz.com', nom: 'GRTgaz' },
-  { domaine: 'dalkia.fr', nom: 'Dalkia' },
   { domaine: 'orano.group', nom: 'Orano' },
-  { domaine: 'framatome.com', nom: 'Framatome' },
-  { domaine: 'naval-group.com', nom: 'Naval Group' },
   { domaine: 'neoen.com', nom: 'Neoen' },
   { domaine: 'voltalia.com', nom: 'Voltalia' },
   { domaine: 'valeco.fr', nom: 'Valeco' },
@@ -379,7 +368,6 @@ export const ENTREPRISES_2000 = [
   { domaine: 'lyonnaise-des-eaux.fr', nom: 'Lyonnaise des Eaux' },
   { domaine: 'colas.com', nom: 'Colas' },
   { domaine: 'paprec.com', nom: 'Paprec' },
-  { domaine: 'derichebourg.com', nom: 'Derichebourg' },
   { domaine: 'sita.fr', nom: 'Sita Suez' },
   { domaine: 'seche.com', nom: 'Séché Environnement' },
   { domaine: 'chimirec.fr', nom: 'Chimirec' },
@@ -392,31 +380,10 @@ export const ENTREPRISES_2000 = [
   { domaine: 'doctolib.fr', nom: 'Doctolib' },
   { domaine: 'blablacar.com', nom: 'BlaBlaCar' },
   { domaine: 'backmarket.com', nom: 'Back Market' },
-  { domaine: 'qonto.com', nom: 'Qonto' },
-  { domaine: 'alan.com', nom: 'Alan' },
-  { domaine: 'swile.co', nom: 'Swile' },
-  { domaine: 'manomano.fr', nom: 'ManoMano' },
-  { domaine: 'contentsquare.com', nom: 'Contentsquare' },
-  { domaine: 'dataiku.com', nom: 'Dataiku' },
-  { domaine: 'algolia.com', nom: 'Algolia' },
-  { domaine: 'pennylane.com', nom: 'Pennylane' },
-  { domaine: 'pigment.com', nom: 'Pigment' },
-  { domaine: 'ledger.com', nom: 'Ledger' },
   { domaine: 'criteo.com', nom: 'Criteo' },
   { domaine: 'toogoodtogo.com', nom: 'Too Good To Go' },
-  { domaine: 'payfit.com', nom: 'Payfit' },
-  { domaine: 'spendesk.com', nom: 'Spendesk' },
-  { domaine: 'deezer.com', nom: 'Deezer' },
-  { domaine: 'dailymotion.com', nom: 'Dailymotion' },
   { domaine: 'vestiairecollective.com', nom: 'Vestiaire Collective' },
   { domaine: 'veepee.com', nom: 'Veepee' },
-  { domaine: 'mirakl.com', nom: 'Mirakl' },
-  { domaine: 'ovhcloud.com', nom: 'OVHcloud' },
-  { domaine: 'ubisoft.com', nom: 'Ubisoft' },
-  { domaine: 'withings.com', nom: 'Withings' },
-  { domaine: 'voodoo.io', nom: 'Voodoo' },
-  { domaine: 'meero.com', nom: 'Meero' },
-  { domaine: 'ankorstore.com', nom: 'Ankorstore' },
   { domaine: 'akeneo.com', nom: 'Akeneo' },
   { domaine: 'mistral.ai', nom: 'Mistral AI' },
   { domaine: 'owkin.com', nom: 'Owkin' },
@@ -426,16 +393,9 @@ export const ENTREPRISES_2000 = [
   { domaine: 'greenly.earth', nom: 'Greenly Earth' },
   { domaine: 'sorare.com', nom: 'Sorare' },
   { domaine: 'fr.homa.games', nom: 'Homa Games' },
-  { domaine: 'kyriba.com', nom: 'Kyriba' },
   { domaine: 'doctrine.fr', nom: 'Doctrine' },
-  { domaine: 'ekimetrics.com', nom: 'Ekimetrics' },
-  { domaine: 'wavestone.com', nom: 'Wavestone' },
-  { domaine: 'inetum.com', nom: 'Inetum' },
   { domaine: 'devoteam.com', nom: 'Devoteam' },
-  { domaine: 'aubay.com', nom: 'Aubay' },
   { domaine: 'neurones.com', nom: 'Neurones' },
-  { domaine: 'groupeonepoint.com', nom: 'Onepoint' },
-  { domaine: 'converteo.com', nom: 'Converteo' },
   { domaine: 'decathlon.com', nom: 'Decathlon Tech' },
   { domaine: 'talentsoft.com', nom: 'Talentsoft/Cegid' },
   { domaine: 'cegid.com', nom: 'Cegid' },
@@ -443,7 +403,6 @@ export const ENTREPRISES_2000 = [
   { domaine: 'nuxeo.com', nom: 'Nuxeo' },
   { domaine: 'inato.com', nom: 'Inato' },
   { domaine: 'alma.fr', nom: 'Alma' },
-  { domaine: 'ateme.com', nom: 'Ateme' },
   { domaine: 'skello.com', nom: 'Skello' },
   { domaine: 'devialet.com', nom: 'Devialet' },
   { domaine: 'kayrros.com', nom: 'Kayrros' },
@@ -451,7 +410,6 @@ export const ENTREPRISES_2000 = [
   { domaine: 'sendinblue.com', nom: 'Sendinblue/Brevo' },
   { domaine: 'brevo.com', nom: 'Brevo' },
   { domaine: 'mailjet.com', nom: 'Mailjet' },
-  { domaine: 'talend.com', nom: 'Talend' },
   { domaine: 'invivoo.com', nom: 'Invivoo' },
   { domaine: 'theodo.fr', nom: 'Theodo' },
   { domaine: 'fabernovel.com', nom: 'Fabernovel' },
@@ -525,13 +483,11 @@ export const ENTREPRISES_2000 = [
 
   // RETAIL & DISTRIBUTION (~100)
   { domaine: 'e.leclerc', nom: 'E.Leclerc' },
-  { domaine: 'intermarche.com', nom: 'Intermarché' },
   { domaine: 'auchan.fr', nom: 'Auchan' },
   { domaine: 'casino.fr', nom: 'Groupe Casino' },
   { domaine: 'systemeu.fr', nom: 'Système U' },
   { domaine: 'fnac.com', nom: 'Fnac' },
   { domaine: 'darty.com', nom: 'Darty' },
-  { domaine: 'decathlon.fr', nom: 'Decathlon' },
   { domaine: 'leroymerlin.fr', nom: 'Leroy Merlin' },
   { domaine: 'ikea.com', nom: 'IKEA France' },
   { domaine: 'picard.fr', nom: 'Picard' },
@@ -595,13 +551,9 @@ export const ENTREPRISES_2000 = [
   { domaine: 'maisonmargiela.com', nom: 'Maison Margiela' },
 
   // SANTE & PHARMA (~120)
-  { domaine: 'pierre-fabre.com', nom: 'Pierre Fabre' },
-  { domaine: 'servier.fr', nom: 'Servier' },
   { domaine: 'biomerieux.com', nom: 'BioMérieux' },
   { domaine: 'ramsaysante.fr', nom: 'Ramsay Santé' },
-  { domaine: 'orpea.fr', nom: 'Orpea' },
   { domaine: 'almirall.com', nom: 'Almirall France' },
-  { domaine: 'guerbet.com', nom: 'Guerbet' },
   { domaine: 'expanscience.com', nom: 'Laboratoire Expanscience' },
   { domaine: 'biomnis.com', nom: 'Biomnis' },
   { domaine: 'ap-hp.fr', nom: 'AP-HP' },
@@ -848,18 +800,9 @@ export const ENTREPRISES_2000 = [
   { domaine: 'mtu.fr', nom: 'MTU France' },
 
   // CONSEIL & AUDIT (~80)
-  { domaine: 'mckinsey.com', nom: 'McKinsey France' },
-  { domaine: 'bcg.com', nom: 'BCG France' },
-  { domaine: 'bain.com', nom: 'Bain & Company France' },
-  { domaine: 'accenture.com', nom: 'Accenture France' },
   { domaine: 'deloitte.fr', nom: 'Deloitte France' },
-  { domaine: 'ey.com', nom: 'EY France' },
   { domaine: 'pwc.fr', nom: 'PwC France' },
   { domaine: 'kpmg.fr', nom: 'KPMG France' },
-  { domaine: 'mazars.fr', nom: 'Mazars' },
-  { domaine: 'grant-thornton.fr', nom: 'Grant Thornton France' },
-  { domaine: 'rolandberger.com', nom: 'Roland Berger' },
-  { domaine: 'sia-partners.com', nom: 'Sia Partners' },
   { domaine: 'oliver-wyman.com', nom: 'Oliver Wyman France' },
   { domaine: 'booz-allen.fr', nom: 'Booz Allen Hamilton France' },
   { domaine: 'kearney.com', nom: 'Kearney France' },
@@ -895,7 +838,6 @@ export const ENTREPRISES_2000 = [
   { domaine: 'ineum-consulting.fr', nom: 'Ineum Consulting' },
   { domaine: 'elixir-conseil.fr', nom: 'Elixir Conseil' },
   { domaine: 'asterion.fr', nom: 'Asterion Conseil' },
-  { domaine: 'bdo.fr', nom: 'BDO France' },
   { domaine: 'rsmfr.com', nom: 'RSM France' },
   { domaine: 'fiducial.fr', nom: 'Fiducial' },
   { domaine: 'in-extenso.fr', nom: 'In Extenso' },
@@ -919,13 +861,8 @@ export const ENTREPRISES_2000 = [
   { domaine: 'laposte.fr', nom: 'La Poste' },
   { domaine: 'chronopost.fr', nom: 'Chronopost' },
   { domaine: 'colissimo.fr', nom: 'Colissimo' },
-  { domaine: 'geodis.com', nom: 'Geodis' },
-  { domaine: 'xpo.com', nom: 'XPO Logistics France' },
-  { domaine: 'keolis.com', nom: 'Keolis' },
   { domaine: 'transdev.com', nom: 'Transdev' },
   { domaine: 'cma-cgm.com', nom: 'CMA CGM' },
-  { domaine: 'fmlogistic.com', nom: 'FM Logistic' },
-  { domaine: 'bollore-logistics.com', nom: 'Bolloré Logistics' },
   { domaine: 'norbert-dentressangle.fr', nom: 'Norbert Dentressangle' },
   { domaine: 'dhl.fr', nom: 'DHL France' },
   { domaine: 'ups.com', nom: 'UPS France' },
@@ -1000,7 +937,6 @@ export const ENTREPRISES_2000 = [
   { domaine: 'i24news.tv', nom: 'i24News France' },
   { domaine: 'free.fr', nom: 'Free/Iliad' },
   { domaine: 'sfr.fr', nom: 'SFR' },
-  { domaine: 'bouyguestelecom.fr', nom: 'Bouygues Telecom' },
   { domaine: 'infomaniak.com', nom: 'Infomaniak France' },
   { domaine: 'numericable.fr', nom: 'Numericable' },
   { domaine: 'scaleway.com', nom: 'Scaleway' },
@@ -1279,7 +1215,6 @@ export const ENTREPRISES_2000 = [
 
   // LUXE & MODE (~60)
   { domaine: 'dior.com', nom: 'Dior' },
-  { domaine: 'chanel.com', nom: 'Chanel' },
   { domaine: 'louisvuitton.com', nom: 'Louis Vuitton' },
   { domaine: 'givenchy.com', nom: 'Givenchy' },
   { domaine: 'celine.com', nom: 'Céline' },
@@ -1351,14 +1286,8 @@ export const ENTREPRISES_2000 = [
   { domaine: 'wixel.fr', nom: 'Wixel' },
 
   // RH & RECRUTEMENT (~60)
-  { domaine: 'manpower.fr', nom: 'Manpower France' },
-  { domaine: 'adecco.fr', nom: 'Adecco France' },
-  { domaine: 'randstad.fr', nom: 'Randstad France' },
-  { domaine: 'michaelpage.fr', nom: 'Michael Page' },
   { domaine: 'robertwalters.fr', nom: 'Robert Walters France' },
-  { domaine: 'hays.fr', nom: 'Hays France' },
   { domaine: 'kelly.fr', nom: 'Kelly Services France' },
-  { domaine: 'pagegroup.fr', nom: 'PageGroup France' },
   { domaine: 'altedia.com', nom: 'Altedia' },
   { domaine: 'manpower-group.fr', nom: 'ManpowerGroup France' },
   { domaine: 'experis.fr', nom: 'Experis France' },
@@ -1383,7 +1312,6 @@ export const ENTREPRISES_2000 = [
   { domaine: 'people-at-work.fr', nom: 'People at Work' },
   { domaine: 'rh-performance.com', nom: 'RH Performance' },
   { domaine: 'eureka-recrutement.fr', nom: 'Eureka Recrutement' },
-  { domaine: 'expectra.fr', nom: 'Expectra' },
   { domaine: 'myriad-rh.fr', nom: 'Myriad RH' },
   { domaine: 'talents-france.fr', nom: 'Talents France' },
   { domaine: 'domino-rh.fr', nom: 'Domino RH' },
@@ -2194,6 +2122,11 @@ async function main() {
   let totalOffres = 0
   let entreprisesOK = 0
   for (const { domaine, nom } of tranche) {
+    if (domainesDejaGeres.has(domaine) ||
+        domainesDejaGeres.has('www.' + domaine)) {
+      console.log(`  ⏭️ ${nom}: déjà géré par ATS scraper`)
+      continue
+    }
     console.log(`⏳ ${nom} (${domaine})...`)
     const offres = await scraperEntrepriseJsonLD(domaine, nom)
     if (offres.length === 0) {
