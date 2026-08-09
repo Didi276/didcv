@@ -355,8 +355,9 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   if (req.method === 'OPTIONS') return res.status(200).end()
 
-  const secret = req.headers['x-scrape-secret'] || req.query.secret
-  if (secret !== process.env.SCRAPE_SECRET) {
+  // Protection cron Vercel natif
+  const authHeader = req.headers['authorization']
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return res.status(401).json({ error: 'Non autorisé' })
   }
 
