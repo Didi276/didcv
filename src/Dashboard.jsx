@@ -59,6 +59,8 @@ export default function Dashboard() {
   const [candidaturesRecentes, setCandidaturesRecentes] = useState([])
   const [rappelsEmail, setRappelsEmail] = useState(true)
   const [entretiensCompletes] = useState(() => parseInt(localStorage.getItem('didcv-entretiens-completes') || '0', 10))
+  const [offresMatch, setOffresMatch] = useState([])
+  const [loadingMatch, setLoadingMatch] = useState(true)
   const w = useWidth()
   const isMobile = w < 768
 
@@ -86,6 +88,18 @@ export default function Dashboard() {
     }
     fetchData()
   }, [])
+
+  useEffect(() => {
+    if (user?.id) {
+      fetch(`/api/match?user_id=${user.id}`)
+        .then(r => r.json())
+        .then(data => {
+          setOffresMatch(data.offres || [])
+          setLoadingMatch(false)
+        })
+        .catch(() => setLoadingMatch(false))
+    }
+  }, [user])
 
   const handleToggleRappels = async () => {
     const next = !rappelsEmail
@@ -391,6 +405,56 @@ export default function Dashboard() {
             </a>
           </div>
         )}
+
+        <div style={{ marginTop: '48px' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#0f0f1a', marginBottom: '20px' }}>
+            Offres pour toi
+          </h2>
+
+          {loadingMatch ? (
+            <p style={{ color: '#9ca3af' }}>Analyse en cours...</p>
+          ) : offresMatch.length === 0 ? (
+            <p style={{ color: '#9ca3af' }}>
+              Complète ton profil pour recevoir des recommandations personnalisées.
+            </p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {offresMatch.map((offre, i) => (
+                <div key={i} style={{
+                  background: '#ffffff', border: '1px solid #f0f0f0',
+                  borderRadius: '10px', padding: '18px 20px',
+                  display: 'flex', justifyContent: 'space-between',
+                  alignItems: 'flex-start', cursor: 'pointer'
+                }}
+                onClick={() => window.open(offre.url_candidature, '_blank')}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: '#0f0f1a' }}>
+                      {offre.titre}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '3px' }}>
+                      {offre.entreprise} · {offre.lieu}
+                    </div>
+                    <div style={{
+                      fontSize: '12px', color: '#6366f1', marginTop: '6px',
+                      fontStyle: 'italic'
+                    }}>
+                      {offre.raison}
+                    </div>
+                  </div>
+                  <div style={{
+                    background: offre.score >= 80 ? '#dcfce7' : '#f0f9ff',
+                    color: offre.score >= 80 ? '#166534' : '#1d4ed8',
+                    padding: '4px 10px', borderRadius: '20px',
+                    fontSize: '12px', fontWeight: 700, flexShrink: 0,
+                    marginLeft: '16px'
+                  }}>
+                    {offre.score}%
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Modal apercu */}

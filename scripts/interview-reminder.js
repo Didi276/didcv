@@ -112,4 +112,104 @@ async function main() {
   console.log(`🎉 ${envoyes} rappels envoyés`)
 }
 
-main().catch(console.error)
+async function sendMatchingEmails() {
+  // Récupérer tous les utilisateurs actifs
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('user_id, email, prenom, poste_souhaite, competences, ville')
+    .not('poste_souhaite', 'is', null)
+
+  if (!profiles?.length) return
+
+  // Récupérer les offres récentes
+  const { data: offres } = await supabase
+    .from('offres_directes')
+    .select('id, titre, entreprise, lieu, description, type_contrat, url_candidature')
+    .eq('actif', true)
+    .order('date_publication', { ascending: false })
+    .limit(100)
+
+  for (const profil of profiles.slice(0, 50)) {
+    try {
+      // Matching simple par mots-clés sans Claude pour économiser les tokens
+      const poste = (profil.poste_souhaite || '').toLowerCase()
+      const competences = (profil.competences || '').toLowerCase()
+      const ville = (profil.ville || '').toLowerCase()
+
+      const offresMatchees = offres
+        .filter(o => {
+          const titre = (o.titre || '').toLowerCase()
+          const desc = (o.description || '').toLowerCase()
+          const lieu = (o.lieu || '').toLowerCase()
+
+          const matchPoste = poste.split(' ').some(m => m.length > 3 && (titre.includes(m) || desc.includes(m)))
+          const matchVille = !ville || lieu.includes(ville) || lieu.includes('france') || lieu.includes('remote')
+
+          return matchPoste && matchVille
+        })
+        .slice(0, 5)
+
+      if (offresMatchees.length === 0) continue
+
+      const offresHtml = offresMatchees.map(o => `
+        <tr>
+          <td style="padding: 16px; border-bottom: 1px solid #f0f0f0;">
+            <div style="font-weight: 600; color: #0f0f1a;">${o.titre}</div>
+            <div style="color: #6b7280; font-size: 13px; margin-top: 3px;">${o.entreprise} · ${o.lieu}</div>
+            <a href="${o.url_candidature}" style="color: #6366f1; font-size: 13px; text-decoration: none;">
+              Voir l'offre →
+            </a>
+          </td>
+        </tr>
+      `).join('')
+
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'DidJob <noreply@did-job.com>',
+          to: profil.email,
+          subject: `${offresMatchees.length} offres pour toi aujourd'hui 🎯`,
+          html: `
+          <div style="font-family: Inter, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+            <div style="background: #0a0a0f; padding: 32px; border-radius: 12px; text-align: center; margin-bottom: 32px;">
+              <h1 style="color: white; font-size: 28px; margin: 0;">Did<span style="color: #6366f1;">Job</span></h1>
+            </div>
+            <h2 style="color: #0f0f1a;">Bonjour ${profil.prenom || ''} 👋</h2>
+            <p style="color: #4b5563; line-height: 1.7;">
+              Voici les offres qui correspondent à ton profil <strong>${profil.poste_souhaite}</strong> aujourd'hui :
+            </p>
+            <table width="100%" style="border-collapse: collapse; background: #f9fafb; border-radius: 8px; overflow: hidden; margin: 24px 0;">
+              ${offresHtml}
+            </table>
+            <a href="https://did-job.com/offres?query=${encodeURIComponent(profil.poste_souhaite || '')}"
+               style="display: inline-block; background: #0f0f1a; color: white;
+                      padding: 14px 28px; border-radius: 8px; text-decoration: none;
+                      font-weight: 600;">
+              Voir toutes les offres →
+            </a>
+            <p style="color: #9ca3af; font-size: 12px; margin-top: 40px;">
+              Tu reçois cet email parce que tu as un compte DidJob.
+              <a href="https://did-job.com/profile" style="color: #9ca3af;">Modifier mes préférences</a>
+            </p>
+          </div>`
+        })
+      })
+
+      console.log(`✅ Email matching envoyé à ${profil.email}`)
+      await new Promise(r => setTimeout(r, 200))
+    } catch (e) {
+      console.error(`Erreur pour ${profil.email}:`, e.message)
+    }
+  }
+}
+
+async function runAll() {
+  await main() // rappels entretien
+  await sendMatchingEmails() // offres du jour
+}
+
+runAll().catch(console.error)
