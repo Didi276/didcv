@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Zap, Check, Loader2 } from 'lucide-react'
 import { supabase } from './supabase'
-import { emailBienvenueDidJob } from './emailTemplates'
 
 export default function Auth() {
   const [mode, setMode] = useState('login')
@@ -35,7 +34,7 @@ export default function Auth() {
       fetch('/api/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ to: email, subject: 'Bienvenue sur DidJob !', html: emailBienvenueDidJob(prenom), type: 'bienvenue' }),
+        body: JSON.stringify({ type: 'bienvenue', to: email, prenom: prenom || 'là' }),
       }).catch(err => console.error('Erreur envoi email de bienvenue:', err))
       setSuccess('Compte cree ! Verifie ton email pour confirmer.')
       setLoading(false)

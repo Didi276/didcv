@@ -7,10 +7,6 @@
   ],
   "crons": [
     {
-      "path": "/api/interview-reminder",
-      "schedule": "0 9 * * *"
-    },
-    {
       "path": "/api/scrape?batch_size=20",
       "schedule": "0 12 * * *"
     }
