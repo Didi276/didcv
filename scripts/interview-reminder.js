@@ -1,6 +1,11 @@
 // Rappels d'entretien J-3 et J-1, envoyés par un cron GitHub Actions
 // (voir .github/workflows/interview-reminder.yml). Nécessite les variables
 // d'environnement VITE_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY et RESEND_API_KEY.
+//
+// SQL à exécuter dans Supabase (SQL Editor) :
+// ALTER TABLE candidatures
+// ADD COLUMN IF NOT EXISTS rappel_j3_envoye boolean DEFAULT false,
+// ADD COLUMN IF NOT EXISTS rappel_j1_envoye boolean DEFAULT false;
 
 import { createClient } from '@supabase/supabase-js'
 import fetch from 'node-fetch'
@@ -74,25 +79,35 @@ async function main() {
   const j1 = new Date(aujourd_hui.getTime() + 1 * 86400000)
   const j3 = new Date(aujourd_hui.getTime() + 3 * 86400000)
 
-  const { data: candidatures, error } = await supabase
+  const { data: candidaturesJ1, error: erreurJ1 } = await supabase
     .from('candidatures')
-    .select('poste, entreprise, date_entretien, profiles!inner(email, prenom)')
-    .in('statut', ['entretien'])
-    .not('date_entretien', 'is', null)
-    .in('date_entretien', [formatDate(j1), formatDate(j3)])
+    .select('id, poste, entreprise, date_entretien, profiles!inner(email, prenom)')
+    .eq('statut', 'entretien')
+    .eq('date_entretien', formatDate(j1))
+    .eq('rappel_j1_envoye', false)
 
-  if (error) {
-    console.error('Erreur requête Supabase:', error)
+  const { data: candidaturesJ3, error: erreurJ3 } = await supabase
+    .from('candidatures')
+    .select('id, poste, entreprise, date_entretien, profiles!inner(email, prenom)')
+    .eq('statut', 'entretien')
+    .eq('date_entretien', formatDate(j3))
+    .eq('rappel_j3_envoye', false)
+
+  if (erreurJ1 || erreurJ3) {
+    console.error('Erreur requête Supabase:', erreurJ1 || erreurJ3)
     process.exit(1)
   }
 
-  let envoyes = 0
-  for (const c of candidatures || []) {
-    const dateEntretien = new Date(c.date_entretien)
-    const diff = Math.round((dateEntretien.setHours(0, 0, 0, 0) - aujourd_hui.getTime()) / 86400000)
-    const joursAvant = diff === 1 ? 1 : diff === 3 ? 3 : null
-    if (!joursAvant || !c.profiles?.email) continue
+  const aTraiter = [
+    ...(candidaturesJ1 || []).map(c => ({ ...c, joursAvant: 1 })),
+    ...(candidaturesJ3 || []).map(c => ({ ...c, joursAvant: 3 })),
+  ]
 
+  let envoyes = 0
+  for (const c of aTraiter) {
+    if (!c.profiles?.email) continue
+
+    let ok = false
     try {
       await sendReminderEmail(
         c.profiles.email,
@@ -100,12 +115,21 @@ async function main() {
         c.poste,
         c.entreprise,
         c.date_entretien,
-        joursAvant
+        c.joursAvant
       )
-      console.log(`✅ Rappel J-${joursAvant} envoyé à ${c.profiles.email} (${c.entreprise})`)
-      envoyes++
+      console.log(`✅ Rappel J-${c.joursAvant} envoyé à ${c.profiles.email} (${c.entreprise})`)
+      ok = true
     } catch (e) {
       console.error(`❌ Échec envoi à ${c.profiles.email}:`, e.message)
+    }
+
+    if (ok) {
+      const flagField = c.joursAvant === 1 ? 'rappel_j1_envoye' : 'rappel_j3_envoye'
+      await supabase
+        .from('candidatures')
+        .update({ [flagField]: true })
+        .eq('id', c.id)
+      envoyes++
     }
   }
 
