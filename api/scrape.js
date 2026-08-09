@@ -355,6 +355,11 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   if (req.method === 'OPTIONS') return res.status(200).end()
 
+  const secret = req.headers['x-scrape-secret'] || req.query.secret
+  if (secret !== process.env.SCRAPE_SECRET) {
+    return res.status(401).json({ error: 'Non autorisé' })
+  }
+
   const { entreprise_id } = req.query
   const start = parseInt(req.query.start) || 0
   const batchSize = parseInt(req.query.batch_size) || 5
