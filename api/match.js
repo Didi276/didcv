@@ -23,6 +23,7 @@ export default async function handler(req, res) {
     .single()
 
   if (!profil) return res.status(404).json({ error: 'Profil introuvable' })
+  console.log('Profil trouvé:', JSON.stringify(profil))
 
   // 2. Récupérer les offres récentes
   const { data: offres } = await supabase
@@ -89,13 +90,19 @@ Trie par score décroissant. Score de 0 à 100.`
   }
 
   // 4. Construire les offres matchées
-  const offresMatchees = matches
+  let offresMatchees = matches
     .filter(m => m.index >= 0 && m.index < offres.length)
     .map(m => ({
       ...offres[m.index],
       score: m.score,
       raison: m.raison
     }))
+
+  // Fallback : profil trop incomplet pour un matching IA pertinent, ou aucune
+  // correspondance retournée -> on affiche simplement les offres les plus récentes.
+  if (offresMatchees.length === 0) {
+    offresMatchees = offres.slice(0, 10).map(o => ({ ...o, score: null, raison: null }))
+  }
 
   return res.status(200).json({ offres: offresMatchees })
 }

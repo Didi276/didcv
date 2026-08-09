@@ -415,7 +415,7 @@ export default function Dashboard() {
             <p style={{ color: '#9ca3af' }}>Analyse en cours...</p>
           ) : offresMatch.length === 0 ? (
             <p style={{ color: '#9ca3af' }}>
-              Complète ton profil pour recevoir des recommandations personnalisées.
+              Aucune offre disponible pour le moment.
             </p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -434,22 +434,26 @@ export default function Dashboard() {
                     <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '3px' }}>
                       {offre.entreprise} · {offre.lieu}
                     </div>
+                    {offre.raison && (
+                      <div style={{
+                        fontSize: '12px', color: '#6366f1', marginTop: '6px',
+                        fontStyle: 'italic'
+                      }}>
+                        {offre.raison}
+                      </div>
+                    )}
+                  </div>
+                  {offre.score != null && (
                     <div style={{
-                      fontSize: '12px', color: '#6366f1', marginTop: '6px',
-                      fontStyle: 'italic'
+                      background: offre.score >= 80 ? '#dcfce7' : '#f0f9ff',
+                      color: offre.score >= 80 ? '#166534' : '#1d4ed8',
+                      padding: '4px 10px', borderRadius: '20px',
+                      fontSize: '12px', fontWeight: 700, flexShrink: 0,
+                      marginLeft: '16px'
                     }}>
-                      {offre.raison}
+                      {offre.score}%
                     </div>
-                  </div>
-                  <div style={{
-                    background: offre.score >= 80 ? '#dcfce7' : '#f0f9ff',
-                    color: offre.score >= 80 ? '#166534' : '#1d4ed8',
-                    padding: '4px 10px', borderRadius: '20px',
-                    fontSize: '12px', fontWeight: 700, flexShrink: 0,
-                    marginLeft: '16px'
-                  }}>
-                    {offre.score}%
-                  </div>
+                  )}
                 </div>
               ))}
             </div>
