@@ -1,4 +1,6 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { supabase } from './supabase'
 import Home from './Home'
 import Generate from './Generate'
 import Templates from './Templates'
@@ -27,6 +29,28 @@ import BlogArticle from './BlogArticle'
 import GuidesMetier from './GuidesMetier'
 import GuideDetail from './GuideDetail'
 
+function RequireAdmin({ children }) {
+  const [acces, setAcces] = useState('en_cours') // en_cours | ok | refuse
+
+  useEffect(() => {
+    const verifier = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { setAcces('refuse'); return }
+      const { data: profil } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single()
+      setAcces(profil?.role === 'admin' ? 'ok' : 'refuse')
+    }
+    verifier()
+  }, [])
+
+  if (acces === 'en_cours') return null
+  if (acces === 'refuse') return <Navigate to="/" replace />
+  return children
+}
+
 function App() {
   return (
     <BrowserRouter>
@@ -46,7 +70,7 @@ function App() {
         <Route path="/recruteurs/inscription" element={<RecruteurInscription />} />
         <Route path="/recruteurs/connexion"   element={<RecruteurConnexion />} />
         <Route path="/recruteurs/banque"      element={<RecruteurBanque />} />
-        <Route path="/admin/recruteurs"       element={<AdminRecruteurs />} />
+        <Route path="/admin/recruteurs"       element={<RequireAdmin><AdminRecruteurs /></RequireAdmin>} />
         <Route path="/blog"           element={<Blog />} />
         <Route path="/blog/:slug"     element={<BlogArticle />} />
         <Route path="/guides"         element={<GuidesMetier />} />

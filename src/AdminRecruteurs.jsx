@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom'
 import { Lock } from 'lucide-react'
 import { supabase } from './supabase'
 
-const ADMIN_EMAILS = ['fernandochokki@gmail.com', 'chokkifernando@gmail.com', 'carlinazon@gmail.com']
+// SQL à exécuter dans Supabase :
+// ALTER TABLE profiles ADD COLUMN IF NOT EXISTS role text DEFAULT 'user';
+// UPDATE profiles SET role = 'admin' WHERE user_id = '...';
 
 const STATUTS = [
   { id: 'en_attente', label: 'En attente', color: '#92400e', bg: '#fffbeb' },
@@ -27,7 +29,13 @@ export default function AdminRecruteurs() {
   useEffect(() => {
     const verifier = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user || !ADMIN_EMAILS.includes(user.email)) { setAcces('refuse'); return }
+      if (!user) { setAcces('refuse'); return }
+      const { data: profil } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single()
+      if (profil?.role !== 'admin') { setAcces('refuse'); return }
       setAdminEmail(user.email)
       setAcces('ok')
     }
