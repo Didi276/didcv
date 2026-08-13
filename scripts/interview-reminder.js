@@ -24,52 +24,59 @@ async function sendReminderEmail(to, prenom, poste, entreprise, dateEntretien, j
     weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit',
   })
 
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-    },
-    body: JSON.stringify({
-      from: 'DidJob <noreply@did-job.com>',
-      to,
-      subject: `Rappel : Entretien chez ${entreprise} dans ${joursAvant} jour${joursAvant > 1 ? 's' : ''} ⏰`,
-      html: `
-      <div style="font-family: Inter, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-        <div style="background: #0a0a0f; padding: 32px; border-radius: 12px; text-align: center; margin-bottom: 32px;">
-          <h1 style="color: white; font-size: 28px; margin: 0;">Did<span style="color: #6366f1;">Job</span></h1>
-          <p style="color: rgba(255,255,255,0.6); margin: 8px 0 0;">Trouve ton prochain poste.</p>
-        </div>
-        <h2 style="color: #0f0f1a; font-size: 22px;">Bonjour ${prenom} 👋</h2>
-        <p style="color: #4b5563; line-height: 1.7;">
-          Ton entretien pour le poste de <strong>${poste}</strong> chez <strong>${entreprise}</strong>
-          approche : c'est dans ${joursAvant} jour${joursAvant > 1 ? 's' : ''}.
-        </p>
-        <div style="background: #f9fafb; border-radius: 8px; padding: 24px; margin: 24px 0;">
-          <p style="color: #0f0f1a; font-weight: 600; margin: 0 0 12px;">Détails :</p>
-          <ul style="color: #4b5563; line-height: 2; margin: 0; padding-left: 20px;">
-            <li>Poste : ${poste}</li>
-            <li>Entreprise : ${entreprise}</li>
-            <li>Date : ${dateFormatee}</li>
-          </ul>
-        </div>
-        <a href="https://did-job.com/preparation-entretien"
-           style="display: inline-block; background: #0f0f1a; color: white;
-                  padding: 14px 28px; border-radius: 8px; text-decoration: none;
-                  font-weight: 600; margin-top: 8px;">
-          Préparer mon entretien →
-        </a>
-        <p style="color: #9ca3af; font-size: 13px; margin-top: 40px;">
-          DidJob · did-job.com ·
-          <a href="https://did-job.com/privacy" style="color: #9ca3af;">Politique de confidentialité</a>
-        </p>
-      </div>`,
-    }),
-  })
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: 'DidJob <noreply@did-job.com>',
+        to,
+        subject: `Rappel : Entretien chez ${entreprise} dans ${joursAvant} jour${joursAvant > 1 ? 's' : ''} ⏰`,
+        html: `
+        <div style="font-family: Inter, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+          <div style="background: #0a0a0f; padding: 32px; border-radius: 12px; text-align: center; margin-bottom: 32px;">
+            <h1 style="color: white; font-size: 28px; margin: 0;">Did<span style="color: #6366f1;">Job</span></h1>
+            <p style="color: rgba(255,255,255,0.6); margin: 8px 0 0;">Trouve ton prochain poste.</p>
+          </div>
+          <h2 style="color: #0f0f1a; font-size: 22px;">Bonjour ${prenom} 👋</h2>
+          <p style="color: #4b5563; line-height: 1.7;">
+            Ton entretien pour le poste de <strong>${poste}</strong> chez <strong>${entreprise}</strong>
+            approche : c'est dans ${joursAvant} jour${joursAvant > 1 ? 's' : ''}.
+          </p>
+          <div style="background: #f9fafb; border-radius: 8px; padding: 24px; margin: 24px 0;">
+            <p style="color: #0f0f1a; font-weight: 600; margin: 0 0 12px;">Détails :</p>
+            <ul style="color: #4b5563; line-height: 2; margin: 0; padding-left: 20px;">
+              <li>Poste : ${poste}</li>
+              <li>Entreprise : ${entreprise}</li>
+              <li>Date : ${dateFormatee}</li>
+            </ul>
+          </div>
+          <a href="https://did-job.com/preparation-entretien"
+             style="display: inline-block; background: #0f0f1a; color: white;
+                    padding: 14px 28px; border-radius: 8px; text-decoration: none;
+                    font-weight: 600; margin-top: 8px;">
+            Préparer mon entretien →
+          </a>
+          <p style="color: #9ca3af; font-size: 13px; margin-top: 40px;">
+            DidJob · did-job.com ·
+            <a href="https://did-job.com/privacy" style="color: #9ca3af;">Politique de confidentialité</a>
+          </p>
+        </div>`,
+      }),
+    })
 
-  if (!res.ok) {
-    const body = await res.text()
-    throw new Error(`Resend ${res.status}: ${body}`)
+    if (!res.ok) {
+      const body = await res.text()
+      console.error(`❌ Échec envoi à ${to}: Resend ${res.status}: ${body}`)
+      return false
+    }
+    return true
+  } catch (e) {
+    console.error(`❌ Échec envoi à ${to}:`, e.message)
+    return false
   }
 }
 
@@ -81,14 +88,14 @@ async function main() {
 
   const { data: candidaturesJ1, error: erreurJ1 } = await supabase
     .from('candidatures')
-    .select('id, poste, entreprise, date_entretien, profiles!inner(email, prenom)')
+    .select('id, poste, entreprise, date_entretien, user_id')
     .eq('statut', 'entretien')
     .eq('date_entretien', formatDate(j1))
     .eq('rappel_j1_envoye', false)
 
   const { data: candidaturesJ3, error: erreurJ3 } = await supabase
     .from('candidatures')
-    .select('id, poste, entreprise, date_entretien, profiles!inner(email, prenom)')
+    .select('id, poste, entreprise, date_entretien, user_id')
     .eq('statut', 'entretien')
     .eq('date_entretien', formatDate(j3))
     .eq('rappel_j3_envoye', false)
@@ -98,38 +105,34 @@ async function main() {
     process.exit(1)
   }
 
-  const aTraiter = [
-    ...(candidaturesJ1 || []).map(c => ({ ...c, joursAvant: 1 })),
-    ...(candidaturesJ3 || []).map(c => ({ ...c, joursAvant: 3 })),
-  ]
-
   let envoyes = 0
-  for (const c of aTraiter) {
-    if (!c.profiles?.email) continue
+  for (const c of [...(candidaturesJ1 || []), ...(candidaturesJ3 || [])]) {
+    const { data: profil } = await supabase
+      .from('profiles')
+      .select('email, prenom')
+      .eq('user_id', c.user_id)
+      .single()
 
-    let ok = false
-    try {
-      await sendReminderEmail(
-        c.profiles.email,
-        c.profiles.prenom || 'là',
-        c.poste,
-        c.entreprise,
-        c.date_entretien,
-        c.joursAvant
-      )
-      console.log(`✅ Rappel J-${c.joursAvant} envoyé à ${c.profiles.email} (${c.entreprise})`)
-      ok = true
-    } catch (e) {
-      console.error(`❌ Échec envoi à ${c.profiles.email}:`, e.message)
-    }
+    if (!profil?.email) continue
+
+    const joursAvant = c.date_entretien === formatDate(j1) ? 1 : 3
+    const ok = await sendReminderEmail(
+      profil.email,
+      profil.prenom || '',
+      c.poste,
+      c.entreprise,
+      c.date_entretien,
+      joursAvant
+    )
 
     if (ok) {
-      const flagField = c.joursAvant === 1 ? 'rappel_j1_envoye' : 'rappel_j3_envoye'
+      const flagField = joursAvant === 1 ? 'rappel_j1_envoye' : 'rappel_j3_envoye'
       await supabase
         .from('candidatures')
         .update({ [flagField]: true })
         .eq('id', c.id)
       envoyes++
+      console.log(`✅ Rappel envoyé à ${profil.email} pour ${c.entreprise}`)
     }
   }
 
