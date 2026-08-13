@@ -89,6 +89,7 @@ const FOOTER_LINKS = [
   ['Contact', '/contact'],
   ['Confidentialité', '/privacy'],
   ['CGU', '/cgu'],
+  ['Mentions légales', '/mentions-legales'],
 ]
 
 export default function Home() {

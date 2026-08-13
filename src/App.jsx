@@ -18,6 +18,7 @@ import About from './About'
 import Contact from './Contact'
 import Privacy from './Privacy'
 import CGU from './CGU'
+import MentionsLegales from './MentionsLegales'
 import NotFound from './NotFound'
 
 import Candidatures from './Candidatures'
@@ -54,6 +55,7 @@ function App() {
         <Route path="/contact"        element={<Contact />} />
         <Route path="/privacy"        element={<Privacy />} />
         <Route path="/cgu"            element={<CGU />} />
+        <Route path="/mentions-legales" element={<MentionsLegales />} />
         <Route path="*"               element={<NotFound />} />
       </Routes>
     </BrowserRouter>

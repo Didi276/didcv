@@ -1,59 +1,128 @@
 import Navbar from './Navbar'
 
-const Section = ({ title, children }) => (
-  <div style={{ marginBottom: '32px' }}>
-    <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#111', margin: '0 0 12px', letterSpacing: '-0.2px' }}>{title}</h2>
-    <div style={{ fontSize: '15px', color: '#6b7280', lineHeight: '1.8' }}>{children}</div>
-  </div>
-)
+const FONT_TITRE = '"Clash Display","Satoshi","Inter",system-ui,sans-serif'
+const FONT_CORPS = '"Satoshi","Inter",system-ui,sans-serif'
+
+function Section({ title, children }) {
+  return (
+    <div style={{ marginTop: '48px' }}>
+      <h2 style={{ fontFamily: FONT_TITRE, fontSize: '22px', fontWeight: '700', color: '#0f0f1a', margin: '0 0 16px', letterSpacing: '-0.3px' }}>
+        {title}
+      </h2>
+      <div style={{ fontFamily: FONT_CORPS, fontSize: '16px', lineHeight: '1.8', color: '#374151' }}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
+function Liste({ items }) {
+  return (
+    <ul style={{ paddingLeft: '24px', margin: '8px 0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      {items.map((item, i) => <li key={i}>{item}</li>)}
+    </ul>
+  )
+}
+
+const LIEN = { color: '#4f46e5', textDecoration: 'underline' }
 
 export default function CGU() {
   return (
-    <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: '#fff' }}>
       <Navbar />
-      <div style={{ maxWidth: '760px', margin: '0 auto', padding: '60px 24px' }}>
-        <div style={{ marginBottom: '48px' }}>
-          <div style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#4f46e5', textTransform: 'uppercase', marginBottom: '12px' }}>LÉGAL</div>
-          <h1 style={{ fontSize: '32px', fontWeight: '800', color: '#0f0f1a', margin: '0 0 10px', letterSpacing: '-1px' }}>Conditions générales d'utilisation</h1>
-          <p style={{ fontSize: '14px', color: '#9ca3af', margin: 0 }}>Dernière mise à jour : juillet 2026</p>
-        </div>
+      <div style={{ padding: '80px 0' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto', padding: '0 24px' }}>
+          <p style={{ fontFamily: FONT_CORPS, fontSize: '14px', color: '#9ca3af', margin: '0 0 16px' }}>
+            Dernière mise à jour : 13 août 2026
+          </p>
+          <h1 style={{ fontFamily: FONT_TITRE, fontSize: '40px', fontWeight: '700', color: '#0f0f1a', margin: 0, letterSpacing: '-1px' }}>
+            Conditions générales d'utilisation
+          </h1>
 
-        <div style={{ background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '40px' }}>
-          <Section title="1. Acceptation des conditions">
-            En utilisant DidJob, tu acceptes les présentes conditions générales d'utilisation. Si tu n'acceptes pas ces conditions, tu ne dois pas utiliser le service.
+          <div style={{ fontFamily: FONT_CORPS, fontSize: '16px', lineHeight: '1.8', color: '#374151', marginTop: '20px' }}>
+            Les présentes Conditions Générales d'Utilisation (CGU) régissent l'accès et l'utilisation de la plateforme DidJob. En créant un compte ou en utilisant le service, tu acceptes les termes ci-dessous.
+          </div>
+
+          <Section title="1. Objet">
+            <p>
+              DidJob est une plateforme française d'aide à la recherche d'emploi proposant la création de CV, l'agrégation d'offres d'emploi et des outils de préparation aux entretiens.
+            </p>
           </Section>
 
-          <Section title="2. Description du service">
-            DidJob est une plateforme de création de CV assistée par intelligence artificielle. Le service permet de générer des CVs et lettres de motivation personnalisés à partir d'un profil utilisateur et d'une offre d'emploi.
+          <Section title="2. Accès au service">
+            <Liste items={[
+              'Le service est accessible sur did-job.com',
+              "L'inscription est gratuite et nécessite une adresse email valide",
+              "L'utilisateur doit avoir au moins 16 ans",
+              'Le service est destiné à un usage personnel et non commercial',
+            ]} />
           </Section>
 
           <Section title="3. Compte utilisateur">
-            Tu es responsable de la confidentialité de ton compte et de ton mot de passe. Tu t'engages à ne pas partager ton accès et à nous notifier immédiatement de toute utilisation non autorisée.
+            <Liste items={[
+              'L\'utilisateur est responsable de la confidentialité de son compte',
+              'Il s\'engage à signaler toute utilisation non autorisée de son compte',
+              'DidJob se réserve le droit de suspendre un compte en cas d\'abus',
+            ]} />
           </Section>
 
-          <Section title="4. Plan gratuit et Pro">
-            Le plan gratuit permet de générer 1 CV et 1 lettre de motivation. Le plan Pro donne accès à des générations illimitées. Les tarifs en vigueur sont affichés sur la page d'accueil.
+          <Section title="4. Fonctionnalités gratuites">
+            <p>DidJob propose gratuitement :</p>
+            <Liste items={[
+              'La création de CV avec les 40 templates disponibles',
+              "L'accès aux offres d'emploi",
+              'Le suivi des candidatures',
+              "Un simulateur d'entretien",
+              'Des recommandations personnalisées',
+            ]} />
           </Section>
 
           <Section title="5. Propriété intellectuelle">
-            Les CVs générés t'appartiennent entièrement. DidJob conserve les droits sur la plateforme, les templates et les algorithmes. Tu ne peux pas reproduire ou revendre les templates DidJob.
+            <Liste items={[
+              'Les templates de CV sont la propriété de DidJob',
+              "Le contenu des CVs générés appartient à l'utilisateur",
+              "L'utilisateur conserve tous ses droits sur ses données",
+            ]} />
           </Section>
 
-          <Section title="6. Responsabilité">
-            DidJob met tout en oeuvre pour fournir un service de qualité, mais ne garantit pas que les CVs générés permettront d'obtenir un emploi. L'utilisateur est seul responsable du contenu final de son CV.
+          <Section title="6. Données personnelles">
+            <p>
+              Le traitement de tes données personnelles est conforme au RGPD. Pour plus de détails, consulte notre <a href="/privacy" style={LIEN}>Politique de confidentialité</a>.
+            </p>
           </Section>
 
-          <Section title="7. Résiliation">
-            Tu peux supprimer ton compte à tout moment depuis les paramètres. DidJob se réserve le droit de suspendre un compte en cas de violation des présentes CGU.
+          <Section title="7. Responsabilité">
+            <Liste items={[
+              "DidJob agrège des offres d'emploi provenant de sources tierces",
+              "DidJob ne garantit pas l'exactitude ni l'actualité de ces offres",
+              'DidJob n\'est pas responsable des décisions de recrutement prises par des tiers',
+              'Les CV générés sont fournis à titre indicatif',
+            ]} />
           </Section>
 
-          <Section title="8. Droit applicable">
-            Les présentes CGU sont soumises au droit français. En cas de litige, les tribunaux compétents sont ceux du ressort de Paris.
+          <Section title="8. Disponibilité du service">
+            <p>
+              Le service est fourni « tel quel », sans garantie de disponibilité continue. Des opérations de maintenance peuvent survenir, avec préavis si possible.
+            </p>
           </Section>
 
-          <Section title="9. Contact">
-            Pour toute question concernant ces CGU, contacte-nous via notre <a href="/contact" style={{ color: '#4f46e5' }}>page de contact</a>.
+          <Section title="9. Modification des CGU">
+            <p>
+              En cas de changement important, nous t'en informerons par email au moins 30 jours avant son entrée en vigueur. La poursuite de l'utilisation du service après cette notification vaut acceptation des nouvelles conditions.
+            </p>
           </Section>
+
+          <Section title="10. Droit applicable">
+            <Liste items={[
+              'Les présentes CGU sont soumises au droit français',
+              'Les juridictions françaises sont seules compétentes en cas de litige',
+              "En cas de litige, une médiation est possible avant toute action en justice",
+            ]} />
+          </Section>
+
+          <div style={{ marginTop: '64px', paddingTop: '24px', borderTop: '1px solid #e5e7eb' }}>
+            <a href="/" style={{ fontFamily: FONT_CORPS, color: '#4f46e5', textDecoration: 'none', fontWeight: '600', fontSize: '15px' }}>← Retour à l'accueil</a>
+          </div>
         </div>
       </div>
     </div>

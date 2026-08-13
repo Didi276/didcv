@@ -55,11 +55,18 @@ export default function Navbar({ currentPage = '' }) {
     { page: 'guides', label: 'Guides métier', to: '/guides', auth: false },
   ]
 
-  const links = [...mainLinks, profileLink, ...resourceLinks]
+  const legalLinks = [
+    { page: 'privacy',         label: 'Confidentialité',  to: '/privacy',         auth: false },
+    { page: 'cgu',              label: 'CGU',              to: '/cgu',             auth: false },
+    { page: 'mentions-legales', label: 'Mentions légales', to: '/mentions-legales', auth: false },
+  ]
+
+  const links = [...mainLinks, profileLink, ...resourceLinks, ...legalLinks]
   const visibleLinks = user ? links : links.filter(l => !l.auth)
   const visibleMainLinks = user ? mainLinks : mainLinks.filter(l => !l.auth)
   const visibleResourceLinks = user ? resourceLinks : resourceLinks.filter(l => !l.auth)
-  const isResourcePage = visibleResourceLinks.some(l => l.page === currentPage)
+  const visibleLegalLinks = user ? legalLinks : legalLinks.filter(l => !l.auth)
+  const isResourcePage = [...visibleResourceLinks, ...visibleLegalLinks].some(l => l.page === currentPage)
   const showProfile = user || !profileLink.auth
 
   const linkStyle = (page) => ({
@@ -103,6 +110,13 @@ export default function Navbar({ currentPage = '' }) {
                 {visibleResourceLinks.map(({ page, label, to }) => (
                   <Link key={page} to={to}
                     style={{ display: 'block', padding: '9px 12px', borderRadius: '7px', fontSize: '14px', fontWeight: currentPage === page ? '700' : '500', color: currentPage === page ? '#4f46e5' : '#374151', textDecoration: 'none', background: currentPage === page ? '#f5f5ff' : 'transparent' }}>
+                    {label}
+                  </Link>
+                ))}
+                <div style={{ height: '1px', background: '#f0f0f0', margin: '6px 4px' }} />
+                {visibleLegalLinks.map(({ page, label, to }) => (
+                  <Link key={page} to={to}
+                    style={{ display: 'block', padding: '8px 12px', borderRadius: '7px', fontSize: '13px', fontWeight: currentPage === page ? '700' : '500', color: currentPage === page ? '#4f46e5' : '#9ca3af', textDecoration: 'none', background: currentPage === page ? '#f5f5ff' : 'transparent' }}>
                     {label}
                   </Link>
                 ))}
