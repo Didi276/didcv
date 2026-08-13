@@ -25,6 +25,7 @@ export default function AdminRecruteurs() {
   const [filtreStatut, setFiltreStatut] = useState('')
   const [refusEnCours, setRefusEnCours] = useState(null) // id de la demande en cours de refus
   const [raisonRefus, setRaisonRefus] = useState('')
+  const [stats, setStats] = useState({})
 
   useEffect(() => {
     const verifier = async () => {
@@ -53,7 +54,26 @@ export default function AdminRecruteurs() {
     charger()
   }, [acces])
 
-  const stats = {
+  useEffect(() => {
+    if (acces !== 'ok') return
+    const loadStats = async () => {
+      const [users, cvs, offres, candidatures] = await Promise.all([
+        supabase.from('profiles').select('*', { count: 'exact', head: true }),
+        supabase.from('cvs').select('*', { count: 'exact', head: true }),
+        supabase.from('offres_directes').select('*', { count: 'exact', head: true }),
+        supabase.from('candidatures').select('*', { count: 'exact', head: true }),
+      ])
+      setStats({
+        users: users.count || 0,
+        cvs: cvs.count || 0,
+        offres: offres.count || 0,
+        candidatures: candidatures.count || 0,
+      })
+    }
+    loadStats()
+  }, [acces])
+
+  const statsDemandes = {
     en_attente: demandes.filter(d => d.statut === 'en_attente').length,
     valide: demandes.filter(d => d.statut === 'valide').length,
     refuse: demandes.filter(d => d.statut === 'refuse').length,
@@ -105,24 +125,81 @@ export default function AdminRecruteurs() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
-      <div style={{ background: '#fff', borderBottom: '1px solid #f0f0f0', padding: '20px 24px' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <h1 style={{ fontSize: '22px', fontWeight: '800', color: '#111', margin: '0 0 4px', letterSpacing: '-0.5px' }}>Demandes d'accès recruteurs</h1>
-          <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 16px' }}>Validation manuelle des comptes recruteurs</p>
-
-          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-            {STATUTS.map(s => (
-              <div key={s.id} style={{ padding: '8px 16px', background: s.bg, borderRadius: '8px', display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <span style={{ fontSize: '18px', fontWeight: '800', color: s.color }}>{stats[s.id]}</span>
-                <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: '500' }}>{s.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+    <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: '"Satoshi","Inter",system-ui,sans-serif' }}>
+      <div style={{
+        background: '#0a0a0f',
+        padding: '24px 40px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '16px',
+      }}>
+        <Link to="/dashboard" style={{
+          color: 'rgba(255,255,255,0.6)',
+          textDecoration: 'none',
+          fontSize: '14px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+        }}>
+          ← Retour au dashboard
+        </Link>
+        <h1 style={{
+          color: '#ffffff',
+          fontSize: '22px',
+          fontWeight: '700',
+          fontFamily: '"Clash Display","Satoshi","Inter",system-ui,sans-serif',
+          margin: 0,
+        }}>
+          Administration DidJob
+        </h1>
       </div>
 
-      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '24px' }}>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(4, 1fr)',
+        gap: '16px',
+        padding: '32px 40px',
+        background: '#f9fafb',
+        borderBottom: '1px solid #f0f0f0',
+      }}>
+        {[
+          { label: 'Utilisateurs', value: stats.users, icon: '👥' },
+          { label: 'CVs créés', value: stats.cvs, icon: '📄' },
+          { label: 'Offres directes', value: stats.offres, icon: '💼' },
+          { label: 'Candidatures', value: stats.candidatures, icon: '📬' },
+        ].map(s => (
+          <div key={s.label} style={{
+            background: '#ffffff',
+            borderRadius: '10px',
+            padding: '20px',
+            border: '1px solid #f0f0f0',
+          }}>
+            <div style={{ fontSize: '24px', marginBottom: '8px' }}>{s.icon}</div>
+            <div style={{ fontSize: '28px', fontWeight: '700', color: '#0f0f1a', fontFamily: '"Clash Display","Satoshi","Inter",system-ui,sans-serif' }}>
+              {s.value ?? '...'}
+            </div>
+            <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '4px' }}>
+              {s.label}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ padding: '40px' }}>
+        <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#0f0f1a', fontFamily: '"Clash Display","Satoshi","Inter",system-ui,sans-serif', margin: '0 0 4px' }}>
+          Demandes d'accès recruteurs
+        </h2>
+        <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 16px' }}>Validation manuelle des comptes recruteurs</p>
+
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '20px' }}>
+          {STATUTS.map(s => (
+            <div key={s.id} style={{ padding: '8px 16px', background: s.bg, borderRadius: '8px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <span style={{ fontSize: '18px', fontWeight: '800', color: s.color }}>{statsDemandes[s.id]}</span>
+              <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: '500' }}>{s.label}</span>
+            </div>
+          ))}
+        </div>
+
         <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
           <button onClick={() => setFiltreStatut('')}
             style={{ padding: '6px 14px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', background: !filtreStatut ? '#4f46e5' : '#f3f4f6', color: !filtreStatut ? '#fff' : '#374151' }}>
@@ -139,7 +216,7 @@ export default function AdminRecruteurs() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px', color: '#9ca3af', fontSize: '13px' }}>Chargement...</div>
         ) : demandesFiltrees.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#9ca3af', fontSize: '14px', background: '#fff', borderRadius: '14px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#9ca3af', fontSize: '14px', background: '#fff', borderRadius: '14px', border: '1px solid #f0f0f0' }}>
             Aucune demande dans cette catégorie.
           </div>
         ) : (
@@ -147,7 +224,7 @@ export default function AdminRecruteurs() {
             {demandesFiltrees.map(d => {
               const info = statutInfo(d.statut)
               return (
-                <div key={d.id} style={{ background: '#fff', borderRadius: '12px', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: '18px 20px' }}>
+                <div key={d.id} style={{ background: '#fff', borderRadius: '12px', border: '1px solid #f0f0f0', padding: '18px 20px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', flexWrap: 'wrap' }}>
                     <div style={{ flex: 1, minWidth: '220px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
