@@ -21,6 +21,7 @@ const NAV_CSS = `
 
 export default function Navbar({ currentPage = '' }) {
   const [user, setUser] = useState(null)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [resourcesOpen, setResourcesOpen] = useState(false)
   const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
@@ -32,6 +33,29 @@ export default function Navbar({ currentPage = '' }) {
     window.addEventListener('resize', fn)
     return () => window.removeEventListener('resize', fn)
   }, [])
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (!user) { setIsAdmin(false); return }
+      const { data: profil } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single()
+      setIsAdmin(profil?.role === 'admin')
+    }
+    checkAdmin()
+  }, [user])
+
+  const adminLinkStyle = {
+    color: '#6366f1',
+    fontWeight: '600',
+    fontSize: '14px',
+    textDecoration: 'none',
+    padding: '6px 12px',
+    background: '#f0f0ff',
+    borderRadius: '6px',
+  }
 
   const isMobile = w < 768
 
@@ -136,6 +160,12 @@ export default function Navbar({ currentPage = '' }) {
           </Link>
         )}
 
+        {!isMobile && isAdmin && (
+          <Link to="/admin/recruteurs" style={adminLinkStyle}>
+            ⚙️ Admin
+          </Link>
+        )}
+
         <div style={{ flex: isMobile ? 0 : 1 }} />
 
         {/* Desktop déconnexion */}
@@ -165,6 +195,12 @@ export default function Navbar({ currentPage = '' }) {
                 {Icon && <Icon size={16} />}{label}
               </Link>
             ))}
+            {isAdmin && (
+              <Link to="/admin/recruteurs" onClick={() => setMenuOpen(false)}
+                style={{ display: 'block', margin: '4px 24px', ...adminLinkStyle, textAlign: 'center' }}>
+                ⚙️ Admin
+              </Link>
+            )}
             {user && (
               <button onClick={handleLogout}
                 style={{ display: 'block', width: '100%', textAlign: 'left', padding: '14px 24px', fontSize: '15px', color: '#dc2626', background: 'none', border: 'none', borderTop: '1px solid #f0f0f0', cursor: 'pointer', fontFamily: 'inherit', fontWeight: '500', marginTop: '4px' }}>
