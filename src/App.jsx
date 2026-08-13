@@ -68,8 +68,10 @@ function App() {
         <Route path="/preparation-entretien" element={<PreparationEntretien />} />
         <Route path="/cv/:slug"       element={<CVPublic />} />
         <Route path="/recruteurs/inscription" element={<RecruteurInscription />} />
+        <Route path="/recruteur/inscription"  element={<Navigate to="/recruteurs/inscription" replace />} />
         <Route path="/recruteurs/connexion"   element={<RecruteurConnexion />} />
         <Route path="/recruteurs/banque"      element={<RecruteurBanque />} />
+        <Route path="/espace-recruteur"       element={<RecruteurBanque />} />
         <Route path="/admin/recruteurs"       element={<RequireAdmin><AdminRecruteurs /></RequireAdmin>} />
         <Route path="/blog"           element={<Blog />} />
         <Route path="/blog/:slug"     element={<BlogArticle />} />

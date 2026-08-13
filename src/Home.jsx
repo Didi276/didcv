@@ -384,6 +384,37 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ─── CTA RECRUTEURS ─────────────────────────────────── */}
+      <section style={{ background: '#0a0a0f', padding: '80px 24px' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+          <h2 style={{
+            color: '#ffffff',
+            fontSize: '36px',
+            fontFamily: '"Clash Display","Satoshi","Inter",system-ui,sans-serif',
+            fontWeight: '700',
+            marginBottom: '16px',
+          }}>
+            Vous recrutez ?
+          </h2>
+          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '18px', marginBottom: '32px', lineHeight: '1.7' }}>
+            Accédez à notre base de candidats qualifiés et publiez vos offres
+            directement sur DidJob. Gratuit pendant la phase de lancement.
+          </p>
+          <a href="/recruteur/inscription" style={{
+            display: 'inline-block',
+            background: '#6366f1',
+            color: '#ffffff',
+            padding: '16px 32px',
+            borderRadius: '10px',
+            textDecoration: 'none',
+            fontWeight: '600',
+            fontSize: '16px',
+          }}>
+            Demander l'accès recruteur →
+          </a>
+        </div>
+      </section>
+
       {/* ─── FOOTER ──────────────────────────────────────────── */}
       <footer style={{ background: '#0a0a0f', padding: isMobile ? '56px 20px 28px' : '80px 48px 32px' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>

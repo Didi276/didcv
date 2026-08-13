@@ -87,7 +87,16 @@ export default function AdminRecruteurs() {
       .eq('id', demande.id)
     if (error) { alert('Erreur lors de la validation.'); return }
     setDemandes(demandes.map(d => d.id === demande.id ? { ...d, statut: 'valide', valide_par: adminEmail } : d))
-    window.open(`mailto:${demande.email}?subject=${encodeURIComponent('Ton accès DidJob Recruteurs est validé')}&body=${encodeURIComponent(`Bonjour ${demande.prenom},\n\nBonne nouvelle : ton accès à la banque de talents DidJob a été validé.\n\nTu peux te connecter dès maintenant : ${window.location.origin}/recruteurs/connexion\n\nÀ bientôt,\nL'équipe DidJob`)}`)
+
+    if (demande.user_id) {
+      await supabase.from('profiles').upsert({ user_id: demande.user_id, role: 'recruteur' }, { onConflict: 'user_id' })
+    }
+
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'recruteur_valide', to: demande.email, prenom: demande.prenom }),
+    }).catch(err => console.error('Erreur envoi email de validation recruteur:', err))
   }
 
   const ouvrirRefus = (id) => { setRefusEnCours(id); setRaisonRefus('') }
@@ -98,8 +107,17 @@ export default function AdminRecruteurs() {
       .eq('id', demande.id)
     if (error) { alert('Erreur lors du refus.'); return }
     setDemandes(demandes.map(d => d.id === demande.id ? { ...d, statut: 'refuse', valide_par: adminEmail } : d))
-    const raison = raisonRefus.trim() ? `\n\nMotif : ${raisonRefus.trim()}` : ''
-    window.open(`mailto:${demande.email}?subject=${encodeURIComponent('À propos de ta demande d\'accès DidJob Recruteurs')}&body=${encodeURIComponent(`Bonjour ${demande.prenom},\n\nAprès étude, nous ne sommes pas en mesure de valider ta demande d'accès à la banque de talents DidJob pour le moment.${raison}\n\nL'équipe DidJob`)}`)
+
+    if (demande.user_id) {
+      await supabase.from('profiles').upsert({ user_id: demande.user_id, role: 'recruteur_refused' }, { onConflict: 'user_id' })
+    }
+
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'recruteur_refuse', to: demande.email, prenom: demande.prenom, raison: raisonRefus.trim() }),
+    }).catch(err => console.error('Erreur envoi email de refus recruteur:', err))
+
     setRefusEnCours(null)
     setRaisonRefus('')
   }

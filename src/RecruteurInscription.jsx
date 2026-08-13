@@ -28,9 +28,12 @@
   -- s'auto-valider.
   CREATE POLICY "Un recruteur peut creer sa demande" ON recruteurs FOR INSERT WITH CHECK (auth.uid() = user_id AND statut = 'en_attente');
 
+  ALTER TABLE recruteurs ADD COLUMN IF NOT EXISTS site_web TEXT;
+
   ALTER TABLE profiles ADD COLUMN IF NOT EXISTS visible_recruteurs BOOLEAN DEFAULT false;
   ALTER TABLE profiles ADD COLUMN IF NOT EXISTS recherche_contrat TEXT DEFAULT '';
   ALTER TABLE profiles ADD COLUMN IF NOT EXISTS disponibilite TEXT DEFAULT '';
+  ALTER TABLE profiles ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'user';
 
   ──────────────────────────────────────────────────────────────────────────
 */
@@ -70,12 +73,13 @@ function EnTete() {
   )
 }
 
-const EMPTY = { prenom: '', nom: '', email: '', password: '', entreprise: '', poste: '', telephone: '', justification: '' }
+const EMPTY = { prenom: '', nom: '', email: '', password: '', entreprise: '', siteWeb: '', poste: '', telephone: '', justification: '' }
 
 export default function RecruteurInscription() {
   const isMobile = useWidth() < 768
   const [form, setForm] = useState(EMPTY)
   const [certifie, setCertifie] = useState(false)
+  const [cguAcceptees, setCguAcceptees] = useState(false)
   const [loading, setLoading] = useState(false)
   const [erreur, setErreur] = useState('')
   const [envoye, setEnvoye] = useState(false)
@@ -101,6 +105,10 @@ export default function RecruteurInscription() {
       setErreur('Merci de certifier ton engagement avant de continuer.')
       return
     }
+    if (!cguAcceptees) {
+      setErreur('Merci d\'accepter les CGU avant de continuer.')
+      return
+    }
 
     setLoading(true)
     const { data, error } = await supabase.auth.signUp({ email: form.email.trim(), password: form.password })
@@ -116,6 +124,7 @@ export default function RecruteurInscription() {
       nom: form.nom.trim(),
       prenom: form.prenom.trim(),
       entreprise: form.entreprise.trim(),
+      site_web: form.siteWeb.trim(),
       poste: form.poste.trim(),
       telephone: form.telephone.trim(),
       justification: form.justification.trim(),
@@ -123,6 +132,25 @@ export default function RecruteurInscription() {
     })
     setLoading(false)
     if (erreurInsert) { setErreur("Le compte a été créé mais la demande n'a pas pu être enregistrée. Contacte-nous."); return }
+
+    // Marque le compte comme recruteur en attente de validation admin.
+    await supabase.from('profiles').upsert({ user_id: data.user.id, role: 'recruteur_pending' }, { onConflict: 'user_id' })
+
+    // Notifie l'équipe DidJob de la nouvelle demande (best-effort, ne bloque pas l'inscription).
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'nouvelle_demande_recruteur',
+        prenom: form.prenom.trim(),
+        nom: form.nom.trim(),
+        entreprise: form.entreprise.trim(),
+        emailRecruteur: form.email.trim(),
+        poste: form.poste.trim(),
+        message: form.justification.trim(),
+      }),
+    }).catch(err => console.error('Erreur notification nouvelle demande recruteur:', err))
+
     setEnvoye(true)
   }
 
@@ -186,9 +214,15 @@ export default function RecruteurInscription() {
               </div>
             </div>
 
-            <div style={{ marginBottom: '12px' }}>
-              <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '5px' }}>Téléphone</label>
-              <input value={form.telephone} onChange={champ('telephone')} style={INPUT} />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '5px' }}>Site web de l'entreprise</label>
+                <input value={form.siteWeb} onChange={champ('siteWeb')} placeholder="https://..." style={INPUT} />
+              </div>
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '5px' }}>Téléphone</label>
+                <input value={form.telephone} onChange={champ('telephone')} style={INPUT} />
+              </div>
             </div>
 
             <div style={{ marginBottom: '16px' }}>
@@ -196,10 +230,17 @@ export default function RecruteurInscription() {
               <textarea value={form.justification} onChange={champ('justification')} rows={4} style={{ ...INPUT, resize: 'vertical', lineHeight: '1.6' }} />
             </div>
 
-            <label style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', marginBottom: '20px', cursor: 'pointer' }}>
+            <label style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', marginBottom: '12px', cursor: 'pointer' }}>
               <input type="checkbox" checked={certifie} onChange={e => setCertifie(e.target.checked)} style={{ marginTop: '3px', flexShrink: 0 }} />
               <span style={{ fontSize: '13px', color: '#374151', lineHeight: '1.5' }}>
                 Je certifie utiliser ces données uniquement dans le cadre de mes activités de recrutement
+              </span>
+            </label>
+
+            <label style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', marginBottom: '20px', cursor: 'pointer' }}>
+              <input type="checkbox" checked={cguAcceptees} onChange={e => setCguAcceptees(e.target.checked)} style={{ marginTop: '3px', flexShrink: 0 }} />
+              <span style={{ fontSize: '13px', color: '#374151', lineHeight: '1.5' }}>
+                J'accepte les <a href="/cgu" target="_blank" rel="noopener noreferrer" style={{ color: '#1e3a5f', fontWeight: '600' }}>CGU</a>
               </span>
             </label>
 
