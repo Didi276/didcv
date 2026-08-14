@@ -1,4 +1,17 @@
 {
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "destination": "https://did-job.com/$1",
+      "permanent": true,
+      "has": [
+        {
+          "type": "host",
+          "value": "didcv.vercel.app"
+        }
+      ]
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",
