@@ -43,7 +43,6 @@ function useWidth() {
 }
 
 export default function Dashboard() {
-  console.log('Dashboard monté')
   const [cvs, setCvs] = useState([])
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(null)
@@ -526,7 +525,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {console.log('userRole:', userRole)}
       {(!userRole || userRole === 'user') && (
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: `0 ${isMobile ? '16px' : '40px'} ${isMobile ? '40px' : '60px'}` }}>
           <div style={{
