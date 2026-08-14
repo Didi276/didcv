@@ -15,7 +15,7 @@ export default async function handler(req, res) {
   const { user_id } = req.query
   if (!user_id) return res.status(400).json({ error: 'user_id requis' })
 
-  // 1. Récupérer le profil du candidat
+  // 1. Récupérer le profil complet du candidat
   const { data: profil } = await supabase
     .from('profiles')
     .select('*')
@@ -23,9 +23,30 @@ export default async function handler(req, res) {
     .single()
 
   if (!profil) return res.status(404).json({ error: 'Profil introuvable' })
-  console.log('Profil trouvé:', JSON.stringify(profil))
 
-  // 2. Récupérer les offres récentes
+  // 2. Récupérer les CVs du candidat pour en extraire les compétences
+  // (la table cvs stocke tout dans la colonne JSON cv_data, pas de colonnes
+  // top-level titre/competences/experiences/secteur)
+  const { data: cvs } = await supabase
+    .from('cvs')
+    .select('cv_data')
+    .eq('user_id', user_id)
+    .order('created_at', { ascending: false })
+    .limit(3)
+
+  const competencesCvs = [...new Set(
+    (cvs || []).flatMap(cv => (cv.cv_data?.competences || []).filter(Boolean))
+  )]
+
+  // 3. Récupérer les candidatures récentes (pour éviter les doublons)
+  const { data: candidatures } = await supabase
+    .from('candidatures')
+    .select('poste, entreprise, statut')
+    .eq('user_id', user_id)
+    .order('created_at', { ascending: false })
+    .limit(10)
+
+  // 4. Récupérer les offres récentes
   const { data: offres } = await supabase
     .from('offres_directes')
     .select('id, titre, entreprise, lieu, description, type_contrat, salaire, url_candidature')
@@ -35,15 +56,24 @@ export default async function handler(req, res) {
 
   if (!offres?.length) return res.status(200).json({ offres: [] })
 
-  // 3. Demander à Claude de faire le matching
+  // 5. Construire un contexte riche pour Claude
   const profilTexte = `
-Candidat: ${profil.prenom || ''} ${profil.nom || ''}
-Poste souhaité: ${profil.poste_souhaite || 'Non précisé'}
-Localisation: ${profil.ville || 'Non précisée'}
-Compétences: ${profil.competences || 'Non précisées'}
-Expérience: ${profil.experience || 'Non précisée'}
-Type de contrat: ${profil.type_contrat_souhaite || 'Tous'}
-Secteur souhaité: ${profil.secteur || 'Tous'}
+PROJET PROFESSIONNEL :
+Candidat : ${profil.prenom || ''} ${profil.nom || ''}
+Poste recherché : ${profil.poste_souhaite || 'Non précisé'}
+Secteurs souhaités : ${(profil.secteurs_souhaites || []).join(', ') || 'Tous secteurs'}
+Type de contrat : ${profil.type_contrat_souhaite || 'Indifférent'}
+Salaire minimum : ${profil.salaire_min ? profil.salaire_min + '€/an' : 'Non précisé'}
+Ville : ${profil.ville || 'Non précisée'}
+Mobilité : ${profil.mobilite || 'Non précisée'}
+Télétravail : ${profil.teletravail || 'Indifférent'}
+Description projet : ${profil.description_projet || ''}
+
+COMPÉTENCES (depuis CVs) :
+${competencesCvs.join(', ') || 'Non renseignées'}
+
+CANDIDATURES RÉCENTES (postes déjà postulés) :
+${(candidatures || []).map(c => `${c.poste} chez ${c.entreprise} (${c.statut})`).join('\n') || 'Aucune'}
 `.trim()
 
   const offresTexte = offres.map((o, i) =>
@@ -57,13 +87,18 @@ Secteur souhaité: ${profil.secteur || 'Tous'}
       max_tokens: 1000,
       messages: [{
         role: 'user',
-        content: `Tu es un expert en recrutement. Analyse ce profil candidat et ces offres d'emploi.
+        content: `Tu es un expert en recrutement. Analyse ce profil candidat et trouve les meilleures offres.
 
-PROFIL CANDIDAT :
 ${profilTexte}
 
 OFFRES DISPONIBLES (index | titre | entreprise | lieu | type | description) :
 ${offresTexte}
+
+RÈGLES :
+- Évite de proposer des postes similaires à ceux déjà postulés
+- Priorise les offres qui correspondent aux secteurs souhaités
+- Respecte le type de contrat et le salaire minimum si précisés
+- Tiens compte de la mobilité géographique
 
 Sélectionne les 10 meilleures correspondances pour ce candidat.
 Retourne UNIQUEMENT ce JSON sans texte autour :
@@ -89,7 +124,7 @@ Trie par score décroissant. Score de 0 à 100.`
     matches = []
   }
 
-  // 4. Construire les offres matchées
+  // 6. Construire les offres matchées
   let offresMatchees = matches
     .filter(m => m.index >= 0 && m.index < offres.length)
     .map(m => ({

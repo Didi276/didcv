@@ -208,6 +208,7 @@ export default function Dashboard() {
   }
 
   const prenom = profile?.prenom || user?.email?.split('@')[0] || ''
+  const profilIncomplet = !profile?.poste_souhaite && !(profile?.secteurs_souhaites?.length) && cvs.length === 0
 
   if (loading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', flexDirection: 'column', gap: '16px' }}>
@@ -416,6 +417,32 @@ export default function Dashboard() {
 
           {loadingMatch ? (
             <p style={{ color: '#9ca3af' }}>Analyse en cours...</p>
+          ) : profilIncomplet ? (
+            <div style={{
+              background: '#f9fafb', borderRadius: '12px',
+              padding: '32px', textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '40px', marginBottom: '16px' }}>🎯</div>
+              <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0f0f1a', marginBottom: '8px' }}>
+                Personnalise tes recommandations
+              </h3>
+              <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '20px', lineHeight: 1.6 }}>
+                Complète ton projet professionnel pour recevoir des offres
+                vraiment adaptées à ton profil.
+              </p>
+              <Link to="/profile" style={{
+                display: 'inline-block',
+                background: '#0f0f1a',
+                color: '#ffffff',
+                padding: '12px 24px',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                fontWeight: 600,
+                fontSize: '14px'
+              }}>
+                Compléter mon profil →
+              </Link>
+            </div>
           ) : offresMatch.length === 0 ? (
             <p style={{ color: '#9ca3af' }}>
               Aucune offre disponible pour le moment.

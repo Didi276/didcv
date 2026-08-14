@@ -36,6 +36,15 @@ function formationsPourMetier(titrePoste) {
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString()
 
+const SECTEURS = [
+  'Tech & Digital', 'Finance & Banque', 'Santé & Médical',
+  'Commerce & Vente', 'Marketing & Communication', 'Industrie & BTP',
+  'Conseil & Audit', 'RH & Recrutement', 'Juridique', 'Éducation & Formation',
+  'Transport & Logistique', 'Hôtellerie & Restauration', 'Agroalimentaire',
+  'Immobilier', 'Énergie & Environnement', 'Défense & Aérospatial',
+  'Art & Culture', 'Sport & Loisirs', 'Autre',
+]
+
 const INPUT = {
   width: '100%', padding: '10px 14px', border: '1.5px solid #e5e7eb',
   borderRadius: '9px', fontSize: '14px', fontFamily: '"Inter",system-ui,sans-serif',
@@ -90,6 +99,15 @@ export default function Profile() {
   const [visibleRecruteurs, setVisibleRecruteurs] = useState(false)
   const [rechercheContrat, setRechercheContrat] = useState([])
   const [disponibilite, setDisponibilite] = useState('')
+  const [projetPro, setProjetPro] = useState({
+    poste_souhaite: '',
+    secteurs_souhaites: [],
+    type_contrat_souhaite: '',
+    salaire_min: '',
+    mobilite: '',
+    teletravail: '',
+    description_projet: '',
+  })
 
   const [experiences, setExperiences] = useState([{ poste: '', entreprise: '', periode: '', lieu: '', missions: ['', '', ''] }])
   const [formations, setFormations] = useState([{ diplome: '', etablissement: '', periode: '', mention: '', description: '' }])
@@ -117,6 +135,15 @@ export default function Profile() {
         setVisibleRecruteurs(data.visible_recruteurs || false)
         setRechercheContrat(data.recherche_contrat ? data.recherche_contrat.split(',').map(s => s.trim()).filter(Boolean) : [])
         setDisponibilite(data.disponibilite || '')
+        setProjetPro({
+          poste_souhaite: data.poste_souhaite || '',
+          secteurs_souhaites: data.secteurs_souhaites || [],
+          type_contrat_souhaite: data.type_contrat_souhaite || '',
+          salaire_min: data.salaire_min ? String(data.salaire_min) : '',
+          mobilite: data.mobilite || '',
+          teletravail: data.teletravail || '',
+          description_projet: data.description_projet || '',
+        })
         if (data.experiences?.length) setExperiences(data.experiences)
         if (data.formations?.length) setFormations(data.formations)
         if (data.competences?.length) setCompetences(data.competences)
@@ -315,7 +342,14 @@ export default function Profile() {
       titre, accroche, photo,
       visible_recruteurs: visibleRecruteurs,
       recherche_contrat: visibleRecruteurs ? rechercheContrat.join(', ') : '',
-      disponibilite: visibleRecruteurs ? disponibilite : '',
+      disponibilite,
+      poste_souhaite: projetPro.poste_souhaite.trim(),
+      secteurs_souhaites: projetPro.secteurs_souhaites,
+      type_contrat_souhaite: projetPro.type_contrat_souhaite,
+      salaire_min: projetPro.salaire_min ? parseInt(projetPro.salaire_min, 10) : null,
+      mobilite: projetPro.mobilite,
+      teletravail: projetPro.teletravail,
+      description_projet: projetPro.description_projet.trim(),
       experiences: experiences.filter(e => e.poste || e.entreprise),
       formations: formations.filter(f => f.diplome || f.etablissement),
       competences: competences.filter(c => c.trim()),
@@ -703,6 +737,81 @@ export default function Profile() {
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* Mon projet professionnel */}
+            <div style={{ marginTop: '28px', paddingTop: '24px', borderTop: '1px solid #f0f0f0' }}>
+              <div style={{ fontSize: '15px', fontWeight: '700', color: '#111', marginBottom: '16px' }}>Mon projet professionnel</div>
+
+              <Field label="Poste recherché">
+                <input value={projetPro.poste_souhaite} onChange={e => setProjetPro(p => ({ ...p, poste_souhaite: e.target.value }))}
+                  placeholder="Ex: Développeur React Senior, Comptable, Infirmier..." style={INPUT} onFocus={focusStyle} onBlur={blurStyle} />
+              </Field>
+
+              <Field label="Secteurs d'activité souhaités" hint="plusieurs choix possibles">
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {SECTEURS.map(secteur => {
+                    const actif = projetPro.secteurs_souhaites.includes(secteur)
+                    return (
+                      <button key={secteur} type="button"
+                        onClick={() => setProjetPro(p => ({
+                          ...p,
+                          secteurs_souhaites: actif ? p.secteurs_souhaites.filter(s => s !== secteur) : [...p.secteurs_souhaites, secteur],
+                        }))}
+                        style={{ padding: '6px 14px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', background: actif ? '#6366f1' : '#f3f4f6', color: actif ? '#fff' : '#374151' }}>
+                        {actif ? '✓ ' : ''}{secteur}
+                      </button>
+                    )
+                  })}
+                </div>
+              </Field>
+
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '16px' }}>
+                <Field label="Type de contrat souhaité">
+                  <select value={projetPro.type_contrat_souhaite} onChange={e => setProjetPro(p => ({ ...p, type_contrat_souhaite: e.target.value }))} style={{ ...INPUT, cursor: 'pointer' }}>
+                    <option value="">Indifférent</option>
+                    {['CDI', 'CDD', 'Alternance', 'Stage', 'Freelance', 'Intérim'].map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </Field>
+                <Field label="Salaire annuel minimum souhaité">
+                  <select value={projetPro.salaire_min} onChange={e => setProjetPro(p => ({ ...p, salaire_min: e.target.value }))} style={{ ...INPUT, cursor: 'pointer' }}>
+                    <option value="">Non précisé</option>
+                    {[20000, 25000, 30000, 35000, 40000, 45000, 50000, 60000, 70000, 80000, 100000].map(s => (
+                      <option key={s} value={s}>{s === 100000 ? '100 000 €+' : `${s.toLocaleString('fr-FR')} €`}</option>
+                    ))}
+                  </select>
+                </Field>
+                <Field label="Disponibilité">
+                  <select value={disponibilite} onChange={e => setDisponibilite(e.target.value)} style={{ ...INPUT, cursor: 'pointer' }}>
+                    <option value="">Non précisé</option>
+                    {['Immédiatement', 'Dans 1 mois', 'Dans 3 mois', 'Dans 6 mois'].map(d => <option key={d}>{d}</option>)}
+                  </select>
+                </Field>
+                <Field label="Mobilité géographique">
+                  <select value={projetPro.mobilite} onChange={e => setProjetPro(p => ({ ...p, mobilite: e.target.value }))} style={{ ...INPUT, cursor: 'pointer' }}>
+                    <option value="">Non précisé</option>
+                    <option value="ville">Ma ville uniquement</option>
+                    <option value="region">Ma région</option>
+                    <option value="france">France entière</option>
+                    <option value="europe">Europe</option>
+                    <option value="monde">Monde entier</option>
+                  </select>
+                </Field>
+                <Field label="Télétravail">
+                  <select value={projetPro.teletravail} onChange={e => setProjetPro(p => ({ ...p, teletravail: e.target.value }))} style={{ ...INPUT, cursor: 'pointer' }}>
+                    <option value="">Indifférent</option>
+                    <option value="non">Pas de télétravail</option>
+                    <option value="partiel">Télétravail partiel</option>
+                    <option value="total">Full remote</option>
+                  </select>
+                </Field>
+              </div>
+
+              <Field label="Décrivez votre projet professionnel" hint="optionnel">
+                <textarea rows={4} value={projetPro.description_projet} onChange={e => setProjetPro(p => ({ ...p, description_projet: e.target.value }))}
+                  placeholder="Ex: Je recherche un poste de manager dans la tech, idéalement dans une startup en croissance..."
+                  style={{ ...INPUT, resize: 'vertical', lineHeight: '1.6' }} onFocus={focusStyle} onBlur={blurStyle} />
+              </Field>
             </div>
           </div>
         )}
