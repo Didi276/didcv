@@ -26,6 +26,7 @@ export default function AdminRecruteurs() {
   const [refusEnCours, setRefusEnCours] = useState(null) // id de la demande en cours de refus
   const [raisonRefus, setRaisonRefus] = useState('')
   const [stats, setStats] = useState({})
+  const [derniersUtilisateurs, setDerniersUtilisateurs] = useState([])
 
   useEffect(() => {
     const verifier = async () => {
@@ -57,20 +58,55 @@ export default function AdminRecruteurs() {
   useEffect(() => {
     if (acces !== 'ok') return
     const loadStats = async () => {
-      const [users, cvs, offres, candidatures] = await Promise.all([
+      const [
+        users, cvs, offresDirectes, candidatures,
+        recruteurs, offresRecruteurs,
+        offresActives, entreprisesRes,
+        candidatsVisibles, entretiensPlanifies,
+        rappelsEnvoyesRes, recruteursEnAttenteRes,
+      ] = await Promise.all([
         supabase.from('profiles').select('*', { count: 'exact', head: true }),
         supabase.from('cvs').select('*', { count: 'exact', head: true }),
         supabase.from('offres_directes').select('*', { count: 'exact', head: true }),
         supabase.from('candidatures').select('*', { count: 'exact', head: true }),
+        supabase.from('recruteurs').select('*', { count: 'exact', head: true }),
+        supabase.from('offres_directes').select('*', { count: 'exact', head: true }).eq('ats_source', 'recruteur_didjob'),
+        supabase.from('offres_directes').select('*', { count: 'exact', head: true }).eq('actif', true),
+        supabase.from('offres_directes').select('entreprise').then(r => ({
+          count: new Set((r.data || []).map(o => o.entreprise)).size,
+        })),
+        supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('visible_recruteurs', true),
+        supabase.from('candidatures').select('*', { count: 'exact', head: true }).eq('statut', 'entretien'),
+        supabase.from('candidatures').select('*', { count: 'exact', head: true }).eq('rappel_j1_envoye', true),
+        supabase.from('recruteurs').select('*', { count: 'exact', head: true }).eq('statut', 'en_attente'),
       ])
+
       setStats({
         users: users.count || 0,
         cvs: cvs.count || 0,
-        offres: offres.count || 0,
+        offresDirectes: offresDirectes.count || 0,
         candidatures: candidatures.count || 0,
+        recruteurs: recruteurs.count || 0,
+        offresRecruteurs: offresRecruteurs.count || 0,
+        offresActives: offresActives.count || 0,
+        entreprises: entreprisesRes.count || 0,
+        candidatsVisibles: candidatsVisibles.count || 0,
+        entretiensPlanifies: entretiensPlanifies.count || 0,
+        rappelsEnvoyes: rappelsEnvoyesRes.count || 0,
+        recruteursEnAttente: recruteursEnAttenteRes.count || 0,
       })
     }
     loadStats()
+
+    const loadDerniereActivite = async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('prenom, nom, created_at, role')
+        .order('created_at', { ascending: false })
+        .limit(5)
+      setDerniersUtilisateurs(data || [])
+    }
+    loadDerniereActivite()
   }, [acces])
 
   const statsDemandes = {
@@ -181,29 +217,69 @@ export default function AdminRecruteurs() {
         borderBottom: '1px solid #f0f0f0',
       }}>
         {[
-          { label: 'Utilisateurs', value: stats.users, icon: '👥' },
-          { label: 'CVs créés', value: stats.cvs, icon: '📄' },
-          { label: 'Offres directes', value: stats.offres, icon: '💼' },
-          { label: 'Candidatures', value: stats.candidatures, icon: '📬' },
-        ].map(s => (
-          <div key={s.label} style={{
-            background: '#ffffff',
-            borderRadius: '10px',
-            padding: '20px',
-            border: '1px solid #f0f0f0',
-          }}>
-            <div style={{ fontSize: '24px', marginBottom: '8px' }}>{s.icon}</div>
-            <div style={{ fontSize: '28px', fontWeight: '700', color: '#0f0f1a', fontFamily: '"Clash Display","Satoshi","Inter",system-ui,sans-serif' }}>
-              {s.value ?? '...'}
+          // Rangée 1 — Utilisateurs
+          { key: 'users', label: 'Utilisateurs inscrits', value: stats.users, icon: '👥' },
+          { key: 'cvs', label: 'CVs créés', value: stats.cvs, icon: '📄' },
+          { key: 'candidatsVisibles', label: 'Candidats visibles recruteurs', value: stats.candidatsVisibles, icon: '👁' },
+          { key: 'recruteurs', label: 'Recruteurs inscrits', value: stats.recruteurs, icon: '🏢' },
+          // Rangée 2 — Offres
+          { key: 'offresDirectes', label: 'Offres directes en base', value: stats.offresDirectes, icon: '💼' },
+          { key: 'offresActives', label: 'Offres actives', value: stats.offresActives, icon: '✅' },
+          { key: 'entreprises', label: 'Entreprises scrapées', value: stats.entreprises, icon: '🏭' },
+          { key: 'offresRecruteurs', label: 'Offres publiées par recruteurs', value: stats.offresRecruteurs, icon: '📝' },
+          // Rangée 3 — Activité
+          { key: 'candidatures', label: 'Candidatures totales', value: stats.candidatures, icon: '📬' },
+          { key: 'entretiensPlanifies', label: 'Entretiens planifiés', value: stats.entretiensPlanifies, icon: '🎯' },
+          { key: 'rappelsEnvoyes', label: 'Rappels envoyés', value: stats.rappelsEnvoyes, icon: '📧' },
+          { key: 'recruteursEnAttente', label: 'Recruteurs en attente', value: stats.recruteursEnAttente, icon: '⏳' },
+        ].map(s => {
+          const alerte = s.key === 'recruteursEnAttente' && stats.recruteursEnAttente > 0
+          return (
+            <div key={s.key} style={{
+              background: alerte ? '#fef3c7' : '#ffffff',
+              borderRadius: '10px',
+              padding: '20px',
+              border: alerte ? '1px solid #f59e0b' : '1px solid #f0f0f0',
+            }}>
+              <div style={{ fontSize: '28px', marginBottom: '8px' }}>{s.icon}</div>
+              <div style={{ fontSize: '32px', fontWeight: '700', color: '#0f0f1a', fontFamily: '"Clash Display","Satoshi","Inter",system-ui,sans-serif' }}>
+                {s.value ?? '...'}
+              </div>
+              <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
+                {s.label}
+              </div>
             </div>
-            <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '4px' }}>
-              {s.label}
-            </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       <div style={{ padding: '40px' }}>
+        <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#0f0f1a', fontFamily: '"Clash Display","Satoshi","Inter",system-ui,sans-serif', margin: '0 0 16px' }}>
+          Dernière activité
+        </h2>
+        <div style={{ background: '#fff', borderRadius: '12px', border: '1px solid #f0f0f0', padding: '8px 20px', marginBottom: '40px' }}>
+          {derniersUtilisateurs.length === 0 ? (
+            <div style={{ padding: '16px 0', fontSize: '13px', color: '#9ca3af' }}>Aucun utilisateur pour l'instant.</div>
+          ) : (
+            derniersUtilisateurs.map((u, i) => (
+              <div key={i} style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '12px 0',
+                borderTop: i > 0 ? '1px solid #f0f0f0' : 'none',
+                fontSize: '13px',
+              }}>
+                <span style={{ color: '#0f0f1a', fontWeight: '600' }}>
+                  {u.prenom || 'Sans prénom'} {u.nom || ''}
+                  <span style={{ color: '#9ca3af', fontWeight: '400' }}> — {u.role || 'user'}</span>
+                </span>
+                <span style={{ color: '#9ca3af' }}>
+                  {new Date(u.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </span>
+              </div>
+            ))
+          )}
+        </div>
+
         <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#0f0f1a', fontFamily: '"Clash Display","Satoshi","Inter",system-ui,sans-serif', margin: '0 0 4px' }}>
           Demandes d'accès recruteurs
         </h2>
