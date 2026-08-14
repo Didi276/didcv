@@ -2,6 +2,7 @@
 // Nécessite ANTHROPIC_API_KEY (console.anthropic.com).
 import { createClient } from '@supabase/supabase-js'
 import Anthropic from '@anthropic-ai/sdk'
+import { rateLimit } from './middleware/rateLimit.js'
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
@@ -9,11 +10,18 @@ const supabase = createClient(
 )
 const anthropic = new Anthropic()
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
 
+  // Chaque appel déclenche un appel à l'API Claude — limite stricte.
+  if (!rateLimit(req, res, { limit: 15, windowMs: 60_000 })) return
+
   const { user_id } = req.query
-  if (!user_id) return res.status(400).json({ error: 'user_id requis' })
+  if (!user_id || !UUID_RE.test(user_id)) {
+    return res.status(400).json({ error: 'user_id requis et doit être un UUID valide' })
+  }
 
   // 1. Récupérer le profil complet du candidat
   const { data: profil } = await supabase

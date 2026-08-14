@@ -3,6 +3,7 @@
 // (DNS) dans le compte Resend, sinon l'envoi échoue.
 import { Resend } from 'resend'
 import { emailBienvenueDidJob } from '../src/emailTemplates.js'
+import { rateLimit } from './middleware/rateLimit.js'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -11,8 +12,37 @@ const HEADER_HTML = `
     <h1 style="color: white; font-size: 28px; margin: 0;">Did<span style="color: #6366f1;">Job</span></h1>
   </div>`
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+// `nouvelle_demande_recruteur` fixe le destinataire côté serveur (contact@did-job.com) —
+// le `to` envoyé par le client n'est jamais utilisé pour ce type, donc pas besoin de le valider.
+function validerRequete(body) {
+  const { to, subject, html, type } = body
+
+  if (type === 'nouvelle_demande_recruteur') return null
+
+  if (!to || typeof to !== 'string' || !EMAIL_RE.test(to.trim())) {
+    return 'Adresse email destinataire invalide'
+  }
+
+  if (!type) {
+    if (!subject || typeof subject !== 'string') return 'subject requis'
+    if (!html || typeof html !== 'string') return 'html requis'
+    if (html.length > 200_000) return 'Contenu HTML trop volumineux'
+  }
+
+  return null
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
+
+  // Endpoint capable d'envoyer des emails — limite stricte contre le spam/relais.
+  if (!rateLimit(req, res, { limit: 5, windowMs: 60_000 })) return
+
+  const erreurValidation = validerRequete(req.body || {})
+  if (erreurValidation) return res.status(400).json({ error: erreurValidation })
+
   const { to, subject, html, type, prenom, nom, entreprise, emailRecruteur, poste, message, raison } = req.body
   let mailTo = to
   let mailSubject = subject
