@@ -307,7 +307,7 @@ export default function Profile() {
   }
 
   const handleSave = async () => {
-    if (!user) return
+    if (!user || saving) return
     setSaving(true)
 
     const profileData = {
@@ -324,26 +324,9 @@ export default function Profile() {
       centres_interet: centresInteret.filter(c => c.trim()),
     }
 
-    // Vérifier si un profil existe déjà
-    const { data: existing } = await supabase
+    const { error } = await supabase
       .from('profiles')
-      .select('id')
-      .eq('user_id', user.id)
-      .maybeSingle()
-
-    let error
-    if (existing) {
-      const { error: e } = await supabase
-        .from('profiles')
-        .update(profileData)
-        .eq('user_id', user.id)
-      error = e
-    } else {
-      const { error: e } = await supabase
-        .from('profiles')
-        .insert(profileData)
-      error = e
-    }
+      .upsert(profileData, { onConflict: 'user_id' })
 
     if (error) {
       alert('Erreur de sauvegarde : ' + error.message)
@@ -354,6 +337,15 @@ export default function Profile() {
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2500)
+  }
+
+  const toggleVisibilite = async () => {
+    const newVal = !visibleRecruteurs
+    setVisibleRecruteurs(newVal)
+    await supabase
+      .from('profiles')
+      .update({ visible_recruteurs: newVal })
+      .eq('user_id', user.id)
   }
 
   const addExp = () => setExperiences([...experiences, { poste: '', entreprise: '', periode: '', lieu: '', missions: ['', '', ''] }])
@@ -581,8 +573,8 @@ export default function Profile() {
                 <Briefcase size={15} /> Vérifier mes expériences
               </button>
             </div>
-            <button onClick={handleSave}
-              style={{ width: '100%', marginTop: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', padding: '12px', background: '#16a34a', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 12px rgba(22,163,74,0.3)' }}>
+            <button onClick={handleSave} disabled={saving}
+              style={{ width: '100%', marginTop: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', padding: '12px', background: '#16a34a', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: '700', cursor: saving ? 'default' : 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 12px rgba(22,163,74,0.3)' }}>
               {saved && <CheckCircle size={15} />}
               {saving ? 'Sauvegarde...' : saved ? 'Sauvegardé !' : 'Tout semble bon - Sauvegarder'}
             </button>
@@ -676,7 +668,7 @@ export default function Profile() {
                   <div style={{ fontSize: '14px', fontWeight: '700', color: '#111', marginBottom: '2px' }}>Être visible par les recruteurs</div>
                   <div style={{ fontSize: '12px', color: '#9ca3af' }}>Apparaît dans la banque de talents recruteurs</div>
                 </div>
-                <button type="button" onClick={() => setVisibleRecruteurs(v => !v)}
+                <button type="button" onClick={toggleVisibilite}
                   style={{ width: '46px', height: '26px', borderRadius: '20px', border: 'none', cursor: 'pointer', background: visibleRecruteurs ? '#4f46e5' : '#e5e7eb', position: 'relative', flexShrink: 0, transition: 'background 0.2s' }}>
                   <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#fff', position: 'absolute', top: '3px', left: visibleRecruteurs ? '23px' : '3px', transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
                 </button>
