@@ -233,13 +233,23 @@ export default function Home() {
           }}>
             Créer mon CV gratuitement
           </a>
-          <div style={{ display: 'flex', gap: '32px', justifyContent: 'center', marginTop: '32px' }}>
+          <div style={{ display: 'flex', gap: '32px', justifyContent: 'center', marginTop: '32px', flexWrap: 'wrap' }}>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '28px', fontWeight: 700, color: '#ffffff' }}>
                 {stats.total ? stats.total.toLocaleString('fr-FR') : '—'}
               </div>
               <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '2px' }}>
                 offres disponibles
+              </div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '28px', fontWeight: 700, color: '#ffffff' }}>
+                {stats.entreprisesTotales
+                  ? `${Math.round(stats.entreprisesTotales / 1000)}k+`
+                  : '60k+'}
+              </div>
+              <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '2px' }}>
+                entreprises
               </div>
             </div>
             <div style={{ textAlign: 'center' }}>

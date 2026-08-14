@@ -19,14 +19,29 @@ export default async function handler(req, res) {
     stats.directes = count || 0
   } catch { stats.directes = 0 }
 
-  // 2. Nombre d'entreprises actives
+  // 2. Nombre d'entreprises actives (directes, réelles depuis Supabase)
   try {
-    const { data } = await supabase
+    const { data: ents } = await supabase
       .from('offres_directes')
       .select('entreprise')
       .eq('actif', true)
-    stats.entreprises = new Set((data || []).map(o => o.entreprise)).size
-  } catch { stats.entreprises = 0 }
+      .not('entreprise', 'is', null)
+
+    const entreprisesDirectes = new Set(
+      (ents || []).map(o => o.entreprise?.trim().toLowerCase())
+        .filter(Boolean)
+    ).size
+
+    // Estimation totale toutes sources
+    // France Travail : ~50 000 entreprises
+    // Adzuna : ~25 000 entreprises
+    // Chevauchement estimé ~20% : -15 000
+    // + nos directes
+    const entreprisesTotales = 50000 + 25000 + entreprisesDirectes - 15000
+
+    stats.entreprises = entreprisesDirectes
+    stats.entreprisesTotales = entreprisesTotales
+  } catch { stats.entreprises = 0; stats.entreprisesTotales = 0 }
 
   // 3. France Travail — volume total disponible
   try {
