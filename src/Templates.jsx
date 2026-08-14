@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { CVTemplatePro, TEMPLATES_PRO_META } from './CVTemplatesPro'
+import { TEMPLATES_EXTRA_META } from './CVTemplatesExtra'
 import Navbar from './Navbar'
+
+const TEMPLATES_META = { ...TEMPLATES_PRO_META, ...TEMPLATES_EXTRA_META }
 
 const CV_DEMO = {
   prenom: 'Camille',
@@ -180,7 +183,7 @@ export default function Templates() {
   const [recommandesOnly, setRecommandesOnly] = useState(false)
 
   const styles = useMemo(() => {
-    const uniques = [...new Set(Object.values(TEMPLATES_PRO_META).map(m => m.style))].sort((a, b) => a.localeCompare(b, 'fr'))
+    const uniques = [...new Set(Object.values(TEMPLATES_META).map(m => m.style))].sort((a, b) => a.localeCompare(b, 'fr'))
     return ['Tous styles', ...uniques]
   }, [])
 
@@ -196,7 +199,7 @@ export default function Templates() {
   }
 
   const templatesFiltres = useMemo(() => {
-    return Object.entries(TEMPLATES_PRO_META)
+    return Object.entries(TEMPLATES_META)
       .filter(([, m]) => {
         if (secteur !== 'Tous les secteurs' && !m.secteurs.includes(secteur) && !m.secteurs.includes('Tous secteurs')) return false
         if (niveau !== 'Tous niveaux' && !m.niveaux.includes(niveau)) return false
@@ -222,7 +225,7 @@ export default function Templates() {
           fontFamily: '"Clash Display","Satoshi",sans-serif', fontSize: '44px', fontWeight: 700,
           color: '#ffffff', textAlign: 'center', margin: 0,
         }}>
-          40 modèles de CV professionnels
+          50 modèles de CV professionnels
         </h1>
         <p style={{
           fontFamily: '"Satoshi","Inter",sans-serif', fontSize: '15px', color: 'rgba(255,255,255,0.6)',

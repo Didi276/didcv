@@ -1,5 +1,6 @@
 // src/CVTemplatesPro.jsx
 // 10 templates de CV premium — dimensions A4 exactes (794x1123px @ 96dpi)
+import { CVTemplateExtra, TEMPLATES_EXTRA_META } from './CVTemplatesExtra.jsx'
 
 const PAGE = { width: 794, minHeight: 1123 }
 
@@ -5911,8 +5912,12 @@ export function getTemplatesPourSecteur(secteur) {
     .sort((a, b) => b.atsScore - a.atsScore)
 }
 
+// Fusion des métadonnées des deux vagues de templates (1-40 + 41-50), utile
+// aux consommateurs qui veulent la liste complète sans importer les deux modules.
+export const TEMPLATES_ALL_META = { ...TEMPLATES_PRO_META, ...TEMPLATES_EXTRA_META }
+
 export function CVTemplatePro({ cvData, template = 'meridien', color }) {
-  const couleur = color || TEMPLATES_PRO_META[template]?.couleurDefaut || '#1e3a8a'
+  const couleur = color || TEMPLATES_PRO_META[template]?.couleurDefaut || TEMPLATES_EXTRA_META[template]?.couleurDefaut || '#1e3a8a'
   switch (template) {
     case 'meridien': return <Meridien cvData={cvData} color={couleur} />
     case 'atelier': return <Atelier cvData={cvData} color={couleur} />
@@ -5954,11 +5959,14 @@ export function CVTemplatePro({ cvData, template = 'meridien', color }) {
     case 'essentiel': return <Essentiel cvData={cvData} color={couleur} />
     case 'impulsion': return <Impulsion cvData={cvData} color={couleur} />
     case 'trajectoire': return <Trajectoire cvData={cvData} color={couleur} />
-    default: return <Meridien cvData={cvData} color={couleur} />
+    default:
+      if (TEMPLATES_EXTRA_META[template]) return <CVTemplateExtra cvData={cvData} template={template} color={couleur} />
+      return <Meridien cvData={cvData} color={couleur} />
   }
 }
 
 export {
+  PhotoCV,
   Meridien, Atelier, Tribune, Chronique, Manuscrit,
   Grille, Silence, Signal, Prestige, Contraste,
   Horizon, Palier, Dossier, Aurore, Registre,

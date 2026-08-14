@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { supabase } from './supabase'
 import { CVTemplatePro, TEMPLATES_PRO_META } from './CVTemplatesPro'
+import { TEMPLATES_EXTRA_META } from './CVTemplatesExtra'
 import CVEditorBlocks from './CVEditorBlocks'
 import Navbar from './Navbar'
 import { detecterSecteur, getSecteurConfig, buildPromptCV } from './secteurConfig'
@@ -15,6 +16,8 @@ import { downloadCVasPDF, downloadLettreasePDF } from './pdfUtils'
 import ATSScore from './ATSScore'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString()
+
+const TEMPLATES_META = { ...TEMPLATES_PRO_META, ...TEMPLATES_EXTRA_META }
 
 function useWidth() {
   const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
@@ -440,7 +443,7 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
                 Changer template
               </a>
             </div>
-            <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 20px' }}>Template : <strong style={{ color: '#374151' }}>{TEMPLATES_PRO_META[currentTemplate]?.nom || currentTemplate}</strong></p>
+            <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 20px' }}>Template : <strong style={{ color: '#374151' }}>{TEMPLATES_META[currentTemplate]?.nom || currentTemplate}</strong></p>
           </div>
 
           {/* Profil charge */}
@@ -752,13 +755,13 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
           <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: isMobile ? 'auto' : '70px', bottom: isMobile ? 0 : 'auto', right: 0, left: isMobile ? 0 : 'auto', width: isMobile ? '100%' : '320px', background: '#fff', borderRadius: isMobile ? '16px 16px 0 0' : '14px 0 0 14px', padding: '20px', boxShadow: '-8px 0 32px rgba(0,0,0,0.1)', maxHeight: '80vh', overflowY: 'auto' }}>
             <div style={{ fontSize: '14px', fontWeight: '700', color: '#111', marginBottom: '4px' }}>Changer de template</div>
             <a href="/templates" style={{ display: 'block', fontSize: '11px', color: '#4f46e5', textDecoration: 'none', fontWeight: '600', marginBottom: '14px' }}>
-              Voir les 40 modèles avec filtres →
+              Voir les 50 modèles avec filtres →
             </a>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-              {Object.keys(TEMPLATES_PRO_META).map(t => (
+              {Object.keys(TEMPLATES_META).map(t => (
                 <button key={t} onClick={() => { setCurrentTemplate(t); setTemplateAuto(false); setShowTemplatePicker(false) }}
                   style={{ padding: '8px 6px', background: currentTemplate === t ? '#4f46e5' : '#f8f9ff', color: currentTemplate === t ? '#fff' : '#374151', border: `1.5px solid ${currentTemplate === t ? '#4f46e5' : '#e5e7eb'}`, borderRadius: '8px', fontSize: '11px', fontWeight: currentTemplate === t ? '700' : '500', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'center' }}>
-                  {currentTemplate === t ? '✓ ' : ''}{TEMPLATES_PRO_META[t].nom}
+                  {currentTemplate === t ? '✓ ' : ''}{TEMPLATES_META[t].nom}
                 </button>
               ))}
             </div>

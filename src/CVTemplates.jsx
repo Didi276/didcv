@@ -1,4 +1,4 @@
-import { TemplateEtudiant, TemplateAlternance, TemplatePortfolio, TemplateSante, TemplateCommercial, TemplateStartup, TemplateClassique, TemplateInternational, TemplateBTP, TemplateRestauration, TemplateTransport, TemplateBeaute } from './CVTemplatesExtra'
+import { TemplateEtudiant, TemplateAlternance, TemplatePortfolio, TemplateSante, TemplateCommercial, TemplateStartup, TemplateClassique, TemplateInternational, TemplateBTP, TemplateRestauration, TemplateTransport, TemplateBeaute } from './CVTemplatesLegacy'
 
 const PHOTO_DEMO = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop&crop=face'
 
