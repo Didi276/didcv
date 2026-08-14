@@ -17,6 +17,8 @@ function statutInfo(id) {
   return STATUTS.find(s => s.id === id) || STATUTS[0]
 }
 
+const fmt = n => n?.toLocaleString('fr-FR') || '...'
+
 export default function AdminRecruteurs() {
   const [acces, setAcces] = useState('en_cours') // en_cours | ok | refuse
   const [adminEmail, setAdminEmail] = useState('')
@@ -97,6 +99,19 @@ export default function AdminRecruteurs() {
       })
     }
     loadStats()
+
+    const loadStatsSources = async () => {
+      const ftStats = await fetch('/api/stats').then(r => r.json()).catch(() => null)
+      setStats(prev => ({
+        ...prev,
+        totalOffres: ftStats?.total || 0,
+        offresFT: ftStats?.franceTravail || 0,
+        offresAdzuna: ftStats?.adzuna || 0,
+        offresDirectesSources: ftStats?.directes || 0,
+        entreprisesDirectes: ftStats?.entreprises || 0,
+      }))
+    }
+    loadStatsSources()
 
     const loadDerniereActivite = async () => {
       const { data } = await supabase
@@ -232,6 +247,11 @@ export default function AdminRecruteurs() {
           { key: 'entretiensPlanifies', label: 'Entretiens planifiés', value: stats.entretiensPlanifies, icon: '🎯' },
           { key: 'rappelsEnvoyes', label: 'Rappels envoyés', value: stats.rappelsEnvoyes, icon: '📧' },
           { key: 'recruteursEnAttente', label: 'Recruteurs en attente', value: stats.recruteursEnAttente, icon: '⏳' },
+          // Rangée 4 — Sources d'offres
+          { key: 'totalOffres', label: 'Total toutes sources', value: stats.totalOffres, icon: '🌐' },
+          { key: 'offresDirectesSources', label: 'Offres directes entreprises', value: stats.offresDirectesSources, icon: '🏢' },
+          { key: 'offresFT', label: 'France Travail', value: stats.offresFT, icon: '🇫🇷' },
+          { key: 'offresAdzuna', label: 'Adzuna', value: stats.offresAdzuna, icon: '💰' },
         ].map(s => {
           const alerte = s.key === 'recruteursEnAttente' && stats.recruteursEnAttente > 0
           return (
@@ -243,7 +263,7 @@ export default function AdminRecruteurs() {
             }}>
               <div style={{ fontSize: '28px', marginBottom: '8px' }}>{s.icon}</div>
               <div style={{ fontSize: '32px', fontWeight: '700', color: '#0f0f1a', fontFamily: '"Clash Display","Satoshi","Inter",system-ui,sans-serif' }}>
-                {s.value ?? '...'}
+                {fmt(s.value)}
               </div>
               <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
                 {s.label}
