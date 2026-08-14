@@ -755,7 +755,7 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
           <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: isMobile ? 'auto' : '70px', bottom: isMobile ? 0 : 'auto', right: 0, left: isMobile ? 0 : 'auto', width: isMobile ? '100%' : '320px', background: '#fff', borderRadius: isMobile ? '16px 16px 0 0' : '14px 0 0 14px', padding: '20px', boxShadow: '-8px 0 32px rgba(0,0,0,0.1)', maxHeight: '80vh', overflowY: 'auto' }}>
             <div style={{ fontSize: '14px', fontWeight: '700', color: '#111', marginBottom: '4px' }}>Changer de template</div>
             <a href="/templates" style={{ display: 'block', fontSize: '11px', color: '#4f46e5', textDecoration: 'none', fontWeight: '600', marginBottom: '14px' }}>
-              Voir les 60 modèles avec filtres →
+              Voir les 70 modèles avec filtres →
             </a>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
               {Object.keys(TEMPLATES_META).map(t => (

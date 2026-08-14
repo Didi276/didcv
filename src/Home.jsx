@@ -54,7 +54,7 @@ const ETAPES = [
 ]
 
 // 8 templates Pro variés (recommandés en priorité, styles bien différents)
-// pour la vitrine de la home — la galerie complète (60 modèles) est sur /templates
+// pour la vitrine de la home — la galerie complète (70 modèles) est sur /templates
 const TEMPLATES_CAROUSEL = ['meridien', 'sobre', 'impulsion', 'colonne', 'archive', 'chiffre', 'essentiel', 'clarte']
 
 const CAROUSEL_DEMO_CV = {
@@ -130,7 +130,7 @@ export default function Home() {
     <div style={{ fontFamily: '"Satoshi","Inter",system-ui,sans-serif', color: '#111', background: '#fff', minHeight: '100vh' }}>
       <SEO
         titre="Créez votre CV optimisé ATS en 30 secondes"
-        description="DidJob génère votre CV professionnel et votre lettre de motivation en 30 secondes grâce à l'IA. 60 templates, score ATS, offres d'emploi intégrées. Gratuit."
+        description="DidJob génère votre CV professionnel et votre lettre de motivation en 30 secondes grâce à l'IA. 70 templates, score ATS, offres d'emploi intégrées. Gratuit."
         url="https://did-job.com"
       />
       <style>{PAGE_CSS}</style>
@@ -327,7 +327,7 @@ export default function Home() {
       <section id="templates" ref={templatesRef} style={{ padding: `${sectionPad.split(' ')[0]} 0`, opacity: templatesInView ? 1 : 0, transform: templatesInView ? 'translateY(0)' : 'translateY(24px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: isMobile ? '0 20px' : '0 48px' }}>
           <h2 style={{ fontSize: isMobile ? '32px' : '52px', fontWeight: '700', letterSpacing: '-1.5px', margin: '0 0 40px', color: '#0a0a0f', textAlign: 'left' }}>
-            60 templates.
+            70 templates.
           </h2>
         </div>
 
