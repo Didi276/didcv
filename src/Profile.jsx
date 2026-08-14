@@ -344,8 +344,10 @@ export default function Profile() {
     setVisibleRecruteurs(newVal)
     await supabase
       .from('profiles')
-      .update({ visible_recruteurs: newVal })
-      .eq('user_id', user.id)
+      .upsert({
+        user_id: user.id,
+        visible_recruteurs: newVal
+      }, { onConflict: 'user_id' })
   }
 
   const addExp = () => setExperiences([...experiences, { poste: '', entreprise: '', periode: '', lieu: '', missions: ['', '', ''] }])
