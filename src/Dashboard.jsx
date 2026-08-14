@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { FileText, Search, Mail, Link as LinkIcon, Eye, ClipboardList, Mic, Trash2, Edit2, Download, Plus, Lightbulb } from 'lucide-react'
 import { supabase } from './supabase'
 import { CVTemplatePro } from './CVTemplatesPro'
@@ -61,6 +62,7 @@ export default function Dashboard() {
   const [entretiensCompletes] = useState(() => parseInt(localStorage.getItem('didcv-entretiens-completes') || '0', 10))
   const [offresMatch, setOffresMatch] = useState([])
   const [loadingMatch, setLoadingMatch] = useState(true)
+  const [userRole, setUserRole] = useState(null)
   const w = useWidth()
   const isMobile = w < 768
 
@@ -74,6 +76,7 @@ export default function Dashboard() {
       const { data: profileData } = await supabase.from('profiles').select('*').eq('user_id', user.id).maybeSingle()
       if (profileData?.prenom) setProfile(profileData)
       if (profileData) setRappelsEmail(profileData.rappels_email !== false)
+      setUserRole(profileData?.role || 'user')
       const { data: partagesData } = await supabase.from('cv_partages').select('*').eq('user_id', user.id)
       if (partagesData) {
         const map = {}
@@ -518,6 +521,50 @@ export default function Dashboard() {
               style={{ width: '100%', padding: '11px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
               Fermer
             </button>
+          </div>
+        </div>
+      )}
+
+      {(!userRole || userRole === 'user') && (
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: `0 ${isMobile ? '16px' : '40px'} ${isMobile ? '40px' : '60px'}` }}>
+          <div style={{
+            background: '#0a0a0f',
+            borderRadius: '16px',
+            padding: '40px',
+            marginTop: '48px',
+            textAlign: 'center',
+          }}>
+            <h2 style={{
+              color: '#ffffff',
+              fontSize: '24px',
+              fontFamily: '"Clash Display","Satoshi","Inter",system-ui,sans-serif',
+              fontWeight: '700',
+              marginBottom: '12px',
+            }}>
+              Vous recrutez ?
+            </h2>
+            <p style={{
+              color: 'rgba(255,255,255,0.6)',
+              fontSize: '15px',
+              marginBottom: '24px',
+              lineHeight: '1.7',
+            }}>
+              Accédez à notre base de candidats qualifiés
+              et publiez vos offres directement sur DidJob.
+              Gratuit pendant la phase de lancement.
+            </p>
+            <Link to="/recruteur/inscription" style={{
+              display: 'inline-block',
+              background: '#6366f1',
+              color: '#ffffff',
+              padding: '14px 28px',
+              borderRadius: '10px',
+              textDecoration: 'none',
+              fontWeight: '600',
+              fontSize: '15px',
+            }}>
+              Demander l'accès recruteur →
+            </Link>
           </div>
         </div>
       )}
