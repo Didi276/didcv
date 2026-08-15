@@ -2275,139 +2275,6 @@ function Registre({ cvData, color }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// TEMPLATE 16 : NOCTURNE — Fond sombre élégant
-// ═══════════════════════════════════════════════════════════════════
-function Nocturne({ cvData, color }) {
-  const experiences = cvData.experiences || []
-  const formations = cvData.formations || []
-  const competences = cvData.competences || []
-  const langues = cvData.langues || []
-  const certifications = cvData.certifications || []
-  const centresInteret = cvData.centres_interet || []
-  const contacts = [cvData.email, cvData.telephone, cvData.ville, cvData.linkedin].filter(Boolean)
-  const initiales = [cvData.prenom, cvData.nom].filter(Boolean).map(s => s[0]).join('').toUpperCase()
-  const showPhoto = cvData.showPhoto !== false
-
-  const sectionTitle = { fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px', color, marginBottom: '18px' }
-
-  return (
-    <div id="cv-to-print" className="cv-template" style={{
-      width: `${PAGE.width}px`, minHeight: `${PAGE.minHeight}px`, background: '#0f172a',
-      padding: '50px 56px', boxSizing: 'border-box', fontFamily: '"Inter", sans-serif', overflow: 'hidden',
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <div style={{ fontSize: '32px', fontWeight: 700, color: '#f8fafc', letterSpacing: '-0.6px' }}>
-            {cvData.prenom} {cvData.nom}
-          </div>
-          {cvData.titre && <div style={{ fontSize: '14px', fontWeight: 400, color, marginTop: '6px' }}>{cvData.titre}</div>}
-          {contacts.length > 0 && (
-            <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', fontSize: '10.5px', color: '#94a3b8', marginTop: '16px' }}>
-              {contacts.map((c, i) => <span key={i}>{c}</span>)}
-            </div>
-          )}
-        </div>
-        {showPhoto && (
-          <div style={{ width: 'fit-content', flexShrink: 0, marginLeft: '20px' }}>
-            <PhotoCV photo={cvData.photo} initiales={initiales} size={80} color={color} forme={cvData.forme} showPhoto={showPhoto} />
-          </div>
-        )}
-      </div>
-      <div style={{ height: '2px', background: color, width: '50px', marginTop: '22px', marginBottom: '30px' }} />
-
-      {cvData.accroche && (
-        <div style={{ fontSize: '11.5px', lineHeight: 1.7, color: '#cbd5e1', marginBottom: '30px' }}>
-          {cvData.accroche}
-        </div>
-      )}
-
-      {experiences.length > 0 && (
-        <div style={{ marginBottom: '32px' }}>
-          <div style={sectionTitle}>Expériences</div>
-          {experiences.map((exp, i) => (
-            <div key={i} style={{ marginBottom: i < experiences.length - 1 ? '22px' : 0 }}>
-              <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#f1f5f9' }}>{exp.poste}</div>
-              <div style={{ fontSize: '11.5px', fontWeight: 400, color: '#94a3b8', marginTop: '3px' }}>{exp.entreprise}</div>
-              <div style={{ fontSize: '10px', color: '#64748b', marginTop: '2px', marginBottom: '8px' }}>
-                {[exp.periode, exp.lieu].filter(Boolean).join(' · ')}
-              </div>
-              {exp.missions?.length > 0 && (
-                <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-                  {exp.missions.map((m, j) => (
-                    <li key={j} style={{ position: 'relative', paddingLeft: '14px', fontSize: '10.5px', lineHeight: 1.6, color: '#cbd5e1', marginBottom: '4px' }}>
-                      <span style={{ position: 'absolute', left: 0, color }}>—</span>
-                      {m}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {formations.length > 0 && (
-        <div style={{ marginBottom: '32px' }}>
-          <div style={sectionTitle}>Formations</div>
-          {formations.map((f, i) => (
-            <div key={i} style={{ marginBottom: i < formations.length - 1 ? '16px' : 0 }}>
-              <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#f1f5f9' }}>{f.diplome}</div>
-              <div style={{ fontSize: '11.5px', color: '#94a3b8', marginTop: '3px' }}>{f.etablissement}</div>
-              <div style={{ fontSize: '10px', color: '#64748b', marginTop: '2px' }}>{f.periode}</div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {competences.length > 0 && (
-        <div style={{ marginBottom: '32px' }}>
-          <div style={sectionTitle}>Compétences</div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '7px' }}>
-            {competences.map((c, i) => (
-              <span key={i} style={{ padding: '5px 12px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '4px', fontSize: '10.5px', fontWeight: 500, color: '#e2e8f0' }}>
-                {c}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {langues.length > 0 && (
-        <div style={{ marginBottom: certifications.length || centresInteret.length ? '32px' : 0 }}>
-          <div style={sectionTitle}>Langues</div>
-          {langues.map((l, i) => (
-            <div key={i} style={{ fontSize: '11px', marginBottom: '5px' }}>
-              <span style={{ fontWeight: 600, color: '#f1f5f9' }}>{l.langue}</span>
-              <span style={{ color: '#94a3b8' }}> — {l.niveau}</span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {certifications.length > 0 && (
-        <div style={{ marginBottom: centresInteret.length ? '32px' : 0 }}>
-          <div style={sectionTitle}>Certifications</div>
-          {certifications.map((c, i) => (
-            <div key={i} style={{ fontSize: '11px', color: '#cbd5e1', marginBottom: '5px' }}>
-              <span style={{ fontWeight: 600 }}>{c.titre}</span>
-              {c.organisme && <span style={{ color: '#94a3b8' }}> — {c.organisme}</span>}
-              {c.annee && <span style={{ color: '#64748b' }}> ({c.annee})</span>}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {centresInteret.length > 0 && (
-        <div>
-          <div style={sectionTitle}>Centres d'intérêt</div>
-          <div style={{ fontSize: '11px', color: '#cbd5e1' }}>{centresInteret.join(' · ')}</div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-// ═══════════════════════════════════════════════════════════════════
 // TEMPLATE 17 : COMPACT — Dense pour profils expérimentés
 // ═══════════════════════════════════════════════════════════════════
 function Compact({ cvData, color }) {
@@ -5779,11 +5646,6 @@ export const TEMPLATES_PRO_META = {
     niveaux: ['Confirmé', 'Senior', 'Cadre'], atsScore: 93, couleurDefaut: '#ea580c',
     description: 'Vos dates en évidence. Idéal pour les parcours longs et linéaires.', recommande: true },
 
-  nocturne: { nom: 'Nocturne', style: 'Fond sombre',
-    secteurs: ['Design', 'Tech', 'Créatif', 'Gaming'],
-    niveaux: ['Junior', 'Confirmé'], atsScore: 78, couleurDefaut: '#38bdf8',
-    description: 'Audacieux et mémorable. À réserver aux candidatures directes.', recommande: false },
-
   compact: { nom: 'Compact', style: 'Dense',
     secteurs: ['Tous secteurs', 'Ingénierie', 'Recherche', 'Conseil'],
     niveaux: ['Senior', 'Cadre', 'Direction'], atsScore: 95, couleurDefaut: '#0891b2',
@@ -5934,7 +5796,6 @@ export function CVTemplatePro({ cvData, template = 'meridien', color }) {
     case 'dossier': return <Dossier cvData={cvData} color={couleur} />
     case 'aurore': return <Aurore cvData={cvData} color={couleur} />
     case 'registre': return <Registre cvData={cvData} color={couleur} />
-    case 'nocturne': return <Nocturne cvData={cvData} color={couleur} />
     case 'compact': return <Compact cvData={cvData} color={couleur} />
     case 'vitrine': return <Vitrine cvData={cvData} color={couleur} />
     case 'terrain': return <Terrain cvData={cvData} color={couleur} />
@@ -5970,7 +5831,7 @@ export {
   Meridien, Atelier, Tribune, Chronique, Manuscrit,
   Grille, Silence, Signal, Prestige, Contraste,
   Horizon, Palier, Dossier, Aurore, Registre,
-  Nocturne, Compact, Vitrine, Terrain, Soin,
+  Compact, Vitrine, Terrain, Soin,
   Parallele, Mosaique, Angle, Colonne, Etape,
   Focus, Sobre, Duo, Chiffre, Archive,
   Ruban, Plan, Clarte, Signature, Cadre,

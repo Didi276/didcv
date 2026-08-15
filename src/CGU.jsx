@@ -69,7 +69,7 @@ export default function CGU() {
           <Section title="4. Fonctionnalités gratuites">
             <p>DidJob propose gratuitement :</p>
             <Liste items={[
-              'La création de CV avec les 78 templates disponibles',
+              'La création de CV avec les 77 templates disponibles',
               "L'accès aux offres d'emploi",
               'Le suivi des candidatures',
               "Un simulateur d'entretien",

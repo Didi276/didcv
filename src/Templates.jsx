@@ -225,7 +225,7 @@ export default function Templates() {
           fontFamily: '"Clash Display","Satoshi",sans-serif', fontSize: '44px', fontWeight: 700,
           color: '#ffffff', textAlign: 'center', margin: 0,
         }}>
-          78 modèles de CV professionnels
+          77 modèles de CV professionnels
         </h1>
         <p style={{
           fontFamily: '"Satoshi","Inter",sans-serif', fontSize: '15px', color: 'rgba(255,255,255,0.6)',
