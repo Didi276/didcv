@@ -124,7 +124,23 @@ export default function Offres() {
     handleSearch({ typeContrat: '', experience: '', publieeDepuis: '', teletravail: false, salaireMin: '', tempsPartiel: false })
   }
 
+  // Persiste l'offre en cours de candidature pour le bandeau de rappel dans
+  // Generate.jsx — distinct de offre_prefill (one-shot, consommé au chargement) :
+  // celle-ci reste active tant que l'utilisateur ne la ferme pas explicitement.
+  const stockerOffreActive = (offre) => {
+    sessionStorage.setItem('offre_active', JSON.stringify({
+      titre: offre.titre,
+      entreprise: offre.entreprise,
+      lieu: offre.lieu,
+      description: offre.description,
+      url: offre.url,
+      type_contrat: offre.type,
+      salaire: offre.salaire,
+    }))
+  }
+
   const handleGenererCV = (offre) => {
+    stockerOffreActive(offre)
     const texte = [offre.titre, offre.entreprise && `${offre.entreprise} - ${offre.lieu}`, offre.type, '', offre.description].filter(Boolean).join('\n')
     sessionStorage.setItem('offre_prefill', JSON.stringify({
       titre: offre.titre || '',
@@ -249,7 +265,7 @@ export default function Offres() {
               <Zap size={14} /> Générer mon CV
             </button>
             {offre.url && (
-              <a href={offre.url} target="_blank" rel="noopener noreferrer"
+              <a href={offre.url} target="_blank" rel="noopener noreferrer" onClick={() => stockerOffreActive(offre)}
                 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', flex: isMobile ? '1 1 auto' : '0 0 auto', padding: '11px 20px', background: 'transparent', color: '#374151', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'none' }}>
                 <ExternalLink size={14} /> Postuler
               </a>

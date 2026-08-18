@@ -112,6 +112,14 @@ export default function Generate() {
   const [cvSauvegardeId, setCvSauvegardeId] = useState(null)
   const [candidatureAjoutee, setCandidatureAjoutee] = useState(false)
   const [ajoutCandidatureEnCours, setAjoutCandidatureEnCours] = useState(false)
+  const [offreActive, setOffreActive] = useState(null)
+
+  useEffect(() => {
+    const stored = sessionStorage.getItem('offre_active')
+    if (stored) {
+      try { setOffreActive(JSON.parse(stored)) } catch { /* ignore */ }
+    }
+  }, [])
 
   useEffect(() => {
     const init = async () => {
@@ -412,6 +420,50 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
   return (
     <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
       <Navbar currentPage="generate" />
+
+      {offreActive && (
+        <div style={{
+          background: '#f0f9ff',
+          border: '1px solid #bae6fd',
+          borderRadius: '10px',
+          padding: '14px 20px',
+          margin: '20px 20px 0',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
+          <div>
+            <div style={{ fontSize: '13px', color: '#0369a1', fontWeight: 600 }}>
+              Candidature en cours de préparation
+            </div>
+            <div style={{ fontSize: '12px', color: '#374151', marginTop: '3px' }}>
+              {offreActive.titre} chez {offreActive.entreprise} · {offreActive.lieu}
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            {offreActive.url && (
+              <a href={offreActive.url} target="_blank" rel="noopener noreferrer"
+                style={{
+                  padding: '8px 16px', background: '#0369a1', color: '#ffffff',
+                  borderRadius: '6px', textDecoration: 'none', fontSize: '12px',
+                  fontWeight: 600,
+                }}>
+                Postuler →
+              </a>
+            )}
+            <button onClick={() => {
+              sessionStorage.removeItem('offre_active')
+              setOffreActive(null)
+            }} style={{
+              padding: '8px 12px', background: 'transparent',
+              border: '1px solid #e5e7eb', borderRadius: '6px',
+              fontSize: '12px', cursor: 'pointer', color: '#6b7280',
+            }}>
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Onglets mobile */}
       {isMobile && (
