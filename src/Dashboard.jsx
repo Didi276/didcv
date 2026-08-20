@@ -63,8 +63,21 @@ export default function Dashboard() {
   const [offresMatch, setOffresMatch] = useState([])
   const [loadingMatch, setLoadingMatch] = useState(true)
   const [userRole, setUserRole] = useState(null)
+  const [offresSauvegardees, setOffresSauvegardees] = useState([])
   const w = useWidth()
   const isMobile = w < 768
+
+  useEffect(() => {
+    if (user?.id) {
+      supabase
+        .from('offres_sauvegardees')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(10)
+        .then(({ data }) => setOffresSauvegardees(data || []))
+    }
+  }, [user])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -322,6 +335,45 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* Offres sauvegardées */}
+      <div style={{ maxWidth: '1200px', margin: '24px auto 0', padding: `0 ${isMobile ? '16px' : '40px'}` }}>
+        <div style={{ marginTop: '40px' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#0f0f1a', marginBottom: '16px' }}>
+            Offres sauvegardées {offresSauvegardees.length > 0 && `(${offresSauvegardees.length})`}
+          </h2>
+          {offresSauvegardees.length === 0 ? (
+            <p style={{ color: '#9ca3af', fontSize: '14px' }}>
+              Sauvegarde des offres depuis la page de recherche avec le bouton ❤️
+            </p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {offresSauvegardees.map((offre, i) => (
+                <div key={i} style={{
+                  background: '#ffffff', border: '1px solid #f0f0f0',
+                  borderRadius: '10px', padding: '16px 18px',
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                }}>
+                  <div>
+                    <div style={{ fontSize: '13px', fontWeight: 600, color: '#0f0f1a' }}>
+                      {offre.titre}
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '3px' }}>
+                      {offre.entreprise} · {offre.lieu}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <a href={offre.url_candidature} target="_blank" rel="noopener noreferrer"
+                      style={{ fontSize: '12px', color: '#0369a1', textDecoration: 'none' }}>
+                      Voir l'offre →
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Bandeau profil */}
       {!profile?.prenom && (

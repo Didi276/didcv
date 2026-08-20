@@ -84,13 +84,49 @@ export default function Offres() {
   const [modalMobileOuvert, setModalMobileOuvert] = useState(false)
   const [candidaturesAjoutees, setCandidaturesAjoutees] = useState(new Set())
   const [ajoutEnCours, setAjoutEnCours] = useState(false)
+  const [user, setUser] = useState(null)
+  const [savedIds, setSavedIds] = useState(new Set())
   const w = useWidth()
   const isMobile = w < 900
 
   useEffect(() => {
     const prefill = sessionStorage.getItem('offre_prefill_query')
     if (prefill) { setQuery(prefill); sessionStorage.removeItem('offre_prefill_query') }
+    supabase.auth.getUser().then(({ data }) => setUser(data.user))
   }, [])
+
+  // L'offre en favori n'a pas toujours d'id stable (offres externes agrégées) :
+  // on se replie sur son URL de candidature, unique par annonce.
+  const toggleSave = async (offre) => {
+    if (!user) return
+    const cle = offre.id || offre.url
+
+    if (savedIds.has(cle)) {
+      await supabase
+        .from('offres_sauvegardees')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('url_candidature', offre.url)
+      setSavedIds(prev => {
+        const next = new Set(prev)
+        next.delete(cle)
+        return next
+      })
+    } else {
+      await supabase.from('offres_sauvegardees').insert({
+        user_id: user.id,
+        titre: offre.titre,
+        entreprise: offre.entreprise,
+        lieu: offre.lieu,
+        description: offre.description,
+        url_candidature: offre.url,
+        type_contrat: offre.type,
+        salaire: offre.salaire,
+        source: offre.source,
+      })
+      setSavedIds(prev => new Set([...prev, cle]))
+    }
+  }
 
   const handleSearch = async (overrides = {}) => {
     const q = overrides.query ?? query
@@ -437,7 +473,18 @@ export default function Offres() {
                     onMouseLeave={e => { if (!estSelectionne) e.currentTarget.style.background = 'transparent' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', alignItems: 'flex-start' }}>
                       <div style={{ fontSize: '15px', fontWeight: '600', color: '#111', lineHeight: '1.3', wordBreak: 'break-word' }}>{offre.titre}</div>
-                      {offre.date && <div style={{ fontSize: '12px', color: '#d1d5db', flexShrink: 0, whiteSpace: 'nowrap' }}>{formatDate(offre.date)}</div>}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '2px', flexShrink: 0 }}>
+                        {offre.date && <span style={{ fontSize: '12px', color: '#d1d5db', whiteSpace: 'nowrap' }}>{formatDate(offre.date)}</span>}
+                        <button onClick={(e) => { e.stopPropagation(); toggleSave(offre) }}
+                          style={{
+                            background: 'none', border: 'none', cursor: 'pointer',
+                            fontSize: '18px', color: savedIds.has(offre.id || offre.url)
+                              ? '#ef4444' : '#d1d5db',
+                            padding: '4px', lineHeight: 1,
+                          }}>
+                          {savedIds.has(offre.id || offre.url) ? '❤️' : '🤍'}
+                        </button>
+                      </div>
                     </div>
                     <div style={{ fontSize: '13px', color: '#6b7280', margin: '3px 0 8px' }}>
                       {offre.entreprise}
