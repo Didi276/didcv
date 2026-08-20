@@ -7,6 +7,67 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY
 )
 
+function normaliserQuery(q) {
+  if (!q) return []
+
+  // Mots vides à ignorer
+  const STOP_WORDS = new Set(['et', 'de', 'le', 'la', 'les', 'un', 'une',
+    'des', 'du', 'en', 'au', 'aux', 'pour', 'par', 'sur', 'dans',
+    'avec', 'sans', 'the', 'and', 'or', 'of', 'in', 'at'])
+
+  // Normaliser
+  const normalise = s => s.toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+
+  // Tous les tokens bruts (y compris les acronymes de 2 lettres comme "rh"/"it",
+  // trop courts pour `mots` mais nécessaires pour retrouver leurs synonymes)
+  const motsBruts = normalise(q).split(/\s+/).filter(Boolean)
+  const mots = motsBruts.filter(m => m.length > 2 && !STOP_WORDS.has(m))
+
+  // Synonymes métier courants
+  const SYNONYMES = {
+    'raf': ['responsable administratif financier', 'responsable administratif', 'financier'],
+    'daf': ['directeur administratif financier', 'directeur financier'],
+    'dsi': ['directeur systemes information', 'responsable informatique'],
+    'drh': ['directeur ressources humaines', 'responsable rh'],
+    'dg': ['directeur general', 'directeur'],
+    'rh': ['ressources humaines', 'recrutement', 'human resources'],
+    'it': ['informatique', 'systemes information', 'developpeur'],
+    'dev': ['developpeur', 'developer', 'ingenieur logiciel'],
+    'compta': ['comptable', 'comptabilite', 'finance'],
+    'com': ['communication', 'marketing', 'community manager'],
+    'adv': ['administration des ventes', 'commercial', 'ventes'],
+    'qhse': ['qualite hygiene securite environnement', 'qualite', 'hse'],
+    'sav': ['service apres vente', 'service client', 'support'],
+  }
+
+  const termes = new Set(mots)
+  motsBruts.forEach(m => {
+    if (SYNONYMES[m]) SYNONYMES[m].forEach(s =>
+      s.split(' ').forEach(w => termes.add(w))
+    )
+  })
+
+  return [...termes]
+}
+
+// Distance de Levenshtein simplifiée pour tolérance fautes
+function distanceLevenshtein(a, b) {
+  if (Math.abs(a.length - b.length) > 3) return 99
+  const dp = Array(a.length + 1).fill(null).map((_, i) =>
+    Array(b.length + 1).fill(0).map((_, j) => i === 0 ? j : j === 0 ? i : 0)
+  )
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      dp[i][j] = a[i-1] === b[j-1]
+        ? dp[i-1][j-1]
+        : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])
+    }
+  }
+  return dp[a.length][b.length]
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   if (req.method === 'OPTIONS') return res.status(200).end()
@@ -339,6 +400,31 @@ export default async function handler(req, res) {
 
   // ─── Filtres avancés post-agrégation ──────────────────
   let filtrees = dedup
+
+  // Pertinence de la requête, tolérante aux fautes de frappe et aux synonymes
+  // métier — les sources n'appliquent pas toutes la même rigueur de recherche
+  // en amont (RemoteOK par ex. ne cherche que sur le premier mot de la query).
+  if (query) {
+    const termes = normaliserQuery(query)
+
+    filtrees = filtrees.filter(o => {
+      const titre = (o.titre || '').toLowerCase()
+        .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      const desc = (o.description || '').toLowerCase()
+        .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      const texte = titre + ' ' + desc
+
+      return termes.some(terme => {
+        // Match exact
+        if (texte.includes(terme)) return true
+        // Match approximatif sur les mots du titre
+        const motsTitre = titre.split(/\s+/)
+        return motsTitre.some(mot =>
+          mot.length > 4 && distanceLevenshtein(mot, terme) <= 1
+        )
+      })
+    })
+  }
 
   // Salaire minimum (extraire les nombres du champ salaire)
   if (salaireMin) {
