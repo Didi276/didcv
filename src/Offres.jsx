@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Search, MapPin, Zap, SearchX, ChevronDown, ChevronLeft, Briefcase, ExternalLink, Bookmark, X, Calendar, Layers } from 'lucide-react'
+import Fuse from 'fuse.js'
 import Navbar from './Navbar'
 import { supabase } from './supabase'
 
@@ -58,6 +59,20 @@ const TRIS = [
 
 const SUGGESTIONS = ['Développeur', 'Commercial', 'Comptable', 'Alternance', 'Télétravail']
 
+// Mots vides à ignorer lors du classement flou des suggestions
+const MOTS_VIDES = ['et', 'de', 'le', 'la', 'les', 'un', 'une',
+  'des', 'du', 'en', 'au', 'aux', 'pour', 'par', 'sur', 'dans']
+
+// Normaliser une chaîne (minuscules, sans accents)
+const normaliser = (str) => (str || '')
+  .toLowerCase()
+  .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .trim()
+
+// Idem, sans les mots vides — utilisé comme requête de recherche floue
+const sansMotsVides = (str) => normaliser(str)
+  .split(/\s+/).filter(mot => mot && !MOTS_VIDES.includes(mot)).join(' ')
+
 function salaireAnnuel(offre) {
   if (!offre.salaire) return null
   const nums = offre.salaire.match(/\d+/g)
@@ -89,11 +104,63 @@ export default function Offres() {
   const w = useWidth()
   const isMobile = w < 900
 
+  // Historique des recherches (localStorage)
+  const [historique, setHistorique] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('recherches_recentes') || '[]')
+    } catch { return [] }
+  })
+
+  // Derniers filtres utilisés, pour pré-remplir une nouvelle session
+  const [filtresMemo] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('filtres_offres') || '{}')
+    } catch { return {} }
+  })
+
   useEffect(() => {
     const prefill = sessionStorage.getItem('offre_prefill_query')
     if (prefill) { setQuery(prefill); sessionStorage.removeItem('offre_prefill_query') }
     supabase.auth.getUser().then(({ data }) => setUser(data.user))
   }, [])
+
+  // Pré-remplir les filtres avec la dernière session
+  useEffect(() => {
+    if (filtresMemo.ville && !location) setLocation(filtresMemo.ville)
+    if (filtresMemo.typeContrat && !typeContrat) setTypeContrat(filtresMemo.typeContrat)
+    if (filtresMemo.salaireMin && !salaireMin) setSalaireMin(filtresMemo.salaireMin)
+    if (filtresMemo.teletravail !== undefined) setTeletravail(filtresMemo.teletravail)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const sauvegarderRecherche = (q, loc, filtres) => {
+    if (!q && !loc) return
+    const entry = { query: q, location: loc, date: new Date().toISOString() }
+    const newHisto = [entry, ...historique.filter(h => normaliser(h.query) !== normaliser(q))].slice(0, 8)
+    setHistorique(newHisto)
+    localStorage.setItem('recherches_recentes', JSON.stringify(newHisto))
+    localStorage.setItem('filtres_offres', JSON.stringify(filtres))
+  }
+
+  // Suggestions intelligentes : recherche floue (Fuse.js) tolérante aux fautes
+  // de frappe/accents dès que l'utilisateur tape, repli sur l'historique récent
+  // + une liste générique quand le champ est vide.
+  const poolSuggestions = useMemo(() => (
+    [...historique.map(h => h.query), ...SUGGESTIONS]
+      .filter(Boolean)
+      .filter((v, i, a) => a.findIndex(x => normaliser(x) === normaliser(v)) === i)
+  ), [historique])
+
+  const fuseSuggestions = useMemo(() => (
+    new Fuse(poolSuggestions, { threshold: 0.4, ignoreLocation: true })
+  ), [poolSuggestions])
+
+  const suggestions = query.trim()
+    ? fuseSuggestions.search(sansMotsVides(query)).map(r => r.item).slice(0, 6)
+    : [
+        ...historique.slice(0, 4).map(h => h.query).filter(Boolean),
+        ...(historique.length === 0 ? ['Développeur', 'Commercial', 'Comptable', 'Chef de projet'] : []),
+      ].filter((v, i, a) => v && a.indexOf(v) === i).slice(0, 6)
 
   // L'offre en favori n'a pas toujours d'id stable (offres externes agrégées) :
   // on se replie sur son URL de candidature, unique par annonce.
@@ -130,13 +197,20 @@ export default function Offres() {
 
   const handleSearch = async (overrides = {}) => {
     const q = overrides.query ?? query
+    const loc = overrides.location ?? location
     if (!q.trim()) return
+    sauvegarderRecherche(q, loc, {
+      ville: loc,
+      typeContrat: overrides.typeContrat ?? typeContrat,
+      salaireMin: overrides.salaireMin ?? salaireMin,
+      teletravail: overrides.teletravail ?? teletravail,
+    })
     setLoading(true); setSearched(false); setOffres([]); setSelectedId(null)
     setDropdownOuvert(null)
     try {
       const params = new URLSearchParams({
         query: q,
-        location: overrides.location ?? location,
+        location: loc,
         typeContrat: overrides.typeContrat ?? typeContrat,
         experience: overrides.experience ?? experience,
         publieeDepuis: overrides.publieeDepuis ?? publieeDepuis,
@@ -373,14 +447,46 @@ export default function Offres() {
             </button>
           </div>
 
-          <div style={{ display: 'flex', gap: '8px', marginTop: '16px', flexWrap: 'wrap' }}>
-            {SUGGESTIONS.map(s => (
-              <button key={s} onClick={() => { setQuery(s); handleSearch({ query: s }) }}
-                style={{ padding: '5px 14px', background: 'transparent', color: '#e5e5e5', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '20px', fontSize: '12px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: '400' }}>
-                {s}
-              </button>
-            ))}
-          </div>
+          {suggestions.length > 0 && (
+            <div style={{
+              display: 'flex', gap: '8px', flexWrap: 'wrap',
+              marginTop: '16px', alignItems: 'center',
+            }}>
+              {!query.trim() && historique.length > 0 && (
+                <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>
+                  Récents :
+                </span>
+              )}
+              {suggestions.map(s => (
+                <button key={s}
+                  onClick={() => { setQuery(s); handleSearch({ query: s }) }}
+                  style={{
+                    padding: '4px 12px',
+                    background: 'rgba(255,255,255,0.08)',
+                    color: 'rgba(255,255,255,0.8)',
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    borderRadius: '20px',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                  }}>
+                  {s}
+                </button>
+              ))}
+              {historique.length > 0 && (
+                <button onClick={() => {
+                  setHistorique([])
+                  localStorage.removeItem('recherches_recentes')
+                }} style={{
+                  background: 'none', border: 'none',
+                  color: 'rgba(255,255,255,0.3)', fontSize: '11px',
+                  cursor: 'pointer',
+                }}>
+                  Effacer
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
