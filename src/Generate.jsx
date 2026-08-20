@@ -96,6 +96,9 @@ export default function Generate() {
   const [photoManuelle, setPhotoManuelle] = useState(null)
   const [offreEmploi, setOffreEmploi] = useState('')
   const [offreMeta, setOffreMeta] = useState(null)
+  const [offreUrl, setOffreUrl] = useState('')
+  const [offreErreur, setOffreErreur] = useState('')
+  const [offreAnalyseEnCours, setOffreAnalyseEnCours] = useState(false)
   const [secteurDetecte, setSecteurDetecte] = useState(null)
   const [showChat, setShowChat] = useState(false)
   const [chatMessages, setChatMessages] = useState([])
@@ -154,6 +157,23 @@ export default function Generate() {
   useEffect(() => {
     if (templateAuto && secteurDetecte) setCurrentTemplate(SECTEUR_TO_TEMPLATE[secteurDetecte] || 'meridien')
   }, [secteurDetecte, templateAuto])
+
+  const analyserOffre = async () => {
+    const cible = offreUrl.trim()
+    if (!cible) return
+    setOffreAnalyseEnCours(true)
+    setOffreErreur('')
+    try {
+      const r = await fetch(`/api/fetch-offer?url=${encodeURIComponent(cible)}`)
+      const data = await r.json()
+      if (!data.contenu) throw new Error('vide')
+      setOffreEmploi(data.contenu)
+      setOffreMeta({ titre: data.titre || '', entreprise: data.entreprise || '', url: cible })
+    } catch {
+      setOffreErreur('Impossible de récupérer cette offre.')
+    }
+    setOffreAnalyseEnCours(false)
+  }
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0]
@@ -558,20 +578,61 @@ Retourne UNIQUEMENT le texte avec les marqueurs.` }]
             </div>
           )}
 
-          {/* Offre d'emploi */}
+          {/* Analyser une offre */}
           <div style={{ margin: '0 24px 16px', flexShrink: 0 }}>
-            <div style={{ fontSize: '12px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>
-              Offre d'emploi
+            <label style={{ fontSize: '13px', fontWeight: 600, color: '#0f0f1a' }}>
+              Lien de l'offre
+            </label>
+            <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
+              <input
+                type="url"
+                placeholder="https://..."
+                value={offreUrl}
+                onChange={e => setOffreUrl(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && analyserOffre()}
+                style={{ flex: 1, padding: '10px 14px', borderRadius: '8px',
+                  border: '1px solid #e5e7eb', fontSize: '13px', outline: 'none',
+                  fontFamily: 'inherit', boxSizing: 'border-box' }}
+              />
+              <button onClick={analyserOffre} disabled={offreAnalyseEnCours || !offreUrl.trim()}
+                style={{ padding: '10px 16px', background: offreAnalyseEnCours ? '#9ca3af' : '#0f0f1a', color: '#fff',
+                  borderRadius: '8px', border: 'none', cursor: offreAnalyseEnCours ? 'default' : 'pointer', fontSize: '13px',
+                  fontWeight: 600, whiteSpace: 'nowrap', fontFamily: 'inherit' }}>
+                {offreAnalyseEnCours ? '...' : 'Analyser'}
+              </button>
             </div>
-            <textarea
-              value={offreEmploi}
-              onChange={e => setOffreEmploi(e.target.value)}
-              placeholder="Colle ici le texte complet de l'offre d'emploi..."
-              rows={8}
-              style={{ width: '100%', border: '1.5px solid #e5e7eb', borderRadius: '10px', padding: '12px 14px', fontSize: '13px', lineHeight: '1.6', color: '#374151', resize: 'vertical', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', transition: 'border-color 0.15s' }}
-              onFocus={e => e.target.style.borderColor = '#4f46e5'}
-              onBlur={e => e.target.style.borderColor = '#e5e7eb'}
-            />
+
+            {offreErreur && (
+              <div style={{ marginTop: '8px', padding: '10px 14px', background: '#fef3c7',
+                borderRadius: '6px', fontSize: '12px', color: '#92400e' }}>
+                {offreErreur} — ou collez directement le texte ci-dessous.
+              </div>
+            )}
+
+            <div style={{ marginTop: '12px' }}>
+              <label style={{ fontSize: '12px', color: '#6b7280' }}>
+                Ou collez directement la description de l'offre
+              </label>
+              <textarea
+                value={offreEmploi}
+                onChange={e => setOffreEmploi(e.target.value)}
+                placeholder="Copiez-collez ici le texte complet de l'offre d'emploi..."
+                rows={8}
+                style={{ width: '100%', marginTop: '6px', border: '1.5px solid #e5e7eb', borderRadius: '10px', padding: '12px 14px', fontSize: '13px', lineHeight: '1.6', color: '#374151', resize: 'vertical', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', transition: 'border-color 0.15s' }}
+                onFocus={e => e.target.style.borderColor = '#4f46e5'}
+                onBlur={e => e.target.style.borderColor = '#e5e7eb'}
+              />
+            </div>
+
+            {offreMeta?.titre && (
+              <div style={{ marginTop: '8px', padding: '10px 14px', background: '#f0fdf4',
+                borderRadius: '6px', fontSize: '12px', color: '#166534',
+                display: 'flex', alignItems: 'center', gap: '6px' }}>
+                ✅ Offre analysée : <strong>{offreMeta.titre}</strong>
+                {offreMeta.entreprise && ` chez ${offreMeta.entreprise}`}
+              </div>
+            )}
+
             {secteurDetecte && (
               <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px' }}>
                 <span style={{ color: '#9ca3af' }}>Secteur detecte :</span>
