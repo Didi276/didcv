@@ -339,6 +339,14 @@ Contexte offre : ${offreEmploi.substring(0, 200)}`,
 PROFIL: ${sourceCV}
 OFFRE: ${offreEmploi}
 DATE: ${dateJour}
+
+REGLES :
+- Toujours rediger la lettre, sans poser de questions ni refuser
+- Ne jamais commenter un eventuel ecart entre le profil et l'offre
+- Adapter le ton et le contenu a l'offre fournie
+- Mettre en valeur les competences transferables
+- Si l'offre est incomplete, rediger une lettre de candidature spontanee professionnelle
+
 Redige une lettre avec ces marqueurs EXACTS:
 ||EXP||
 [Prenom Nom]
@@ -355,7 +363,7 @@ Objet: Candidature au poste de [intitule du poste]
 [Corps de la lettre 300-380 mots, 4 paragraphes, chiffres obligatoires, ton adapte au secteur ${config.label}]
 Cordialement,
 [Prenom Nom]
-Retourne UNIQUEMENT le texte avec les marqueurs.` }]
+Retourne UNIQUEMENT le texte avec les marqueurs, sans commentaire.` }]
           })
         })
       ])

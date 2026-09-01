@@ -52,25 +52,25 @@ function LettreMot() {
           max_tokens: 2000,
           messages: [{
             role: 'user',
-            content: `Tu es un expert en recrutement et rédaction de lettres de motivation.
+            content: `Tu es un expert en rédaction de lettres de motivation.
+Rédige une lettre de motivation professionnelle et personnalisée en français pour ce candidat.
 
-Voici le CV du candidat :
+PROFIL DU CANDIDAT :
 ${cvTexte}
 
-Voici l'offre d'emploi :
+OFFRE D'EMPLOI :
 ${offreEmploi}
 
-Rédige une lettre de motivation professionnelle, personnalisée et convaincante.
+RÈGLES :
+- Toujours rédiger la lettre, sans poser de questions
+- Adapter le ton et le contenu à l'offre fournie
+- Mettre en valeur les compétences transférables
+- Si l'offre est incomplète, rédiger une lettre de candidature spontanée professionnelle
+- Longueur : 3 paragraphes maximum
+- Commencer par Madame, Monsieur,
+- Terminer par une formule de politesse
 
-Règles :
-- Commence par "Madame, Monsieur,"
-- 3 paragraphes maximum
-- Ton professionnel mais humain
-- Met en valeur les compétences du candidat en lien avec l'offre
-- Termine par "Cordialement," suivi du prénom et nom du candidat
-- Maximum 300 mots
-- Ne mets pas de date ni d'adresse
-- Retourne UNIQUEMENT le texte de la lettre, sans commentaire`
+Rédige uniquement la lettre, sans commentaire.`
           }]
         })
       })
