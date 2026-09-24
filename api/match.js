@@ -1,14 +1,13 @@
-// Matching IA entre le profil d'un candidat et les offres actives, via Claude.
-// Nécessite ANTHROPIC_API_KEY (console.anthropic.com).
+// Matching IA entre le profil d'un candidat et les offres actives, via Qwen3.8-Flash
+// (API Alibaba Cloud, compatible OpenAI). Nécessite QWEN_API_KEY et QWEN_BASE_URL.
+// Migré depuis Claude (Anthropic) — voir bloc commenté en bas de fichier.
 import { createClient } from '@supabase/supabase-js'
-import Anthropic from '@anthropic-ai/sdk'
 import { rateLimit } from './middleware/rateLimit.js'
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY
 )
-const anthropic = new Anthropic()
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -88,14 +87,7 @@ ${(candidatures || []).map(c => `${c.poste} chez ${c.entreprise} (${c.statut})`)
     `[${i}] ${o.titre} | ${o.entreprise} | ${o.lieu} | ${o.type_contrat || ''} | ${(o.description || '').slice(0, 100)}`
   ).join('\n')
 
-  let matches = []
-  try {
-    const message = await anthropic.messages.create({
-      model: 'claude-haiku-4-5',
-      max_tokens: 1000,
-      messages: [{
-        role: 'user',
-        content: `Tu es un expert en recrutement. Analyse ce profil candidat et trouve les meilleures offres.
+  const promptMatching = `Tu es un expert en recrutement. Analyse ce profil candidat et trouve les meilleures offres.
 
 ${profilTexte}
 
@@ -121,16 +113,40 @@ Retourne UNIQUEMENT ce JSON sans texte autour :
 }
 
 Trie par score décroissant. Score de 0 à 100.`
-      }]
-    })
 
-    const text = message.content.find(b => b.type === 'text')?.text || ''
+  let matches = []
+  try {
+    const qwenRes = await fetch(`${process.env.QWEN_BASE_URL}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.QWEN_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'qwen3.8-flash',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: promptMatching }],
+      }),
+    })
+    const data = await qwenRes.json()
+    if (!qwenRes.ok) throw new Error(data.error?.message || 'Erreur API Qwen')
+
+    const text = data.choices?.[0]?.message?.content || ''
     const clean = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
     const parsed = JSON.parse(clean)
     matches = parsed.matches || []
   } catch {
     matches = []
   }
+
+  /* ─── Ancien code (Anthropic Claude Haiku) ────────────────────────────
+  const message = await anthropic.messages.create({
+    model: 'claude-haiku-4-5',
+    max_tokens: 1000,
+    messages: [{ role: 'user', content: promptMatching }]
+  })
+  const text = message.content.find(b => b.type === 'text')?.text || ''
+  ────────────────────────────────────────────────────────────────────── */
 
   // 6. Construire les offres matchées
   let offresMatchees = matches
