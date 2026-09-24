@@ -1,4 +1,4 @@
-// Matching IA entre le profil d'un candidat et les offres actives, via Qwen3.8-Flash
+// Matching IA entre le profil d'un candidat et les offres actives, via Qwen-Turbo
 // (API Alibaba Cloud, compatible OpenAI). Nécessite QWEN_API_KEY et QWEN_BASE_URL.
 // Migré depuis Claude (Anthropic) — voir bloc commenté en bas de fichier.
 import { createClient } from '@supabase/supabase-js'
@@ -123,7 +123,7 @@ Trie par score décroissant. Score de 0 à 100.`
         'Authorization': `Bearer ${process.env.QWEN_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'qwen3.8-flash',
+        model: 'qwen-turbo',
         max_tokens: 1000,
         messages: [{ role: 'user', content: promptMatching }],
       }),
