@@ -346,6 +346,9 @@ REGLES :
 - Adapter le ton et le contenu a l'offre fournie
 - Mettre en valeur les competences transferables
 - Si l'offre est incomplete, rediger une lettre de candidature spontanee professionnelle
+- Ne jamais inventer de nom d'entreprise, de date de publication, de plateforme (LinkedIn, etc.) ni de chiffre qui ne sont pas explicitement presents dans l'offre fournie
+- Si l'offre fait moins de 50 mots ou n'est qu'un intitule de poste, rediger une lettre generaliste professionnelle sans reference specifique a une offre : pas de "annonce le", pas de nom d'entreprise invente, pas de "vu sur"
+- Si l'offre est detaillee, s'appuyer uniquement sur ce qui y est ecrit
 
 Redige une lettre avec ces marqueurs EXACTS:
 ||EXP||
@@ -360,7 +363,7 @@ Redige une lettre avec ces marqueurs EXACTS:
 [Ville], le ${dateJour}
 ||BODY||
 Objet: Candidature au poste de [intitule du poste]
-[Corps de la lettre 300-380 mots, 4 paragraphes, chiffres obligatoires, ton adapte au secteur ${config.label}]
+[Corps de la lettre 300-380 mots, 4 paragraphes, chiffres uniquement si presents dans le profil ou l'offre, ton adapte au secteur ${config.label}]
 Cordialement,
 [Prenom Nom]
 Retourne UNIQUEMENT le texte avec les marqueurs, sans commentaire.` }]

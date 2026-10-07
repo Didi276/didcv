@@ -66,6 +66,9 @@ RÈGLES :
 - Adapter le ton et le contenu à l'offre fournie
 - Mettre en valeur les compétences transférables
 - Si l'offre est incomplète, rédiger une lettre de candidature spontanée professionnelle
+- Ne jamais inventer de nom d'entreprise, de date de publication, de plateforme (LinkedIn, etc.) ni de chiffre qui ne sont pas explicitement présents dans l'offre fournie
+- Si l'offre fait moins de 50 mots ou n'est qu'un intitulé de poste, rédiger une lettre généraliste professionnelle sans référence spécifique à une offre : pas de "annoncé le", pas de nom d'entreprise inventé, pas de "vu sur"
+- Si l'offre est détaillée, s'appuyer uniquement sur ce qui y est écrit
 - Longueur : 3 paragraphes maximum
 - Commencer par Madame, Monsieur,
 - Terminer par une formule de politesse

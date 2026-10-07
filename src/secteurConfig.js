@@ -314,8 +314,9 @@ ${promptSupp}
 
 RÈGLES GÉNÉRALES OBLIGATOIRES :
 
-1. CHIFFRES DANS CHAQUE MISSION : Chaque mission DOIT avoir au minimum 1 chiffre ou résultat mesurable.
-   Si le candidat n'en donne pas, estime des ordres de grandeur crédibles selon le contexte.
+1. CHIFFRES DANS CHAQUE MISSION : Privilégie au moins 1 chiffre ou résultat mesurable par mission quand
+   cette information est fournie par le candidat. Ne jamais inventer un chiffre que le candidat n'a pas
+   donné — reformule la mission sans chiffre si aucun n'est disponible.
 
 2. DISTINCTION STAGE / POSTE :
    - Poste permanent : ${missionsPoste} missions avec chiffres
@@ -338,6 +339,13 @@ RÈGLES GÉNÉRALES OBLIGATOIRES :
 
 10. OPTIMISATION ATS : Mots-clés EXACTS de l'offre dans missions et compétences.
 
+11. NE JAMAIS INVENTER : nom d'entreprise, date de publication, plateforme (LinkedIn, etc.) ou chiffre
+    qui ne sont pas explicitement présents dans l'offre d'emploi fournie.
+
+12. Si l'offre fait moins de 50 mots ou n'est qu'un intitulé de poste, reste général et professionnel
+    (accroche générique, sans référence à une entreprise ou un détail inventés). Si l'offre est détaillée,
+    appuie-toi uniquement sur ce qui y est écrit.
+
 Retourne UNIQUEMENT ce JSON valide et complet :
 
 {
@@ -355,7 +363,7 @@ Retourne UNIQUEMENT ce JSON valide et complet :
       "entreprise": "...",
       "periode": "...",
       "lieu": "...",
-      "missions": ["Mission avec CHIFFRE obligatoire", "..."]
+      "missions": ["Mission avec chiffre si fourni par le candidat", "..."]
     }
   ],
   "formations": [
