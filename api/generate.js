@@ -1,4 +1,4 @@
-// Proxy IA générique — migré de Claude (Anthropic) vers Qwen-Turbo (API
+// Proxy IA générique — migré de Claude (Anthropic) vers Qwen-Flash-Character (API
 // Alibaba Cloud, compatible OpenAI). Le front (Generate.jsx, LettreMot.jsx,
 // Entretien.jsx, PreparationEntretien.jsx, ATSScore.jsx, Formations.jsx,
 // Profile.jsx, SuggestionsIA.jsx) envoie et attend toujours le format
@@ -30,7 +30,7 @@ export default async function handler(req, res) {
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'qwen-turbo',
+        model: 'qwen-flash-character',
         max_tokens,
         messages: qwenMessages,
       }),
