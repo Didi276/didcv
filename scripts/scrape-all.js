@@ -468,10 +468,16 @@ async function main() {
         i === self.findIndex(t => t.hash === o.hash)
       )
 
+      // Scrape réussi : les offres encore présentes aujourd'hui sont la
+      // vérité du jour. On désactive d'abord tout ce qui existait pour
+      // cette entreprise, puis on réactive uniquement ce qu'on vient de
+      // trouver — les offres pourvues/disparues restent actif=false.
+      await supabase.from('offres_directes').update({ actif: false }).eq('entreprise_id', e.id)
+
       const { error } = await supabase
         .from('offres_directes')
         .upsert(
-          uniques.map(o => ({ ...o, entreprise_id: e.id })),
+          uniques.map(o => ({ ...o, entreprise_id: e.id, actif: true, date_scraping: new Date().toISOString() })),
           { onConflict: 'hash', ignoreDuplicates: false }
         )
 
@@ -493,6 +499,15 @@ async function main() {
 
   console.log('\n❌ Entreprises sans offres :')
   entreprisesZero.forEach(e => console.log(' -', e))
+
+  // Filet de sécurité : entreprises qui échouent durablement ou qui sont
+  // sorties de ENTREPRISES (donc jamais désactivées ci-dessus faute de
+  // repasser dans la boucle) — toute offre non rafraîchie depuis plus de
+  // 7 jours est désactivée.
+  await supabase
+    .from('offres_directes')
+    .update({ actif: false })
+    .lt('date_scraping', new Date(Date.now() - 7 * 86400000).toISOString())
 }
 
 main().catch(console.error)

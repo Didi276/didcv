@@ -208,7 +208,7 @@ export default async function handler(req, res) {
     return { results: tous }
   }
 
-  // ─── Direct (offres scrapées des pages carrières, voir api/scrape.js) ──
+  // ─── Direct (offres scrapées des pages carrières, voir scripts/scrape-all.js) ──
   const normalize = (str) => str
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
