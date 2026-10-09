@@ -126,8 +126,8 @@ export default async function handler(req, res) {
     }
 
     const ranges = []
-    for (let i = 0; i < 10; i++) {
-      ranges.push([i * 150, (i * 150) + 149])
+    for (let start = 0; start <= 1149; start += 150) {
+      ranges.push([start, Math.min(start + 149, 1149)])
     }
 
     const results = await Promise.allSettled(
@@ -159,16 +159,6 @@ export default async function handler(req, res) {
         resultonpage: 20
       })
     })
-    return r.json()
-  }
-
-  // ─── La Bonne Alternance ───────────────────────────────
-  const searchAlternance = async () => {
-    if (typeContrat && typeContrat !== 'E1') return null // seulement si alternance demandée ou recherche générale
-    const r = await fetch(
-      `https://labonnealternance.apprentissage.beta.gouv.fr/api/V1/jobs?caller=DidJob&romes=&latitude=${location ? '' : '48.866'}&longitude=${location ? '' : '2.333'}&radius=100&insee=&sources=offres_emploi_partenaires`,
-      { headers: { Accept: 'application/json' } }
-    )
     return r.json()
   }
 
@@ -205,7 +195,7 @@ export default async function handler(req, res) {
     const pages = [1, 2, 3, 4, 5]
     const results = await Promise.allSettled(
       pages.map(p =>
-        fetch(`https://api.adzuna.com/v1/api/jobs/fr/search/${p}?app_id=c07dfdb2&app_key=7acb6df75a80e2623290c5d84559e278&what=${encodeURIComponent(query)}&where=${encodeURIComponent(location || 'France')}&results_per_page=20`)
+        fetch(`https://api.adzuna.com/v1/api/jobs/fr/search/${p}?app_id=${process.env.ADZUNA_APP_ID}&app_key=${process.env.ADZUNA_APP_KEY}&what=${encodeURIComponent(query)}&where=${encodeURIComponent(location || 'France')}&results_per_page=20`)
           .then(r => r.ok ? r.json() : null).catch(() => null)
       )
     )

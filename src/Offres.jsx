@@ -124,6 +124,16 @@ export default function Offres() {
     supabase.auth.getUser().then(({ data }) => setUser(data.user))
   }, [])
 
+  useEffect(() => {
+    if (!user) return
+    supabase.from('offres_sauvegardees')
+      .select('url_candidature')
+      .eq('user_id', user.id)
+      .then(({ data }) => {
+        if (data) setSavedIds(new Set(data.map(r => r.url_candidature)))
+      })
+  }, [user])
+
   // Pré-remplir les filtres avec la dernière session
   useEffect(() => {
     if (filtresMemo.ville && !location) setLocation(filtresMemo.ville)
@@ -166,7 +176,7 @@ export default function Offres() {
   // on se replie sur son URL de candidature, unique par annonce.
   const toggleSave = async (offre) => {
     if (!user) return
-    const cle = offre.id || offre.url
+    const cle = offre.url || offre.id
 
     if (savedIds.has(cle)) {
       await supabase
@@ -584,11 +594,11 @@ export default function Offres() {
                         <button onClick={(e) => { e.stopPropagation(); toggleSave(offre) }}
                           style={{
                             background: 'none', border: 'none', cursor: 'pointer',
-                            fontSize: '18px', color: savedIds.has(offre.id || offre.url)
+                            fontSize: '18px', color: savedIds.has(offre.url || offre.id)
                               ? '#ef4444' : '#d1d5db',
                             padding: '4px', lineHeight: 1,
                           }}>
-                          {savedIds.has(offre.id || offre.url) ? '❤️' : '🤍'}
+                          {savedIds.has(offre.url || offre.id) ? '❤️' : '🤍'}
                         </button>
                       </div>
                     </div>
