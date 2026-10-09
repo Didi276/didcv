@@ -1,8 +1,23 @@
 // pdfUtils.js — Génération PDF texte réel (compatible ATS)
 // Remplace html2canvas qui produisait des PDFs image illisibles par les ATS
 
+// Référence A4 @ 96 DPI — c'est la même constante (PAGE.minHeight) utilisée par
+// tous les templates CV pour leur propre mise en page.
+const PAGE_HEIGHT = 1123
+const PAGE_WIDTH = 794
+const SCALE_FLOOR = 0.7
+
 export function downloadCVasPDF(cvElement, prenom, nom) {
   if (!cvElement) return
+
+  // Mesurer la hauteur réelle du CV rendu sur l'élément LIVE, avant de le
+  // cloner en HTML — scrollHeight reflète le contenu réel même si App.css le
+  // masque visuellement à l'écran via #cv-to-print { overflow: hidden }.
+  const naturalHeight = cvElement.scrollHeight
+  const scale = naturalHeight > PAGE_HEIGHT
+    ? Math.max(PAGE_HEIGHT / naturalHeight, SCALE_FLOOR)
+    : 1
+  const hauteurAjustee = Math.ceil(naturalHeight * scale)
 
   // Récupérer le HTML rendu avec tous les styles inline
   const html = cvElement.outerHTML
@@ -34,20 +49,38 @@ export function downloadCVasPDF(cvElement, prenom, nom) {
     html, body {
       margin: 0;
       padding: 0;
-      width: 794px;
+      width: ${PAGE_WIDTH}px;
       background: white;
     }
     /* Masquer les boutons et éléments d'interface */
     button, .no-print { display: none !important; }
-    /* Éviter les coupures de page dans le CV */
+    /* Ajustement automatique "fit-to-page" : le wrapper réserve l'espace
+       réellement occupé par le CV une fois réduit, pour que la pagination de
+       l'impression se base sur la taille visuelle réduite, pas la taille
+       d'origine. Centré horizontalement pour compenser le rétrécissement
+       proportionnel de la largeur. */
+    .cv-fit-wrapper {
+      width: ${PAGE_WIDTH}px;
+      height: ${hauteurAjustee}px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+    }
     #cv-to-print {
+      --cv-scale: ${scale};
+      transform: scale(var(--cv-scale));
+      transform-origin: top center;
+      /* Évite une coupure de page évitable si le CV reste malgré tout
+         légèrement plus haut qu'une page (cas du plancher à 0.7). */
       page-break-inside: avoid;
       break-inside: avoid;
     }
   </style>
 </head>
 <body>
+<div class="cv-fit-wrapper">
 ${html}
+</div>
 <script>
   // Attendre que les polices et styles soient chargés
   document.fonts.ready.then(function() {
