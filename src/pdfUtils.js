@@ -10,15 +10,9 @@ const SCALE_FLOOR = 0.7
 export function downloadCVasPDF(cvElement, prenom, nom) {
   if (!cvElement) return
 
-  // Mesurer la VRAIE hauteur du contenu, pas la hauteur de "page" imposée par
-  // minHeight (tous les templates fixent PAGE.minHeight=1123px sur #cv-to-print
-  // lui-même) ni par App.css (#cv-to-print { max-height: 1123px; overflow: hidden }).
-  // Avec min-height === max-height === 1123px, la boîte est verrouillée à
-  // 1123px quel que soit le contenu réel : mesurer scrollHeight tel quel
-  // mesurerait souvent "la page", pas "le contenu". On neutralise ces
-  // contraintes sur l'élément live le temps de la mesure (synchrone, restauré
-  // avant tout repaint — aucun flash visible), puis on restaure le style
-  // d'origine.
+  // Mesurer la VRAIE hauteur du contenu : les templates verrouillent #cv-to-print
+  // à min-height=max-height=1123px avec overflow:hidden. On neutralise ces
+  // contraintes sur l'élément live le temps de la mesure, puis on restaure.
   const styleOriginal = cvElement.getAttribute('style') || ''
   cvElement.style.setProperty('height', 'auto', 'important')
   cvElement.style.setProperty('min-height', '0', 'important')
@@ -30,15 +24,11 @@ export function downloadCVasPDF(cvElement, prenom, nom) {
   const scale = naturalHeight > PAGE_HEIGHT
     ? Math.max(PAGE_HEIGHT / naturalHeight, SCALE_FLOOR)
     : 1
-  const hauteurAjustee = Math.ceil(naturalHeight * scale)
 
-  // Pour vérifier/diagnostiquer : ouvrir la console avant de télécharger.
-  console.log('[fit-to-page]', { naturalHeight, PAGE_HEIGHT, scale, hauteurAjustee })
+  console.log('[fit-to-page]', { naturalHeight, PAGE_HEIGHT, scale })
 
-  // Récupérer le HTML rendu avec tous les styles inline
   const html = cvElement.outerHTML
 
-  // Ouvrir une fenêtre d'impression
   const printWindow = window.open('', '_blank', 'width=900,height=700')
   if (!printWindow) {
     alert('Active les popups pour télécharger ton CV.')
@@ -51,13 +41,11 @@ export function downloadCVasPDF(cvElement, prenom, nom) {
   <meta charset="UTF-8">
   <title>CV - ${prenom} ${nom}</title>
   <style>
-    /* Forcer les couleurs exactes à l'impression */
     * {
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
       color-adjust: exact !important;
     }
-    /* Format A4 exact */
     @page {
       size: 210mm 297mm;
       margin: 0;
@@ -68,37 +56,26 @@ export function downloadCVasPDF(cvElement, prenom, nom) {
       width: ${PAGE_WIDTH}px;
       background: white;
     }
-    /* Masquer les boutons et éléments d'interface */
     button, .no-print { display: none !important; }
-    /* Ajustement automatique "fit-to-page" : le wrapper réserve l'espace
-       réellement occupé par le CV une fois réduit, pour que la pagination de
-       l'impression se base sur la taille visuelle réduite, pas la taille
-       d'origine. Centré horizontalement pour compenser le rétrécissement
-       proportionnel de la largeur. */
-    .cv-fit-wrapper {
-      width: ${PAGE_WIDTH}px;
-      height: ${hauteurAjustee}px;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-    }
+    /* 1) Neutraliser les contraintes inline du template (min/max-height=1123px,
+          overflow:hidden) qui, sinon, re-verrouillent la boîte à une page dans
+          la fenêtre d'impression. Un !important en feuille de style bat un
+          style inline SANS !important (ce qui est le cas des templates). */
+    /* 2) zoom (contrairement à transform:scale) réduit la mise en page ET la
+          pagination d'impression ensemble : le CV tient réellement sur une
+          page au lieu de déborder visuellement en page 2. */
     #cv-to-print {
-      --cv-scale: ${scale};
-      transform: scale(var(--cv-scale));
-      transform-origin: top center;
-      /* Évite une coupure de page évitable si le CV reste malgré tout
-         légèrement plus haut qu'une page (cas du plancher à 0.7). */
-      page-break-inside: avoid;
-      break-inside: avoid;
+      zoom: ${scale};
+      min-height: 0 !important;
+      max-height: none !important;
+      height: auto !important;
+      overflow: visible !important;
     }
   </style>
 </head>
 <body>
-<div class="cv-fit-wrapper">
 ${html}
-</div>
 <script>
-  // Attendre que les polices et styles soient chargés
   document.fonts.ready.then(function() {
     setTimeout(function() {
       window.focus()
