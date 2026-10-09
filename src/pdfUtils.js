@@ -10,23 +10,6 @@ const SCALE_FLOOR = 0.7
 export function downloadCVasPDF(cvElement, prenom, nom) {
   if (!cvElement) return
 
-  // Mesurer la VRAIE hauteur du contenu : les templates verrouillent #cv-to-print
-  // à min-height=max-height=1123px avec overflow:hidden. On neutralise ces
-  // contraintes sur l'élément live le temps de la mesure, puis on restaure.
-  const styleOriginal = cvElement.getAttribute('style') || ''
-  cvElement.style.setProperty('height', 'auto', 'important')
-  cvElement.style.setProperty('min-height', '0', 'important')
-  cvElement.style.setProperty('max-height', 'none', 'important')
-  cvElement.style.setProperty('overflow', 'visible', 'important')
-  const naturalHeight = cvElement.scrollHeight
-  cvElement.setAttribute('style', styleOriginal)
-
-  const scale = naturalHeight > PAGE_HEIGHT
-    ? Math.max(PAGE_HEIGHT / naturalHeight, SCALE_FLOOR)
-    : 1
-
-  console.log('[fit-to-page]', { naturalHeight, PAGE_HEIGHT, scale })
-
   const html = cvElement.outerHTML
 
   const printWindow = window.open('', '_blank', 'width=900,height=700')
@@ -55,37 +38,57 @@ export function downloadCVasPDF(cvElement, prenom, nom) {
       padding: 0;
       width: ${PAGE_WIDTH}px;
       background: white;
+      overflow: visible;
     }
     button, .no-print { display: none !important; }
-    /* 1) Neutraliser les contraintes inline du template (min/max-height=1123px,
-          overflow:hidden) qui, sinon, re-verrouillent la boîte à une page dans
-          la fenêtre d'impression. Un !important en feuille de style bat un
-          style inline SANS !important (ce qui est le cas des templates). */
-    /* 2) zoom (contrairement à transform:scale) réduit la mise en page ET la
-          pagination d'impression ensemble : le CV tient réellement sur une
-          page au lieu de déborder visuellement en page 2. */
-    #cv-to-print {
-      zoom: ${scale};
-      min-height: 0 !important;
-      max-height: none !important;
-      height: auto !important;
-      overflow: visible !important;
-    }
   </style>
 </head>
 <body>
 ${html}
 <script>
-  document.fonts.ready.then(function() {
-    setTimeout(function() {
-      window.focus()
-      window.print()
-    }, 300)
-  }).catch(function() {
-    setTimeout(function() {
-      window.print()
-    }, 500)
-  })
+  (function () {
+    var PAGE_HEIGHT = ${PAGE_HEIGHT};
+    var PAGE_WIDTH = ${PAGE_WIDTH};
+    var SCALE_FLOOR = ${SCALE_FLOOR};
+
+    function fitAndPrint() {
+      var el = document.getElementById('cv-to-print');
+      if (!el) { window.print(); return; }
+
+      // Neutraliser les contraintes inline du template (min/max-height=1123px,
+      // overflow:hidden) qui verrouilleraient la boîte à une page.
+      el.style.setProperty('min-height', '0', 'important');
+      el.style.setProperty('max-height', 'none', 'important');
+      el.style.setProperty('height', 'auto', 'important');
+      el.style.setProperty('overflow', 'visible', 'important');
+
+      // Deux passes : à chaque passe on mesure la hauteur à la largeur courante,
+      // on calcule le zoom nécessaire pour tenir en hauteur, puis on pré-élargit
+      // le contenu (PAGE_WIDTH / zoom) pour qu'une fois zoomé il remplisse toute
+      // la largeur. Ça converge sur largeur ET hauteur pleines.
+      var scale = 1, width = PAGE_WIDTH;
+      for (var i = 0; i < 2; i++) {
+        el.style.setProperty('zoom', '1', 'important');
+        el.style.setProperty('width', width + 'px', 'important');
+        var h = el.scrollHeight;
+        scale = h > PAGE_HEIGHT ? Math.max(PAGE_HEIGHT / h, SCALE_FLOOR) : 1;
+        width = Math.round(PAGE_WIDTH / scale);
+      }
+
+      el.style.setProperty('width', width + 'px', 'important');
+      el.style.setProperty('zoom', String(scale), 'important');
+      console.log('[fit-to-page]', { scale: scale, width: width });
+
+      setTimeout(function () { window.focus(); window.print(); }, 150);
+    }
+
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () { setTimeout(fitAndPrint, 200); })
+        .catch(function () { setTimeout(fitAndPrint, 400); });
+    } else {
+      setTimeout(fitAndPrint, 400);
+    }
+  })();
 </script>
 </body>
 </html>`)
