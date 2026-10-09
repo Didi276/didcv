@@ -10,14 +10,30 @@ const SCALE_FLOOR = 0.7
 export function downloadCVasPDF(cvElement, prenom, nom) {
   if (!cvElement) return
 
-  // Mesurer la hauteur réelle du CV rendu sur l'élément LIVE, avant de le
-  // cloner en HTML — scrollHeight reflète le contenu réel même si App.css le
-  // masque visuellement à l'écran via #cv-to-print { overflow: hidden }.
+  // Mesurer la VRAIE hauteur du contenu, pas la hauteur de "page" imposée par
+  // minHeight (tous les templates fixent PAGE.minHeight=1123px sur #cv-to-print
+  // lui-même) ni par App.css (#cv-to-print { max-height: 1123px; overflow: hidden }).
+  // Avec min-height === max-height === 1123px, la boîte est verrouillée à
+  // 1123px quel que soit le contenu réel : mesurer scrollHeight tel quel
+  // mesurerait souvent "la page", pas "le contenu". On neutralise ces
+  // contraintes sur l'élément live le temps de la mesure (synchrone, restauré
+  // avant tout repaint — aucun flash visible), puis on restaure le style
+  // d'origine.
+  const styleOriginal = cvElement.getAttribute('style') || ''
+  cvElement.style.setProperty('height', 'auto', 'important')
+  cvElement.style.setProperty('min-height', '0', 'important')
+  cvElement.style.setProperty('max-height', 'none', 'important')
+  cvElement.style.setProperty('overflow', 'visible', 'important')
   const naturalHeight = cvElement.scrollHeight
+  cvElement.setAttribute('style', styleOriginal)
+
   const scale = naturalHeight > PAGE_HEIGHT
     ? Math.max(PAGE_HEIGHT / naturalHeight, SCALE_FLOOR)
     : 1
   const hauteurAjustee = Math.ceil(naturalHeight * scale)
+
+  // Pour vérifier/diagnostiquer : ouvrir la console avant de télécharger.
+  console.log('[fit-to-page]', { naturalHeight, PAGE_HEIGHT, scale, hauteurAjustee })
 
   // Récupérer le HTML rendu avec tous les styles inline
   const html = cvElement.outerHTML
