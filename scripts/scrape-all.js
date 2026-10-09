@@ -508,6 +508,14 @@ async function main() {
     .from('offres_directes')
     .update({ actif: false })
     .lt('date_scraping', new Date(Date.now() - 7 * 86400000).toISOString())
+
+  // Purge définitive : au-delà de 14 jours d'inactivité, une offre morte
+  // n'a plus aucune valeur et ne fait que grossir la table pour rien.
+  await supabase
+    .from('offres_directes')
+    .delete()
+    .eq('actif', false)
+    .lt('date_scraping', new Date(Date.now() - 14 * 86400000).toISOString())
 }
 
 main().catch(console.error)
