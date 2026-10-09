@@ -57,59 +57,78 @@ ${html}
       var el = document.getElementById('cv-to-print');
       if (!el) { window.print(); return; }
 
-      // 1) Lever les verrous de hauteur posés en inline par le template
-      //    (min/max-height = 1123px, overflow:hidden).
       el.style.setProperty('min-height', '0', 'important');
       el.style.setProperty('max-height', 'none', 'important');
       el.style.setProperty('height', 'auto', 'important');
       el.style.setProperty('overflow', 'visible', 'important');
 
-      // 2) Identifier la famille de template.
       var cs = window.getComputedStyle(el);
       var mode = 'other';
       if (cs.display === 'flex' && cs.flexDirection.indexOf('column') === -1) mode = 'twocol';
       else if (cs.display === 'block') mode = 'onecol';
 
-      // 3) Zoom "densité" + largeur pleine (3 passes de convergence).
-      //    On mesure la hauteur réelle en flux naturel, on calcule le zoom
-      //    nécessaire pour tenir sur une page, BORNÉ dans une plage lisible
-      //    (0.7 à 1.12 : jamais minuscule, jamais démesuré), puis on pré-élargit
-      //    le contenu pour qu'une fois zoomé il occupe toute la largeur.
-      var scale = 1, width = PAGE_WIDTH;
+      // Convergence zoom densité + largeur pleine.
+      var scale = 1, width = PAGE_WIDTH, naturalH = 0;
       for (var i = 0; i < 3; i++) {
         el.style.setProperty('zoom', '1', 'important');
         el.style.setProperty('width', width + 'px', 'important');
-        var h = el.scrollHeight;
-        scale = Math.min(Math.max(PAGE_HEIGHT / h, SCALE_FLOOR), SCALE_CEILING);
+        naturalH = el.scrollHeight;
+        scale = Math.min(Math.max(PAGE_HEIGHT / naturalH, SCALE_FLOOR), SCALE_CEILING);
         width = Math.round(PAGE_WIDTH / scale);
       }
+      // Mesure finale à la largeur retenue (flux naturel).
+      el.style.setProperty('zoom', '1', 'important');
+      el.style.setProperty('width', width + 'px', 'important');
+      naturalH = el.scrollHeight;
+      scale = Math.min(Math.max(PAGE_HEIGHT / naturalH, SCALE_FLOOR), SCALE_CEILING);
+
+      // ── CONTRÔLE INTERNE D'HARMONISATION ──
+      var rendered = naturalH * scale;            // hauteur réelle après zoom
+      var fillRatio = rendered / PAGE_HEIGHT;
+      var verdict = 'OK';
+      if (rendered > PAGE_HEIGHT + 3) {
+        // Contenu trop dense même au plancher : on force le zoom sous le plancher
+        // pour GARANTIR une seule page (jamais de page 2 livrée à l'utilisateur).
+        scale = PAGE_HEIGHT / naturalH;
+        width = Math.round(PAGE_WIDTH / scale);
+        verdict = 'OVERFLOW_CORRIGE';
+      } else if (fillRatio < 0.85) {
+        verdict = 'SOUS_REMPLI';       // CV très léger : réparti sans trou, mais aéré
+      } else if (scale <= SCALE_FLOOR + 0.001) {
+        verdict = 'DENSE_POLICE_MIN';  // contenu très dense, police au plus petit
+      }
+
       el.style.setProperty('width', width + 'px', 'important');
       el.style.setProperty('zoom', String(scale), 'important');
 
-      // 4) Remplir la hauteur SANS toucher la police : on répartit l'espace
-      //    restant entre les sections (comme un graphiste aère un CV léger),
-      //    pour qu'il n'y ait jamais ni trou ni bloc tassé. Hauteur cible avant
-      //    zoom = PAGE_HEIGHT / scale (= une page pile une fois zoomée).
+      // Remplir la hauteur par répartition de l'espace, sauf si on vient de
+      // corriger un débordement (le contenu occupe alors déjà toute la page).
       var targetH = Math.round(PAGE_HEIGHT / scale);
-      if (mode === 'onecol') {
-        el.style.setProperty('display', 'flex', 'important');
-        el.style.setProperty('flex-direction', 'column', 'important');
-        el.style.setProperty('justify-content', 'space-between', 'important');
-        el.style.setProperty('height', targetH + 'px', 'important');
-      } else if (mode === 'twocol') {
-        el.style.setProperty('height', targetH + 'px', 'important');
-        el.style.setProperty('align-items', 'stretch', 'important');
-        for (var c = 0; c < el.children.length; c++) {
-          var col = el.children[c];
-          col.style.setProperty('display', 'flex', 'important');
-          col.style.setProperty('flex-direction', 'column', 'important');
-          col.style.setProperty('justify-content', 'space-between', 'important');
+      if (verdict !== 'OVERFLOW_CORRIGE') {
+        if (mode === 'onecol') {
+          el.style.setProperty('display', 'flex', 'important');
+          el.style.setProperty('flex-direction', 'column', 'important');
+          el.style.setProperty('justify-content', 'space-between', 'important');
+          el.style.setProperty('height', targetH + 'px', 'important');
+        } else if (mode === 'twocol') {
+          el.style.setProperty('height', targetH + 'px', 'important');
+          el.style.setProperty('align-items', 'stretch', 'important');
+          for (var c = 0; c < el.children.length; c++) {
+            var col = el.children[c];
+            col.style.setProperty('display', 'flex', 'important');
+            col.style.setProperty('flex-direction', 'column', 'important');
+            col.style.setProperty('justify-content', 'space-between', 'important');
+          }
         }
       }
-      // mode 'other' (grille/bento…) : on ne restructure pas, le zoom borné
-      // suffit et on évite de casser une mise en page exotique.
 
-      console.log('[fit-to-page]', { scale: scale, width: width, targetH: targetH, mode: mode });
+      console.log('[controle-harmonisation]', {
+        verdict: verdict,
+        scale: Math.round(scale * 1000) / 1000,
+        fillRatio: Math.round(fillRatio * 100) / 100,
+        naturalH: naturalH, mode: mode
+      });
+
       setTimeout(function () { window.focus(); window.print(); }, 150);
     }
 

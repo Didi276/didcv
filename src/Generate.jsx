@@ -429,6 +429,43 @@ Retourne UNIQUEMENT le texte structuré avec les marqueurs. Aucun commentaire.`
 
       if (!json.prenom || !json.experiences) throw new Error('CV invalide. Reessaie.')
 
+      // Controle interne d'integrite du contenu : protege contre un oubli
+      // d'experiences par l'IA. Non bloquant, une seule relance au maximum.
+      if (!json.prenom || !json.nom) {
+        console.warn('[controle-contenu] champs essentiels manquants', { prenom: json.prenom, nom: json.nom })
+      }
+      if (Array.isArray(json.experiences) && nbExp > 0 && json.experiences.length < nbExp) {
+        console.warn('[controle-contenu] experiences manquantes', { attendu: nbExp, obtenu: json.experiences.length })
+        try {
+          const promptRenforce = `⚠️ Ta reponse precedente ne contenait que ${json.experiences.length} experiences sur ${nbExp}. Tu DOIS inclure les ${nbExp} experiences listees, sans exception.\n\n${promptFinal}`
+          const resRetry = await fetchWithRetry('/api/generate', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model: 'claude-haiku-4-5-20251001', max_tokens: 8000,
+              system: `Tu es un expert RH senior specialise en ${config.label}. Tu retournes UNIQUEMENT un JSON valide, sans texte avant ou apres, sans balises markdown.`,
+              messages: [{ role: 'user', content: promptRenforce }]
+            })
+          })
+          const dataRetry = await resRetry.json()
+          const texteRetry = dataRetry.content[0].text
+          const jsonPropreRetry = texteRetry.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+          let jsonRetry
+          try { jsonRetry = JSON.parse(jsonPropreRetry) }
+          catch {
+            const matchRetry = jsonPropreRetry.match(/\{[\s\S]*\}/)
+            if (matchRetry) { try { jsonRetry = JSON.parse(matchRetry[0]) } catch { /* relance invalide, on garde json */ } }
+          }
+          if (jsonRetry?.prenom && Array.isArray(jsonRetry.experiences) && jsonRetry.experiences.length > json.experiences.length) {
+            json = jsonRetry
+          }
+          if (!json.experiences || json.experiences.length < nbExp) {
+            console.warn('[controle-contenu] experiences toujours insuffisantes apres relance', { attendu: nbExp, obtenu: json.experiences?.length || 0 })
+          }
+        } catch (e) {
+          console.warn('[controle-contenu] relance echouee', e)
+        }
+      }
+
       json.photo = profile?.photo ?? photoManuelle ?? undefined
       if (!json.certifications) json.certifications = []
       if (!json.centres_interet) json.centres_interet = []
