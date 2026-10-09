@@ -18,7 +18,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms))
 const hashOffre = (titre, entreprise, lieu) =>
   Buffer.from(`${titre}-${entreprise}-${lieu}`).toString('base64').slice(0, 32)
 
-async function scrapeGreenhouse(slug, nom) {
+export async function scrapeGreenhouse(slug, nom) {
   try {
     const r = await fetch(`https://boards-api.greenhouse.io/v1/boards/${slug}/jobs?content=true`)
     if (!r.ok) return []
@@ -107,7 +107,7 @@ async function scrapeLeverHTML(slug, nom) {
   }
 }
 
-async function scrapeLever(slug, nom) {
+export async function scrapeLever(slug, nom) {
   try {
     const r = await fetch(`https://api.lever.co/v0/postings/${slug}?mode=json`)
     if (!r.ok) return scrapeLeverHTML(slug, nom)
@@ -134,7 +134,7 @@ async function scrapeLever(slug, nom) {
   }
 }
 
-async function scrapeSmartRecruiters(slug, nom) {
+export async function scrapeSmartRecruiters(slug, nom) {
   const toutes = []
   let offset = 0
   const limit = 100
@@ -202,7 +202,7 @@ async function scrapeWorkday(entreprise) {
   } catch { return [] }
 }
 
-async function scrapeAshby(slug, nom) {
+export async function scrapeAshby(slug, nom) {
   try {
     const r = await fetch(`https://api.ashbyhq.com/posting-api/job-board/${slug}`)
     if (!r.ok) return []
@@ -224,7 +224,7 @@ async function scrapeAshby(slug, nom) {
   } catch { return [] }
 }
 
-async function scrapeWorkable(slug, nom) {
+export async function scrapeWorkable(slug, nom) {
   try {
     const r = await fetch(`https://apply.workable.com/api/v1/widget/accounts/${slug}?details=true`)
     if (!r.ok) return []
@@ -246,7 +246,7 @@ async function scrapeWorkable(slug, nom) {
   } catch { return [] }
 }
 
-async function scrapeRecruitee(slug, nom) {
+export async function scrapeRecruitee(slug, nom) {
   try {
     const r = await fetch(`https://${slug}.recruitee.com/api/offers/`)
     if (!r.ok) return []
@@ -268,7 +268,7 @@ async function scrapeRecruitee(slug, nom) {
   } catch { return [] }
 }
 
-async function scrapeTeamtailor(slug, nom) {
+export async function scrapeTeamtailor(slug, nom) {
   try {
     const r = await fetch(`https://${slug}.teamtailor.com/jobs.json`)
     if (!r.ok) return []
@@ -291,7 +291,7 @@ async function scrapeTeamtailor(slug, nom) {
   } catch { return [] }
 }
 
-async function scrapePersonio(slug, nom) {
+export async function scrapePersonio(slug, nom) {
   try {
     const r = await fetch(`https://${slug}.jobs.personio.de/search.json`)
     if (!r.ok) return []
