@@ -81,43 +81,50 @@ async function main() {
   let testees = 0
   let validees = 0
 
-  for (const nom of noms) {
+  for (let i = 0; i < noms.length; i++) {
+    const nom = noms[i]
+    console.log(`[${i + 1}/${noms.length}] ${nom}`)
     testees++
-    const variantes = genererVariantesSlug(nom)
-    let trouve = null
 
-    for (const ats of ATS_A_TESTER) {
-      if (trouve) break
-      for (const slug of variantes) {
-        await sleep(300)
-        let offres = []
-        try {
-          offres = await SCRAPERS[ats](slug, nom)
-        } catch {
-          offres = []
-        }
-        if (offres.length > 0) {
-          trouve = { ats, slug, nb_offres_detectees: offres.length }
-          break
+    try {
+      const variantes = genererVariantesSlug(nom)
+      let trouve = null
+
+      for (const ats of ATS_A_TESTER) {
+        if (trouve) break
+        for (const slug of variantes) {
+          await sleep(300)
+          let offres = []
+          try {
+            offres = await SCRAPERS[ats](slug, nom)
+          } catch {
+            offres = []
+          }
+          if (offres.length > 0) {
+            trouve = { ats, slug, nb_offres_detectees: offres.length }
+            break
+          }
         }
       }
+
+      if (!trouve) continue
+
+      const cle = `${trouve.ats}::${trouve.slug}`
+      if (dejaConnues.has(cle) || dejaAjoutees.has(cle)) continue
+
+      dejaAjoutees.add(cle)
+      decouvertes.push({
+        nom,
+        ats: trouve.ats,
+        slug: trouve.slug,
+        nb_offres_detectees: trouve.nb_offres_detectees,
+      })
+      parAts[trouve.ats] = (parAts[trouve.ats] || 0) + 1
+      validees++
+      console.log(`✅ ${nom} -> ${trouve.ats}/${trouve.slug} (${trouve.nb_offres_detectees} offres)`)
+    } catch (err) {
+      console.error(`❌ Erreur sur ${nom}, on continue :`, err.message)
     }
-
-    if (!trouve) continue
-
-    const cle = `${trouve.ats}::${trouve.slug}`
-    if (dejaConnues.has(cle) || dejaAjoutees.has(cle)) continue
-
-    dejaAjoutees.add(cle)
-    decouvertes.push({
-      nom,
-      ats: trouve.ats,
-      slug: trouve.slug,
-      nb_offres_detectees: trouve.nb_offres_detectees,
-    })
-    parAts[trouve.ats] = (parAts[trouve.ats] || 0) + 1
-    validees++
-    console.log(`✅ ${nom} -> ${trouve.ats}/${trouve.slug} (${trouve.nb_offres_detectees} offres)`)
   }
 
   decouvertes.sort((a, b) => b.nb_offres_detectees - a.nb_offres_detectees)

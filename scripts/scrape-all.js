@@ -15,12 +15,22 @@ const supabase = createClient(
 
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 
+// Evite qu'un ATS qui ne répond jamais (timeout réseau silencieux) ne fige
+// tout le script — chaque appel est borné, l'erreur AbortError résultante est
+// attrapée par le try/catch existant de chaque fonction de scraping.
+const fetchTimeout = async (url, opts = {}, ms = 8000) => {
+  const ctrl = new AbortController()
+  const t = setTimeout(() => ctrl.abort(), ms)
+  try { return await fetch(url, { ...opts, signal: ctrl.signal }) }
+  finally { clearTimeout(t) }
+}
+
 const hashOffre = (titre, entreprise, lieu) =>
   Buffer.from(`${titre}-${entreprise}-${lieu}`).toString('base64').slice(0, 32)
 
 export async function scrapeGreenhouse(slug, nom) {
   try {
-    const r = await fetch(`https://boards-api.greenhouse.io/v1/boards/${slug}/jobs?content=true`)
+    const r = await fetchTimeout(`https://boards-api.greenhouse.io/v1/boards/${slug}/jobs?content=true`)
     if (!r.ok) return []
     const data = await r.json()
     return (data.jobs || []).map(job => ({
@@ -42,7 +52,7 @@ export async function scrapeGreenhouse(slug, nom) {
 
 async function scrapeLeverHTML(slug, nom) {
   try {
-    const r = await fetch(`https://jobs.lever.co/${slug}`, {
+    const r = await fetchTimeout(`https://jobs.lever.co/${slug}`, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml'
@@ -109,7 +119,7 @@ async function scrapeLeverHTML(slug, nom) {
 
 export async function scrapeLever(slug, nom) {
   try {
-    const r = await fetch(`https://api.lever.co/v0/postings/${slug}?mode=json`)
+    const r = await fetchTimeout(`https://api.lever.co/v0/postings/${slug}?mode=json`)
     if (!r.ok) return scrapeLeverHTML(slug, nom)
     const data = await r.json()
     if (!Array.isArray(data) || data.length === 0) {
@@ -141,7 +151,7 @@ export async function scrapeSmartRecruiters(slug, nom) {
 
   while (offset < 3000) {
     try {
-      const r = await fetch(`https://api.smartrecruiters.com/v1/companies/${slug}/postings?limit=${limit}&offset=${offset}`)
+      const r = await fetchTimeout(`https://api.smartrecruiters.com/v1/companies/${slug}/postings?limit=${limit}&offset=${offset}`)
       if (!r.ok) break
       const data = await r.json()
       const content = data.content || []
@@ -178,7 +188,7 @@ async function scrapeWorkday(entreprise) {
   const subdomain = workday_subdomain || 'wd3'
   const url = `https://${workday_id}.${subdomain}.myworkdayjobs.com/wday/cxs/${workday_id}/${workday_path}/jobs`
   try {
-    const r = await fetch(url, {
+    const r = await fetchTimeout(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ limit: 50, offset: 0 })
@@ -204,7 +214,7 @@ async function scrapeWorkday(entreprise) {
 
 export async function scrapeAshby(slug, nom) {
   try {
-    const r = await fetch(`https://api.ashbyhq.com/posting-api/job-board/${slug}`)
+    const r = await fetchTimeout(`https://api.ashbyhq.com/posting-api/job-board/${slug}`)
     if (!r.ok) return []
     const d = await r.json()
     return (d.jobs || []).map(job => ({
@@ -226,7 +236,7 @@ export async function scrapeAshby(slug, nom) {
 
 export async function scrapeWorkable(slug, nom) {
   try {
-    const r = await fetch(`https://apply.workable.com/api/v1/widget/accounts/${slug}?details=true`)
+    const r = await fetchTimeout(`https://apply.workable.com/api/v1/widget/accounts/${slug}?details=true`)
     if (!r.ok) return []
     const d = await r.json()
     return (d.jobs || []).map(job => ({
@@ -248,7 +258,7 @@ export async function scrapeWorkable(slug, nom) {
 
 export async function scrapeRecruitee(slug, nom) {
   try {
-    const r = await fetch(`https://${slug}.recruitee.com/api/offers/`)
+    const r = await fetchTimeout(`https://${slug}.recruitee.com/api/offers/`)
     if (!r.ok) return []
     const d = await r.json()
     return (d.offers || []).map(job => ({
@@ -270,7 +280,7 @@ export async function scrapeRecruitee(slug, nom) {
 
 export async function scrapeTeamtailor(slug, nom) {
   try {
-    const r = await fetch(`https://${slug}.teamtailor.com/jobs.json`)
+    const r = await fetchTimeout(`https://${slug}.teamtailor.com/jobs.json`)
     if (!r.ok) return []
     const d = await r.json()
     const jobs = Array.isArray(d) ? d : (d.jobs || [])
@@ -293,7 +303,7 @@ export async function scrapeTeamtailor(slug, nom) {
 
 export async function scrapePersonio(slug, nom) {
   try {
-    const r = await fetch(`https://${slug}.jobs.personio.de/search.json`)
+    const r = await fetchTimeout(`https://${slug}.jobs.personio.de/search.json`)
     if (!r.ok) return []
     const d = await r.json()
     const jobs = Array.isArray(d) ? d : []
@@ -316,7 +326,7 @@ export async function scrapePersonio(slug, nom) {
 
 async function scrapeRippling(slug, nom) {
   try {
-    const r = await fetch(`https://api.rippling.com/platform/api/ats/v1/board/${slug}/jobs`)
+    const r = await fetchTimeout(`https://api.rippling.com/platform/api/ats/v1/board/${slug}/jobs`)
     if (!r.ok) return []
     const d = await r.json()
     const jobs = Array.isArray(d) ? d : (d.items || [])
@@ -352,7 +362,7 @@ async function scrapeTalentsoft(slug, nom) {
     try {
       // 1. Récupérer la page des flux RSS
       const listUrl = `${base}/offre-de-emploi/tous-les-flux-rss.aspx`
-      const r = await fetch(listUrl, {
+      const r = await fetchTimeout(listUrl, {
         headers: { 'User-Agent': 'DidJob-Aggregator/1.0 (contact@did-job.com)' }
       })
       if (!r.ok) continue
@@ -373,7 +383,7 @@ async function scrapeTalentsoft(slug, nom) {
 
       for (const fluxUrl of fluxUrls) {
         try {
-          const fr = await fetch(fluxUrl, {
+          const fr = await fetchTimeout(fluxUrl, {
             headers: { 'User-Agent': 'DidJob-Aggregator/1.0 (contact@did-job.com)' }
           })
           if (!fr.ok) continue
