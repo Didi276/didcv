@@ -7,6 +7,7 @@ const PAGE_HEIGHT = 1123
 const PAGE_WIDTH = 794
 const SCALE_FLOOR = 0.7
 const SCALE_CEILING = 1.12
+const MAX_GAP_EXTRA = 50
 
 export function downloadCVasPDF(cvElement, prenom, nom) {
   if (!cvElement) return
@@ -52,6 +53,7 @@ ${html}
     var PAGE_WIDTH = ${PAGE_WIDTH};
     var SCALE_FLOOR = ${SCALE_FLOOR};
     var SCALE_CEILING = ${SCALE_CEILING};
+    var MAX_GAP_EXTRA = ${MAX_GAP_EXTRA};
 
     function fitAndPrint() {
       var el = document.getElementById('cv-to-print');
@@ -99,33 +101,60 @@ ${html}
       }
 
       el.style.setProperty('width', width + 'px', 'important');
-      el.style.setProperty('zoom', String(scale), 'important');
+      // Le zoom final est appliqué tout en bas, après le contrôle des espaces :
+      // repartir() doit mesurer scrollHeight en unités "avant zoom" (comme
+      // targetH, lui aussi calculé en pré-zoom) pour que le calcul du slack
+      // (targetH - natural) compare des quantités dans la même unité.
 
-      // Remplir la hauteur par répartition de l'espace, sauf si on vient de
-      // corriger un débordement (le contenu occupe alors déjà toute la page).
+      // ── CONTRÔLE DES ESPACES : répartition bornée et équilibrée ──
       var targetH = Math.round(PAGE_HEIGHT / scale);
+      var espaceMode = 'aucun', extraParEspace = 0;
+
+      function repartir(container) {
+        var childCount = container.children.length;
+        container.style.setProperty('height', 'auto', 'important');
+        var natural = container.scrollHeight;
+        var gaps = Math.max(childCount - 1, 1);
+        var slack = targetH - natural;
+        var extra = slack > 0 ? slack / gaps : 0;
+        container.style.setProperty('display', 'flex', 'important');
+        container.style.setProperty('flex-direction', 'column', 'important');
+        container.style.setProperty('height', targetH + 'px', 'important');
+        if (slack <= 0) {
+          container.style.setProperty('justify-content', 'flex-start', 'important');
+          return { mode: 'plein', extra: 0 };
+        }
+        if (extra <= MAX_GAP_EXTRA) {
+          container.style.setProperty('justify-content', 'space-between', 'important');
+          return { mode: 'reparti', extra: Math.round(extra) };
+        }
+        container.style.setProperty('justify-content', 'center', 'important');
+        return { mode: 'centre', extra: Math.round(extra) };
+      }
+
       if (verdict !== 'OVERFLOW_CORRIGE') {
         if (mode === 'onecol') {
-          el.style.setProperty('display', 'flex', 'important');
-          el.style.setProperty('flex-direction', 'column', 'important');
-          el.style.setProperty('justify-content', 'space-between', 'important');
-          el.style.setProperty('height', targetH + 'px', 'important');
+          var r = repartir(el);
+          espaceMode = r.mode; extraParEspace = r.extra;
         } else if (mode === 'twocol') {
           el.style.setProperty('height', targetH + 'px', 'important');
           el.style.setProperty('align-items', 'stretch', 'important');
           for (var c = 0; c < el.children.length; c++) {
-            var col = el.children[c];
-            col.style.setProperty('display', 'flex', 'important');
-            col.style.setProperty('flex-direction', 'column', 'important');
-            col.style.setProperty('justify-content', 'space-between', 'important');
+            var rc = repartir(el.children[c]);
+            espaceMode = rc.mode; extraParEspace = rc.extra;
           }
         }
       }
+
+      // Zoom final : appliqué en dernier, une fois toutes les hauteurs et
+      // justify-content figés en unités pré-zoom.
+      el.style.setProperty('zoom', String(scale), 'important');
 
       console.log('[controle-harmonisation]', {
         verdict: verdict,
         scale: Math.round(scale * 1000) / 1000,
         fillRatio: Math.round(fillRatio * 100) / 100,
+        espaces: espaceMode, extraParEspace: extraParEspace,
         naturalH: naturalH, mode: mode
       });
 
