@@ -48,32 +48,38 @@ function LettreMot() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-haiku-4-5-20251001',
+          model: 'qwen-plus-character',
           max_tokens: 2000,
           messages: [{
             role: 'user',
-            content: `Tu es un expert en rédaction de lettres de motivation.
-Rédige une lettre de motivation professionnelle et personnalisée en français pour ce candidat.
+            content: (() => {
+              const offreMots = offreEmploi.trim().split(/\s+/).filter(Boolean).length
+              const modeGeneraliste = offreMots < 50
+              return `Tu es un expert en rédaction de lettres de motivation professionnelles.
 
-PROFIL DU CANDIDAT :
-${cvTexte}
+${modeGeneraliste
+  ? `⚠️ MODE CANDIDATURE SPONTANÉE GÉNÉRALISTE ACTIVÉ ⚠️
+RÈGLES STRICTES :
+✗ NE PAS écrire de nom d'entreprise — utilise "votre entreprise"
+✗ NE PAS écrire de date de publication
+✗ NE PAS mentionner de plateforme (LinkedIn, Indeed, etc.)
+✗ NE PAS inventer de chiffres`
+  : `✅ MODE CIBLÉ — L'offre est détaillée.
+RÈGLES STRICTES :
+✗ Utilise UNIQUEMENT ce qui est dans l'offre
+✗ NE PAS inventer de détails absents
+✗ Nom d'entreprise uniquement s'il est dans l'offre`
+}
 
-OFFRE D'EMPLOI :
-${offreEmploi}
+PROFIL : ${cvTexte}
+OFFRE : ${offreEmploi}
 
-RÈGLES :
-- Toujours rédiger la lettre, sans poser de questions
-- Adapter le ton et le contenu à l'offre fournie
-- Mettre en valeur les compétences transférables
-- Si l'offre est incomplète, rédiger une lettre de candidature spontanée professionnelle
-- Ne jamais inventer de nom d'entreprise, de date de publication, de plateforme (LinkedIn, etc.) ni de chiffre qui ne sont pas explicitement présents dans l'offre fournie
-- Si l'offre fait moins de 50 mots ou n'est qu'un intitulé de poste, rédiger une lettre généraliste professionnelle sans référence spécifique à une offre : pas de "annoncé le", pas de nom d'entreprise inventé, pas de "vu sur"
-- Si l'offre est détaillée, s'appuyer uniquement sur ce qui y est écrit
-- Longueur : 3 paragraphes maximum
-- Commencer par Madame, Monsieur,
-- Terminer par une formule de politesse
+INTERDIT : "Votre offre publiée sur LinkedIn...", "L'annonce parue sur Indeed...", chiffres inventés.
 
-Rédige uniquement la lettre, sans commentaire.`
+RÈGLES : Commencer par "Madame, Monsieur,", 3-4 paragraphes 300-380 mots, ton professionnel, terminer par formule de politesse + nom.
+
+Rédige uniquement la lettre. Aucun commentaire.`
+            })()
           }]
         })
       })

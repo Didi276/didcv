@@ -305,6 +305,80 @@ Contexte offre : ${offreEmploi.substring(0, 200)}`,
       ? `${promptCV}\n\nINSTRUCTIONS PERSONNALISEES DU CANDIDAT (a respecter absolument) :\n${instructions}`
       : promptCV
     const dateJour = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+    const offreMots = offreEmploi.trim().split(/\s+/).filter(Boolean).length
+    const modeGeneraliste = offreMots < 50
+
+    const promptLettre = `Tu es un expert en rédaction de lettres de motivation professionnelles, secteur ${config.label}.
+
+${modeGeneraliste
+  ? `⚠️ MODE CANDIDATURE SPONTANÉE GÉNÉRALISTE ACTIVÉ ⚠️
+L'offre fournie est trop courte (moins de 50 mots). Tu dois rédiger une lettre généraliste.
+
+RÈGLES STRICTES MODE GÉNÉRALISTE :
+✗ NE PAS écrire de nom d'entreprise — utilise "votre entreprise" ou "votre structure"
+✗ NE PAS écrire de date de publication ("annoncé le", "publiée le", "vue le", "parue le")
+✗ NE PAS mentionner de plateforme ("sur LinkedIn", "sur Indeed", "via JobTeaser", "sur votre site")
+✗ NE PAS inventer de chiffres, pourcentages, métriques
+✗ NE PAS utiliser de formule comme "votre offre de poste de [titre] annoncée..."
+→ UNIQUEMENT : mettre en valeur les compétences du candidat pour le type de poste ciblé.`
+  : `✅ MODE CIBLÉ ACTIVÉ — L'offre est détaillée.
+
+RÈGLES STRICTES MODE CIBLÉ :
+✗ Utilise UNIQUEMENT les informations EXPLICITEMENT écrites dans l'offre
+✗ NE PAS inventer de détails absents de l'offre (ni date de publication, ni plateforme)
+✗ Si le nom d'entreprise est dans l'offre → utilise-le. Sinon → "votre entreprise"
+✗ NE PAS inventer de chiffres, métriques ou résultats non mentionnés
+→ Personnalise en t'appuyant mot pour mot sur ce qui est écrit dans l'offre.`
+}
+
+PROFIL DU CANDIDAT :
+${sourceCV}
+
+OFFRE D'EMPLOI :
+${offreEmploi}
+
+DATE : ${dateJour}
+
+═══════════════════════════════════════
+EXEMPLES DE FORMULATIONS ABSOLUMENT INTERDITES :
+✗ "Votre offre publiée sur LinkedIn le 15 octobre..."
+✗ "L'annonce parue sur Indeed m'a particulièrement attirée..."
+✗ "J'ai découvert votre offre via Welcome to the Jungle..."
+✗ "Chez [Nom d'entreprise inventé], vous recherchez..."
+✗ "J'ai généré 30% de croissance..." (chiffre inventé)
+→ SI tu as envie d'écrire l'un de ces tournures : STOP — reformule sans la référence.
+═══════════════════════════════════════
+
+RÈGLES DE RÉDACTION :
+- Toujours rédiger la lettre, sans poser de questions ni refuser
+- Ne jamais commenter un éventuel écart entre le profil et l'offre
+- Commencer le corps par "Madame, Monsieur,"
+- Corps de la lettre : 3 à 4 paragraphes, 300 à 380 mots
+- Chiffres UNIQUEMENT si présents dans le profil candidat ou dans l'offre
+- Ton professionnel et naturel, adapté au secteur ${config.label}
+- Mettre en valeur les compétences transférables du candidat
+- Terminer par une formule de politesse complète suivie du nom
+
+FORMAT OBLIGATOIRE :
+||EXP||
+[Prénom Nom] [Email] [Téléphone] [Ville]
+||DEST||
+[Entreprise si dans l'offre, sinon vide]
+Service des Ressources Humaines
+||DATE||
+[Ville], le ${dateJour}
+||BODY||
+Objet : Candidature au poste de [intitulé]
+
+Madame, Monsieur,
+
+[Corps]
+
+[Formule de politesse]
+
+[Prénom Nom]
+
+Retourne UNIQUEMENT le texte structuré avec les marqueurs. Aucun commentaire.`
 
     const fetchWithRetry = async (url, opts) => {
       for (let i = 0; i <= 1; i++) {
@@ -326,7 +400,7 @@ Contexte offre : ${offreEmploi.substring(0, 200)}`,
         fetchWithRetry('/api/generate', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: 'claude-haiku-4-5-20251001', max_tokens: 6000,
+            model: 'claude-haiku-4-5-20251001', max_tokens: 8000,
             system: `Tu es un expert RH senior specialise en ${config.label}. Tu retournes UNIQUEMENT un JSON valide, sans texte avant ou apres, sans balises markdown.`,
             messages: [{ role: 'user', content: promptFinal }]
           })
@@ -334,39 +408,8 @@ Contexte offre : ${offreEmploi.substring(0, 200)}`,
         fetchWithRetry('/api/generate', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: 'claude-haiku-4-5-20251001', max_tokens: 1500,
-            messages: [{ role: 'user', content: `Tu es expert en lettres de motivation pour le secteur ${config.label}.
-PROFIL: ${sourceCV}
-OFFRE: ${offreEmploi}
-DATE: ${dateJour}
-
-REGLES :
-- Toujours rediger la lettre, sans poser de questions ni refuser
-- Ne jamais commenter un eventuel ecart entre le profil et l'offre
-- Adapter le ton et le contenu a l'offre fournie
-- Mettre en valeur les competences transferables
-- Si l'offre est incomplete, rediger une lettre de candidature spontanee professionnelle
-- Ne jamais inventer de nom d'entreprise, de date de publication, de plateforme (LinkedIn, etc.) ni de chiffre qui ne sont pas explicitement presents dans l'offre fournie
-- Si l'offre fait moins de 50 mots ou n'est qu'un intitule de poste, rediger une lettre generaliste professionnelle sans reference specifique a une offre : pas de "annonce le", pas de nom d'entreprise invente, pas de "vu sur"
-- Si l'offre est detaillee, s'appuyer uniquement sur ce qui y est ecrit
-
-Redige une lettre avec ces marqueurs EXACTS:
-||EXP||
-[Prenom Nom]
-[Email]
-[Telephone]
-[Ville]
-||DEST||
-[Entreprise]
-[Service RH]
-||DATE||
-[Ville], le ${dateJour}
-||BODY||
-Objet: Candidature au poste de [intitule du poste]
-[Corps de la lettre 300-380 mots, 4 paragraphes, chiffres uniquement si presents dans le profil ou l'offre, ton adapte au secteur ${config.label}]
-Cordialement,
-[Prenom Nom]
-Retourne UNIQUEMENT le texte avec les marqueurs, sans commentaire.` }]
+            model: 'qwen-plus-character', max_tokens: 1500,
+            messages: [{ role: 'user', content: promptLettre }]
           })
         })
       ])

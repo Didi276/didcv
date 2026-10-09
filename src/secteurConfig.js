@@ -297,10 +297,39 @@ export function buildPromptCV(sourceCV, offreEmploi, secteur, config, nbExp, has
   const { missionsPoste, missionsStage, promptSupp } = config
 
   const sectionFormation = !aExperience || secteur === 'junior'
-    ? `IMPORTANT : Ce candidat a peu ou pas d'expérience professionnelle. 
+    ? `IMPORTANT : Ce candidat a peu ou pas d'expérience professionnelle.
        Mets les FORMATIONS EN PREMIER dans le JSON (avant les expériences).
        Valorise les projets académiques, stages, associations et compétences acquises en formation.`
     : `Les expériences professionnelles passent avant les formations.`
+
+  const lignesExp = sourceCV
+    .split('\n')
+    .filter(l => /^\[(\d+)\]/.test(l.trim()))
+    .map(l => l.trim())
+
+  const listeExpObligatoires = lignesExp.length > 0
+    ? `\nLISTE DES EXPÉRIENCES À INCLURE OBLIGATOIREMENT (${nbExp} au total) :\n` +
+      lignesExp.map((l, i) => `  ${i + 1}. ${l}`).join('\n') + '\n'
+    : ''
+
+  // Le nombre d'expériences n'est fiable que lorsqu'il vient du profil structuré
+  // (nbExp = profile.experiences.length). Pour un CV PDF importé sans profil,
+  // nbExp vaut 0 par défaut alors que le CV peut contenir plusieurs expériences
+  // — appliquer ici la règle stricte "génère exactement 0 expérience, vérifie
+  // avant de répondre" effacerait silencieusement tout le parcours du candidat.
+  const regleExperiences = nbExp > 0
+    ? `6. ⚠️ RÈGLE CRITIQUE — TOUTES LES EXPÉRIENCES SANS EXCEPTION ⚠️
+   Le profil contient exactement ${nbExp} expérience(s).
+${listeExpObligatoires}
+   OBLIGATIONS :
+   - Générer exactement ${nbExp} objet(s) dans le tableau "experiences" du JSON.
+   - Respecter l'ordre chronologique INVERSE (plus récente en premier).
+   - INTERDIT : fusionner deux expériences en une seule.
+   - INTERDIT : omettre ou ignorer une expérience, même courte.
+   - Si le contexte est limité : réduire les missions à 2 par expérience PLUTÔT QUE d'en omettre une.
+   ✅ VÉRIFICATION AVANT DE RÉPONDRE : compte les objets dans "experiences".
+      Si le nombre n'est pas ${nbExp}, tu dois corriger avant de répondre.`
+    : `6. EXPÉRIENCES : Extrais et inclus TOUTES les expériences professionnelles présentes dans le profil ci-dessus, ordre chronologique inverse (plus récente en premier). N'en omets aucune, même courte.`
 
   return `PROFIL DU CANDIDAT :
 ${sourceCV}
@@ -312,46 +341,58 @@ SECTEUR DÉTECTÉ : ${config.label}
 
 ${promptSupp}
 
-RÈGLES GÉNÉRALES OBLIGATOIRES :
+═══════════════════════════════════════════════════════════════
+RÈGLES ABSOLUES — À LIRE ET APPLIQUER TOUTES SANS EXCEPTION
+═══════════════════════════════════════════════════════════════
 
-1. CHIFFRES DANS CHAQUE MISSION : Privilégie au moins 1 chiffre ou résultat mesurable par mission quand
-   cette information est fournie par le candidat. Ne jamais inventer un chiffre que le candidat n'a pas
-   donné — reformule la mission sans chiffre si aucun n'est disponible.
+1. CHIFFRES : Utilise UNIQUEMENT les chiffres déjà présents dans le profil du candidat.
+   INTERDIT d'inventer : pourcentages, CA, volumes, durées non mentionnés.
+   Si aucun chiffre disponible → formule la mission sans chiffre, sans placeholder.
 
 2. DISTINCTION STAGE / POSTE :
-   - Poste permanent : ${missionsPoste} missions avec chiffres
-   - Stage (< 6 mois) : ${missionsStage} missions maximum
+   - Poste permanent (> 6 mois) : ${missionsPoste} missions maximum
+   - Stage ou mission courte (≤ 6 mois) : ${missionsStage} missions maximum
 
-3. COMPÉTENCES ATS : 1 à 3 mots max par compétence. Entre 8 et 12. Mots-clés EXACTS de l'offre.
+3. COMPÉTENCES ATS : entre 8 et 12 compétences. 1 à 3 mots par compétence.
+   Utilise les mots-clés EXACTS de l'offre d'emploi.
 
-4. ACCROCHE : 3 à 5 phrases. Honnête, percutant, humain. Ne pas inventer de titre non occupé.
+4. ACCROCHE : 3 à 5 phrases. Basée UNIQUEMENT sur le profil fourni.
    INTERDIT : "Actuellement...", "Doté de...", "Fort de...", "Je suis..."
+   INTERDIT : inventer un titre, un poste ou une entreprise non mentionnés dans le profil.
 
 5. ${sectionFormation}
 
-6. EXPÉRIENCES : ${nbExp} expériences, ordre chronologique inverse.
+${regleExperiences}
 
-7. CERTIFICATIONS : ${hasCertifications ? "Inclus toutes les certifications." : "Tableau vide []."}
+7. CERTIFICATIONS : ${hasCertifications ? 'Inclus toutes les certifications du profil.' : 'Tableau vide [].'}
 
-8. CENTRES D'INTÉRÊT : ${hasCentresInteret ? "Inclus les centres d'intérêt." : "Tableau vide []."}
+8. CENTRES D'INTÉRÊT : ${hasCentresInteret ? "Inclus les centres d'intérêt du profil." : 'Tableau vide [].'}
 
-9. FORMATIONS : Description obligatoire pour chaque formation (1 phrase sur les matières/compétences).
+9. FORMATIONS : Une ligne "description" obligatoire pour chaque formation (matières ou compétences acquises).
 
-10. OPTIMISATION ATS : Mots-clés EXACTS de l'offre dans missions et compétences.
+10. OPTIMISATION ATS : Intègre les mots-clés EXACTS de l'offre dans missions et compétences.
+    Si l'offre est vague (< 50 mots), utilise les mots-clés du secteur ${config.label}.
 
-11. NE JAMAIS INVENTER : nom d'entreprise, date de publication, plateforme (LinkedIn, etc.) ou chiffre
-    qui ne sont pas explicitement présents dans l'offre d'emploi fournie.
+11. ⚠️ NE JAMAIS INVENTER — RÈGLE ABSOLUE :
+    - Aucun nom d'entreprise absent du profil candidat
+    - Aucune date de publication d'offre
+    - Aucune plateforme de recrutement (LinkedIn, Indeed, Welcome to the Jungle, etc.)
+    - Aucun chiffre, pourcentage ou métrique absent du profil
+    - Aucun diplôme, certification ou formation non mentionnés dans le profil
 
-12. Si l'offre fait moins de 50 mots ou n'est qu'un intitulé de poste, reste général et professionnel
-    (accroche générique, sans référence à une entreprise ou un détail inventés). Si l'offre est détaillée,
-    appuie-toi uniquement sur ce qui y est écrit.
+12. MODE SELON L'OFFRE :
+    - Offre < 50 mots ou simple intitulé de poste :
+      → CV généraliste professionnel. Titre adapté au poste ciblé mais sans référence inventée.
+    - Offre détaillée :
+      → Utilise ses mots-clés EXACTS dans missions et compétences. Ne va pas au-delà de ce qui est écrit.
 
-Retourne UNIQUEMENT ce JSON valide et complet :
+Retourne UNIQUEMENT le JSON valide et complet ci-dessous.
+Sans balises markdown. Sans texte avant. Sans texte après.
 
 {
   "prenom": "...",
   "nom": "...",
-  "titre": "Titre EXACT calqué sur le poste visé",
+  "titre": "Titre EXACT calqué sur le poste visé dans l'offre",
   "email": "...",
   "telephone": "...",
   "ville": "...",
@@ -363,13 +404,13 @@ Retourne UNIQUEMENT ce JSON valide et complet :
       "entreprise": "...",
       "periode": "...",
       "lieu": "...",
-      "missions": ["Mission avec chiffre si fourni par le candidat", "..."]
+      "missions": ["Mission avec résultat si disponible dans le profil", "Mission 2", "Mission 3"]
     }
   ],
   "formations": [
-    {"diplome": "...", "etablissement": "...", "periode": "...", "mention": "...", "description": "..."}
+    {"diplome": "...", "etablissement": "...", "periode": "...", "mention": "...", "description": "Matières et compétences acquises."}
   ],
-  "competences": ["Compétence ATS précise", "..."],
+  "competences": ["Compétence ATS précise 1", "Compétence 2", "..."],
   "langues": [{"langue": "...", "niveau": "..."}],
   "certifications": [],
   "centres_interet": [],
