@@ -71,6 +71,46 @@ const dejaConnues = new Set(
     .map(e => `${e.ats}::${e.slug.toLowerCase()}`)
 )
 
+// Teste un candidat : lance TOUTES les combinaisons (ats, slug) en parallèle
+// (chaque appel reste borné à 8s via fetchTimeout dans scrape-all.js), puis
+// retient le résultat de l'ATS de plus haute priorité parmi ceux ayant
+// renvoyé au moins une offre — indépendamment de l'ordre de résolution.
+async function testerCandidat(nom) {
+  const variantes = genererVariantesSlug(nom)
+  const combos = []
+  for (const ats of ATS_A_TESTER) {
+    for (const slug of variantes) combos.push({ ats, slug })
+  }
+
+  const resultats = await Promise.allSettled(
+    combos.map(async ({ ats, slug }) => {
+      let offres = []
+      try {
+        offres = await SCRAPERS[ats](slug, nom)
+      } catch {
+        offres = []
+      }
+      return { ats, slug, nb: offres.length }
+    })
+  )
+
+  for (const ats of ATS_A_TESTER) {
+    for (const r of resultats) {
+      if (r.status === 'fulfilled' && r.value.ats === ats && r.value.nb > 0) {
+        return { ats: r.value.ats, slug: r.value.slug, nb_offres_detectees: r.value.nb }
+      }
+    }
+  }
+  return null
+}
+
+const CHEMIN_SORTIE = new URL('./decouvertes.json', import.meta.url)
+
+function ecrireResultats(decouvertes) {
+  const triees = [...decouvertes].sort((a, b) => b.nb_offres_detectees - a.nb_offres_detectees)
+  fs.writeFileSync(CHEMIN_SORTIE, JSON.stringify(triees, null, 2))
+}
+
 async function main() {
   const noms = [...new Set(CANDIDATS.map(n => n.trim()).filter(Boolean))]
   console.log(`Démarrage découverte — ${noms.length} candidats uniques à tester`)
@@ -87,50 +127,38 @@ async function main() {
     testees++
 
     try {
-      const variantes = genererVariantesSlug(nom)
-      let trouve = null
-
-      for (const ats of ATS_A_TESTER) {
-        if (trouve) break
-        for (const slug of variantes) {
-          await sleep(300)
-          let offres = []
-          try {
-            offres = await SCRAPERS[ats](slug, nom)
-          } catch {
-            offres = []
-          }
-          if (offres.length > 0) {
-            trouve = { ats, slug, nb_offres_detectees: offres.length }
-            break
-          }
+      const trouve = await testerCandidat(nom)
+      if (trouve) {
+        const cle = `${trouve.ats}::${trouve.slug}`
+        if (!dejaConnues.has(cle) && !dejaAjoutees.has(cle)) {
+          dejaAjoutees.add(cle)
+          decouvertes.push({
+            nom,
+            ats: trouve.ats,
+            slug: trouve.slug,
+            nb_offres_detectees: trouve.nb_offres_detectees,
+          })
+          parAts[trouve.ats] = (parAts[trouve.ats] || 0) + 1
+          validees++
+          console.log(`✅ ${nom} -> ${trouve.ats}/${trouve.slug} (${trouve.nb_offres_detectees} offres)`)
         }
       }
-
-      if (!trouve) continue
-
-      const cle = `${trouve.ats}::${trouve.slug}`
-      if (dejaConnues.has(cle) || dejaAjoutees.has(cle)) continue
-
-      dejaAjoutees.add(cle)
-      decouvertes.push({
-        nom,
-        ats: trouve.ats,
-        slug: trouve.slug,
-        nb_offres_detectees: trouve.nb_offres_detectees,
-      })
-      parAts[trouve.ats] = (parAts[trouve.ats] || 0) + 1
-      validees++
-      console.log(`✅ ${nom} -> ${trouve.ats}/${trouve.slug} (${trouve.nb_offres_detectees} offres)`)
     } catch (err) {
       console.error(`❌ Erreur sur ${nom}, on continue :`, err.message)
     }
+
+    // Flush périodique : les résultats partiels survivent à une interruption
+    // (timeout CI, annulation manuelle, crash réseau) sur un run de plusieurs
+    // heures.
+    if ((i + 1) % 25 === 0) {
+      ecrireResultats(decouvertes)
+      console.log(`💾 Sauvegarde intermédiaire (${i + 1}/${noms.length})`)
+    }
+
+    await sleep(50)
   }
 
-  decouvertes.sort((a, b) => b.nb_offres_detectees - a.nb_offres_detectees)
-
-  const chemin = new URL('./decouvertes.json', import.meta.url)
-  fs.writeFileSync(chemin, JSON.stringify(decouvertes, null, 2))
+  ecrireResultats(decouvertes)
 
   console.log(`\n🔍 Découverte terminée`)
   console.log(`Entreprises testées : ${testees}`)
