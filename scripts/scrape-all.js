@@ -283,21 +283,37 @@ export async function scrapeTeamtailor(slug, nom) {
     const r = await fetchTimeout(`https://${slug}.teamtailor.com/jobs.json`)
     if (!r.ok) return []
     const d = await r.json()
-    const jobs = Array.isArray(d) ? d : (d.jobs || [])
-    return jobs.map(job => ({
-      titre: job.title || '',
-      entreprise: nom,
-      lieu: job.location || 'France',
-      description: (job.body || '').replace(/<[^>]*>/g, '').slice(0, 800),
-      url_candidature: job.url || '',
-      date_publication: job.created_at || new Date().toISOString(),
-      type_contrat: '',
-      departement: job.department || '',
-      ats_source: 'teamtailor',
-      hash: Buffer.from(`${job.title}-${nom}`).toString('base64').slice(0, 32),
-      actif: true,
-      date_scraping: new Date().toISOString()
-    }))
+    const items = d.items || d.jobs || (Array.isArray(d) ? d : [])
+
+    const lieuDepuisJobposting = (jp) => {
+      if (!jp) return ''
+      let loc = jp.jobLocation
+      if (Array.isArray(loc)) loc = loc[0]
+      const addr = (loc && loc.address) || loc
+      if (!addr) return ''
+      return [addr.addressLocality, addr.addressRegion, addr.addressCountry]
+        .filter(Boolean).join(', ')
+    }
+
+    return items.map(job => {
+      const jp = job._jobposting || null
+      const lieu = lieuDepuisJobposting(jp) || job.location || 'France'
+      const titre = job.title || ''
+      return {
+        titre,
+        entreprise: nom,
+        lieu,
+        description: (job.content_html || '').replace(/<[^>]*>/g, '').slice(0, 800),
+        url_candidature: job.url || '',
+        date_publication: job.date_published || new Date().toISOString(),
+        type_contrat: (jp && jp.employmentType) || '',
+        departement: (jp && jp.occupationalCategory) || '',
+        ats_source: 'teamtailor',
+        hash: Buffer.from(`${titre}-${nom}-${lieu}`).toString('base64').slice(0, 32),
+        actif: true,
+        date_scraping: new Date().toISOString()
+      }
+    })
   } catch { return [] }
 }
 
