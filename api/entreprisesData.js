@@ -32,7 +32,7 @@ export const ENTREPRISES = [
   { id: 25, nom: 'Pennylane', secteur: 'Fintech', ats: 'ashby', slug: 'pennylane', careers_url: 'https://www.pennylane.com/fr/jobs' },
   { id: 26, nom: 'Pigment', secteur: 'SaaS', ats: 'lever', slug: 'pigment', careers_url: 'https://www.pigment.com/fr/careers' },
   { id: 27, nom: 'Luko', secteur: 'Insurtech', ats: 'lever', slug: 'luko', careers_url: 'https://www.luko.eu/fr/careers' },
-  { id: 28, nom: 'Alma', secteur: 'Fintech', ats: 'greenhouse', slug: 'alma', careers_url: 'https://www.getalma.eu/fr/jobs' },
+  { id: 28, nom: 'Alma', secteur: 'Fintech', ats: 'greenhouse', slug: 'alma31', careers_url: 'https://www.getalma.eu/fr/jobs' },
   { id: 29, nom: 'Ateme', secteur: 'Tech', ats: 'greenhouse', slug: 'ateme', careers_url: 'https://www.ateme.com/company/careers' },
   { id: 30, nom: 'Maif', secteur: 'Assurance', ats: 'talentsoft', slug: 'maif', careers_url: 'https://www.maif.fr/qui-sommes-nous/travailler-chez-maif.html' },
 
@@ -175,8 +175,8 @@ export const ENTREPRISES = [
   { id: 152, nom: 'Infomaniak', secteur: 'Cloud/Tech', ats: 'custom', slug: null, careers_url: 'https://www.infomaniak.com/fr/jobs' },
   { id: 153, nom: 'Dailymotion', secteur: 'Vidéo/Tech', ats: 'smartrecruiters', slug: 'dailymotion', careers_url: 'https://www.dailymotion.com/fr/careers' },
   { id: 154, nom: 'Voodoo', secteur: 'Jeux vidéo', ats: 'ashby', slug: 'voodoo', careers_url: 'https://www.voodoo.io/jobs' },
-  { id: 155, nom: 'Homa Games', secteur: 'Jeux vidéo', ats: 'personio', slug: 'homa-games', careers_url: 'https://homa-games.jobs.personio.de' },
-  { id: 156, nom: 'Ubisoft', secteur: 'Jeux vidéo', ats: 'greenhouse', slug: 'ubisoft', careers_url: 'https://www.ubisoft.com/fr-fr/company/careers' },
+  { id: 155, nom: 'Homa Games', secteur: 'Jeux vidéo', ats: 'workable', slug: 'homa-games', careers_url: 'https://homa-games.jobs.personio.de' },
+  { id: 156, nom: 'Ubisoft', secteur: 'Jeux vidéo', ats: 'smartrecruiters', slug: 'Ubisoft2', careers_url: 'https://www.ubisoft.com/fr-fr/company/careers' },
   { id: 157, nom: 'Gameloft', secteur: 'Jeux vidéo', ats: 'smartrecruiters', slug: 'gameloft', careers_url: 'https://www.gameloft.com/careers' },
   { id: 158, nom: 'Dalkia', secteur: 'Énergie services', ats: 'talentsoft', slug: 'dalkia', careers_url: 'https://www.dalkia.fr/nous-rejoindre' },
   { id: 159, nom: 'Nexity', secteur: 'Immobilier', ats: 'smartrecruiters', slug: 'nexity', careers_url: 'https://www.nexity.fr/carrieres' },
@@ -203,7 +203,7 @@ export const ENTREPRISES = [
   { id: 176, nom: 'PwC France', secteur: 'Audit/Conseil', ats: 'workday', slug: 'pwcfrance', careers_url: 'https://careers.pwc.fr' },
   { id: 177, nom: 'KPMG France', secteur: 'Audit/Conseil', ats: 'custom', slug: null, careers_url: 'https://home.kpmg/fr/fr/home/carrieres.html' },
   { id: 178, nom: 'Grant Thornton', secteur: 'Audit/Conseil', ats: 'recruitee', slug: 'grantthornton', careers_url: 'https://www.grant-thornton.fr/carrieres' },
-  { id: 179, nom: 'Wavestone', secteur: 'Conseil stratégique/IT', ats: 'greenhouse', slug: 'wavestone', careers_url: 'https://www.wavestone.com/carrieres' },
+  { id: 179, nom: 'Wavestone', secteur: 'Conseil stratégique/IT', ats: 'smartrecruiters', slug: 'Wavestone1', careers_url: 'https://www.wavestone.com/carrieres' },
   { id: 180, nom: 'Sia Partners', secteur: 'Conseil', ats: 'smartrecruiters', slug: 'sia', careers_url: 'https://www.sia-partners.com/fr/carrieres' },
 
   // ═══ INDUSTRIE ET INGÉNIERIE ══════════════════════════════════════════
