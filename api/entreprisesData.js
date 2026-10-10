@@ -40,7 +40,7 @@ export const ENTREPRISES = [
   { id: 31, nom: 'Meetic', secteur: 'Tech/Dating', ats: 'lever', slug: 'meetic', careers_url: 'https://jobs.lever.co/meetic' },
   { id: 32, nom: 'Sunrise', secteur: 'Tech', ats: 'greenhouse', slug: 'sunrise', careers_url: 'https://jobs.lever.co/sunrise' },
   { id: 33, nom: 'Skello', secteur: 'RH Tech', ats: 'teamtailor', slug: 'skello', careers_url: 'https://jobs.lever.co/skello' },
-  { id: 34, nom: 'Shine', secteur: 'Fintech', ats: 'rippling', slug: 'shine', careers_url: 'https://jobs.lever.co/shine-1' },
+  { id: 34, nom: 'Shine', secteur: 'Fintech', ats: 'teamtailor', slug: 'shine', careers_url: 'https://jobs.lever.co/shine-1' },
   { id: 35, nom: 'Akeneo', secteur: 'SaaS', ats: 'teamtailor', slug: 'akeneo', careers_url: 'https://jobs.lever.co/akeneo' },
   { id: 36, nom: 'Algolia', secteur: 'Tech/Search', ats: 'greenhouse', slug: 'algolia', careers_url: 'https://www.algolia.com/careers' },
   { id: 37, nom: 'Talentsoft', secteur: 'RH Tech', ats: 'lever', slug: 'talentsoft', careers_url: 'https://jobs.lever.co/talentsoft' },
@@ -334,6 +334,20 @@ export const ENTREPRISES = [
   { id: 299, nom: 'Implicity', secteur: '', ats: 'smartrecruiters', slug: 'implicity', careers_url: '' },
   { id: 300, nom: 'Sophia Genetics', secteur: '', ats: 'recruitee', slug: 'sophia', careers_url: '' },
   { id: 301, nom: 'Nomad Education', secteur: '', ats: 'smartrecruiters', slug: 'nomadeducation', careers_url: '' },
+
+  // ═══ TEAMTAILOR (vérifiées manuellement) ════════════════════════════
+  { id: 302, nom: 'Treezor', secteur: '', ats: 'teamtailor', slug: 'treezor', careers_url: '' },
+  { id: 303, nom: 'Wakam', secteur: '', ats: 'teamtailor', slug: 'wakam', careers_url: '' },
+  { id: 304, nom: 'Yousign', secteur: '', ats: 'teamtailor', slug: 'yousign', careers_url: '' },
+  { id: 305, nom: 'Botify', secteur: '', ats: 'teamtailor', slug: 'botify', careers_url: '' },
+  { id: 306, nom: 'Leocare', secteur: '', ats: 'teamtailor', slug: 'leocare', careers_url: '' },
+  { id: 307, nom: 'Innovorder', secteur: '', ats: 'teamtailor', slug: 'innovorder', careers_url: '' },
+  { id: 308, nom: 'LumApps', secteur: '', ats: 'teamtailor', slug: 'lumapps', careers_url: '' },
+  { id: 309, nom: 'Kameleoon', secteur: '', ats: 'teamtailor', slug: 'kameleoon', careers_url: '' },
+  { id: 310, nom: 'GitGuardian', secteur: '', ats: 'teamtailor', slug: 'gitguardian', careers_url: '' },
+  { id: 311, nom: 'CybelAngel', secteur: '', ats: 'teamtailor', slug: 'cybelangel', careers_url: '' },
+  { id: 312, nom: 'Pasqal', secteur: '', ats: 'teamtailor', slug: 'pasqal', careers_url: '' },
+  { id: 313, nom: 'Figured', secteur: '', ats: 'teamtailor', slug: 'figured', careers_url: '' },
 ]
 
 export const ATS_TYPES = [
