@@ -261,16 +261,25 @@ function FormationCard({ f, recommandee }) {
   )
 }
 
-function matchFormations(formations, mot) {
-  const m = (mot || '').toLowerCase().trim()
-  if (!m) return []
-  return formations.filter(f =>
-    (f.titre || '').toLowerCase().includes(m) ||
-    (f.tags || []).some(t => {
-      const tag = (t || '').toLowerCase()
-      return tag.includes(m) || m.includes(tag)
-    })
-  ).slice(0, 2)
+const STOP_MOTS = new Set(['pour', 'avec', 'dans', 'etc', 'niveau', 'outils', 'methodologie', 'methodologies', 'competence', 'competences', 'specifique', 'avance', 'avancee', 'bases', 'notions', 'connaissance', 'connaissances'])
+
+function normal(s) {
+  return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+}
+
+// Rapproche un manque de compétence des formations, par score de mots-clés.
+function matchFormations(formations, query, extra = []) {
+  const brut = normal(query) + ' ' + extra.map(normal).join(' ')
+  const tokens = brut.replace(/[^a-z0-9 ]/g, ' ').split(/\s+/).filter(w => w.length > 3 && !STOP_MOTS.has(w))
+  if (!tokens.length) return []
+  const uniq = [...new Set(tokens)]
+  const scored = formations.map(f => {
+    const hay = normal((f.titre || '') + ' ' + (f.tags || []).join(' ') + ' ' + (f.categorie || '') + ' ' + (f.description || ''))
+    let s = 0
+    for (const tk of uniq) if (hay.includes(tk)) s++
+    return { f, s }
+  }).filter(x => x.s > 0).sort((a, b) => b.s - a.s)
+  return scored.slice(0, 2).map(x => x.f)
 }
 
 // Détermine le poste cible : le poste souhaité, sinon la dernière expérience.
@@ -390,7 +399,8 @@ function BilanCompetences({ profil, formations, isMobile }) {
           <div style={{ fontSize: '13px', fontWeight: '700', color: '#fff', marginBottom: '12px' }}>Ce qu'il te manque, et comment combler</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {bilan.ecarts.map((e, i) => {
-              const reco = matchFormations(formations, e.competence)
+              let reco = matchFormations(formations, e.competence)
+              if (reco.length === 0) reco = matchFormations(formations, '', bilan.recherche || [])
               return (
                 <div key={i} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '14px 16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
