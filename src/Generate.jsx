@@ -141,6 +141,17 @@ export default function Generate() {
   const [candidatureAjoutee, setCandidatureAjoutee] = useState(false)
   const [ajoutCandidatureEnCours, setAjoutCandidatureEnCours] = useState(false)
   const [offreActive, setOffreActive] = useState(null)
+  const previewRef = useRef(null)
+  const [previewW, setPreviewW] = useState(0)
+
+  useEffect(() => {
+    if (!previewRef.current) return
+    const mesurer = () => { if (previewRef.current) setPreviewW(previewRef.current.clientWidth) }
+    mesurer()
+    const ro = new ResizeObserver(mesurer)
+    ro.observe(previewRef.current)
+    return () => ro.disconnect()
+  }, [showEditor, activeTab])
 
   useEffect(() => {
     const stored = sessionStorage.getItem('offre_active')
@@ -942,12 +953,18 @@ Retourne UNIQUEMENT le texte structuré avec les marqueurs. Aucun commentaire.`
               </div>
 
               {/* Contenu */}
-              <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: isMobile ? '16px' : '32px 24px' }}>
-                {activeTab === 'cv' ? (
-                  <div style={{ transform: isMobile ? `scale(${Math.min(0.45, (w-32)/794)})` : 'scale(1)', transformOrigin: 'top center', boxShadow: '0 8px 40px rgba(0,0,0,0.15)', borderRadius: '4px', overflow: 'hidden', marginBottom: isMobile ? `-${Math.round(1123*(1-Math.min(0.45,(w-32)/794)))}px` : 0 }}>
-                    <CVTemplatePro cvData={cvData} template={currentTemplate} color={customColor} />
-                  </div>
-                ) : (
+              <div ref={previewRef} style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: isMobile ? '16px' : '32px 24px', overflow: 'hidden' }}>
+                {activeTab === 'cv' ? (() => {
+                  const dispo = (previewW || (isMobile ? w : 760)) - (isMobile ? 32 : 48)
+                  const cvScale = Math.max(0.12, Math.min(1, dispo / 794))
+                  return (
+                    <div style={{ width: Math.round(794 * cvScale), flexShrink: 0, boxShadow: '0 8px 40px rgba(0,0,0,0.15)', borderRadius: '4px', overflow: 'hidden' }}>
+                      <div style={{ width: '794px', transform: `scale(${cvScale})`, transformOrigin: 'top left', marginBottom: `-${Math.round(1123 * (1 - cvScale))}px` }}>
+                        <CVTemplatePro cvData={cvData} template={currentTemplate} color={customColor} />
+                      </div>
+                    </div>
+                  )
+                })() : (
                   <div style={{ background: '#fff', borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', width: '100%', maxWidth: '680px', overflow: 'hidden' }}>
                     <LettreRenderer lettre={lettre} />
                   </div>
