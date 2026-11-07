@@ -236,20 +236,18 @@ export default function Home() {
           <div style={{ display: 'flex', gap: '32px', justifyContent: 'center', marginTop: '32px', flexWrap: 'wrap' }}>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '28px', fontWeight: 700, color: '#ffffff' }}>
-                {stats.total ? stats.total.toLocaleString('fr-FR') : '—'}
+                {stats.directes ? `${stats.directes.toLocaleString('fr-FR')}+` : '—'}
               </div>
               <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '2px' }}>
-                offres disponibles
+                offres directes
               </div>
             </div>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '28px', fontWeight: 700, color: '#ffffff' }}>
-                {stats.entreprisesTotales
-                  ? `${Math.round(stats.entreprisesTotales / 1000)}k+`
-                  : '60k+'}
+                {stats.entreprises ? `${stats.entreprises.toLocaleString('fr-FR')}+` : '—'}
               </div>
               <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '2px' }}>
-                entreprises
+                entreprises qui recrutent
               </div>
             </div>
             <div style={{ textAlign: 'center' }}>
@@ -261,7 +259,7 @@ export default function Home() {
               </div>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '28px', fontWeight: 700, color: '#ffffff' }}>40</div>
+              <div style={{ fontSize: '28px', fontWeight: 700, color: '#ffffff' }}>77</div>
               <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '2px' }}>
                 modèles de CV
               </div>
