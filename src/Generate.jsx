@@ -153,6 +153,22 @@ export default function Generate() {
     return () => ro.disconnect()
   }, [showEditor, activeTab])
 
+  // Ajuste le contenu pour tenir dans une seule page A4 dans l'aperçu,
+  // comme le fait l'export PDF, pour que le visuel soit une vraie page A4.
+  const cvContentRef = useRef(null)
+  const [pageFit, setPageFit] = useState(1)
+
+  useEffect(() => {
+    const el = cvContentRef.current
+    if (!el) return
+    const measurer = () => {
+      const h = el.scrollHeight
+      setPageFit(h > 1123 ? Math.max(0.5, 1123 / h) : 1)
+    }
+    const id = setTimeout(measurer, 80)
+    return () => clearTimeout(id)
+  }, [cvData, currentTemplate, customColor, activeTab])
+
   useEffect(() => {
     const stored = sessionStorage.getItem('offre_active')
     if (stored) {
@@ -958,9 +974,11 @@ Retourne UNIQUEMENT le texte structuré avec les marqueurs. Aucun commentaire.`
                   const dispo = (previewW || (isMobile ? w : 760)) - (isMobile ? 32 : 48)
                   const cvScale = Math.max(0.12, Math.min(1, dispo / 794))
                   return (
-                    <div style={{ width: Math.round(794 * cvScale), flexShrink: 0, boxShadow: '0 8px 40px rgba(0,0,0,0.15)', borderRadius: '4px', overflow: 'hidden' }}>
-                      <div style={{ width: '794px', transform: `scale(${cvScale})`, transformOrigin: 'top left', marginBottom: `-${Math.round(1123 * (1 - cvScale))}px` }}>
-                        <CVTemplatePro cvData={cvData} template={currentTemplate} color={customColor} />
+                    <div style={{ width: Math.round(794 * cvScale), height: Math.round(1123 * cvScale), flexShrink: 0, boxShadow: '0 8px 40px rgba(0,0,0,0.15)', borderRadius: '4px', overflow: 'hidden', background: '#fff' }}>
+                      <div style={{ width: '794px', height: '1123px', transform: `scale(${cvScale})`, transformOrigin: 'top left' }}>
+                        <div ref={cvContentRef} style={{ width: '794px', transform: `scale(${pageFit})`, transformOrigin: 'top left' }}>
+                          <CVTemplatePro cvData={cvData} template={currentTemplate} color={customColor} />
+                        </div>
                       </div>
                     </div>
                   )
