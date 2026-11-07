@@ -261,6 +261,150 @@ function FormationCard({ f, recommandee }) {
   )
 }
 
+function matchFormations(formations, mot) {
+  const m = (mot || '').toLowerCase().trim()
+  if (!m) return []
+  return formations.filter(f =>
+    (f.titre || '').toLowerCase().includes(m) ||
+    (f.tags || []).some(t => {
+      const tag = (t || '').toLowerCase()
+      return tag.includes(m) || m.includes(tag)
+    })
+  ).slice(0, 2)
+}
+
+function BilanCompetences({ profil, formations, isMobile }) {
+  const [loading, setLoading] = useState(false)
+  const [bilan, setBilan] = useState(null)
+  const [erreur, setErreur] = useState('')
+  const poste = profil?.poste_souhaite
+
+  useEffect(() => {
+    if (!poste) return
+    let annule = false
+    setLoading(true); setErreur(''); setBilan(null)
+    fetch('/api/bilan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        poste,
+        secteur: profil?.secteur || '',
+        competences: profil?.competences || [],
+        experiences: profil?.experiences || [],
+      }),
+    })
+      .then(r => r.json())
+      .then(d => { if (annule) return; if (d && !d.error && Array.isArray(d.ecarts)) setBilan(d); else setErreur('indispo') })
+      .catch(() => { if (!annule) setErreur('indispo') })
+      .finally(() => { if (!annule) setLoading(false) })
+    return () => { annule = true }
+  }, [poste])
+
+  const wrap = (children) => (
+    <div style={{ background: '#0f0f1a', borderRadius: '20px', padding: isMobile ? '24px 20px' : '32px', marginBottom: '48px', color: '#fff' }}>
+      <div style={{ fontSize: '11px', fontWeight: '700', color: '#818cf8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>Bilan de compétences</div>
+      {children}
+    </div>
+  )
+
+  if (!poste) {
+    return wrap(
+      <div>
+        <div style={{ fontSize: isMobile ? '20px' : '24px', fontWeight: '800', marginBottom: '8px' }}>Ton bilan personnalisé</div>
+        <p style={{ fontSize: '14px', color: '#a1a1aa', margin: '0 0 16px', lineHeight: '1.6' }}>
+          Renseigne le poste que tu vises dans ton profil, et on analyse de vraies offres du marché pour te dire quelles compétences te manquent et quelles formations suivre.
+        </p>
+        <a href="/profile" style={{ display: 'inline-block', fontSize: '14px', fontWeight: '700', color: '#0f0f1a', background: '#fff', padding: '11px 22px', borderRadius: '12px', textDecoration: 'none' }}>
+          Compléter mon profil
+        </a>
+      </div>
+    )
+  }
+
+  if (loading) {
+    return wrap(
+      <div>
+        <div style={{ fontSize: isMobile ? '20px' : '24px', fontWeight: '800', marginBottom: '8px' }}>Analyse du marché pour « {poste} »</div>
+        <p style={{ fontSize: '14px', color: '#a1a1aa', margin: 0 }}>On compare ton profil à de vraies offres d'emploi en cours...</p>
+        <div style={{ width: '32px', height: '32px', border: '3px solid rgba(255,255,255,0.15)', borderTop: '3px solid #818cf8', borderRadius: '50%', animation: 'spin 0.8s linear infinite', marginTop: '20px' }} />
+        <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      </div>
+    )
+  }
+
+  if (erreur || !bilan) {
+    return wrap(
+      <div>
+        <div style={{ fontSize: isMobile ? '20px' : '24px', fontWeight: '800', marginBottom: '8px' }}>Ton bilan pour « {poste} »</div>
+        <p style={{ fontSize: '14px', color: '#a1a1aa', margin: 0 }}>Le bilan n'a pas pu être généré pour le moment. Réessaie dans un instant.</p>
+      </div>
+    )
+  }
+
+  const chip = (txt, bg, col) => (
+    <span key={txt} style={{ fontSize: '12px', fontWeight: '600', color: col, background: bg, padding: '5px 11px', borderRadius: '20px' }}>{txt}</span>
+  )
+
+  return wrap(
+    <div>
+      <div style={{ fontSize: isMobile ? '20px' : '24px', fontWeight: '800', marginBottom: '4px' }}>Ton bilan pour « {poste} »</div>
+      <p style={{ fontSize: '12px', color: '#71717a', margin: '0 0 24px' }}>
+        {bilan._offresAnalysees ? `Basé sur ${bilan._offresAnalysees} offres réelles analysées` : 'Basé sur les attentes du marché'}
+      </p>
+
+      {Array.isArray(bilan.points_forts) && bilan.points_forts.length > 0 && (
+        <div style={{ marginBottom: '20px' }}>
+          <div style={{ fontSize: '13px', fontWeight: '700', color: '#fff', marginBottom: '10px' }}>Tes points forts</div>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            {bilan.points_forts.map(p => chip(p, 'rgba(34,197,94,0.15)', '#4ade80'))}
+          </div>
+        </div>
+      )}
+
+      {Array.isArray(bilan.competences_marche) && bilan.competences_marche.length > 0 && (
+        <div style={{ marginBottom: '20px' }}>
+          <div style={{ fontSize: '13px', fontWeight: '700', color: '#fff', marginBottom: '10px' }}>Compétences demandées pour ce poste</div>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            {bilan.competences_marche.map(p => chip(p, 'rgba(129,140,248,0.15)', '#c7d2fe'))}
+          </div>
+        </div>
+      )}
+
+      {Array.isArray(bilan.ecarts) && bilan.ecarts.length > 0 && (
+        <div>
+          <div style={{ fontSize: '13px', fontWeight: '700', color: '#fff', marginBottom: '12px' }}>Ce qu'il te manque, et comment combler</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {bilan.ecarts.map((e, i) => {
+              const reco = matchFormations(formations, e.competence)
+              return (
+                <div key={i} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '14px 16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '14px', fontWeight: '700', color: '#fff' }}>{e.competence}</span>
+                    <span style={{ fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', color: e.importance === 'haute' ? '#fca5a5' : '#fcd34d', background: e.importance === 'haute' ? 'rgba(239,68,68,0.15)' : 'rgba(245,158,11,0.15)', padding: '3px 8px', borderRadius: '12px' }}>
+                      {e.importance === 'haute' ? 'priorité haute' : 'à renforcer'}
+                    </span>
+                  </div>
+                  {e.pourquoi && <p style={{ fontSize: '12px', color: '#a1a1aa', margin: '0 0 10px', lineHeight: '1.5' }}>{e.pourquoi}</p>}
+                  {reco.length > 0 && (
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      {reco.map(f => (
+                        <a key={f.id} href={f.lien} target="_blank" rel="noopener noreferrer"
+                          style={{ fontSize: '12px', fontWeight: '600', color: '#fff', background: '#4f46e5', padding: '7px 12px', borderRadius: '9px', textDecoration: 'none' }}>
+                          {f.emoji} {f.titre.length > 42 ? f.titre.slice(0, 42) + '…' : f.titre}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function Formations() {
   const isMobile = useWidth() < 768
   const [categorie, setCategorie] = useState('')
@@ -275,7 +419,7 @@ export default function Formations() {
       // Requête directe Supabase plutôt que /api/match : cet endpoint ne
       // renvoie que des offres d'emploi matchées par IA (pas le profil brut),
       // et déclencherait un appel Claude inutile juste pour lire poste_souhaite.
-      const { data } = await supabase.from('profiles').select('poste_souhaite').eq('user_id', user.id).maybeSingle()
+      const { data } = await supabase.from('profiles').select('*').eq('user_id', user.id).maybeSingle()
       if (data) setProfil(data)
     }
     chargerProfil()
@@ -325,6 +469,9 @@ export default function Formations() {
       </div>
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: isMobile ? '48px 16px 80px' : '64px 40px 80px' }}>
+
+        {/* SECTION 0 — Bilan de compétences ancré sur le marché */}
+        <BilanCompetences profil={profil} formations={toutes} isMobile={isMobile} />
 
         {/* SECTION 1 — Recommandées pour vous */}
         {formationsRecommandees.length > 0 && (
