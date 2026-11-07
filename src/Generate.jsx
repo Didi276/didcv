@@ -165,8 +165,14 @@ export default function Generate() {
       const h = el.scrollHeight
       setPageFit(h > 1123 ? Math.max(0.5, 1123 / h) : 1)
     }
-    const id = setTimeout(measurer, 80)
-    return () => clearTimeout(id)
+    measurer()
+    // recalcule dès que le contenu change de taille (chargement des polices,
+    // rendu tardif du template). Le transform scale ne déclenche pas le RO,
+    // donc pas de boucle.
+    const ro = new ResizeObserver(measurer)
+    ro.observe(el)
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measurer).catch(() => {})
+    return () => ro.disconnect()
   }, [cvData, currentTemplate, customColor, activeTab])
 
   useEffect(() => {
