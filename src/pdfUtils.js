@@ -39,8 +39,9 @@ export function downloadCVasPDF(cvElement, prenom, nom) {
       margin: 0;
       padding: 0;
       width: ${PAGE_WIDTH}px;
+      height: 296mm;
       background: white;
-      overflow: visible;
+      overflow: hidden;
     }
     button, .no-print { display: none !important; }
   </style>
@@ -49,7 +50,9 @@ export function downloadCVasPDF(cvElement, prenom, nom) {
 ${html}
 <script>
   (function () {
-    var PAGE_HEIGHT = ${PAGE_HEIGHT};
+    // Marge de sécurité : on vise un peu moins qu'une page physique pour qu'aucun
+    // pixel résiduel ne déborde sur une 2e page (1123px = 297,07mm > page 297mm).
+    var PAGE_HEIGHT = ${PAGE_HEIGHT - 12};
     var PAGE_WIDTH = ${PAGE_WIDTH};
     var SCALE_FLOOR = ${SCALE_FLOOR};
     var SCALE_CEILING = ${SCALE_CEILING};

@@ -19,6 +19,31 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.mi
 
 const TEMPLATES_META = { ...TEMPLATES_PRO_META, ...TEMPLATES_EXTRA_META }
 
+// Nettoie le texte d'une offre (collée, scrapée ou récupérée par lien) :
+// décode les entités HTML (&#39; &eacute; &nbsp;...), retire les balises
+// résiduelles, supprime les caractères invisibles ou de contrôle et normalise
+// les espaces. Sans ça, des caractères parasites se retrouvaient dans le CV.
+function nettoyerTexteOffre(txt) {
+  if (!txt) return ''
+  let s = String(txt)
+  try {
+    const doc = new DOMParser().parseFromString(s, 'text/html')
+    s = doc.body.textContent || s
+  } catch {
+    s = s.replace(/<[^>]+>/g, ' ')
+  }
+  // entités numériques restantes (au cas où)
+  s = s.replace(/&#(\d+);/g, (m, d) => { try { return String.fromCodePoint(parseInt(d, 10)) } catch { return ' ' } })
+  s = s.replace(/&#x([0-9a-fA-F]+);/g, (m, h) => { try { return String.fromCodePoint(parseInt(h, 16)) } catch { return ' ' } })
+  s = s.replace(/&(amp|lt|gt|quot|apos|nbsp);/g, (m, n) => ({ amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' }[n]))
+  // espaces insécables, caractères invisibles et de contrôle
+  s = s.replace(/ /g, ' ').replace(/[​-‍﻿­]/g, '')
+  s = s.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '')
+  // normalisation des espaces
+  s = s.replace(/[ \t]+/g, ' ').replace(/ *\n */g, '\n').replace(/\n{3,}/g, '\n\n').trim()
+  return s
+}
+
 function useWidth() {
   const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
   useEffect(() => {
@@ -137,11 +162,11 @@ export default function Generate() {
         sessionStorage.removeItem('offre_prefill')
         try {
           const parsed = JSON.parse(prefill)
-          setOffreEmploi(parsed.texte || '')
+          setOffreEmploi(nettoyerTexteOffre(parsed.texte || ''))
           setOffreMeta({ titre: parsed.titre || '', entreprise: parsed.entreprise || '', url: parsed.url || '' })
         } catch {
           // Ancien format (texte brut) — conservé par compatibilité
-          setOffreEmploi(prefill)
+          setOffreEmploi(nettoyerTexteOffre(prefill))
         }
       }
     }
@@ -167,7 +192,7 @@ export default function Generate() {
       const r = await fetch(`/api/fetch-offer?url=${encodeURIComponent(cible)}`)
       const data = await r.json()
       if (!data.contenu) throw new Error('vide')
-      setOffreEmploi(data.contenu)
+      setOffreEmploi(nettoyerTexteOffre(data.contenu))
       setOffreMeta({ titre: data.titre || '', entreprise: data.entreprise || '', url: cible })
     } catch {
       setOffreErreur('Impossible de récupérer cette offre.')
@@ -296,7 +321,8 @@ Contexte offre : ${offreEmploi.substring(0, 200)}`,
     const nbExp = profile?.experiences?.length || 0
     const secteur = detecterSecteur(offreEmploi, sourceCV)
     const config = getSecteurConfig(secteur, nbExp, profile)
-    const promptCV = buildPromptCV(sourceCV, offreEmploi, secteur, config, nbExp,
+    const offrePropre = nettoyerTexteOffre(offreEmploi)
+    const promptCV = buildPromptCV(sourceCV, offrePropre, secteur, config, nbExp,
       profile?.certifications?.filter(c=>c.titre).length > 0,
       profile?.centres_interet?.filter(c=>c).length > 0)
 
@@ -335,7 +361,7 @@ PROFIL DU CANDIDAT :
 ${sourceCV}
 
 OFFRE D'EMPLOI :
-${offreEmploi}
+${offrePropre}
 
 DATE : ${dateJour}
 

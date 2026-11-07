@@ -358,6 +358,7 @@ RÈGLES ABSOLUES — À LIRE ET APPLIQUER TOUTES SANS EXCEPTION
 
 4. ACCROCHE : 3 à 5 phrases. Basée UNIQUEMENT sur le profil fourni.
    INTERDIT : "Actuellement...", "Doté de...", "Fort de...", "Je suis..."
+   INTERDIT : la 3e personne. Ne jamais écrire "Il", "Elle", ni le prénom ou le nom du candidat. Style CV impersonnel, commence par le titre du poste (ex : "Analyste financier avec 3 ans d'expérience...").
    INTERDIT : inventer un titre, un poste ou une entreprise non mentionnés dans le profil.
 
 5. ${sectionFormation}
@@ -385,6 +386,11 @@ ${regleExperiences}
       → CV généraliste professionnel. Titre adapté au poste ciblé mais sans référence inventée.
     - Offre détaillée :
       → Utilise ses mots-clés EXACTS dans missions et compétences. Ne va pas au-delà de ce qui est écrit.
+
+13. VOIX ET STYLE — RÈGLE ABSOLUE : Tout le CV est rédigé dans un style CV impersonnel.
+    - JAMAIS de "je", JAMAIS de "il" ou "elle", JAMAIS le prénom ou le nom du candidat dans les phrases de l'accroche ou des missions.
+    - Chaque mission commence par un verbe d'action (infinitif ou participe passé) : "Piloter...", "Analysé...", "Gestion de...".
+    - L'accroche décrit le profil directement, sans sujet personnel.
 
 Retourne UNIQUEMENT le JSON valide et complet ci-dessous.
 Sans balises markdown. Sans texte avant. Sans texte après.
