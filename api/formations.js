@@ -1002,16 +1002,18 @@ function withTimeout(promise, ms) {
 function mapCategorie(titreRaw) {
   const t = (titreRaw || '').toLowerCase()
   const has = (re) => re.test(t)
-  if (has(/sant[ée]|m[ée]dic|soin|infirm|pharma|cliniq|maladie|patient|nutrition|psychi|handicap|m[ée]dico/)) return ['Santé', '🩺']
-  if (has(/anglais|langue|espagnol|allemand|chinois|fran[çc]ais langue|\bfle\b|english/)) return ['Langues', '🗣️']
-  if (has(/num[ée]riq|informatiq|programm|\bcode\b|codage|d[ée]veloppe|data|donn[ée]es|python|\bweb\b|cyber|intelligence artificielle|\bia\b|logiciel|algorith|r[ée]seau informatique|blockchain|robot/)) return ['Tech & Dev', '💻']
-  if (has(/marketing|communicat|r[ée]seaux sociaux|m[ée]dia|publicit|journalis/)) return ['Marketing', '📈']
-  if (has(/vente|commerc|client|n[ée]goci|business develop|relation client/)) return ['Commercial', '💼']
-  if (has(/droit|juridiq|fiscal|comptab|financ|budget|[ée]conomie|mon[ée]taire|banc|assurance|gestion financi|march[ée]s/)) return ['Finance', '💶']
-  if (has(/manage|ressources humaines|\brh\b|leadership|[ée]quipe|gestion de projet|agile|scrum|encadr/)) return ['RH & Management', '👔']
-  if (has(/entrepreneur|cr[ée]ation d|cr[ée]er son|startup|innovation|business model|lancer son/)) return ['Entrepreneuriat', '🚀']
-  if (has(/prise de parole|confiance|stress|gestion du temps|cr[ée]ativit|apprendre|m[ée]moire|soft skill|d[ée]veloppement personnel|motivation/)) return ['Soft Skills', '🧩']
-  return ['Reconversion', '🎓']
+  if (has(/sant[ée]|m[ée]dic|soin|infirm|pharma|cliniq|maladie|patient|nutrition|psychi|handicap|m[ée]dico|vaccin|[ée]pid[ée]mi|cancer|h[ôo]pital|th[ée]rap/)) return ['Santé', '🩺']
+  if (has(/\banglais\b|apprendre une langue|espagnol|allemand|chinois|italien|portugais|arabe|fran[çc]ais langue|\bfle\b|\benglish\b|linguistiq/)) return ['Langues', '🗣️']
+  if (has(/num[ée]riq|informatiq|programm|\bcode\b|codage|d[ée]veloppe|data|donn[ée]es|python|\bweb\b|cyber|intelligence artificielle|\bia\b|machine learning|logiciel|algorith|r[ée]seau informatique|blockchain|robot|\bapi\b|cloud|t[ée]l[ée]com/)) return ['Tech & Dev', '💻']
+  if (has(/marketing|communicat|r[ée]seaux sociaux|publicit|journalis|\bseo\b|community manager|\bbrand\b|notori[ée]t/)) return ['Marketing', '📈']
+  if (has(/\bvente\b|commerc|n[ée]goci|business develop|relation client|prospect/)) return ['Commercial', '💼']
+  if (has(/comptab|financ|budget|mon[ée]taire|\bbanc|assurance|gestion financi|march[ée]s financiers|contr[ôo]le de gestion|audit|fiscalit/)) return ['Finance', '💶']
+  if (has(/manage|ressources humaines|\brh\b|leadership|gestion d'[ée]quipe|gestion de projet|agile|scrum|encadr|droit du travail|droit social|paie/)) return ['RH & Management', '👔']
+  if (has(/entrepreneur|cr[ée]ation d'entreprise|cr[ée]er son|startup|\bpme\b|business model|lancer son|artisan/)) return ['Entrepreneuriat', '🚀']
+  if (has(/prise de parole|confiance en soi|\bstress\b|gestion du temps|cr[ée]ativit|apprendre à apprendre|\bm[ée]moire\b|soft skill|d[ée]veloppement personnel|motivation|bien-[êe]tre/)) return ['Soft Skills', '🧩']
+  if (has(/reconversion|orientation|insertion profession|trouver un emploi|projet profession|retour à l'emploi/)) return ['Reconversion', '🔄']
+  // Cours universitaires et généraux : droit, sciences, histoire, art, société...
+  return ['Culture & Sciences', '🎓']
 }
 
 function motsCles(titre) {

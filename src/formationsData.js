@@ -310,6 +310,7 @@ export const FORMATIONS = [
 export const CATEGORIES_DATA = [
   'Tech & Dev', 'Marketing', 'Finance', 'RH & Management', 'Commercial',
   'Santé', 'Langues', 'Reconversion', 'Entrepreneuriat', 'Soft Skills',
+  'Culture & Sciences',
 ]
 
 export const FORMATIONS_DATA = [
