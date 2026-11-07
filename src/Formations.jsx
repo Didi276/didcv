@@ -303,7 +303,7 @@ function BilanCompetences({ profil, formations, isMobile }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         poste,
-        secteur: profil?.secteur || '',
+        secteur: (Array.isArray(profil?.secteurs_souhaites) ? profil.secteurs_souhaites[0] : profil?.secteur) || '',
         competences: profil?.competences || [],
         experiences: profil?.experiences || [],
       }),
@@ -451,10 +451,17 @@ export default function Formations() {
   // Toutes les formations : socle statique + catalogue gratuit agrégé
   const toutes = [...FORMATIONS_DATA, ...extra]
 
-  const formationsRecommandees = toutes.filter(f =>
-    profil?.poste_souhaite &&
-    (f.tags || []).some(t => profil.poste_souhaite.toLowerCase().includes(t.toLowerCase()))
-  ).slice(0, 3)
+  // Poste cible : poste souhaité s'il existe, sinon titre ou dernière expérience
+  const cible = ciblePoste(profil)
+
+  const formationsRecommandees = toutes.filter(f => {
+    if (!cible) return false
+    const c = cible.toLowerCase()
+    return (f.tags || []).some(t => {
+      const tag = (t || '').toLowerCase()
+      return tag && (c.includes(tag) || tag.includes(c))
+    })
+  }).slice(0, 3)
 
   const idsRecommandees = new Set(formationsRecommandees.map(f => f.id))
 
