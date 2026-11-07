@@ -273,11 +273,26 @@ function matchFormations(formations, mot) {
   ).slice(0, 2)
 }
 
+// Détermine le poste cible : le poste souhaité, sinon la dernière expérience.
+function ciblePoste(profil) {
+  if (!profil) return ''
+  const direct = profil.poste_souhaite || profil.poste_vise || profil.metier_vise || profil.objectif || profil.titre
+  if (direct && String(direct).trim()) return String(direct).trim()
+  const exps = profil.experiences || profil.experience || []
+  const arr = Array.isArray(exps) ? exps : []
+  for (const e of arr) {
+    if (typeof e === 'string' && e.trim()) return e.trim()
+    const p = e && (e.poste || e.intitule || e.titre || e.job_title || e.title)
+    if (p && String(p).trim()) return String(p).trim()
+  }
+  return ''
+}
+
 function BilanCompetences({ profil, formations, isMobile }) {
   const [loading, setLoading] = useState(false)
   const [bilan, setBilan] = useState(null)
   const [erreur, setErreur] = useState('')
-  const poste = profil?.poste_souhaite
+  const poste = ciblePoste(profil)
 
   useEffect(() => {
     if (!poste) return

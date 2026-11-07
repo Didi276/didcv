@@ -1,0 +1,1238 @@
+[
+  {
+    "nom": "Assystem",
+    "ats": "smartrecruiters",
+    "slug": "assystem",
+    "nb_offres_detectees": 1008
+  },
+  {
+    "nom": "Scalian",
+    "ats": "smartrecruiters",
+    "slug": "scalian",
+    "nb_offres_detectees": 746
+  },
+  {
+    "nom": "OuiHelp",
+    "ats": "greenhouse",
+    "slug": "ouihelp",
+    "nb_offres_detectees": 680
+  },
+  {
+    "nom": "Artelia",
+    "ats": "smartrecruiters",
+    "slug": "artelia",
+    "nb_offres_detectees": 502
+  },
+  {
+    "nom": "Harmattan AI",
+    "ats": "ashby",
+    "slug": "harmattan-ai",
+    "nb_offres_detectees": 160
+  },
+  {
+    "nom": "Antea Group",
+    "ats": "recruitee",
+    "slug": "anteagroup",
+    "nb_offres_detectees": 108
+  },
+  {
+    "nom": "Aroma-Zone",
+    "ats": "teamtailor",
+    "slug": "aromazone",
+    "nb_offres_detectees": 100
+  },
+  {
+    "nom": "Consort Group",
+    "ats": "teamtailor",
+    "slug": "consortgroup",
+    "nb_offres_detectees": 100
+  },
+  {
+    "nom": "Metaline Group",
+    "ats": "teamtailor",
+    "slug": "metaline",
+    "nb_offres_detectees": 100
+  },
+  {
+    "nom": "Kpler",
+    "ats": "lever",
+    "slug": "kpler",
+    "nb_offres_detectees": 93
+  },
+  {
+    "nom": "Groupe Creative",
+    "ats": "teamtailor",
+    "slug": "groupe",
+    "nb_offres_detectees": 78
+  },
+  {
+    "nom": "Gojob",
+    "ats": "lever",
+    "slug": "gojob",
+    "nb_offres_detectees": 77
+  },
+  {
+    "nom": "Boccard",
+    "ats": "smartrecruiters",
+    "slug": "boccard",
+    "nb_offres_detectees": 73
+  },
+  {
+    "nom": "Maison 123",
+    "ats": "teamtailor",
+    "slug": "maison123",
+    "nb_offres_detectees": 69
+  },
+  {
+    "nom": "Ivalua",
+    "ats": "greenhouse",
+    "slug": "ivalua",
+    "nb_offres_detectees": 50
+  },
+  {
+    "nom": "Inside Group",
+    "ats": "teamtailor",
+    "slug": "insidegroup",
+    "nb_offres_detectees": 44
+  },
+  {
+    "nom": "VO2 Group",
+    "ats": "lever",
+    "slug": "vo2-group",
+    "nb_offres_detectees": 43
+  },
+  {
+    "nom": "Bigblue",
+    "ats": "lever",
+    "slug": "bigblue",
+    "nb_offres_detectees": 34
+  },
+  {
+    "nom": "Hublo",
+    "ats": "teamtailor",
+    "slug": "hublo",
+    "nb_offres_detectees": 31
+  },
+  {
+    "nom": "Visiativ",
+    "ats": "teamtailor",
+    "slug": "visiativ",
+    "nb_offres_detectees": 31
+  },
+  {
+    "nom": "Advens",
+    "ats": "smartrecruiters",
+    "slug": "advens",
+    "nb_offres_detectees": 29
+  },
+  {
+    "nom": "BeReal",
+    "ats": "ashby",
+    "slug": "bereal",
+    "nb_offres_detectees": 28
+  },
+  {
+    "nom": "DiliTrust",
+    "ats": "lever",
+    "slug": "dilitrust",
+    "nb_offres_detectees": 28
+  },
+  {
+    "nom": "H Company",
+    "ats": "ashby",
+    "slug": "hcompany",
+    "nb_offres_detectees": 28
+  },
+  {
+    "nom": "Opus Aerospace",
+    "ats": "recruitee",
+    "slug": "opus",
+    "nb_offres_detectees": 27
+  },
+  {
+    "nom": "Ysé Paris",
+    "ats": "teamtailor",
+    "slug": "yseparis",
+    "nb_offres_detectees": 27
+  },
+  {
+    "nom": "MyUnisoft",
+    "ats": "teamtailor",
+    "slug": "myunisoft",
+    "nb_offres_detectees": 25
+  },
+  {
+    "nom": "bsport",
+    "ats": "teamtailor",
+    "slug": "bsport",
+    "nb_offres_detectees": 24
+  },
+  {
+    "nom": "EcoVadis",
+    "ats": "smartrecruiters",
+    "slug": "ecovadis",
+    "nb_offres_detectees": 24
+  },
+  {
+    "nom": "Expliseat",
+    "ats": "teamtailor",
+    "slug": "expliseat",
+    "nb_offres_detectees": 24
+  },
+  {
+    "nom": "MaiaSpace",
+    "ats": "recruitee",
+    "slug": "maiaspace",
+    "nb_offres_detectees": 23
+  },
+  {
+    "nom": "Equativ",
+    "ats": "lever",
+    "slug": "equativ",
+    "nb_offres_detectees": 22
+  },
+  {
+    "nom": "Le Collectionist",
+    "ats": "smartrecruiters",
+    "slug": "lecollectionist",
+    "nb_offres_detectees": 22
+  },
+  {
+    "nom": "Padoa",
+    "ats": "teamtailor",
+    "slug": "padoa",
+    "nb_offres_detectees": 22
+  },
+  {
+    "nom": "Foodles",
+    "ats": "teamtailor",
+    "slug": "foodles",
+    "nb_offres_detectees": 19
+  },
+  {
+    "nom": "Imagino",
+    "ats": "teamtailor",
+    "slug": "imagino",
+    "nb_offres_detectees": 19
+  },
+  {
+    "nom": "La Rosée",
+    "ats": "teamtailor",
+    "slug": "larosee",
+    "nb_offres_detectees": 19
+  },
+  {
+    "nom": "Metron",
+    "ats": "greenhouse",
+    "slug": "metron",
+    "nb_offres_detectees": 18
+  },
+  {
+    "nom": "Ogury",
+    "ats": "lever",
+    "slug": "ogury",
+    "nb_offres_detectees": 18
+  },
+  {
+    "nom": "Orbital Views",
+    "ats": "ashby",
+    "slug": "orbital",
+    "nb_offres_detectees": 18
+  },
+  {
+    "nom": "BearingPoint",
+    "ats": "greenhouse",
+    "slug": "bearingpoint",
+    "nb_offres_detectees": 17
+  },
+  {
+    "nom": "BTP Consultants",
+    "ats": "teamtailor",
+    "slug": "btpconsultants",
+    "nb_offres_detectees": 17
+  },
+  {
+    "nom": "Delair",
+    "ats": "teamtailor",
+    "slug": "delair",
+    "nb_offres_detectees": 17
+  },
+  {
+    "nom": "Pelico",
+    "ats": "ashby",
+    "slug": "pelico",
+    "nb_offres_detectees": 17
+  },
+  {
+    "nom": "Syroco",
+    "ats": "personio",
+    "slug": "syroco",
+    "nb_offres_detectees": 17
+  },
+  {
+    "nom": "Elise",
+    "ats": "recruitee",
+    "slug": "elise",
+    "nb_offres_detectees": 16
+  },
+  {
+    "nom": "Filigran",
+    "ats": "ashby",
+    "slug": "filigran",
+    "nb_offres_detectees": 16
+  },
+  {
+    "nom": "IAD",
+    "ats": "smartrecruiters",
+    "slug": "iad",
+    "nb_offres_detectees": 16
+  },
+  {
+    "nom": "Klee Group",
+    "ats": "teamtailor",
+    "slug": "klee",
+    "nb_offres_detectees": 16
+  },
+  {
+    "nom": "Solutions30",
+    "ats": "recruitee",
+    "slug": "solutions30",
+    "nb_offres_detectees": 16
+  },
+  {
+    "nom": "Zoï",
+    "ats": "recruitee",
+    "slug": "zoi",
+    "nb_offres_detectees": 16
+  },
+  {
+    "nom": "Hybrid Propulsion",
+    "ats": "recruitee",
+    "slug": "hybrid",
+    "nb_offres_detectees": 15
+  },
+  {
+    "nom": "Legalplace",
+    "ats": "teamtailor",
+    "slug": "legalplace",
+    "nb_offres_detectees": 15
+  },
+  {
+    "nom": "Ornikar",
+    "ats": "teamtailor",
+    "slug": "ornikar",
+    "nb_offres_detectees": 15
+  },
+  {
+    "nom": "Trustpair",
+    "ats": "teamtailor",
+    "slug": "trustpair",
+    "nb_offres_detectees": 15
+  },
+  {
+    "nom": "Actemium",
+    "ats": "teamtailor",
+    "slug": "actemium",
+    "nb_offres_detectees": 14
+  },
+  {
+    "nom": "CVE Group",
+    "ats": "teamtailor",
+    "slug": "cvegroup",
+    "nb_offres_detectees": 14
+  },
+  {
+    "nom": "Dashlane",
+    "ats": "greenhouse",
+    "slug": "dashlane",
+    "nb_offres_detectees": 14
+  },
+  {
+    "nom": "iQo",
+    "ats": "teamtailor",
+    "slug": "iqo",
+    "nb_offres_detectees": 14
+  },
+  {
+    "nom": "Lucis",
+    "ats": "ashby",
+    "slug": "lucis",
+    "nb_offres_detectees": 14
+  },
+  {
+    "nom": "Phoenix Mobility",
+    "ats": "ashby",
+    "slug": "phoenix",
+    "nb_offres_detectees": 14
+  },
+  {
+    "nom": "Avencore",
+    "ats": "teamtailor",
+    "slug": "avencore",
+    "nb_offres_detectees": 13
+  },
+  {
+    "nom": "Fractal Energy",
+    "ats": "teamtailor",
+    "slug": "fractal",
+    "nb_offres_detectees": 12
+  },
+  {
+    "nom": "Lemlist",
+    "ats": "ashby",
+    "slug": "lemlist",
+    "nb_offres_detectees": 12
+  },
+  {
+    "nom": "Outsight",
+    "ats": "lever",
+    "slug": "outsight",
+    "nb_offres_detectees": 12
+  },
+  {
+    "nom": "Sigma Informatique",
+    "ats": "teamtailor",
+    "slug": "sigmainformatique",
+    "nb_offres_detectees": 12
+  },
+  {
+    "nom": "SiPearl",
+    "ats": "teamtailor",
+    "slug": "sipearl",
+    "nb_offres_detectees": 12
+  },
+  {
+    "nom": "Solarock",
+    "ats": "teamtailor",
+    "slug": "solarock",
+    "nb_offres_detectees": 12
+  },
+  {
+    "nom": "Tomorro",
+    "ats": "teamtailor",
+    "slug": "tomorro",
+    "nb_offres_detectees": 12
+  },
+  {
+    "nom": "Adikteev",
+    "ats": "recruitee",
+    "slug": "adikteev",
+    "nb_offres_detectees": 11
+  },
+  {
+    "nom": "Comand AI",
+    "ats": "ashby",
+    "slug": "comand-ai",
+    "nb_offres_detectees": 11
+  },
+  {
+    "nom": "Waat",
+    "ats": "teamtailor",
+    "slug": "waat",
+    "nb_offres_detectees": 11
+  },
+  {
+    "nom": "Zefir",
+    "ats": "ashby",
+    "slug": "zefir",
+    "nb_offres_detectees": 11
+  },
+  {
+    "nom": "Alteia",
+    "ats": "teamtailor",
+    "slug": "alteia",
+    "nb_offres_detectees": 10
+  },
+  {
+    "nom": "Blue Frog Robotics",
+    "ats": "lever",
+    "slug": "blue",
+    "nb_offres_detectees": 10
+  },
+  {
+    "nom": "Linkup",
+    "ats": "ashby",
+    "slug": "linkup",
+    "nb_offres_detectees": 10
+  },
+  {
+    "nom": "Mylight150",
+    "ats": "teamtailor",
+    "slug": "mylight150",
+    "nb_offres_detectees": 10
+  },
+  {
+    "nom": "Bastion",
+    "ats": "ashby",
+    "slug": "bastion",
+    "nb_offres_detectees": 9
+  },
+  {
+    "nom": "Bright",
+    "ats": "recruitee",
+    "slug": "bright",
+    "nb_offres_detectees": 9
+  },
+  {
+    "nom": "Convelio",
+    "ats": "lever",
+    "slug": "convelio",
+    "nb_offres_detectees": 9
+  },
+  {
+    "nom": "Decade Energy",
+    "ats": "teamtailor",
+    "slug": "decade",
+    "nb_offres_detectees": 9
+  },
+  {
+    "nom": "Hoppen",
+    "ats": "teamtailor",
+    "slug": "hoppen",
+    "nb_offres_detectees": 9
+  },
+  {
+    "nom": "Interstellar Lab",
+    "ats": "greenhouse",
+    "slug": "interstellarlab",
+    "nb_offres_detectees": 9
+  },
+  {
+    "nom": "Lincoln HR Group",
+    "ats": "greenhouse",
+    "slug": "lincoln",
+    "nb_offres_detectees": 9
+  },
+  {
+    "nom": "MeiliSearch",
+    "ats": "teamtailor",
+    "slug": "meilisearch",
+    "nb_offres_detectees": 9
+  },
+  {
+    "nom": "Mistertemp'",
+    "ats": "recruitee",
+    "slug": "mistertemp",
+    "nb_offres_detectees": 9
+  },
+  {
+    "nom": "Payflows",
+    "ats": "recruitee",
+    "slug": "payflows",
+    "nb_offres_detectees": 9
+  },
+  {
+    "nom": "UNYC",
+    "ats": "teamtailor",
+    "slug": "unyc",
+    "nb_offres_detectees": 9
+  },
+  {
+    "nom": "Adista",
+    "ats": "teamtailor",
+    "slug": "adista",
+    "nb_offres_detectees": 8
+  },
+  {
+    "nom": "Apo France",
+    "ats": "personio",
+    "slug": "apo",
+    "nb_offres_detectees": 8
+  },
+  {
+    "nom": "ASI",
+    "ats": "greenhouse",
+    "slug": "asi",
+    "nb_offres_detectees": 8
+  },
+  {
+    "nom": "Flint",
+    "ats": "ashby",
+    "slug": "flint",
+    "nb_offres_detectees": 8
+  },
+  {
+    "nom": "Maki",
+    "ats": "ashby",
+    "slug": "maki",
+    "nb_offres_detectees": 8
+  },
+  {
+    "nom": "Prêt à Pousser",
+    "ats": "teamtailor",
+    "slug": "pret",
+    "nb_offres_detectees": 8
+  },
+  {
+    "nom": "Simundia",
+    "ats": "teamtailor",
+    "slug": "simundia",
+    "nb_offres_detectees": 8
+  },
+  {
+    "nom": "Advizeo",
+    "ats": "recruitee",
+    "slug": "advizeo",
+    "nb_offres_detectees": 7
+  },
+  {
+    "nom": "Castalie",
+    "ats": "teamtailor",
+    "slug": "castalie",
+    "nb_offres_detectees": 7
+  },
+  {
+    "nom": "Constellation",
+    "ats": "ashby",
+    "slug": "constellation",
+    "nb_offres_detectees": 7
+  },
+  {
+    "nom": "Didomi",
+    "ats": "lever",
+    "slug": "didomi",
+    "nb_offres_detectees": 7
+  },
+  {
+    "nom": "Energo",
+    "ats": "smartrecruiters",
+    "slug": "energo",
+    "nb_offres_detectees": 7
+  },
+  {
+    "nom": "Entech",
+    "ats": "teamtailor",
+    "slug": "entech",
+    "nb_offres_detectees": 7
+  },
+  {
+    "nom": "Morpho Labs",
+    "ats": "ashby",
+    "slug": "morpho",
+    "nb_offres_detectees": 7
+  },
+  {
+    "nom": "Patyka",
+    "ats": "teamtailor",
+    "slug": "patyka",
+    "nb_offres_detectees": 7
+  },
+  {
+    "nom": "AMI Labs",
+    "ats": "ashby",
+    "slug": "ami",
+    "nb_offres_detectees": 6
+  },
+  {
+    "nom": "Ares & Co",
+    "ats": "personio",
+    "slug": "ares",
+    "nb_offres_detectees": 6
+  },
+  {
+    "nom": "Cohort",
+    "ats": "ashby",
+    "slug": "cohort",
+    "nb_offres_detectees": 6
+  },
+  {
+    "nom": "Cycle App",
+    "ats": "recruitee",
+    "slug": "cycle",
+    "nb_offres_detectees": 6
+  },
+  {
+    "nom": "Dotfile",
+    "ats": "ashby",
+    "slug": "dotfile",
+    "nb_offres_detectees": 6
+  },
+  {
+    "nom": "Escape",
+    "ats": "ashby",
+    "slug": "escape",
+    "nb_offres_detectees": 6
+  },
+  {
+    "nom": "GrAI Matter Labs",
+    "ats": "ashby",
+    "slug": "grai",
+    "nb_offres_detectees": 6
+  },
+  {
+    "nom": "HomeExchange",
+    "ats": "teamtailor",
+    "slug": "homeexchange",
+    "nb_offres_detectees": 6
+  },
+  {
+    "nom": "Klara",
+    "ats": "teamtailor",
+    "slug": "klara",
+    "nb_offres_detectees": 6
+  },
+  {
+    "nom": "Lemon Curve",
+    "ats": "teamtailor",
+    "slug": "lemon",
+    "nb_offres_detectees": 6
+  },
+  {
+    "nom": "Safti",
+    "ats": "teamtailor",
+    "slug": "safti",
+    "nb_offres_detectees": 6
+  },
+  {
+    "nom": "Water Horizon",
+    "ats": "personio",
+    "slug": "water",
+    "nb_offres_detectees": 6
+  },
+  {
+    "nom": "Aura Aero",
+    "ats": "greenhouse",
+    "slug": "aura",
+    "nb_offres_detectees": 5
+  },
+  {
+    "nom": "ekWateur",
+    "ats": "teamtailor",
+    "slug": "ekwateur",
+    "nb_offres_detectees": 5
+  },
+  {
+    "nom": "Gradient Denervation",
+    "ats": "ashby",
+    "slug": "gradient",
+    "nb_offres_detectees": 5
+  },
+  {
+    "nom": "MAJ",
+    "ats": "teamtailor",
+    "slug": "maj",
+    "nb_offres_detectees": 5
+  },
+  {
+    "nom": "MWM",
+    "ats": "teamtailor",
+    "slug": "mwm",
+    "nb_offres_detectees": 5
+  },
+  {
+    "nom": "Onestock",
+    "ats": "ashby",
+    "slug": "onestock",
+    "nb_offres_detectees": 5
+  },
+  {
+    "nom": "Polar Analytics",
+    "ats": "ashby",
+    "slug": "polaranalytics",
+    "nb_offres_detectees": 5
+  },
+  {
+    "nom": "Scality",
+    "ats": "lever",
+    "slug": "scality",
+    "nb_offres_detectees": 5
+  },
+  {
+    "nom": "Steer AI",
+    "ats": "greenhouse",
+    "slug": "steerai",
+    "nb_offres_detectees": 5
+  },
+  {
+    "nom": "Yubo",
+    "ats": "ashby",
+    "slug": "yubo",
+    "nb_offres_detectees": 5
+  },
+  {
+    "nom": "Bruce",
+    "ats": "teamtailor",
+    "slug": "bruce",
+    "nb_offres_detectees": 4
+  },
+  {
+    "nom": "Damae Medical",
+    "ats": "teamtailor",
+    "slug": "damaemedical",
+    "nb_offres_detectees": 4
+  },
+  {
+    "nom": "DCS Easyware",
+    "ats": "personio",
+    "slug": "dcs",
+    "nb_offres_detectees": 4
+  },
+  {
+    "nom": "Egide",
+    "ats": "teamtailor",
+    "slug": "egide",
+    "nb_offres_detectees": 4
+  },
+  {
+    "nom": "Fipto",
+    "ats": "teamtailor",
+    "slug": "fipto",
+    "nb_offres_detectees": 4
+  },
+  {
+    "nom": "Flowdesk",
+    "ats": "greenhouse",
+    "slug": "flowdesk",
+    "nb_offres_detectees": 4
+  },
+  {
+    "nom": "Formance",
+    "ats": "ashby",
+    "slug": "formance",
+    "nb_offres_detectees": 4
+  },
+  {
+    "nom": "Neptune Elements",
+    "ats": "ashby",
+    "slug": "neptune",
+    "nb_offres_detectees": 4
+  },
+  {
+    "nom": "Pivot",
+    "ats": "ashby",
+    "slug": "pivot",
+    "nb_offres_detectees": 4
+  },
+  {
+    "nom": "Prodigy Agency",
+    "ats": "recruitee",
+    "slug": "prodigy",
+    "nb_offres_detectees": 4
+  },
+  {
+    "nom": "Qubit Pharmaceuticals",
+    "ats": "recruitee",
+    "slug": "qubit",
+    "nb_offres_detectees": 4
+  },
+  {
+    "nom": "A44 Games",
+    "ats": "smartrecruiters",
+    "slug": "a44games",
+    "nb_offres_detectees": 3
+  },
+  {
+    "nom": "Akka Technologies",
+    "ats": "teamtailor",
+    "slug": "akka",
+    "nb_offres_detectees": 3
+  },
+  {
+    "nom": "Axians",
+    "ats": "smartrecruiters",
+    "slug": "axians",
+    "nb_offres_detectees": 3
+  },
+  {
+    "nom": "Charles & Alice",
+    "ats": "greenhouse",
+    "slug": "charles",
+    "nb_offres_detectees": 3
+  },
+  {
+    "nom": "Look Up",
+    "ats": "recruitee",
+    "slug": "lookup",
+    "nb_offres_detectees": 3
+  },
+  {
+    "nom": "Motion Twin",
+    "ats": "personio",
+    "slug": "motion",
+    "nb_offres_detectees": 3
+  },
+  {
+    "nom": "NcodiN",
+    "ats": "greenhouse",
+    "slug": "ncodin",
+    "nb_offres_detectees": 3
+  },
+  {
+    "nom": "Renaissance Fusion",
+    "ats": "teamtailor",
+    "slug": "renaissancefusion",
+    "nb_offres_detectees": 3
+  },
+  {
+    "nom": "Sonio",
+    "ats": "ashby",
+    "slug": "sonio",
+    "nb_offres_detectees": 3
+  },
+  {
+    "nom": "Timeleft",
+    "ats": "greenhouse",
+    "slug": "timeleft",
+    "nb_offres_detectees": 3
+  },
+  {
+    "nom": "Ultra Premium Direct",
+    "ats": "ashby",
+    "slug": "ultra",
+    "nb_offres_detectees": 3
+  },
+  {
+    "nom": "Veda Labs",
+    "ats": "ashby",
+    "slug": "veda",
+    "nb_offres_detectees": 3
+  },
+  {
+    "nom": "ARMIS",
+    "ats": "smartrecruiters",
+    "slug": "armis",
+    "nb_offres_detectees": 2
+  },
+  {
+    "nom": "AssoConnect",
+    "ats": "teamtailor",
+    "slug": "assoconnect",
+    "nb_offres_detectees": 2
+  },
+  {
+    "nom": "Cryptio",
+    "ats": "ashby",
+    "slug": "cryptio",
+    "nb_offres_detectees": 2
+  },
+  {
+    "nom": "Energy Pool",
+    "ats": "smartrecruiters",
+    "slug": "energypool",
+    "nb_offres_detectees": 2
+  },
+  {
+    "nom": "Epsor",
+    "ats": "smartrecruiters",
+    "slug": "epsor",
+    "nb_offres_detectees": 2
+  },
+  {
+    "nom": "Fifty Five",
+    "ats": "teamtailor",
+    "slug": "fifty",
+    "nb_offres_detectees": 2
+  },
+  {
+    "nom": "Infinite Orbits",
+    "ats": "ashby",
+    "slug": "infinite",
+    "nb_offres_detectees": 2
+  },
+  {
+    "nom": "Invers",
+    "ats": "recruitee",
+    "slug": "invers",
+    "nb_offres_detectees": 2
+  },
+  {
+    "nom": "Million Victories",
+    "ats": "recruitee",
+    "slug": "million",
+    "nb_offres_detectees": 2
+  },
+  {
+    "nom": "Neoplants",
+    "ats": "teamtailor",
+    "slug": "neoplants",
+    "nb_offres_detectees": 2
+  },
+  {
+    "nom": "Papernest",
+    "ats": "teamtailor",
+    "slug": "papernest",
+    "nb_offres_detectees": 2
+  },
+  {
+    "nom": "Raidium",
+    "ats": "lever",
+    "slug": "raidium",
+    "nb_offres_detectees": 2
+  },
+  {
+    "nom": "SESAMm",
+    "ats": "greenhouse",
+    "slug": "sesamm",
+    "nb_offres_detectees": 2
+  },
+  {
+    "nom": "Sifflet",
+    "ats": "ashby",
+    "slug": "sifflet",
+    "nb_offres_detectees": 2
+  },
+  {
+    "nom": "Tap Nation",
+    "ats": "teamtailor",
+    "slug": "tapnation",
+    "nb_offres_detectees": 2
+  },
+  {
+    "nom": "Upway",
+    "ats": "recruitee",
+    "slug": "upway",
+    "nb_offres_detectees": 2
+  },
+  {
+    "nom": "Webnet",
+    "ats": "recruitee",
+    "slug": "webnet",
+    "nb_offres_detectees": 2
+  },
+  {
+    "nom": "What Matters",
+    "ats": "recruitee",
+    "slug": "what",
+    "nb_offres_detectees": 2
+  },
+  {
+    "nom": "Worldia",
+    "ats": "smartrecruiters",
+    "slug": "worldia",
+    "nb_offres_detectees": 2
+  },
+  {
+    "nom": "52 Entertainment",
+    "ats": "smartrecruiters",
+    "slug": "52",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "73 Strings",
+    "ats": "smartrecruiters",
+    "slug": "73",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Ada Tech School",
+    "ats": "personio",
+    "slug": "ada",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Adaxis",
+    "ats": "teamtailor",
+    "slug": "adaxis",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Arthur D. Little",
+    "ats": "ashby",
+    "slug": "arthur",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Ask Mona",
+    "ats": "teamtailor",
+    "slug": "ask",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Bodyguard",
+    "ats": "teamtailor",
+    "slug": "bodyguard",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Cegid",
+    "ats": "smartrecruiters",
+    "slug": "cegid",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Clustree",
+    "ats": "smartrecruiters",
+    "slug": "clustree",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Data Impact",
+    "ats": "recruitee",
+    "slug": "data",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "De Fursac",
+    "ats": "recruitee",
+    "slug": "de",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Efalia",
+    "ats": "recruitee",
+    "slug": "efalia",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Esker",
+    "ats": "teamtailor",
+    "slug": "esker",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Exo Platform",
+    "ats": "ashby",
+    "slug": "exo",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Fortil",
+    "ats": "smartrecruiters",
+    "slug": "fortil",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Goshaba",
+    "ats": "smartrecruiters",
+    "slug": "goshaba",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Happytal",
+    "ats": "teamtailor",
+    "slug": "happytal",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Hivebrite",
+    "ats": "teamtailor",
+    "slug": "hivebrite",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "IT Link",
+    "ats": "recruitee",
+    "slug": "it",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Lago",
+    "ats": "ashby",
+    "slug": "lago",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Libon",
+    "ats": "teamtailor",
+    "slug": "libon",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Mobility Work",
+    "ats": "smartrecruiters",
+    "slug": "mobilitywork",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Muzzo",
+    "ats": "lever",
+    "slug": "muzzo",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Nannybag",
+    "ats": "smartrecruiters",
+    "slug": "nannybag",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "New Heat",
+    "ats": "greenhouse",
+    "slug": "new",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "OpusMajor",
+    "ats": "teamtailor",
+    "slug": "opusmajor",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Paragon Mobility",
+    "ats": "ashby",
+    "slug": "paragon",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Recommerce Solutions",
+    "ats": "teamtailor",
+    "slug": "recommerce",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Segula Technologies",
+    "ats": "smartrecruiters",
+    "slug": "segulatechnologies",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Sidetrade",
+    "ats": "smartrecruiters",
+    "slug": "sidetrade",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Smart Sailors",
+    "ats": "smartrecruiters",
+    "slug": "smart",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Synapse Medicine",
+    "ats": "teamtailor",
+    "slug": "synapsemedicine",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Syntetica",
+    "ats": "greenhouse",
+    "slug": "syntetica",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Technology & Strategy",
+    "ats": "greenhouse",
+    "slug": "technology",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Tesseract Solutions",
+    "ats": "greenhouse",
+    "slug": "tesseract",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "ThrustMe",
+    "ats": "smartrecruiters",
+    "slug": "thrustme",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "Videdressing",
+    "ats": "smartrecruiters",
+    "slug": "videdressing",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "WhiteLab Genetix",
+    "ats": "smartrecruiters",
+    "slug": "whitelab",
+    "nb_offres_detectees": 1
+  },
+  {
+    "nom": "YZR",
+    "ats": "smartrecruiters",
+    "slug": "yzr",
+    "nb_offres_detectees": 1
+  }
+]
