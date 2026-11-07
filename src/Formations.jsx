@@ -265,6 +265,8 @@ export default function Formations() {
   const isMobile = useWidth() < 768
   const [categorie, setCategorie] = useState('')
   const [profil, setProfil] = useState(null)
+  const [extra, setExtra] = useState([])
+  const [limite, setLimite] = useState(48)
 
   useEffect(() => {
     const chargerProfil = async () => {
@@ -277,16 +279,28 @@ export default function Formations() {
       if (data) setProfil(data)
     }
     chargerProfil()
+
+    // Catalogue gratuit agrégé (socle curé + FUN-MOOC) via l'API
+    fetch('/api/formations')
+      .then(r => r.json())
+      .then(d => { if (d && Array.isArray(d.formations)) setExtra(d.formations) })
+      .catch(() => {})
   }, [])
 
-  const formationsRecommandees = FORMATIONS_DATA.filter(f =>
+  const choisirCategorie = (c) => { setCategorie(c); setLimite(48) }
+
+  // Toutes les formations : socle statique + catalogue gratuit agrégé
+  const toutes = [...FORMATIONS_DATA, ...extra]
+
+  const formationsRecommandees = toutes.filter(f =>
     profil?.poste_souhaite &&
-    f.tags.some(t => profil.poste_souhaite.toLowerCase().includes(t.toLowerCase()))
+    (f.tags || []).some(t => profil.poste_souhaite.toLowerCase().includes(t.toLowerCase()))
   ).slice(0, 3)
 
   const idsRecommandees = new Set(formationsRecommandees.map(f => f.id))
 
-  const formations = categorie ? FORMATIONS_DATA.filter(f => f.categorie === categorie) : FORMATIONS_DATA
+  const formationsFiltrees = categorie ? toutes.filter(f => f.categorie === categorie) : toutes
+  const formations = formationsFiltrees.slice(0, limite)
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8f9ff', fontFamily: '"Inter",system-ui,sans-serif' }}>
@@ -333,12 +347,12 @@ export default function Formations() {
         </h2>
 
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '28px' }}>
-          <button onClick={() => setCategorie('')}
+          <button onClick={() => choisirCategorie('')}
             style={{ padding: '6px 14px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', background: !categorie ? '#4f46e5' : '#f3f4f6', color: !categorie ? '#fff' : '#374151' }}>
             Toutes
           </button>
           {CATEGORIES_DATA.map(c => (
-            <button key={c} onClick={() => setCategorie(c === categorie ? '' : c)}
+            <button key={c} onClick={() => choisirCategorie(c === categorie ? '' : c)}
               style={{ padding: '6px 14px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: '600', background: categorie === c ? '#4f46e5' : '#f3f4f6', color: categorie === c ? '#fff' : '#374151' }}>
               {c}
             </button>
@@ -346,14 +360,24 @@ export default function Formations() {
         </div>
 
         <div style={{ fontSize: '13px', color: '#9ca3af', marginBottom: '16px' }}>
-          {formations.length} formation{formations.length > 1 ? 's' : ''}
+          {formationsFiltrees.length} formation{formationsFiltrees.length > 1 ? 's' : ''}
+          {extra.length === 0 && ' · chargement du catalogue gratuit...'}
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
           {formations.map(f => <FormationCard key={f.id} f={f} recommandee={idsRecommandees.has(f.id)} />)}
         </div>
 
-        {formations.length === 0 && (
+        {formationsFiltrees.length > limite && (
+          <div style={{ textAlign: 'center', marginTop: '32px' }}>
+            <button onClick={() => setLimite(l => l + 48)}
+              style={{ padding: '12px 28px', borderRadius: '12px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '14px', fontWeight: '700', background: '#4f46e5', color: '#fff' }}>
+              Voir plus de formations ({formationsFiltrees.length - limite} restantes)
+            </button>
+          </div>
+        )}
+
+        {formationsFiltrees.length === 0 && (
           <div style={{ textAlign: 'center', padding: '60px 20px', color: '#9ca3af', fontSize: '14px' }}>
             Aucune formation dans cette catégorie.
           </div>
