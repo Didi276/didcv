@@ -1,4 +1,4 @@
-// api/offres.js — France Travail + Jooble + Arbeitnow + RemoteOK + Adzuna + Direct (offres_directes)
+// api/offres.js — France Travail + Jooble + Arbeitnow + RemoteOK + Remotive + Adzuna + Direct (offres_directes)
 
 import { createClient } from '@supabase/supabase-js'
 
@@ -190,6 +190,15 @@ export default async function handler(req, res) {
     return r.json()
   }
 
+  // ─── Remotive (gratuit, sans inscription, recherche par mot-clé, offres remote) ─
+  const searchRemotive = async () => {
+    const r = await fetch(
+      `https://remotive.com/api/remote-jobs?search=${encodeURIComponent(query)}&limit=30`,
+      { headers: { Accept: 'application/json' } }
+    )
+    return r.json()
+  }
+
   // ─── Adzuna ───────────────────────────────────────────
   const searchAdzuna = async () => {
     const pages = [1, 2, 3, 4, 5]
@@ -228,11 +237,12 @@ export default async function handler(req, res) {
   }
 
   // ─── Appels parallèles ────────────────────────────────
-  const [ftRes, cjRes, aRes, rkRes, azRes, ddRes] = await Promise.allSettled([
+  const [ftRes, cjRes, aRes, rkRes, rmRes, azRes, ddRes] = await Promise.allSettled([
     withTimeout(searchFT(), 20000),
     withTimeout(searchJooble(), 8000),
     withTimeout(searchArbeitnow(), 15000),
     withTimeout(searchRemoteOK(), 5000),
+    withTimeout(searchRemotive(), 8000),
     withTimeout(searchAdzuna(), 15000),
     withTimeout(searchDirectes(), 10000),
   ])
@@ -338,6 +348,35 @@ export default async function handler(req, res) {
         remote: true,
       })
     })
+  }
+
+  // ─── Remotive ─────────────────────────────────────────
+  if (rmRes.status === 'fulfilled' && Array.isArray(rmRes.value?.jobs)) {
+    const localisationOuverteFrance = (loc) => {
+      const l = (loc || '').toLowerCase()
+      return l === '' ||
+        l.includes('worldwide') || l.includes('anywhere') ||
+        l.includes('europe') || l.includes('emea') || l.includes('france')
+    }
+    rmRes.value.jobs
+      .filter(job => localisationOuverteFrance(job.candidate_required_location))
+      .slice(0, 20)
+      .forEach(job => {
+        offres.push({
+          id: `rmv-${job.id}`,
+          source: 'Remotive',
+          titre: job.title || '',
+          entreprise: job.company_name || '',
+          lieu: job.candidate_required_location || 'Remote',
+          date: job.publication_date || '',
+          description: (job.description || '').replace(/<[^>]*>/g, '').substring(0, 600),
+          url: job.url || '',
+          type: job.job_type || 'Remote',
+          salaire: job.salary || '',
+          experience: '',
+          remote: true,
+        })
+      })
   }
 
   // ─── Adzuna ───────────────────────────────────────────
@@ -504,6 +543,7 @@ export default async function handler(req, res) {
     'Adzuna': 1,
     'Arbeitnow': 1,
     'RemoteOK': 1,
+    'Remotive': 1,
   }
 
   const melange = []
@@ -515,7 +555,7 @@ export default async function handler(req, res) {
     encore = false
 
     // Ordre de priorité dans chaque tour
-    const ordre = ['Direct', 'France Travail', 'Jooble', 'Adzuna', 'Arbeitnow', 'RemoteOK']
+    const ordre = ['Direct', 'France Travail', 'Jooble', 'Adzuna', 'Arbeitnow', 'RemoteOK', 'Remotive']
     const sources = [...ordre.filter(s => parSource[s]),
                      ...Object.keys(parSource).filter(s => !ordre.includes(s))]
 
