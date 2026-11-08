@@ -1,4 +1,4 @@
-// api/offres.js — France Travail + Jooble + Arbeitnow + RemoteOK + Remotive + Adzuna + Direct (offres_directes)
+// api/offres.js — France Travail + Jooble + Arbeitnow + RemoteOK + Remotive + Jobicy + Himalayas + Adzuna + Direct (offres_directes)
 
 import { createClient } from '@supabase/supabase-js'
 
@@ -199,6 +199,24 @@ export default async function handler(req, res) {
     return r.json()
   }
 
+  // ─── Jobicy (gratuit, sans clé, recherche par mot-clé, offres remote) ─
+  const searchJobicy = async () => {
+    const r = await fetch(
+      `https://jobicy.com/api/v2/remote-jobs?count=50&tag=${encodeURIComponent(query)}`,
+      { headers: { Accept: 'application/json' } }
+    )
+    return r.json()
+  }
+
+  // ─── Himalayas (gratuit, sans clé, recherche par mot-clé, offres remote) ─
+  const searchHimalayas = async () => {
+    const r = await fetch(
+      `https://himalayas.app/jobs/api?search=${encodeURIComponent(query)}&limit=30`,
+      { headers: { Accept: 'application/json' } }
+    )
+    return r.json()
+  }
+
   // ─── Adzuna ───────────────────────────────────────────
   const searchAdzuna = async () => {
     const pages = [1, 2, 3, 4, 5]
@@ -237,12 +255,14 @@ export default async function handler(req, res) {
   }
 
   // ─── Appels parallèles ────────────────────────────────
-  const [ftRes, cjRes, aRes, rkRes, rmRes, azRes, ddRes] = await Promise.allSettled([
+  const [ftRes, cjRes, aRes, rkRes, rmRes, jbRes, hmRes, azRes, ddRes] = await Promise.allSettled([
     withTimeout(searchFT(), 20000),
     withTimeout(searchJooble(), 8000),
     withTimeout(searchArbeitnow(), 15000),
     withTimeout(searchRemoteOK(), 5000),
     withTimeout(searchRemotive(), 8000),
+    withTimeout(searchJobicy(), 8000),
+    withTimeout(searchHimalayas(), 8000),
     withTimeout(searchAdzuna(), 15000),
     withTimeout(searchDirectes(), 10000),
   ])
@@ -374,6 +394,66 @@ export default async function handler(req, res) {
           type: job.job_type || 'Remote',
           salaire: job.salary || '',
           experience: '',
+          remote: true,
+        })
+      })
+  }
+
+  // ─── Jobicy ───────────────────────────────────────────
+  if (jbRes.status === 'fulfilled' && Array.isArray(jbRes.value?.jobs)) {
+    const geoOuverteFrance = (g) => {
+      const l = (g || '').toLowerCase()
+      return l === '' ||
+        l.includes('anywhere') || l.includes('worldwide') ||
+        l.includes('europe') || l.includes('emea') || l.includes('france')
+    }
+    jbRes.value.jobs
+      .filter(job => geoOuverteFrance(job.jobGeo))
+      .slice(0, 20)
+      .forEach(job => {
+        offres.push({
+          id: `jby-${job.id}`,
+          source: 'Jobicy',
+          titre: job.jobTitle || '',
+          entreprise: job.companyName || '',
+          lieu: job.jobGeo || 'Remote',
+          date: job.pubDate || '',
+          description: (job.jobExcerpt || job.jobDescription || '').replace(/<[^>]*>/g, '').substring(0, 600),
+          url: job.url || '',
+          type: Array.isArray(job.jobType) ? job.jobType.join(', ') : (job.jobType || 'Remote'),
+          salaire: job.salaryMin ? `${job.salaryMin}${job.salaryCurrency || ''} - ${job.salaryMax}${job.salaryCurrency || ''}` : '',
+          experience: Array.isArray(job.jobLevel) ? job.jobLevel.join(', ') : (job.jobLevel || ''),
+          remote: true,
+        })
+      })
+  }
+
+  // ─── Himalayas ────────────────────────────────────────
+  if (hmRes.status === 'fulfilled' && Array.isArray(hmRes.value?.jobs)) {
+    const restrictionsOuvertesFrance = (arr) => {
+      if (!Array.isArray(arr) || arr.length === 0) return true
+      return arr.some(x => {
+        const l = (x || '').toLowerCase()
+        return l.includes('france') || l.includes('europe') || l.includes('emea') ||
+          l.includes('worldwide') || l.includes('anywhere')
+      })
+    }
+    hmRes.value.jobs
+      .filter(job => restrictionsOuvertesFrance(job.locationRestrictions))
+      .slice(0, 20)
+      .forEach(job => {
+        offres.push({
+          id: `him-${job.guid}`,
+          source: 'Himalayas',
+          titre: job.title || '',
+          entreprise: job.companyName || '',
+          lieu: (Array.isArray(job.locationRestrictions) && job.locationRestrictions.length) ? job.locationRestrictions.join(', ') : 'Remote',
+          date: job.pubDate ? new Date(job.pubDate * 1000).toISOString() : '',
+          description: (job.excerpt || job.description || '').replace(/<[^>]*>/g, '').substring(0, 600),
+          url: job.applicationLink || '',
+          type: Array.isArray(job.employmentType) ? job.employmentType.join(', ') : (job.employmentType || 'Remote'),
+          salaire: job.minSalary ? `${job.minSalary}${job.currency || ''} - ${job.maxSalary}${job.currency || ''}` : '',
+          experience: Array.isArray(job.seniority) ? job.seniority.join(', ') : (job.seniority || ''),
           remote: true,
         })
       })
@@ -544,6 +624,8 @@ export default async function handler(req, res) {
     'Arbeitnow': 1,
     'RemoteOK': 1,
     'Remotive': 1,
+    'Jobicy': 1,
+    'Himalayas': 1,
   }
 
   const melange = []
@@ -555,7 +637,7 @@ export default async function handler(req, res) {
     encore = false
 
     // Ordre de priorité dans chaque tour
-    const ordre = ['Direct', 'France Travail', 'Jooble', 'Adzuna', 'Arbeitnow', 'RemoteOK', 'Remotive']
+    const ordre = ['Direct', 'France Travail', 'Jooble', 'Adzuna', 'Arbeitnow', 'RemoteOK', 'Remotive', 'Jobicy', 'Himalayas']
     const sources = [...ordre.filter(s => parSource[s]),
                      ...Object.keys(parSource).filter(s => !ordre.includes(s))]
 
