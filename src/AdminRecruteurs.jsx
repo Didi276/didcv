@@ -83,7 +83,8 @@ export default function AdminRecruteurs() {
         supabase.from('recruteurs').select('*', { count: 'exact', head: true }).eq('statut', 'en_attente'),
       ])
 
-      setStats({
+      setStats(prev => ({
+        ...prev,
         users: users.count || 0,
         cvs: cvs.count || 0,
         offresDirectes: offresDirectes.count || 0,
@@ -96,7 +97,7 @@ export default function AdminRecruteurs() {
         entretiensPlanifies: entretiensPlanifies.count || 0,
         rappelsEnvoyes: rappelsEnvoyesRes.count || 0,
         recruteursEnAttente: recruteursEnAttenteRes.count || 0,
-      })
+      }))
     }
     loadStats()
 
