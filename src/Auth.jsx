@@ -3,7 +3,7 @@ import { Zap, Check, Loader2 } from 'lucide-react'
 import { supabase } from './supabase'
 
 export default function Auth() {
-  const [mode, setMode] = useState('login')
+  const [mode, setMode] = useState('login') // login | signup | reset | newpassword
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -17,12 +17,49 @@ export default function Auth() {
     return () => window.removeEventListener('resize', fn)
   }, [])
 
+  // Quand l'utilisateur revient depuis le lien de réinitialisation reçu par email,
+  // Supabase déclenche l'événement PASSWORD_RECOVERY : on affiche le formulaire
+  // de nouveau mot de passe.
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setMode('newpassword'); setError(''); setSuccess('')
+      }
+    })
+    return () => subscription?.unsubscribe()
+  }, [])
+
   const isMobile = w < 768
 
   const handleSubmit = async () => {
+    setError(''); setSuccess('')
+
+    if (mode === 'reset') {
+      if (!email) { setError('Entre ton email.'); return }
+      setLoading(true)
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/auth',
+      })
+      setLoading(false)
+      if (error) { setError("Impossible d'envoyer l'email. Reessaie dans un instant."); return }
+      setSuccess('Email envoye ! Clique sur le lien recu pour choisir un nouveau mot de passe.')
+      return
+    }
+
+    if (mode === 'newpassword') {
+      if (password.length < 6) { setError('Mot de passe : 6 caracteres minimum.'); return }
+      setLoading(true)
+      const { error } = await supabase.auth.updateUser({ password })
+      setLoading(false)
+      if (error) { setError('Impossible de mettre a jour le mot de passe. Le lien a peut-etre expire.'); return }
+      setSuccess('Mot de passe mis a jour !')
+      setTimeout(() => { window.location.href = '/dashboard' }, 900)
+      return
+    }
+
     if (!email || !password) { setError('Remplis tous les champs.'); return }
     if (password.length < 6) { setError('Mot de passe : 6 caracteres minimum.'); return }
-    setLoading(true); setError(''); setSuccess('')
+    setLoading(true)
     if (mode === 'login') {
       const { error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) { setError('Email ou mot de passe incorrect.'); setLoading(false); return }
@@ -47,6 +84,26 @@ export default function Auth() {
     fontFamily: '"Inter",system-ui,sans-serif', color: '#111',
     boxSizing: 'border-box', transition: 'border-color 0.15s',
   }
+
+  const titre = {
+    login: 'Connexion', signup: 'Creer un compte',
+    reset: 'Mot de passe oublie', newpassword: 'Nouveau mot de passe',
+  }[mode]
+
+  const sousTitre = {
+    login: 'Content de te revoir !',
+    signup: 'Gratuit pour commencer - aucune carte bancaire',
+    reset: 'Entre ton email, on t\'envoie un lien de reinitialisation.',
+    newpassword: 'Choisis un nouveau mot de passe pour ton compte.',
+  }[mode]
+
+  const boutonLabel = {
+    login: 'Se connecter', signup: 'Creer mon compte gratuit',
+    reset: 'Envoyer le lien', newpassword: 'Mettre a jour',
+  }[mode]
+
+  const afficheEmail = mode !== 'newpassword'
+  const affichePassword = mode !== 'reset'
 
   return (
     <div style={{ minHeight: '100vh', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', fontFamily: '"Inter",system-ui,sans-serif' }}>
@@ -90,25 +147,37 @@ export default function Auth() {
           )}
 
           <h1 style={{ fontSize: isMobile ? '28px' : '32px', fontWeight: '700', color: '#0a0a0f', margin: '0 0 10px', letterSpacing: '-0.5px' }}>
-            {mode === 'login' ? 'Connexion' : 'Creer un compte'}
+            {titre}
           </h1>
           <p style={{ fontSize: '14px', color: '#9ca3af', margin: '0 0 40px' }}>
-            {mode === 'login' ? 'Content de te revoir !' : 'Gratuit pour commencer - aucune carte bancaire'}
+            {sousTitre}
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', marginBottom: '24px' }}>
-            <div>
-              <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>Email</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="marie@email.com" style={INPUT}
-                onFocus={e => e.target.style.borderColor = '#4f46e5'} onBlur={e => e.target.style.borderColor = '#e5e7eb'}
-                onKeyDown={e => e.key === 'Enter' && handleSubmit()} />
-            </div>
-            <div>
-              <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>Mot de passe</label>
-              <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="6 caracteres minimum" style={INPUT}
-                onFocus={e => e.target.style.borderColor = '#4f46e5'} onBlur={e => e.target.style.borderColor = '#e5e7eb'}
-                onKeyDown={e => e.key === 'Enter' && handleSubmit()} />
-            </div>
+            {afficheEmail && (
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>Email</label>
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="marie@email.com" style={INPUT}
+                  onFocus={e => e.target.style.borderColor = '#4f46e5'} onBlur={e => e.target.style.borderColor = '#e5e7eb'}
+                  onKeyDown={e => e.key === 'Enter' && handleSubmit()} />
+              </div>
+            )}
+            {affichePassword && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151' }}>Mot de passe</label>
+                  {mode === 'login' && (
+                    <button onClick={() => { setMode('reset'); setError(''); setSuccess(''); setPassword('') }}
+                      style={{ fontSize: '12px', color: '#4f46e5', fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', padding: 0 }}>
+                      Mot de passe oublie ?
+                    </button>
+                  )}
+                </div>
+                <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder={mode === 'newpassword' ? 'Nouveau mot de passe' : '6 caracteres minimum'} style={INPUT}
+                  onFocus={e => e.target.style.borderColor = '#4f46e5'} onBlur={e => e.target.style.borderColor = '#e5e7eb'}
+                  onKeyDown={e => e.key === 'Enter' && handleSubmit()} />
+              </div>
+            )}
           </div>
 
           {error && <div style={{ padding: '12px 16px', background: '#fef2f2', border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', borderRadius: '9px', fontSize: '13px', color: '#dc2626', marginBottom: '18px' }}>{error}</div>}
@@ -117,16 +186,26 @@ export default function Auth() {
           <button onClick={handleSubmit} disabled={loading}
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '15px', background: loading ? '#a5b4fc' : '#4f46e5', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: '700', cursor: loading ? 'default' : 'pointer', fontFamily: 'inherit', marginBottom: '24px', boxShadow: loading ? 'none' : '0 4px 16px rgba(79,70,229,0.3)' }}>
             {loading && <Loader2 size={16} style={{ animation: 'spin 0.8s linear infinite' }} />}
-            {loading ? 'Chargement...' : mode === 'login' ? 'Se connecter' : 'Creer mon compte gratuit'}
+            {loading ? 'Chargement...' : boutonLabel}
           </button>
           <style>{'@keyframes spin{to{transform:rotate(360deg)}}'}</style>
 
           <div style={{ textAlign: 'center' }}>
-            <span style={{ fontSize: '14px', color: '#9ca3af' }}>{mode === 'login' ? 'Pas encore de compte ? ' : 'Deja un compte ? '}</span>
-            <button onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); setSuccess('') }}
-              style={{ fontSize: '14px', color: '#4f46e5', fontWeight: '700', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', padding: 0 }}>
-              {mode === 'login' ? 'Creer un compte' : 'Se connecter'}
-            </button>
+            {(mode === 'login' || mode === 'signup') && (
+              <>
+                <span style={{ fontSize: '14px', color: '#9ca3af' }}>{mode === 'login' ? 'Pas encore de compte ? ' : 'Deja un compte ? '}</span>
+                <button onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); setSuccess('') }}
+                  style={{ fontSize: '14px', color: '#4f46e5', fontWeight: '700', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', padding: 0 }}>
+                  {mode === 'login' ? 'Creer un compte' : 'Se connecter'}
+                </button>
+              </>
+            )}
+            {(mode === 'reset' || mode === 'newpassword') && (
+              <button onClick={() => { setMode('login'); setError(''); setSuccess('') }}
+                style={{ fontSize: '14px', color: '#4f46e5', fontWeight: '700', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', padding: 0 }}>
+                Retour a la connexion
+              </button>
+            )}
           </div>
           <div style={{ textAlign: 'center', marginTop: '28px' }}>
             <a href="/" style={{ fontSize: '13px', color: '#c4c4c4', textDecoration: 'none' }}>Retour a l'accueil</a>

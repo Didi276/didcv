@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import fetch from 'node-fetch'
 import { ENTREPRISES } from '../api/entreprisesData.js'
 import ws from 'ws'
+import { fileURLToPath } from 'node:url'
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
@@ -544,4 +545,8 @@ async function main() {
     .lt('date_scraping', new Date(Date.now() - 14 * 86400000).toISOString())
 }
 
-main().catch(console.error)
+// N'exécute le scraping complet que si le fichier est lancé directement
+// (`node scripts/scrape-all.js`). Importé ailleurs (ex: revalidation des
+// slugs), il n'expose que ses fonctions sans tout relancer.
+const estLanceDirectement = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]
+if (estLanceDirectement) main().catch(console.error)

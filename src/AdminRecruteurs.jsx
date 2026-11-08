@@ -240,7 +240,7 @@ export default function AdminRecruteurs() {
           // Rangée 2 — Offres
           { key: 'offresDirectes', label: 'Offres directes en base', value: stats.offresDirectes, icon: '💼' },
           { key: 'offresActives', label: 'Offres actives', value: stats.offresActives, icon: '✅' },
-          { key: 'entreprises', label: 'Entreprises scrapées', value: stats.entreprises, icon: '🏭' },
+          { key: 'entreprises', label: 'Entreprises scrapées', value: stats.entreprisesDirectes ?? stats.entreprises, icon: '🏭' },
           { key: 'offresRecruteurs', label: 'Offres publiées par recruteurs', value: stats.offresRecruteurs, icon: '📝' },
           // Rangée 3 — Activité
           { key: 'candidatures', label: 'Candidatures totales', value: stats.candidatures, icon: '📬' },

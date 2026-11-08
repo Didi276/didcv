@@ -1,0 +1,914 @@
+{
+  "date": "2026-11-08T08:14:43.143Z",
+  "total": 576,
+  "ok": 396,
+  "corriges": 16,
+  "irrecuperables": 52,
+  "nonTestes": 112,
+  "corrigesListe": [
+    {
+      "nom": "Doctolib",
+      "ancien": {
+        "ats": "greenhouse",
+        "slug": "doctolib"
+      },
+      "nouveau": {
+        "ats": "ashby",
+        "slug": "doctolib",
+        "offres": 152
+      }
+    },
+    {
+      "nom": "Qonto",
+      "ancien": {
+        "ats": "greenhouse",
+        "slug": "qonto"
+      },
+      "nouveau": {
+        "ats": "ashby",
+        "slug": "qonto",
+        "offres": 53
+      }
+    },
+    {
+      "nom": "Swile",
+      "ancien": {
+        "ats": "greenhouse",
+        "slug": "swile"
+      },
+      "nouveau": {
+        "ats": "lever",
+        "slug": "swile",
+        "offres": 31
+      }
+    },
+    {
+      "nom": "Ledger",
+      "ancien": {
+        "ats": "lever",
+        "slug": "ledger"
+      },
+      "nouveau": {
+        "ats": "ashby",
+        "slug": "ledger",
+        "offres": 14
+      }
+    },
+    {
+      "nom": "Lifen",
+      "ancien": {
+        "ats": "lever",
+        "slug": "lifen"
+      },
+      "nouveau": {
+        "ats": "ashby",
+        "slug": "lifen",
+        "offres": 6
+      }
+    },
+    {
+      "nom": "Lydia Solutions",
+      "ancien": {
+        "ats": "lever",
+        "slug": "lydia"
+      },
+      "nouveau": {
+        "ats": "teamtailor",
+        "slug": "lydiasolutions",
+        "offres": 7
+      }
+    },
+    {
+      "nom": "Groupe SEB",
+      "ancien": {
+        "ats": "smartrecruiters",
+        "slug": "GroupeSEB"
+      },
+      "nouveau": {
+        "ats": "teamtailor",
+        "slug": "groupe",
+        "offres": 56
+      }
+    },
+    {
+      "nom": "Homa Games",
+      "ancien": {
+        "ats": "workable",
+        "slug": "homa-games"
+      },
+      "nouveau": {
+        "ats": "teamtailor",
+        "slug": "homa",
+        "offres": 34
+      }
+    },
+    {
+      "nom": "DBV Technologies",
+      "ancien": {
+        "ats": "greenhouse",
+        "slug": "dbvtechnologies"
+      },
+      "nouveau": {
+        "ats": "teamtailor",
+        "slug": "dbvtechnologies",
+        "offres": 15
+      }
+    },
+    {
+      "nom": "BDO France",
+      "ancien": {
+        "ats": "greenhouse",
+        "slug": "bdofrance"
+      },
+      "nouveau": {
+        "ats": "teamtailor",
+        "slug": "bdofrance",
+        "offres": 100
+      }
+    },
+    {
+      "nom": "Converteo",
+      "ancien": {
+        "ats": "lever",
+        "slug": "converteo"
+      },
+      "nouveau": {
+        "ats": "teamtailor",
+        "slug": "converteo",
+        "offres": 27
+      }
+    },
+    {
+      "nom": "Too Good To Go",
+      "ancien": {
+        "ats": "greenhouse",
+        "slug": "toogoodtogo"
+      },
+      "nouveau": {
+        "ats": "ashby",
+        "slug": "toogoodtogo",
+        "offres": 58
+      }
+    },
+    {
+      "nom": "Qonto",
+      "ancien": {
+        "ats": "lever",
+        "slug": "qonto"
+      },
+      "nouveau": {
+        "ats": "ashby",
+        "slug": "qonto",
+        "offres": 53
+      }
+    },
+    {
+      "nom": "PlayPlay",
+      "ancien": {
+        "ats": "lever",
+        "slug": "playplay"
+      },
+      "nouveau": {
+        "ats": "teamtailor",
+        "slug": "playplay",
+        "offres": 2
+      }
+    },
+    {
+      "nom": "Klaxoon",
+      "ancien": {
+        "ats": "greenhouse",
+        "slug": "klaxoon"
+      },
+      "nouveau": {
+        "ats": "smartrecruiters",
+        "slug": "klaxoon",
+        "offres": 3
+      }
+    },
+    {
+      "nom": "Polar Analytics",
+      "ancien": {
+        "ats": "ashby",
+        "slug": "polaranalytics"
+      },
+      "nouveau": {
+        "ats": "ashby",
+        "slug": "polar",
+        "offres": 3
+      }
+    }
+  ],
+  "irrecuperablesListe": [
+    {
+      "nom": "ManoMano",
+      "ats": "lever",
+      "slug": "manomano"
+    },
+    {
+      "nom": "Talend",
+      "ats": "greenhouse",
+      "slug": "talend"
+    },
+    {
+      "nom": "Kyriba",
+      "ats": "greenhouse",
+      "slug": "kyriba"
+    },
+    {
+      "nom": "Meero",
+      "ats": "greenhouse",
+      "slug": "meero"
+    },
+    {
+      "nom": "Spendesk",
+      "ats": "lever",
+      "slug": "spendesk"
+    },
+    {
+      "nom": "Publicis Groupe",
+      "ats": "greenhouse",
+      "slug": "publicisgroupe"
+    },
+    {
+      "nom": "Luko",
+      "ats": "lever",
+      "slug": "luko"
+    },
+    {
+      "nom": "Meetic",
+      "ats": "lever",
+      "slug": "meetic"
+    },
+    {
+      "nom": "Talentsoft",
+      "ats": "lever",
+      "slug": "talentsoft"
+    },
+    {
+      "nom": "Nuxeo",
+      "ats": "lever",
+      "slug": "nuxeo"
+    },
+    {
+      "nom": "Devialet",
+      "ats": "lever",
+      "slug": "devialet"
+    },
+    {
+      "nom": "Kering",
+      "ats": "smartrecruiters",
+      "slug": "Kering"
+    },
+    {
+      "nom": "Fnac Darty",
+      "ats": "smartrecruiters",
+      "slug": "FnacDarty"
+    },
+    {
+      "nom": "Auchan",
+      "ats": "smartrecruiters",
+      "slug": "Auchan"
+    },
+    {
+      "nom": "Leroy Merlin",
+      "ats": "smartrecruiters",
+      "slug": "LeroyMerlin"
+    },
+    {
+      "nom": "Club Med",
+      "ats": "smartrecruiters",
+      "slug": "ClubMed"
+    },
+    {
+      "nom": "Pierre & Vacances",
+      "ats": "smartrecruiters",
+      "slug": "PierreEtVacances"
+    },
+    {
+      "nom": "Hermès",
+      "ats": "personio",
+      "slug": "Hermes"
+    },
+    {
+      "nom": "Cdiscount",
+      "ats": "smartrecruiters",
+      "slug": "Cdiscount"
+    },
+    {
+      "nom": "Safran",
+      "ats": "workable",
+      "slug": "safrangroup"
+    },
+    {
+      "nom": "Capgemini",
+      "ats": "greenhouse",
+      "slug": "capgemini"
+    },
+    {
+      "nom": "Dior",
+      "ats": "smartrecruiters",
+      "slug": "Dior"
+    },
+    {
+      "nom": "OVHcloud",
+      "ats": "greenhouse",
+      "slug": "ovhcloud"
+    },
+    {
+      "nom": "BCG France",
+      "ats": "greenhouse",
+      "slug": "bcg"
+    },
+    {
+      "nom": "Accenture France",
+      "ats": "recruitee",
+      "slug": "accenture"
+    },
+    {
+      "nom": "CMA CGM",
+      "ats": "greenhouse",
+      "slug": "cma"
+    },
+    {
+      "nom": "Michael Page",
+      "ats": "greenhouse",
+      "slug": "michaelpage"
+    },
+    {
+      "nom": "Robert Half",
+      "ats": "recruitee",
+      "slug": "robert"
+    },
+    {
+      "nom": "Hays France",
+      "ats": "greenhouse",
+      "slug": "hays"
+    },
+    {
+      "nom": "Adecco France",
+      "ats": "recruitee",
+      "slug": "adecco"
+    },
+    {
+      "nom": "Inetum",
+      "ats": "greenhouse",
+      "slug": "inetum"
+    },
+    {
+      "nom": "Onepoint",
+      "ats": "lever",
+      "slug": "onepoint"
+    },
+    {
+      "nom": "Cultura",
+      "ats": "personio",
+      "slug": "cultura"
+    },
+    {
+      "nom": "Aircall",
+      "ats": "lever",
+      "slug": "aircall"
+    },
+    {
+      "nom": "Qare",
+      "ats": "recruitee",
+      "slug": "qare"
+    },
+    {
+      "nom": "Sophia Genetics",
+      "ats": "recruitee",
+      "slug": "sophia"
+    },
+    {
+      "nom": "Treezor",
+      "ats": "teamtailor",
+      "slug": "treezor"
+    },
+    {
+      "nom": "Wakam",
+      "ats": "teamtailor",
+      "slug": "wakam"
+    },
+    {
+      "nom": "DeepLife",
+      "ats": "smartrecruiters",
+      "slug": "deeplife"
+    },
+    {
+      "nom": "Energy Pool",
+      "ats": "smartrecruiters",
+      "slug": "energypool"
+    },
+    {
+      "nom": "Million Victories",
+      "ats": "recruitee",
+      "slug": "million"
+    },
+    {
+      "nom": "Papernest",
+      "ats": "teamtailor",
+      "slug": "papernest"
+    },
+    {
+      "nom": "Tap Nation",
+      "ats": "teamtailor",
+      "slug": "tapnation"
+    },
+    {
+      "nom": "Upway",
+      "ats": "recruitee",
+      "slug": "upway"
+    },
+    {
+      "nom": "Webnet",
+      "ats": "recruitee",
+      "slug": "webnet"
+    },
+    {
+      "nom": "Adaxis",
+      "ats": "teamtailor",
+      "slug": "adaxis"
+    },
+    {
+      "nom": "Lago",
+      "ats": "ashby",
+      "slug": "lago"
+    },
+    {
+      "nom": "Libon",
+      "ats": "teamtailor",
+      "slug": "libon"
+    },
+    {
+      "nom": "OpusMajor",
+      "ats": "teamtailor",
+      "slug": "opusmajor"
+    },
+    {
+      "nom": "Paragon Mobility",
+      "ats": "ashby",
+      "slug": "paragon"
+    },
+    {
+      "nom": "Sidetrade",
+      "ats": "smartrecruiters",
+      "slug": "sidetrade"
+    },
+    {
+      "nom": "Synapse Medicine",
+      "ats": "teamtailor",
+      "slug": "synapsemedicine"
+    }
+  ],
+  "nonTestesListe": [
+    {
+      "nom": "Criteo",
+      "ats": "custom"
+    },
+    {
+      "nom": "Maif",
+      "ats": "talentsoft"
+    },
+    {
+      "nom": "Maisons du Monde",
+      "ats": "workday"
+    },
+    {
+      "nom": "Sanofi",
+      "ats": "workday"
+    },
+    {
+      "nom": "AXA",
+      "ats": "workday"
+    },
+    {
+      "nom": "Danone",
+      "ats": "custom"
+    },
+    {
+      "nom": "Engie",
+      "ats": "workday"
+    },
+    {
+      "nom": "Pernod Ricard",
+      "ats": "workday"
+    },
+    {
+      "nom": "Legrand",
+      "ats": "custom"
+    },
+    {
+      "nom": "Dassault Systèmes",
+      "ats": "workday"
+    },
+    {
+      "nom": "Veolia",
+      "ats": "workday"
+    },
+    {
+      "nom": "Rexel",
+      "ats": "workday"
+    },
+    {
+      "nom": "BioMérieux",
+      "ats": "workday"
+    },
+    {
+      "nom": "Stellantis",
+      "ats": "workday"
+    },
+    {
+      "nom": "Amundi",
+      "ats": "talentsoft"
+    },
+    {
+      "nom": "Nexans",
+      "ats": "workday"
+    },
+    {
+      "nom": "Imerys",
+      "ats": "workday"
+    },
+    {
+      "nom": "Michelin",
+      "ats": "workday"
+    },
+    {
+      "nom": "Plastic Omnium",
+      "ats": "rippling"
+    },
+    {
+      "nom": "Rémy Cointreau",
+      "ats": "workday"
+    },
+    {
+      "nom": "Korian",
+      "ats": "workday"
+    },
+    {
+      "nom": "Ipsen",
+      "ats": "workday"
+    },
+    {
+      "nom": "Vallourec",
+      "ats": "workday"
+    },
+    {
+      "nom": "Servier",
+      "ats": "workday"
+    },
+    {
+      "nom": "TotalEnergies",
+      "ats": "successfactors"
+    },
+    {
+      "nom": "Airbus",
+      "ats": "successfactors"
+    },
+    {
+      "nom": "Renault",
+      "ats": "successfactors"
+    },
+    {
+      "nom": "Orange",
+      "ats": "talentsoft"
+    },
+    {
+      "nom": "Arkema",
+      "ats": "successfactors"
+    },
+    {
+      "nom": "Alstom",
+      "ats": "successfactors"
+    },
+    {
+      "nom": "Deloitte France",
+      "ats": "workday"
+    },
+    {
+      "nom": "Société Générale",
+      "ats": "successfactors"
+    },
+    {
+      "nom": "Bouygues Telecom",
+      "ats": "successfactors"
+    },
+    {
+      "nom": "EDF",
+      "ats": "successfactors"
+    },
+    {
+      "nom": "BNP Paribas",
+      "ats": "custom"
+    },
+    {
+      "nom": "Carrefour",
+      "ats": "custom"
+    },
+    {
+      "nom": "Vinci",
+      "ats": "taleo"
+    },
+    {
+      "nom": "Bouygues Construction",
+      "ats": "custom"
+    },
+    {
+      "nom": "Vivendi",
+      "ats": "custom"
+    },
+    {
+      "nom": "SNCF",
+      "ats": "custom"
+    },
+    {
+      "nom": "RATP",
+      "ats": "custom"
+    },
+    {
+      "nom": "La Poste",
+      "ats": "custom"
+    },
+    {
+      "nom": "EDF Renouvelables",
+      "ats": "custom"
+    },
+    {
+      "nom": "Crédit Agricole",
+      "ats": "taleo"
+    },
+    {
+      "nom": "Natixis",
+      "ats": "custom"
+    },
+    {
+      "nom": "Lagardère",
+      "ats": "custom"
+    },
+    {
+      "nom": "Elior Group",
+      "ats": "talentsoft"
+    },
+    {
+      "nom": "Eiffage",
+      "ats": "workday"
+    },
+    {
+      "nom": "Colas",
+      "ats": "custom"
+    },
+    {
+      "nom": "Sopra Steria",
+      "ats": "custom"
+    },
+    {
+      "nom": "Atos",
+      "ats": "custom"
+    },
+    {
+      "nom": "Chanel",
+      "ats": "talentsoft"
+    },
+    {
+      "nom": "Richemont/Cartier",
+      "ats": "workday"
+    },
+    {
+      "nom": "Pierre Fabre",
+      "ats": "workday"
+    },
+    {
+      "nom": "Biomérieux",
+      "ats": "workday"
+    },
+    {
+      "nom": "Sartorius Stedim",
+      "ats": "workday"
+    },
+    {
+      "nom": "Eurazeo",
+      "ats": "custom"
+    },
+    {
+      "nom": "Soitec",
+      "ats": "workday"
+    },
+    {
+      "nom": "CGG",
+      "ats": "custom"
+    },
+    {
+      "nom": "BPCE",
+      "ats": "custom"
+    },
+    {
+      "nom": "Banque Postale",
+      "ats": "custom"
+    },
+    {
+      "nom": "CNP Assurances",
+      "ats": "custom"
+    },
+    {
+      "nom": "MAAF",
+      "ats": "custom"
+    },
+    {
+      "nom": "Groupama",
+      "ats": "custom"
+    },
+    {
+      "nom": "GMF",
+      "ats": "custom"
+    },
+    {
+      "nom": "Casino",
+      "ats": "custom"
+    },
+    {
+      "nom": "Système U",
+      "ats": "custom"
+    },
+    {
+      "nom": "Bricorama",
+      "ats": "custom"
+    },
+    {
+      "nom": "Monoprix",
+      "ats": "custom"
+    },
+    {
+      "nom": "H&M France",
+      "ats": "successfactors"
+    },
+    {
+      "nom": "Sephora",
+      "ats": "talentsoft"
+    },
+    {
+      "nom": "Yves Rocher",
+      "ats": "custom"
+    },
+    {
+      "nom": "Infomaniak",
+      "ats": "custom"
+    },
+    {
+      "nom": "Dalkia",
+      "ats": "talentsoft"
+    },
+    {
+      "nom": "Icade",
+      "ats": "talentsoft"
+    },
+    {
+      "nom": "Ramsay Santé",
+      "ats": "custom"
+    },
+    {
+      "nom": "Orpea",
+      "ats": "workday"
+    },
+    {
+      "nom": "Almirall",
+      "ats": "workday"
+    },
+    {
+      "nom": "Boehringer Ingelheim",
+      "ats": "workday"
+    },
+    {
+      "nom": "Guerbet",
+      "ats": "workday"
+    },
+    {
+      "nom": "Laboratoire Expanscience",
+      "ats": "custom"
+    },
+    {
+      "nom": "Biomnis",
+      "ats": "custom"
+    },
+    {
+      "nom": "Hartmann France",
+      "ats": "custom"
+    },
+    {
+      "nom": "Zambon France",
+      "ats": "custom"
+    },
+    {
+      "nom": "McKinsey France",
+      "ats": "workday"
+    },
+    {
+      "nom": "Bain & Company France",
+      "ats": "workday"
+    },
+    {
+      "nom": "PwC France",
+      "ats": "workday"
+    },
+    {
+      "nom": "KPMG France",
+      "ats": "custom"
+    },
+    {
+      "nom": "Framatome",
+      "ats": "successfactors"
+    },
+    {
+      "nom": "Naval Group",
+      "ats": "successfactors"
+    },
+    {
+      "nom": "MBDA",
+      "ats": "custom"
+    },
+    {
+      "nom": "Nexter",
+      "ats": "custom"
+    },
+    {
+      "nom": "Faurecia/Forvia",
+      "ats": "workday"
+    },
+    {
+      "nom": "Valeo",
+      "ats": "workday"
+    },
+    {
+      "nom": "Roquette",
+      "ats": "workday"
+    },
+    {
+      "nom": "Lactalis",
+      "ats": "custom"
+    },
+    {
+      "nom": "Bonduelle",
+      "ats": "workday"
+    },
+    {
+      "nom": "InVivo",
+      "ats": "custom"
+    },
+    {
+      "nom": "Bigard",
+      "ats": "custom"
+    },
+    {
+      "nom": "XPO Logistics France",
+      "ats": "workday"
+    },
+    {
+      "nom": "Transdev",
+      "ats": "custom"
+    },
+    {
+      "nom": "PageGroup",
+      "ats": "workday"
+    },
+    {
+      "nom": "Expectra",
+      "ats": "workday"
+    },
+    {
+      "nom": "McKinsey France",
+      "ats": "workday"
+    },
+    {
+      "nom": "AG2R La Mondiale",
+      "ats": "workday"
+    },
+    {
+      "nom": "Banque de France",
+      "ats": "workday"
+    },
+    {
+      "nom": "Deloitte France",
+      "ats": "workday"
+    },
+    {
+      "nom": "SNCF Connect Tech",
+      "ats": "workday"
+    },
+    {
+      "nom": "La Mutuelle Générale",
+      "ats": "workday"
+    },
+    {
+      "nom": "Abeille Assurances",
+      "ats": "workday"
+    },
+    {
+      "nom": "Carglass",
+      "ats": "talentsoft"
+    },
+    {
+      "nom": "AGIRC-ARRCO",
+      "ats": "talentsoft"
+    }
+  ]
+}
