@@ -212,7 +212,7 @@ export default async function handler(req, res) {
   const searchHimalayas = async () => {
     const r = await fetch(
       `https://himalayas.app/jobs/api?search=${encodeURIComponent(query)}&limit=30`,
-      { headers: { Accept: 'application/json' } }
+      { headers: { Accept: 'application/json', 'User-Agent': 'DidJob-Aggregator/1.0 (contact@did-job.com)' } }
     )
     return r.json()
   }
