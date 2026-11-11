@@ -1,0 +1,5 @@
+# Fichier de données (liste des entreprises) importé uniquement par les scripts
+# de scraping (GitHub Actions), jamais par un endpoint du site. On l'exclut de
+# l'upload Vercel pour qu'il ne compte pas comme une fonction serverless
+# (limite de 12 sur le plan Hobby).
+api/entreprisesData.js
