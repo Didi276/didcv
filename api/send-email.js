@@ -3,7 +3,7 @@
 // (DNS) dans le compte Resend, sinon l'envoi échoue.
 import { Resend } from 'resend'
 import { emailBienvenueDidJob } from '../src/emailTemplates.js'
-import { rateLimit } from './middleware/rateLimit.js'
+import { rateLimit } from './_lib/rateLimit.js'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 

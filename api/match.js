@@ -2,7 +2,7 @@
 // (API Alibaba Cloud, compatible OpenAI). Nécessite QWEN_API_KEY et QWEN_BASE_URL.
 // Migré depuis Claude (Anthropic) — voir bloc commenté en bas de fichier.
 import { createClient } from '@supabase/supabase-js'
-import { rateLimit } from './middleware/rateLimit.js'
+import { rateLimit } from './_lib/rateLimit.js'
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL,

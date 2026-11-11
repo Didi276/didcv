@@ -2,7 +2,7 @@
 // (API Alibaba Cloud, compatible OpenAI). Nécessite QWEN_API_KEY et QWEN_BASE_URL.
 // Entrée  : POST { cv: {...}, langue: 'en'|'es'|'de'|'it'|'pt'|'nl' }
 // Sortie  : { cv: {...} }  (même structure, champs textuels traduits)
-import { rateLimit } from './middleware/rateLimit.js'
+import { rateLimit } from './_lib/rateLimit.js'
 
 const LANGUES = {
   en: 'anglais',
