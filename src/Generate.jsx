@@ -10,6 +10,7 @@ import { supabase } from './supabase'
 import { CVTemplatePro, TEMPLATES_PRO_META } from './CVTemplatesPro'
 import { TEMPLATES_EXTRA_META } from './CVTemplatesExtra'
 import CVEditorBlocks from './CVEditorBlocks'
+import TraducteurCV from './TraducteurCV'
 import Navbar from './Navbar'
 import { detecterSecteur, getSecteurConfig, buildPromptCV } from './secteurConfig'
 import { downloadCVasPDF, downloadLettreasePDF } from './pdfUtils'
@@ -133,6 +134,7 @@ export default function Generate() {
   const [loading, setLoading] = useState(false)
   const [progress, setProgress] = useState('')
   const [cvData, setCvData] = useState(null)
+  const [cvTraduit, setCvTraduit] = useState(null)
   const [lettre, setLettre] = useState('')
   const [activeTab, setActiveTab] = useState('cv')
   const [showEditor, setShowEditor] = useState(false)
@@ -958,7 +960,10 @@ Retourne UNIQUEMENT le texte structuré avec les marqueurs. Aucun commentaire.`
                     <Palette size={14} />
                   </button>
                 </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  {activeTab === 'cv' && (
+                    <TraducteurCV cv={cvData} onTraduit={setCvTraduit} />
+                  )}
                   {activeTab === 'cv' && (
                     <button onClick={handleDownloadCV}
                       style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '7px 16px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}>
@@ -983,7 +988,7 @@ Retourne UNIQUEMENT le texte structuré avec les marqueurs. Aucun commentaire.`
                     <div style={{ width: Math.round(794 * cvScale), height: Math.round(1123 * cvScale), flexShrink: 0, boxShadow: '0 8px 40px rgba(0,0,0,0.15)', borderRadius: '4px', overflow: 'hidden', background: '#fff' }}>
                       <div style={{ width: '794px', height: '1123px', transform: `scale(${cvScale})`, transformOrigin: 'top left' }}>
                         <div ref={cvContentRef} style={{ width: '794px', transform: `scale(${pageFit})`, transformOrigin: 'top left' }}>
-                          <CVTemplatePro cvData={cvData} template={currentTemplate} color={customColor} />
+                          <CVTemplatePro cvData={cvTraduit || cvData} template={currentTemplate} color={customColor} />
                         </div>
                       </div>
                     </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { FileText, Menu, X, Target } from 'lucide-react'
+import { FileText, Menu, X, Target, Sparkles } from 'lucide-react'
 import { supabase } from './supabase'
 
 const NAV_CSS = `
@@ -79,6 +79,7 @@ export default function Navbar({ currentPage = '' }) {
   const mainLinks = [
     { page: 'dashboard',    label: 'Dashboard',     to: '/dashboard',    auth: true },
     { page: 'offres',       label: 'Offres',        to: '/offres',       auth: true },
+    { page: 'offres-pour-vous', label: 'Pour vous', to: '/offres-pour-vous', auth: true, Icon: Sparkles },
     { page: 'generate',     label: 'Générer CV',    to: '/templates',    auth: true },
     { page: 'entretien',    label: 'Entretien',     to: '/entretien',    auth: true, Icon: Target },
     { page: 'candidatures', label: 'Candidatures',  to: '/candidatures', auth: true },

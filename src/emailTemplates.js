@@ -105,6 +105,26 @@ export const emailBienvenueDidJob = (prenom) => emailShell({
   ctaLabel: 'Compléter mon profil',
 })
 
+export const emailAlertesOffres = (prenom, offres, posteRecherche) => emailShell({
+  titre: offres.length > 1 ? `${offres.length} nouvelles offres pour toi` : 'Une nouvelle offre pour toi',
+  sousTitre: posteRecherche ? `En lien avec « ${posteRecherche} »` : 'Sélectionnées selon ton profil',
+  corps: `
+    <p>Bonjour ${prenom},</p>
+    <p>Voici ${offres.length > 1 ? 'les nouvelles offres' : 'la nouvelle offre'} qui ${offres.length > 1 ? 'correspondent' : 'correspond'} à ta recherche :</p>
+    <div class="section">
+      ${offres.map(o => `
+        <div class="item" style="padding:12px 0">
+          <a href="${o.url || '#'}" style="color:#4f46e5;text-decoration:none;font-weight:700;font-size:15px">${o.titre}</a>
+          <div style="color:#6b7280;font-size:13px;margin-top:3px">${[o.entreprise, o.lieu, o.type_contrat].filter(Boolean).join(' · ')}</div>
+        </div>
+      `).join('')}
+    </div>
+    <p style="font-size:13px;color:#9ca3af">Tu reçois cet email car tes rappels DidJob sont activés. Tu peux les couper depuis ton tableau de bord.</p>
+  `,
+  ctaUrl: 'https://did-job.com/offres-pour-vous',
+  ctaLabel: 'Voir toutes mes offres',
+})
+
 export const emailResumeHebdomadaire = (prenom, stats, conseil, lienEntretien) => emailShell({
   titre: 'Ton résumé de la semaine',
   sousTitre: 'DidJob',

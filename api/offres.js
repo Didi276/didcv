@@ -1,4 +1,4 @@
-// api/offres.js — France Travail + Jooble + Arbeitnow + RemoteOK + Remotive + Jobicy + Himalayas + Adzuna + Direct (offres_directes)
+// api/offres.js — France Travail + Jooble + Arbeitnow + RemoteOK + Remotive + Jobicy + Adzuna + Direct (offres_directes)
 
 import { createClient } from '@supabase/supabase-js'
 
@@ -208,15 +208,6 @@ export default async function handler(req, res) {
     return r.json()
   }
 
-  // ─── Himalayas (gratuit, sans clé, recherche par mot-clé, offres remote) ─
-  const searchHimalayas = async () => {
-    const r = await fetch(
-      `https://himalayas.app/jobs/api?search=${encodeURIComponent(query)}&limit=30`,
-      { headers: { Accept: 'application/json', 'User-Agent': 'DidJob-Aggregator/1.0 (contact@did-job.com)' } }
-    )
-    return r.json()
-  }
-
   // ─── Adzuna ───────────────────────────────────────────
   const searchAdzuna = async () => {
     const pages = [1, 2, 3, 4, 5]
@@ -255,14 +246,13 @@ export default async function handler(req, res) {
   }
 
   // ─── Appels parallèles ────────────────────────────────
-  const [ftRes, cjRes, aRes, rkRes, rmRes, jbRes, hmRes, azRes, ddRes] = await Promise.allSettled([
+  const [ftRes, cjRes, aRes, rkRes, rmRes, jbRes, azRes, ddRes] = await Promise.allSettled([
     withTimeout(searchFT(), 20000),
     withTimeout(searchJooble(), 8000),
     withTimeout(searchArbeitnow(), 15000),
     withTimeout(searchRemoteOK(), 5000),
     withTimeout(searchRemotive(), 8000),
     withTimeout(searchJobicy(), 8000),
-    withTimeout(searchHimalayas(), 8000),
     withTimeout(searchAdzuna(), 15000),
     withTimeout(searchDirectes(), 10000),
   ])

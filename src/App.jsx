@@ -12,6 +12,7 @@ import Entretien from './Entretien'
 import PreparationEntretien from './PreparationEntretien'
 import CVPublic from './CVPublic'
 import Offres from './Offres'
+import OffresPourVous from './OffresPourVous'
 import RecruteurInscription from './RecruteurInscription'
 import RecruteurConnexion from './RecruteurConnexion'
 import RecruteurBanque from './RecruteurBanque'
@@ -62,6 +63,7 @@ function App() {
         <Route path="/dashboard"      element={<Dashboard />} />
         <Route path="/profile"        element={<Profile />} />
         <Route path="/offres"         element={<Offres />} />
+        <Route path="/offres-pour-vous" element={<OffresPourVous />} />
         <Route path="/candidatures"   element={<Candidatures />} />
         <Route path="/formations"     element={<Formations />} />
         <Route path="/entretien"      element={<Entretien />} />

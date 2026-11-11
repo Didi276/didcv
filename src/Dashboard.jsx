@@ -5,6 +5,7 @@ import { supabase } from './supabase'
 import { CVTemplatePro } from './CVTemplatesPro'
 import CVEditorBlocks from './CVEditorBlocks'
 import Navbar from './Navbar'
+import { OffresPourVousApercu } from './OffresPourVous'
 import { downloadCVasPDF, downloadLettreasePDF } from './pdfUtils'
 
 // SQL à exécuter dans Supabase :
@@ -287,6 +288,9 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Offres recommandées (matching IA profil + CV) */}
+      <OffresPourVousApercu />
 
       {/* Mes candidatures en cours */}
       {candidaturesRecentes.length > 0 && (

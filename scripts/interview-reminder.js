@@ -88,14 +88,14 @@ async function main() {
 
   const { data: candidaturesJ1, error: erreurJ1 } = await supabase
     .from('candidatures')
-    .select('id, poste, entreprise, date_entretien, user_id')
+    .select('id, titre, entreprise, date_entretien, user_id')
     .eq('statut', 'entretien')
     .eq('date_entretien', formatDate(j1))
     .eq('rappel_j1_envoye', false)
 
   const { data: candidaturesJ3, error: erreurJ3 } = await supabase
     .from('candidatures')
-    .select('id, poste, entreprise, date_entretien, user_id')
+    .select('id, titre, entreprise, date_entretien, user_id')
     .eq('statut', 'entretien')
     .eq('date_entretien', formatDate(j3))
     .eq('rappel_j3_envoye', false)
@@ -119,7 +119,7 @@ async function main() {
     const ok = await sendReminderEmail(
       profil.email,
       profil.prenom || '',
-      c.poste,
+      c.titre,
       c.entreprise,
       c.date_entretien,
       joursAvant
