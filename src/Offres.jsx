@@ -3,6 +3,7 @@ import { Search, MapPin, Zap, SearchX, ChevronDown, ChevronLeft, Briefcase, Exte
 import Fuse from 'fuse.js'
 import Navbar from './Navbar'
 import { supabase } from './supabase'
+import OffresRecentes, { enregistrerOffreCliquee } from './OffresRecentes'
 
 function useWidth() {
   const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
@@ -291,6 +292,7 @@ export default function Offres() {
 
   const selectionner = (offre) => {
     setSelectedId(offre.id)
+    enregistrerOffreCliquee(offre)
     if (isMobile) setModalMobileOuvert(true)
   }
 
@@ -529,6 +531,9 @@ export default function Offres() {
       </div>
 
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: isMobile ? '16px' : '24px 40px 40px' }}>
+
+        {/* Encart des dernières offres consultées à trier */}
+        <OffresRecentes />
 
         {/* Compteur + tri */}
         {searched && offres.length > 0 && (
