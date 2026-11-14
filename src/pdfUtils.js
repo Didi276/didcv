@@ -68,9 +68,11 @@ ${html}
       el.style.setProperty('overflow', 'visible', 'important');
 
       var cs = window.getComputedStyle(el);
-      var mode = 'other';
+      // twocol = vraies colonnes (flex en ligne). Tout le reste (bloc OU flex
+      // en colonne) est un flux vertical unique : on le répartit comme une
+      // colonne pour que l'espace restant soit équilibré et non laissé en bas.
+      var mode = 'onecol';
       if (cs.display === 'flex' && cs.flexDirection.indexOf('column') === -1) mode = 'twocol';
-      else if (cs.display === 'block') mode = 'onecol';
 
       // Convergence zoom densité + largeur pleine.
       var scale = 1, width = PAGE_WIDTH, naturalH = 0;
