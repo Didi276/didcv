@@ -6,7 +6,10 @@
 const PAGE_HEIGHT = 1123
 const PAGE_WIDTH = 794
 const SCALE_FLOOR = 0.7
-const SCALE_CEILING = 1.12
+// Plafond d'agrandissement : un CV peu rempli est grossi jusqu'à occuper toute
+// la page (régulateur automatique selon le volume de contenu), au lieu de rester
+// petit avec du vide. L'ajustement garde toujours une seule page.
+const SCALE_CEILING = 1.35
 const MAX_GAP_EXTRA = 50
 
 export function downloadCVasPDF(cvElement, prenom, nom) {
