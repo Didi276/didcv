@@ -985,7 +985,7 @@ Retourne UNIQUEMENT le texte structuré avec les marqueurs. Aucun commentaire.`
               </div>
 
               {/* Contenu */}
-              <div ref={previewRef} style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: isMobile ? '16px' : '32px 24px', overflow: 'hidden' }}>
+              <div ref={previewRef} style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: isMobile ? '16px' : '32px 24px', overflow: 'auto' }}>
                 {activeTab === 'cv' ? (() => {
                   const dispo = (previewW || (isMobile ? w : 760)) - (isMobile ? 32 : 48)
                   // Sur PC, on borne aussi par la hauteur dispo pour que toute la
