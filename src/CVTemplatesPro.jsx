@@ -116,12 +116,10 @@ function Meridien({ cvData, color }) {
           <div style={sectionRule} />
           {experiences.map((exp, i) => (
             <div key={i} style={{ marginBottom: i < experiences.length - 1 ? '22px' : 0 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#111827' }}>{exp.poste}</div>
-                <div style={{ fontSize: '10.5px', fontWeight: 400, color: '#9ca3af' }}>{exp.periode}</div>
-              </div>
+              <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#111827' }}>{exp.poste}</div>
               <div style={{ fontSize: '12px', fontWeight: 500, color, marginTop: '3px', marginBottom: '8px' }}>
                 {[exp.entreprise, exp.lieu].filter(Boolean).join(' · ')}
+                {exp.periode && <span style={{ color: '#9ca3af', fontWeight: 400 }}> · {exp.periode}</span>}
               </div>
               {exp.missions?.length > 0 && (
                 <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
@@ -145,12 +143,10 @@ function Meridien({ cvData, color }) {
           <div style={sectionRule} />
           {formations.map((f, i) => (
             <div key={i} style={{ marginBottom: i < formations.length - 1 ? '22px' : 0 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#111827' }}>{f.diplome}</div>
-                <div style={{ fontSize: '10.5px', fontWeight: 400, color: '#9ca3af' }}>{f.periode}</div>
-              </div>
+              <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#111827' }}>{f.diplome}</div>
               <div style={{ fontSize: '12px', fontWeight: 500, color, marginTop: '3px', marginBottom: '4px' }}>
                 {[f.etablissement, f.mention].filter(Boolean).join(' — ')}
+                {f.periode && <span style={{ color: '#9ca3af', fontWeight: 400 }}> · {f.periode}</span>}
               </div>
               {f.description && (
                 <div style={{ fontSize: '11px', color: '#4b5563', lineHeight: 1.6 }}>{f.description}</div>
