@@ -145,10 +145,15 @@ export default function Generate() {
   const [offreActive, setOffreActive] = useState(null)
   const previewRef = useRef(null)
   const [previewW, setPreviewW] = useState(0)
+  const [previewH, setPreviewH] = useState(0)
 
   useEffect(() => {
     if (!previewRef.current) return
-    const mesurer = () => { if (previewRef.current) setPreviewW(previewRef.current.clientWidth) }
+    const mesurer = () => {
+      if (!previewRef.current) return
+      setPreviewW(previewRef.current.clientWidth)
+      setPreviewH(previewRef.current.clientHeight)
+    }
     mesurer()
     const ro = new ResizeObserver(mesurer)
     ro.observe(previewRef.current)
@@ -983,7 +988,10 @@ Retourne UNIQUEMENT le texte structuré avec les marqueurs. Aucun commentaire.`
               <div ref={previewRef} style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: isMobile ? '16px' : '32px 24px', overflow: 'hidden' }}>
                 {activeTab === 'cv' ? (() => {
                   const dispo = (previewW || (isMobile ? w : 760)) - (isMobile ? 32 : 48)
-                  const cvScale = Math.max(0.12, Math.min(1, dispo / 794))
+                  // Sur PC, on borne aussi par la hauteur dispo pour que toute la
+                  // page A4 tienne à l'écran (sinon le bas du CV est coupé).
+                  const dispoH = isMobile ? Infinity : (previewH ? Math.max(200, previewH - 64) : Infinity)
+                  const cvScale = Math.max(0.12, Math.min(1, dispo / 794, dispoH / 1123))
                   return (
                     <div style={{ width: Math.round(794 * cvScale), height: Math.round(1123 * cvScale), flexShrink: 0, boxShadow: '0 8px 40px rgba(0,0,0,0.15)', borderRadius: '4px', overflow: 'hidden', background: '#fff' }}>
                       <div style={{ width: '794px', height: '1123px', transform: `scale(${cvScale})`, transformOrigin: 'top left' }}>
