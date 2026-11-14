@@ -19,9 +19,13 @@ function PhotoCV({ photo, initiales, size = 90, color, forme = 'rond', showPhoto
   }
   const borderRadius = formes[forme] || '50%'
 
+  // Photos agrandies (~13 %) et cadrées sur le haut du portrait pour ne pas
+  // couper le visage. Appliqué ici, donc à tous les modèles qui affichent une photo.
+  const s = Math.round(size * 1.13)
+
   const style = {
-    width: size, height: size, borderRadius,
-    objectFit: 'cover', display: 'block',
+    width: s, height: s, borderRadius,
+    objectFit: 'cover', objectPosition: 'center 22%', display: 'block',
     flexShrink: 0,
   }
 
@@ -36,7 +40,7 @@ function PhotoCV({ photo, initiales, size = 90, color, forme = 'rond', showPhoto
       border: '2px solid ' + color + '40',
       display: 'flex', alignItems: 'center',
       justifyContent: 'center',
-      color: color, fontSize: size * 0.3,
+      color: color, fontSize: s * 0.3,
       fontWeight: 700, letterSpacing: '-0.5px',
       fontFamily: 'Inter, sans-serif',
     }}>

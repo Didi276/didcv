@@ -6,10 +6,12 @@ function Avatar({ cvData, size = 70, shape = 'circle' }) {
   const borderRadius = shape === 'circle' ? '50%' : shape === 'rounded' ? '12px' : '4px'
   if (cvData.photo === null) return null
   const src = cvData.photo || PHOTO_DEMO
+  // Photos agrandies (~13 %) et cadrées sur le haut du portrait (visage).
+  const s = Math.round(size * 1.13)
   return (
     <img src={src} alt="Photo" loading="lazy" style={{
-      width: size, height: size, borderRadius,
-      objectFit: 'cover', display: 'block', flexShrink: 0,
+      width: s, height: s, borderRadius,
+      objectFit: 'cover', objectPosition: 'center 22%', display: 'block', flexShrink: 0,
       border: cvData.photo ? 'none' : '2px dashed rgba(128,128,128,0.25)'
     }} />
   )
