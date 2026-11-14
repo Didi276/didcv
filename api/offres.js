@@ -418,37 +418,6 @@ export default async function handler(req, res) {
       })
   }
 
-  // ─── Himalayas ────────────────────────────────────────
-  if (hmRes.status === 'fulfilled' && Array.isArray(hmRes.value?.jobs)) {
-    const restrictionsOuvertesFrance = (arr) => {
-      if (!Array.isArray(arr) || arr.length === 0) return true
-      return arr.some(x => {
-        const l = (x || '').toLowerCase()
-        return l.includes('france') || l.includes('europe') || l.includes('emea') ||
-          l.includes('worldwide') || l.includes('anywhere')
-      })
-    }
-    hmRes.value.jobs
-      .filter(job => restrictionsOuvertesFrance(job.locationRestrictions))
-      .slice(0, 20)
-      .forEach(job => {
-        offres.push({
-          id: `him-${job.guid}`,
-          source: 'Himalayas',
-          titre: job.title || '',
-          entreprise: job.companyName || '',
-          lieu: (Array.isArray(job.locationRestrictions) && job.locationRestrictions.length) ? job.locationRestrictions.join(', ') : 'Remote',
-          date: job.pubDate ? new Date(job.pubDate * 1000).toISOString() : '',
-          description: (job.excerpt || job.description || '').replace(/<[^>]*>/g, '').substring(0, 600),
-          url: job.applicationLink || '',
-          type: Array.isArray(job.employmentType) ? job.employmentType.join(', ') : (job.employmentType || 'Remote'),
-          salaire: job.minSalary ? `${job.minSalary}${job.currency || ''} - ${job.maxSalary}${job.currency || ''}` : '',
-          experience: Array.isArray(job.seniority) ? job.seniority.join(', ') : (job.seniority || ''),
-          remote: true,
-        })
-      })
-  }
-
   // ─── Adzuna ───────────────────────────────────────────
   if (azRes.status === 'fulfilled' && azRes.value?.results) {
     azRes.value.results.forEach(job => {
@@ -615,7 +584,6 @@ export default async function handler(req, res) {
     'RemoteOK': 1,
     'Remotive': 1,
     'Jobicy': 1,
-    'Himalayas': 1,
   }
 
   const melange = []
@@ -627,7 +595,7 @@ export default async function handler(req, res) {
     encore = false
 
     // Ordre de priorité dans chaque tour
-    const ordre = ['Direct', 'France Travail', 'Jooble', 'Adzuna', 'Arbeitnow', 'RemoteOK', 'Remotive', 'Jobicy', 'Himalayas']
+    const ordre = ['Direct', 'France Travail', 'Jooble', 'Adzuna', 'Arbeitnow', 'RemoteOK', 'Remotive', 'Jobicy']
     const sources = [...ordre.filter(s => parSource[s]),
                      ...Object.keys(parSource).filter(s => !ordre.includes(s))]
 
